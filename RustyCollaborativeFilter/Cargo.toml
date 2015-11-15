@@ -1,0 +1,4 @@
+[package]
+name = "rusty_collaborative_filter"
+version = "0.1.0"
+authors = ["james <LucasJ94@hotmail.co.uk>"]
