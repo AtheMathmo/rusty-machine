@@ -111,6 +111,9 @@ impl Add<Matrix> for Matrix {
 	type Output = Matrix;
 
 	fn add(self, m: Matrix) -> Matrix {
+		assert!(self.cols == m.cols);
+		assert!(self.rows == m.rows);
+
 		let new_data = self.data.into_iter().enumerate().map(|(i,v)| v + m.data[i]).collect();
 
         Matrix {
@@ -125,6 +128,9 @@ impl Sub<Matrix> for Matrix {
 	type Output = Matrix;
 
 	fn sub(self, m: Matrix) -> Matrix {
+		assert!(self.cols == m.cols);
+		assert!(self.rows == m.rows);
+
 		let new_data = self.data.into_iter().enumerate().map(|(i,v)| v - m.data[i]).collect();
 
         Matrix {
@@ -139,6 +145,8 @@ impl Div<f32> for Matrix {
 	type Output = Matrix;
 
 	fn div(self, f: f32) -> Matrix {
+		assert!(f != 0.0)
+		
 		let new_data = self.data.into_iter().map(|v| v / f).collect();
 
         Matrix {
