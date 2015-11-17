@@ -3,38 +3,39 @@ use std::ops::Add;
 use std::ops::Div;
 
 struct Matrix {
-	dim1: i32,
-	dim2: i32
+	cols: i32,
+	rows: i32
 }
 
 impl Mul<f32> for Matrix {
 	type Output = Matrix;
 
-	fn mul(self, f: f32) -> Matrix {
-
+	fn mul(self, m: f32) -> Matrix {
+		return self;
 	}
 }
 
 impl Mul<Matrix> for Matrix {
 	type Output = Matrix;
 
-	fn mul(self, f: Matrix) -> Matrix {
+	fn mul(self, m: Matrix) -> Matrix {
 		// Will use Strassen algorithm if large, traditional otherwise
+		return self;
 	}
 }
 
 impl Add<Matrix> for Matrix {
 	type Output = Matrix;
 
-	fn mul(self, f: Matrix) -> Matrix {
-
+	fn add(self, m: Matrix) -> Matrix {
+		return self;
 	}
 }
 
 impl Div<f32> for Matrix {
 	type Output = Matrix;
 
-	fn mul(self, f: f32) -> Matrix {
-
+	fn div(self, f: f32) -> Matrix {
+		return self;
 	}
 }
