@@ -55,6 +55,7 @@ impl Matrix {
     }
 }
 
+
 impl Mul<f32> for Matrix {
     type Output = Matrix;
 
@@ -92,11 +93,45 @@ impl Add<f32> for Matrix {
     }
 }
 
+impl Sub<f32> for Matrix {
+	type Output = Matrix;
+
+	fn sub(self, f: f32) -> Matrix {
+		let new_data = self.data.into_iter().map(|v| v - f).collect();
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data
+        }
+    }
+}
+
 impl Add<Matrix> for Matrix {
 	type Output = Matrix;
 
 	fn add(self, m: Matrix) -> Matrix {
-		return self;
+		let new_data = self.data.into_iter().enumerate().map(|(i,v)| v + m.data[i]).collect();
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data
+        }
+	}
+}
+
+impl Sub<Matrix> for Matrix {
+	type Output = Matrix;
+
+	fn sub(self, m: Matrix) -> Matrix {
+		let new_data = self.data.into_iter().enumerate().map(|(i,v)| v - m.data[i]).collect();
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data
+        }
 	}
 }
 
