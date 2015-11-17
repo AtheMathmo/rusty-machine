@@ -58,8 +58,8 @@ impl Matrix {
 impl Mul<f32> for Matrix {
     type Output = Matrix;
 
-    fn mul(self, m: f32) -> Matrix {
-        let new_data = self.data.into_iter().map(|v| v * m).collect();
+    fn mul(self, f: f32) -> Matrix {
+        let new_data = self.data.into_iter().map(|v| v * f).collect();
 
         Matrix {
             cols: self.cols,
@@ -81,13 +81,15 @@ impl Mul<Matrix> for Matrix {
 impl Add<f32> for Matrix {
 	type Output = Matrix;
 
-	fn add(self, m: f32) -> Matrix {
-		for entry in &self.data {
-			entry + m;
-		}
+	fn add(self, f: f32) -> Matrix {
+		let new_data = self.data.into_iter().map(|v| v + f).collect();
 
-		return self;
-	}
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data
+        }
+    }
 }
 
 impl Add<Matrix> for Matrix {
@@ -102,6 +104,12 @@ impl Div<f32> for Matrix {
 	type Output = Matrix;
 
 	fn div(self, f: f32) -> Matrix {
-		return self;
+		let new_data = self.data.into_iter().map(|v| v / f).collect();
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data
+        }
 	}
 }
