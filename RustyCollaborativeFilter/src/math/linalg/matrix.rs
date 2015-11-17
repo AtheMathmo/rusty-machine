@@ -24,7 +24,7 @@ impl Matrix {
     }
 
     fn identity(size: usize) -> Matrix {
-    	let mut data = Vec::with_capacity(size * size);
+    	let mut data = vec![0.0; size * size];
 
     	for i in 0..size
     	{
@@ -40,7 +40,7 @@ impl Matrix {
 
     fn from_diag(diag: &Vec<f32>) -> Matrix {
     	let size = diag.len();
-    	let mut data = Vec::with_capacity(size * size);
+    	let mut data = vec![0.0; size * size];
 
     	for i in 0..size
     	{
