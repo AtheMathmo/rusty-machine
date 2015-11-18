@@ -145,7 +145,7 @@ impl Div<f32> for Matrix {
 	type Output = Matrix;
 
 	fn div(self, f: f32) -> Matrix {
-		assert!(f != 0.0)
+		assert!(f != 0.0);
 		
 		let new_data = self.data.into_iter().map(|v| v / f).collect();
 
@@ -154,5 +154,16 @@ impl Div<f32> for Matrix {
             rows: self.rows,
             data: new_data
         }
+	}
+}
+
+impl Index<[usize; 2]> for Matrix {
+	type Output = f32;
+
+	fn index(&self, idx : [usize; 2]) -> &f32 {
+		assert!(idx[0] < self.cols);
+		assert!(idx[1] < self.rows);
+
+		&self.data[idx[0] * self.cols + idx[1]]
 	}
 }
