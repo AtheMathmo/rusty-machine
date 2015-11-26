@@ -1,4 +1,5 @@
 use std::ops::{Mul, Add, Div, Sub, Index};
+use math::linalg::vector::Vector;
 
 struct Matrix {
 	cols: usize,
@@ -79,6 +80,29 @@ impl Mul<Matrix> for Matrix {
 	}
 }
 
+impl Mul<Vector> for Matrix {
+    type Output = Vector;
+
+    fn mul(self, v: Vector) -> Vector {
+        let mut new_data = vec![0.0; v.size];
+
+        for i in 0..self.rows
+        {
+            let mut sum = 0.0;
+            for j in 0..self.cols
+            {
+                sum += self.data[i * self.cols + j] * v.data[j];
+            }
+
+            new_data[i] = sum;
+        }
+
+        return Vector {
+            size: v.size,
+            data: new_data
+        }
+    }
+}
 impl Add<f32> for Matrix {
 	type Output = Matrix;
 

@@ -1,14 +1,14 @@
 use std::ops::{Mul, Add, Div, Sub, Index};
 
-struct Vector {
-	size: usize,
-	data: Vec<f32>
+pub struct Vector {
+	pub size: usize,
+	pub data: Vec<f32>
 }
 
 impl Vector {
     fn new(size: usize, data: Vec<f32>) -> Vector {
         Vector {
-            size: size
+            size: size,
             data: data
         }
     }
