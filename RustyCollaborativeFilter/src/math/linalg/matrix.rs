@@ -84,6 +84,8 @@ impl Mul<Vector> for Matrix {
     type Output = Vector;
 
     fn mul(self, v: Vector) -> Vector {
+        assert!(v.size == self.cols);
+
         let mut new_data = vec![0.0; v.size];
 
         for i in 0..self.rows
@@ -91,7 +93,7 @@ impl Mul<Vector> for Matrix {
             let mut sum = 0.0;
             for j in 0..self.cols
             {
-                sum += self.data[i * self.cols + j] * v.data[j];
+                sum += self.data[i * self.cols + j] * v[j];
             }
 
             new_data[i] = sum;
@@ -103,6 +105,7 @@ impl Mul<Vector> for Matrix {
         }
     }
 }
+
 impl Add<f32> for Matrix {
 	type Output = Matrix;
 
