@@ -21,7 +21,7 @@ impl Vector {
         }
     }
 
-    fn dot(self, v: Vector) -> f32 {
+    fn dot(&self, v: Vector) -> f32 {
     	let len = cmp::min(self.size, v.size);
         let mut xs = &self.data[..len];
         let mut ys = &v.data[..len];

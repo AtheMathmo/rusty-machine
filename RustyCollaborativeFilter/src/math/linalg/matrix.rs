@@ -54,6 +54,23 @@ impl Matrix {
             data: data
         }
     }
+
+    fn transpose(&self) -> Matrix {
+        let mut new_data = vec![0.0; self.cols * self.rows];
+        for i in 0..self.cols
+        {
+            for j in 0..self.rows
+            {
+                new_data[j*self.cols+i] = self.data[i*self.rows + j];
+            }
+        }
+
+        Matrix {
+            cols: self.rows,
+            rows: self.cols,
+            data: new_data
+        }
+    }
 }
 
 
