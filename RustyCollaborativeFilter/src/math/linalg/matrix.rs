@@ -104,9 +104,9 @@ impl Mul<Vector> for Matrix {
     fn mul(self, v: Vector) -> Vector {
         assert!(v.size == self.cols);
 
-        let mut new_data = vec![0.0; v.size];
+        let mut new_data = vec![0.0; self.rows];
 
-        for i in 0..v.size
+        for i in 0..self.rows
         {
             new_data[i] = utils::dot(&self.data[i*self.cols..(i+1)*self.cols], &v.data);
         }
