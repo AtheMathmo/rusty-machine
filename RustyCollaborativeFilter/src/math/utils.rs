@@ -1,6 +1,6 @@
 use std::cmp;
 
-pub fn dot(u: Vec<f32>, v: Vec<f32>) -> f32 {
+pub fn dot(u: &[f32], v: &[f32]) -> f32 {
     	let len = cmp::min(u.len(), v.len());
         let mut xs = &u[..len];
         let mut ys = &v[..len];

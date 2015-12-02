@@ -1,5 +1,6 @@
 use std::ops::{Mul, Add, Div, Sub, Index};
 use math::linalg::vector::Vector;
+use math::utils;
 
 struct Matrix {
 	cols: usize,
@@ -93,7 +94,7 @@ impl Mul<Matrix> for Matrix {
 
 	fn mul(self, m: Matrix) -> Matrix {
 		// Will use Strassen algorithm if large, traditional otherwise
-		return self;
+		self
 	}
 }
 
@@ -105,15 +106,9 @@ impl Mul<Vector> for Matrix {
 
         let mut new_data = vec![0.0; v.size];
 
-        for i in 0..self.rows
+        for i in 0..v.size
         {
-            let mut sum = 0.0;
-            for j in 0..self.cols
-            {
-                sum += self.data[i * self.cols + j] * v[j];
-            }
-
-            new_data[i] = sum;
+            new_data[i] = utils::dot(&self.data[i*self.cols..(i+1)*self.cols], &v.data);
         }
 
         return Vector {

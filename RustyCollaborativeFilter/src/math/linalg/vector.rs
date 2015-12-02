@@ -1,5 +1,6 @@
 use std::ops::{Mul, Add, Div, Sub, Index};
 use std::cmp;
+use math::utils;
 
 pub struct Vector {
 	pub size: usize,
@@ -21,37 +22,8 @@ impl Vector {
         }
     }
 
-    fn dot(&self, v: Vector) -> f32 {
-    	let len = cmp::min(self.size, v.size);
-        let mut xs = &self.data[..len];
-        let mut ys = &v.data[..len];
-
-        let mut s = 0.;
-        let (mut p0, mut p1, mut p2, mut p3, mut p4, mut p5, mut p6, mut p7) =
-            (0., 0., 0., 0., 0., 0., 0., 0.);
-
-        while xs.len() >= 8 {
-            p0 += xs[0] * ys[0];
-            p1 += xs[1] * ys[1];
-            p2 += xs[2] * ys[2];
-            p3 += xs[3] * ys[3];
-            p4 += xs[4] * ys[4];
-            p5 += xs[5] * ys[5];
-            p6 += xs[6] * ys[6];
-            p7 += xs[7] * ys[7];
-
-            xs = &xs[8..];
-            ys = &ys[8..];
-        }
-        s += p0 + p4;
-        s += p1 + p5;
-        s += p2 + p6;
-        s += p3 + p7;
-
-        for i in 0..xs.len() {
-            s += xs[i] * ys[i];
-        }
-        s
+    fn dot(&self, v: &Vector) -> f32 {
+    	utils::dot(&self.data, &v.data)
     }
 }
 
