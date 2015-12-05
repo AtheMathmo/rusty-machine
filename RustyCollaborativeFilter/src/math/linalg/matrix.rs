@@ -94,7 +94,25 @@ impl Mul<Matrix> for Matrix {
 
 	fn mul(self, m: Matrix) -> Matrix {
 		// Will use Strassen algorithm if large, traditional otherwise
-		self
+		assert!(self.cols == m.rows);
+
+        let mut new_data = vec![0.0; self.rows * m.cols];
+
+        let mt = &m.transpose();
+
+        for i in 0..self.rows
+        {
+            for j in 0..m.cols
+            {
+                new_data[i * m.cols + j] = utils::dot( &self.data[(i * self.cols)..((i+1)*self.cols)], &mt.data[(j*m.rows)..((j+1)*m.rows)] );
+            }
+        }
+
+        Matrix {
+            cols: self.cols,
+            rows: m.rows,
+            data: new_data
+        }
 	}
 }
 
