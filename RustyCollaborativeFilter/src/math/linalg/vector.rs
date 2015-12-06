@@ -7,7 +7,10 @@ pub struct Vector {
 }
 
 impl Vector {
-    pub fn new(size: usize, data: Vec<f32>) -> Vector {
+    pub fn new(data: Vec<f32>) -> Vector {
+
+    	let size = data.len();
+
         Vector {
             size: size,
             data: data
@@ -21,7 +24,7 @@ impl Vector {
         }
     }
 
-    fn dot(&self, v: &Vector) -> f32 {
+    pub fn dot(&self, v: &Vector) -> f32 {
     	utils::dot(&self.data, &v.data)
     }
 }
@@ -65,19 +68,6 @@ impl Add<f32> for Vector {
     }
 }
 
-impl Sub<f32> for Vector {
-	type Output = Vector;
-
-	fn sub(self, f: f32) -> Vector {
-		let new_data = self.data.into_iter().map(|v| v - f).collect();
-
-        Vector {
-            size: self.size,
-            data: new_data
-        }
-    }
-}
-
 impl Add<Vector> for Vector {
 	type Output = Vector;
 
@@ -91,6 +81,19 @@ impl Add<Vector> for Vector {
             data: new_data
         }
 	}
+}
+
+impl Sub<f32> for Vector {
+	type Output = Vector;
+
+	fn sub(self, f: f32) -> Vector {
+		let new_data = self.data.into_iter().map(|v| v - f).collect();
+
+        Vector {
+            size: self.size,
+            data: new_data
+        }
+    }
 }
 
 impl Sub<Vector> for Vector {
