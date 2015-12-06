@@ -15,6 +15,14 @@ It is somewhat likely that when this project is finished I will convert it into 
 
 Working on the linear algebra library that will power the collaborative filter. Once this implemented the core algorithm should be easy to add on.
 
-Based on the following paper:
+### TODO:
+
+- Implement LPU decomposition.
+- Use LPU for inverting and determinant computation.
+- Multi-threaded divide and conquer matrix multiplication.
+
+After the above are done I will move onto the actual machine learning stuff!
+
+## References
 
 [Online Collaborative Filtering](http://canini.me/research_files/OnlineCollaborativeFiltering.pdf)
