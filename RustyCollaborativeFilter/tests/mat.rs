@@ -12,6 +12,22 @@ fn create_mat_new() {
 }
 
 #[test]
+fn create_mat_zeros() {
+	let a = Matrix::zeros(10, 10);
+
+	assert_eq!(a.rows, 10);
+	assert_eq!(a.cols, 10);
+
+	for i in 0..10
+	{
+		for j in 0..10
+		{
+			assert_eq!(a[[i,j]], 0.0);
+		}
+	}
+}
+
+#[test]
 fn create_mat_identity() {
 	let a = Matrix::identity(4);
 
@@ -103,7 +119,7 @@ fn matrix_mul() {
 #[test]
 fn matrix_vec_mul() {
 	let a = Matrix::new(3, 2, vec![1.,2.,3.,4.,5.,6.]);
-	let b = Vector::new(2, vec![4.,7.]);
+	let b = Vector::new(vec![4.,7.]);
 
 	let c = a * b;
 
