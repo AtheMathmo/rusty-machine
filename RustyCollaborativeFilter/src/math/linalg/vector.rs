@@ -1,5 +1,4 @@
 use std::ops::{Mul, Add, Div, Sub, Index};
-use std::cmp;
 use math::utils;
 
 pub struct Vector {
@@ -8,14 +7,14 @@ pub struct Vector {
 }
 
 impl Vector {
-    fn new(size: usize, data: Vec<f32>) -> Vector {
+    pub fn new(size: usize, data: Vec<f32>) -> Vector {
         Vector {
             size: size,
             data: data
         }
     }
 
-    fn zeros(size: usize) -> Vector {
+    pub fn zeros(size: usize) -> Vector {
     	Vector {
             size: size,
             data: vec![0.0; size]

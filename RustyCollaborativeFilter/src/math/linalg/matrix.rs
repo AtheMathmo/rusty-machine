@@ -2,14 +2,16 @@ use std::ops::{Mul, Add, Div, Sub, Index};
 use math::linalg::vector::Vector;
 use math::utils;
 
-struct Matrix {
-	cols: usize,
-	rows: usize,
-	data: Vec<f32>
+pub struct Matrix {
+	pub cols: usize,
+	pub rows: usize,
+	pub data: Vec<f32>
 }
 
 impl Matrix {
-    fn new(cols: usize, rows: usize, data: Vec<f32>) -> Matrix {
+    pub fn new(rows: usize, cols: usize, data: Vec<f32>) -> Matrix {
+
+        assert_eq!(cols*rows, data.len());
         Matrix {
             cols: cols,
             rows: rows,
@@ -17,7 +19,7 @@ impl Matrix {
         }
     }
 
-    fn zeros(cols: usize, rows: usize) -> Matrix {
+    pub fn zeros(rows: usize, cols: usize) -> Matrix {
     	Matrix {
             cols: cols,
             rows: rows,
@@ -25,7 +27,7 @@ impl Matrix {
         }
     }
 
-    fn identity(size: usize) -> Matrix {
+    pub fn identity(size: usize) -> Matrix {
     	let mut data = vec![0.0; size * size];
 
     	for i in 0..size
@@ -40,7 +42,7 @@ impl Matrix {
         }
     }
 
-    fn from_diag(diag: &Vec<f32>) -> Matrix {
+    pub fn from_diag(diag: &[f32]) -> Matrix {
     	let size = diag.len();
     	let mut data = vec![0.0; size * size];
 
@@ -56,13 +58,13 @@ impl Matrix {
         }
     }
 
-    fn transpose(&self) -> Matrix {
+    pub fn transpose(&self) -> Matrix {
         let mut new_data = vec![0.0; self.cols * self.rows];
         for i in 0..self.cols
         {
             for j in 0..self.rows
             {
-                new_data[j*self.cols+i] = self.data[i*self.rows + j];
+                new_data[i*self.rows+j] = self.data[j*self.cols + i];
             }
         }
 
@@ -109,8 +111,8 @@ impl Mul<Matrix> for Matrix {
         }
 
         Matrix {
-            cols: self.cols,
-            rows: m.rows,
+            rows: self.rows,
+            cols: m.cols,
             data: new_data
         }
 	}
@@ -130,7 +132,7 @@ impl Mul<Vector> for Matrix {
         }
 
         return Vector {
-            size: v.size,
+            size: self.rows,
             data: new_data
         }
     }
@@ -141,20 +143,6 @@ impl Add<f32> for Matrix {
 
 	fn add(self, f: f32) -> Matrix {
 		let new_data = self.data.into_iter().map(|v| v + f).collect();
-
-        Matrix {
-            cols: self.cols,
-            rows: self.rows,
-            data: new_data
-        }
-    }
-}
-
-impl Sub<f32> for Matrix {
-	type Output = Matrix;
-
-	fn sub(self, f: f32) -> Matrix {
-		let new_data = self.data.into_iter().map(|v| v - f).collect();
 
         Matrix {
             cols: self.cols,
@@ -179,6 +167,20 @@ impl Add<Matrix> for Matrix {
             data: new_data
         }
 	}
+}
+
+impl Sub<f32> for Matrix {
+    type Output = Matrix;
+
+    fn sub(self, f: f32) -> Matrix {
+        let new_data = self.data.into_iter().map(|v| v - f).collect();
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data
+        }
+    }
 }
 
 impl Sub<Matrix> for Matrix {
@@ -218,8 +220,8 @@ impl Index<[usize; 2]> for Matrix {
 	type Output = f32;
 
 	fn index(&self, idx : [usize; 2]) -> &f32 {
-		assert!(idx[0] < self.cols);
-		assert!(idx[1] < self.rows);
+		assert!(idx[0] < self.rows);
+		assert!(idx[1] < self.cols);
 
 		&self.data[idx[0] * self.cols + idx[1]]
 	}

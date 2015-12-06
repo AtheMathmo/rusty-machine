@@ -1,13 +1,13 @@
-mod math {
+pub mod math {
 	
-	mod linalg {
-		mod matrix;
-		mod vector;
+	pub mod linalg {
+		pub mod matrix;
+		pub mod vector;
 	}
 
-	mod utils;
+	pub mod utils;
 }
 
-mod optim {
+pub mod optim {
 
 }
