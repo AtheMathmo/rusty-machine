@@ -1,5 +1,6 @@
 use std::ops::{Mul, Add, Div, Sub, Index};
-use math::utils;
+use math::linalg::HasMetric;
+use math::utils::dot;
 
 pub struct Vector {
 	pub size: usize,
@@ -25,7 +26,7 @@ impl Vector {
     }
 
     pub fn dot(&self, v: &Vector) -> f32 {
-    	utils::dot(&self.data, &v.data)
+    	dot(&self.data, &v.data)
     }
 }
 
@@ -119,4 +120,16 @@ impl Index<usize> for Vector {
 
 		&self.data[idx]
 	}
+}
+
+impl HasMetric for Vector {
+    fn norm(&self) -> f32 {
+        let mut s = 0.0;
+
+        for u in &self.data {
+            s += u*u;
+        }
+
+        s.sqrt()
+    }
 }

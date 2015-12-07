@@ -113,3 +113,14 @@ fn vector_f32_sub() {
 		assert_eq!(c[i], ((i+1) as f32) - 2.0);
 	}
 }
+
+#[test]
+fn vector_norm() {
+	let a = Vector::new(vec![1.0,2.0,3.0,4.0,5.0,6.0]);
+
+	let b = a.norm();
+
+	assert_eq!(b, (1. + 4. + 9. + 16. + 25. + 36. as f32).sqrt());
+
+
+}

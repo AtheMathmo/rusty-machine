@@ -1,6 +1,7 @@
 use std::ops::{Mul, Add, Div, Sub, Index};
+use math::linalg::HasMetric;
 use math::linalg::vector::Vector;
-use math::utils;
+use math::utils::dot;
 
 pub struct Matrix {
 	pub cols: usize,
@@ -74,6 +75,13 @@ impl Matrix {
             data: new_data
         }
     }
+
+    pub fn plu_decomp(&self) -> (Matrix, Matrix) {
+        let a = Matrix { cols: self.cols, rows: self.rows, data: vec![0.;self.rows*self.cols] };
+        let b = Matrix { cols: self.cols, rows: self.rows, data: vec![0.;self.rows*self.cols] };
+
+        unimplemented!();
+    }
 }
 
 
@@ -106,7 +114,7 @@ impl Mul<Matrix> for Matrix {
         {
             for j in 0..m.cols
             {
-                new_data[i * m.cols + j] = utils::dot( &self.data[(i * self.cols)..((i+1)*self.cols)], &mt.data[(j*m.rows)..((j+1)*m.rows)] );
+                new_data[i * m.cols + j] = dot( &self.data[(i * self.cols)..((i+1)*self.cols)], &mt.data[(j*m.rows)..((j+1)*m.rows)] );
             }
         }
 
@@ -128,7 +136,7 @@ impl Mul<Vector> for Matrix {
 
         for i in 0..self.rows
         {
-            new_data[i] = utils::dot(&self.data[i*self.cols..(i+1)*self.cols], &v.data);
+            new_data[i] = dot(&self.data[i*self.cols..(i+1)*self.cols], &v.data);
         }
 
         return Vector {
@@ -225,4 +233,16 @@ impl Index<[usize; 2]> for Matrix {
 
 		&self.data[idx[0] * self.cols + idx[1]]
 	}
+}
+
+impl HasMetric for Matrix {
+    fn norm(&self) -> f32 {
+        let mut s = 0.0;
+
+        for u in &self.data {
+            s += u*u;
+        }
+
+        s.sqrt()
+    }
 }
