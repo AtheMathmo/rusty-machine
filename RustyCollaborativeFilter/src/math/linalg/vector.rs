@@ -135,12 +135,12 @@ impl<T> Index<usize> for Vector<T> {
 	}
 }
 
-impl Metric<f32> for Vector<f32> {
-    fn norm(&self) -> f32 {
-        let mut s = 0.0;
+impl<T: Float> Metric<T> for Vector<T> {
+    fn norm(&self) -> T {
+        let mut s = T::zero();
 
         for u in &self.data {
-            s += u*u;
+            s = s + (*u) * (*u);
         }
 
         s.sqrt()

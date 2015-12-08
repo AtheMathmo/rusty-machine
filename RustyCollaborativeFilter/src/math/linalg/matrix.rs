@@ -247,12 +247,12 @@ impl<T> Index<[usize; 2]> for Matrix<T> {
 	}
 }
 
-impl Metric<f32> for Matrix<f32> {
-    fn norm(&self) -> f32 {
-        let mut s = 0.0;
+impl<T: Float> Metric<T> for Matrix<T> {
+    fn norm(&self) -> T {
+        let mut s = T::zero();
 
         for u in &self.data {
-            s += u*u;
+            s = s + (*u) * (*u);
         }
 
         s.sqrt()
