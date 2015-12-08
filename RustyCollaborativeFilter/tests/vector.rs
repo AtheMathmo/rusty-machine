@@ -1,6 +1,7 @@
 extern crate rusty_collaborative_filter as rcf;
 
 use rcf::math::linalg::vector::Vector;
+use rcf::math::linalg::HasMetric;
 
 #[test]
 fn create_vector_new() {
@@ -16,7 +17,7 @@ fn create_vector_new() {
 
 #[test]
 fn create_vector_zeros() {
-	let a = Vector::zeros(7);
+	let a = Vector::<f32>::zeros(7);
 
 	assert_eq!(a.size, 7);
 

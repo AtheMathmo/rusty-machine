@@ -13,7 +13,7 @@ fn create_mat_new() {
 
 #[test]
 fn create_mat_zeros() {
-	let a = Matrix::zeros(10, 10);
+	let a = Matrix::<f32>::zeros(10, 10);
 
 	assert_eq!(a.rows, 10);
 	assert_eq!(a.cols, 10);
@@ -29,7 +29,7 @@ fn create_mat_zeros() {
 
 #[test]
 fn create_mat_identity() {
-	let a = Matrix::identity(4);
+	let a = Matrix::<f32>::identity(4);
 
 	assert_eq!(a.rows, 4);
 	assert_eq!(a.cols, 4);
