@@ -1,16 +1,18 @@
 use std::ops::{Mul, Add, Div, Sub, Index};
+use libnum::{One, Zero};
+use std::cmp::PartialEq;
 use math::linalg::HasMetric;
 use math::linalg::vector::Vector;
 use math::utils::dot;
 
-pub struct Matrix {
+pub struct Matrix<T> {
 	pub cols: usize,
 	pub rows: usize,
-	pub data: Vec<f32>
+	pub data: Vec<T>
 }
 
-impl Matrix {
-    pub fn new(rows: usize, cols: usize, data: Vec<f32>) -> Matrix {
+impl<T: Zero + One + Copy> Matrix<T> {
+    pub fn new(rows: usize, cols: usize, data: Vec<T>) -> Matrix<T> {
 
         assert_eq!(cols*rows, data.len());
         Matrix {
@@ -20,20 +22,28 @@ impl Matrix {
         }
     }
 
-    pub fn zeros(rows: usize, cols: usize) -> Matrix {
+    pub fn zeros(rows: usize, cols: usize) -> Matrix<T> {
     	Matrix {
             cols: cols,
             rows: rows,
-            data: vec![0.0; cols*rows]
+            data: vec![T::zero(); cols*rows]
         }
     }
 
-    pub fn identity(size: usize) -> Matrix {
-    	let mut data = vec![0.0; size * size];
+    pub fn ones(rows: usize, cols: usize) -> Matrix<T> {
+        Matrix {
+            cols: cols,
+            rows: rows,
+            data: vec![T::one(); cols*rows]
+        }
+    }
+
+    pub fn identity(size: usize) -> Matrix<T> {
+    	let mut data = vec![T::zero(); size * size];
 
     	for i in 0..size
     	{
-    		data[(i*(size+1)) as usize] = 1.0;
+    		data[(i*(size+1)) as usize] = T::one();
     	}
 
     	Matrix {
@@ -43,9 +53,9 @@ impl Matrix {
         }
     }
 
-    pub fn from_diag(diag: &[f32]) -> Matrix {
+    pub fn from_diag(diag: &[T]) -> Matrix<T> {
     	let size = diag.len();
-    	let mut data = vec![0.0; size * size];
+    	let mut data = vec![T::zero(); size * size];
 
     	for i in 0..size
     	{
@@ -59,8 +69,8 @@ impl Matrix {
         }
     }
 
-    pub fn transpose(&self) -> Matrix {
-        let mut new_data = vec![0.0; self.cols * self.rows];
+    pub fn transpose(&self) -> Matrix<T> {
+        let mut new_data = vec![T::zero(); self.cols * self.rows];
         for i in 0..self.cols
         {
             for j in 0..self.rows
@@ -75,20 +85,22 @@ impl Matrix {
             data: new_data
         }
     }
+}
 
-    pub fn plu_decomp(&self) -> (Matrix, Matrix) {
-        let a = Matrix { cols: self.cols, rows: self.rows, data: vec![0.;self.rows*self.cols] };
-        let b = Matrix { cols: self.cols, rows: self.rows, data: vec![0.;self.rows*self.cols] };
+impl<T: Copy + One + Zero + Add<T, Output=T> + Mul<T, Output=T>> Matrix<T> {
+    pub fn plu_decomp(&self) -> (Matrix<T>, Matrix<T>) {
+        let a = Matrix { cols: self.cols, rows: self.rows, data: vec![T::zero();self.rows*self.cols] };
+        let b = Matrix { cols: self.cols, rows: self.rows, data: vec![T::zero();self.rows*self.cols] };
 
         unimplemented!();
     }
 }
 
 
-impl Mul<f32> for Matrix {
-    type Output = Matrix;
+impl<T: Copy + One + Zero + Mul<T, Output=T>> Mul<T> for Matrix<T> {
+    type Output = Matrix<T>;
 
-    fn mul(self, f: f32) -> Matrix {
+    fn mul(self, f: T) -> Matrix<T> {
         let new_data = self.data.into_iter().map(|v| v * f).collect();
 
         Matrix {
@@ -99,14 +111,14 @@ impl Mul<f32> for Matrix {
     }
 }
 
-impl Mul<Matrix> for Matrix {
-	type Output = Matrix;
+impl<T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<Matrix<T>> for Matrix<T> {
+	type Output = Matrix<T>;
 
-	fn mul(self, m: Matrix) -> Matrix {
+	fn mul(self, m: Matrix<T>) -> Matrix<T> {
 		// Will use Strassen algorithm if large, traditional otherwise
 		assert!(self.cols == m.rows);
 
-        let mut new_data = vec![0.0; self.rows * m.cols];
+        let mut new_data = vec![T::zero(); self.rows * m.cols];
 
         let mt = &m.transpose();
 
@@ -126,13 +138,13 @@ impl Mul<Matrix> for Matrix {
 	}
 }
 
-impl Mul<Vector> for Matrix {
-    type Output = Vector;
+impl<T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<Vector<T>> for Matrix<T> {
+    type Output = Vector<T>;
 
-    fn mul(self, v: Vector) -> Vector {
+    fn mul(self, v: Vector<T>) -> Vector<T> {
         assert!(v.size == self.cols);
 
-        let mut new_data = vec![0.0; self.rows];
+        let mut new_data = vec![T::zero(); self.rows];
 
         for i in 0..self.rows
         {
@@ -146,10 +158,10 @@ impl Mul<Vector> for Matrix {
     }
 }
 
-impl Add<f32> for Matrix {
-	type Output = Matrix;
+impl<T: Copy + One + Zero + Add<T, Output=T>> Add<T> for Matrix<T> {
+	type Output = Matrix<T>;
 
-	fn add(self, f: f32) -> Matrix {
+	fn add(self, f: T) -> Matrix<T> {
 		let new_data = self.data.into_iter().map(|v| v + f).collect();
 
         Matrix {
@@ -160,10 +172,10 @@ impl Add<f32> for Matrix {
     }
 }
 
-impl Add<Matrix> for Matrix {
-	type Output = Matrix;
+impl<T: Copy + One + Zero + Add<T, Output=T>> Add<Matrix<T>> for Matrix<T> {
+	type Output = Matrix<T>;
 
-	fn add(self, m: Matrix) -> Matrix {
+	fn add(self, m: Matrix<T>) -> Matrix<T> {
 		assert!(self.cols == m.cols);
 		assert!(self.rows == m.rows);
 
@@ -177,10 +189,10 @@ impl Add<Matrix> for Matrix {
 	}
 }
 
-impl Sub<f32> for Matrix {
-    type Output = Matrix;
+impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<T> for Matrix<T> {
+    type Output = Matrix<T>;
 
-    fn sub(self, f: f32) -> Matrix {
+    fn sub(self, f: T) -> Matrix<T> {
         let new_data = self.data.into_iter().map(|v| v - f).collect();
 
         Matrix {
@@ -191,10 +203,10 @@ impl Sub<f32> for Matrix {
     }
 }
 
-impl Sub<Matrix> for Matrix {
-	type Output = Matrix;
+impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<Matrix<T>> for Matrix<T> {
+	type Output = Matrix<T>;
 
-	fn sub(self, m: Matrix) -> Matrix {
+	fn sub(self, m: Matrix<T>) -> Matrix<T> {
 		assert!(self.cols == m.cols);
 		assert!(self.rows == m.rows);
 
@@ -208,11 +220,11 @@ impl Sub<Matrix> for Matrix {
 	}
 }
 
-impl Div<f32> for Matrix {
-	type Output = Matrix;
+impl<T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<T> for Matrix<T> {
+	type Output = Matrix<T>;
 
-	fn div(self, f: f32) -> Matrix {
-		assert!(f != 0.0);
+	fn div(self, f: T) -> Matrix<T> {
+		assert!(f != T::zero());
 		
 		let new_data = self.data.into_iter().map(|v| v / f).collect();
 
@@ -224,10 +236,10 @@ impl Div<f32> for Matrix {
 	}
 }
 
-impl Index<[usize; 2]> for Matrix {
-	type Output = f32;
+impl<T> Index<[usize; 2]> for Matrix<T> {
+	type Output = T;
 
-	fn index(&self, idx : [usize; 2]) -> &f32 {
+	fn index(&self, idx : [usize; 2]) -> &T {
 		assert!(idx[0] < self.rows);
 		assert!(idx[1] < self.cols);
 
@@ -235,7 +247,7 @@ impl Index<[usize; 2]> for Matrix {
 	}
 }
 
-impl HasMetric for Matrix {
+impl HasMetric for Matrix<f32> {
     fn norm(&self) -> f32 {
         let mut s = 0.0;
 

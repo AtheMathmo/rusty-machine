@@ -1,4 +1,9 @@
 [package]
 name = "rusty_collaborative_filter"
-version = "0.1.0"
-authors = ["james <LucasJ94@hotmail.co.uk>"]
+version = "0.0.1"
+authors = ["AtheMathmo"]
+repository = "https://github.com/bluss/rust-ndarray"
+
+[dependencies.num]
+version = "0.1.28"
+

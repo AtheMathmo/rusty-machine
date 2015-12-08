@@ -1,14 +1,16 @@
 use std::ops::{Mul, Add, Div, Sub, Index};
+use libnum::{One, Zero};
+use std::cmp::PartialEq;
 use math::linalg::HasMetric;
 use math::utils::dot;
 
-pub struct Vector {
+pub struct Vector<T> {
 	pub size: usize,
-	pub data: Vec<f32>
+	pub data: Vec<T>
 }
 
-impl Vector {
-    pub fn new(data: Vec<f32>) -> Vector {
+impl<T: Zero + One + Copy> Vector<T> {
+    pub fn new(data: Vec<T>) -> Vector<T> {
 
     	let size = data.len();
 
@@ -18,22 +20,31 @@ impl Vector {
         }
     }
 
-    pub fn zeros(size: usize) -> Vector {
+    pub fn zeros(size: usize) -> Vector<T> {
     	Vector {
             size: size,
-            data: vec![0.0; size]
+            data: vec![T::zero(); size]
         }
     }
 
-    pub fn dot(&self, v: &Vector) -> f32 {
+    pub fn ones(size: usize) -> Vector<T> {
+    	Vector {
+            size: size,
+            data: vec![T::one(); size]
+        }
+    }
+}
+
+impl<T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Vector<T> {
+	pub fn dot(&self, v: &Vector<T>) -> T {
     	dot(&self.data, &v.data)
     }
 }
 
-impl Mul<f32> for Vector {
-    type Output = Vector;
+impl<T: Copy + One + Zero + Mul<T, Output=T>> Mul<T> for Vector<T> {
+    type Output = Vector<T>;
 
-    fn mul(self, f: f32) -> Vector {
+    fn mul(self, f: T) -> Vector<T> {
         let new_data = self.data.into_iter().map(|v| v * f).collect();
 
         Vector {
@@ -43,10 +54,12 @@ impl Mul<f32> for Vector {
     }
 }
 
-impl Div<f32> for Vector {
-    type Output = Vector;
+impl<T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<T> for Vector<T> {
+    type Output = Vector<T>;
 
-    fn div(self, f: f32) -> Vector {
+    fn div(self, f: T) -> Vector<T> {
+    	assert!(f != T::zero());
+
         let new_data = self.data.into_iter().map(|v| v / f).collect();
 
         Vector {
@@ -56,10 +69,10 @@ impl Div<f32> for Vector {
     }
 }
 
-impl Add<f32> for Vector {
-	type Output = Vector;
+impl<T: Copy + One + Zero + Add<T, Output=T>> Add<T> for Vector<T> {
+	type Output = Vector<T>;
 
-	fn add(self, f: f32) -> Vector {
+	fn add(self, f: T) -> Vector<T> {
 		let new_data = self.data.into_iter().map(|v| v + f).collect();
 
         Vector {
@@ -69,10 +82,10 @@ impl Add<f32> for Vector {
     }
 }
 
-impl Add<Vector> for Vector {
-	type Output = Vector;
+impl<T: Copy + One + Zero + Add<T, Output=T>> Add<Vector<T>> for Vector<T> {
+	type Output = Vector<T>;
 
-	fn add(self, v: Vector) -> Vector {
+	fn add(self, v: Vector<T>) -> Vector<T> {
 		assert!(self.size == v.size);
 
 		let new_data = self.data.into_iter().enumerate().map(|(i,s)| s + v.data[i]).collect();
@@ -84,10 +97,10 @@ impl Add<Vector> for Vector {
 	}
 }
 
-impl Sub<f32> for Vector {
-	type Output = Vector;
+impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<T> for Vector<T> {
+	type Output = Vector<T>;
 
-	fn sub(self, f: f32) -> Vector {
+	fn sub(self, f: T) -> Vector<T> {
 		let new_data = self.data.into_iter().map(|v| v - f).collect();
 
         Vector {
@@ -97,10 +110,10 @@ impl Sub<f32> for Vector {
     }
 }
 
-impl Sub<Vector> for Vector {
-	type Output = Vector;
+impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<Vector<T>> for Vector<T> {
+	type Output = Vector<T>;
 
-	fn sub(self, v: Vector) -> Vector {
+	fn sub(self, v: Vector<T>) -> Vector<T> {
 		assert!(self.size == v.size);
 
 		let new_data = self.data.into_iter().enumerate().map(|(i,s)| s - v.data[i]).collect();
@@ -112,17 +125,17 @@ impl Sub<Vector> for Vector {
 	}
 }
 
-impl Index<usize> for Vector {
-	type Output = f32;
+impl<T> Index<usize> for Vector<T> {
+	type Output = T;
 
-	fn index(&self, idx : usize) -> &f32 {
+	fn index(&self, idx : usize) -> &T {
 		assert!(idx < self.size);
 
 		&self.data[idx]
 	}
 }
 
-impl HasMetric for Vector {
+impl HasMetric for Vector<f32> {
     fn norm(&self) -> f32 {
         let mut s = 0.0;
 
