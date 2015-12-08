@@ -1,7 +1,7 @@
 use std::ops::{Mul, Add, Div, Sub, Index};
-use libnum::{One, Zero};
+use libnum::{One, Zero, Float};
 use std::cmp::PartialEq;
-use math::linalg::HasMetric;
+use math::linalg::Metric;
 use math::utils::dot;
 
 pub struct Vector<T> {
@@ -135,7 +135,7 @@ impl<T> Index<usize> for Vector<T> {
 	}
 }
 
-impl HasMetric for Vector<f32> {
+impl Metric<f32> for Vector<f32> {
     fn norm(&self) -> f32 {
         let mut s = 0.0;
 

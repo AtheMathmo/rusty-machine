@@ -4,8 +4,8 @@ pub mod math {
 	
 	pub mod linalg {
 
-		pub trait HasMetric {
-			fn norm(&self) -> f32;
+		pub trait Metric<T> {
+			fn norm(&self) -> T;
 		}
 
 		pub mod matrix;

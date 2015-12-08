@@ -1,7 +1,7 @@
 extern crate rusty_collaborative_filter as rcf;
 
 use rcf::math::linalg::vector::Vector;
-use rcf::math::linalg::HasMetric;
+use rcf::math::linalg::Metric;
 
 #[test]
 fn create_vector_new() {

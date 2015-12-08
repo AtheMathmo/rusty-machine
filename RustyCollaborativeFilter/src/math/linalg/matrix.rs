@@ -1,7 +1,7 @@
 use std::ops::{Mul, Add, Div, Sub, Index};
-use libnum::{One, Zero};
+use libnum::{One, Zero, Float};
 use std::cmp::PartialEq;
-use math::linalg::HasMetric;
+use math::linalg::Metric;
 use math::linalg::vector::Vector;
 use math::utils::dot;
 
@@ -247,7 +247,7 @@ impl<T> Index<[usize; 2]> for Matrix<T> {
 	}
 }
 
-impl HasMetric for Matrix<f32> {
+impl Metric<f32> for Matrix<f32> {
     fn norm(&self) -> f32 {
         let mut s = 0.0;
 
