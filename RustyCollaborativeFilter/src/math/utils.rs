@@ -35,3 +35,19 @@ pub fn dot<T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>>(u: &[T], v: &[T
         }
         s
     }
+
+pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> usize {
+    assert!(u.len() != 0);
+
+    let mut max_index = 0;
+    let mut max = u[max_index];
+
+    for (i, v) in (u.into_iter()).enumerate() {
+        if max < *v {
+            max_index = i;
+            max = *v;
+        }
+    }
+
+    max_index
+}
