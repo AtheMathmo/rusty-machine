@@ -218,3 +218,18 @@ fn matrix_f32_div() {
 	assert_eq!(c[[2,0]], 5.0/3.0);
 	assert_eq!(c[[2,1]], 2.0);
 }
+
+#[test]
+fn matrix_lup_decomp() {
+	let a = Matrix::new(3,3, vec![1.,3.,5.,2.,4.,7.,1.,1.,0.]);
+
+	let (l,u,p) = a.lup_decomp();
+
+	let l_true = vec![1., 0., 0., 0.5, 1., 0., 0.5, -1., 1.];
+	let u_true = vec![2., 4., 7., 0., 1., 1.5, 0., 0., -2.];
+	let p_true = vec![0., 1., 0., 1., 0., 0., 0., 0., 1.];
+
+	assert_eq!(p.data, p_true);
+	assert_eq!(l.data, l_true);
+	assert_eq!(u.data, u_true);
+}

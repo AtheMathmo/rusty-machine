@@ -87,30 +87,61 @@ impl<T: Zero + One + Copy> Matrix<T> {
     }
 }
 
-impl<T: Copy + One + Zero + Add<T, Output=T> + Mul<T, Output=T> + PartialOrd> Matrix<T> {
-    pub fn plu_decomp(&self) -> (Matrix<T>, Matrix<T>) {
+impl<T: Copy + One + Zero + Add<T, Output=T>
+        + Mul<T, Output=T> + Sub<T, Output=T>
+        + Div<T, Output=T> + PartialOrd> Matrix<T> {
+
+    pub fn lup_decomp(&self) -> (Matrix<T>, Matrix<T>, Matrix<T>) {
         assert!(self.rows == self.cols);
 
-        let mut l = Matrix { cols: self.cols, rows: self.rows, data: vec![T::zero();self.rows*self.cols] };
-        let mut u = Matrix { cols: self.cols, rows: self.rows, data: vec![T::zero();self.rows*self.cols] };
+        let n = self.cols;
+
+        let mut l = Matrix::<T>::zeros(n, n);
+        let mut u = Matrix::<T>::zeros(n, n);
 
         let mt = self.transpose();
 
-        let mut p = Matrix::<T>::identity(self.cols);
+        let mut p = Matrix::<T>::identity(n);
 
-        for i in 0..self.cols {
-            let row = argmax(&mt.data[i*(self.cols+1)..(i+1)*self.cols]);
+        // Compute the permutation matrix
+        for i in 0..n {
+            let row = argmax(&mt.data[i*(n+1)..(i+1)*n]) + i;
 
             if row != i {
-                for j in 0..self.cols {
-                    p.data.swap(i*self.cols + j, row*self.cols+j)
+                for j in 0..n {
+                    p.data.swap(i*n + j, row*n+j)
                 }
             }
         }
 
         let a_2 = &p * self;
 
-        unimplemented!();
+        for i in 0..n {
+            l.data[i*(n+1)] = T::one();
+
+            for j in 0..i+1 {
+                let mut s1 = T::zero();
+
+                for k in 0..j {
+                    s1 = s1 + l.data[j*n + k] * u.data[k*n + i];
+                }
+
+                u.data[j*n + i] = a_2[[j,i]] - s1;
+            }
+
+            for j in i..n {
+                let mut s2 = T::zero();
+
+                for k in 0..i {
+                    s2 = s2 + l.data[j*n + k] * u.data[k*n + i];
+                }
+
+                l.data[j*n + i] = (a_2[[j,i]] - s2) / u[[i,i]];
+            }
+
+        }
+
+        (l,u,p)
     }
 }
 
