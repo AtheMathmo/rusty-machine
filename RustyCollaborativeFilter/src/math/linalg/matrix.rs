@@ -3,7 +3,7 @@ use libnum::{One, Zero, Float};
 use std::cmp::PartialEq;
 use math::linalg::Metric;
 use math::linalg::vector::Vector;
-use math::utils::dot;
+use math::utils::{dot, argmax};
 
 pub struct Matrix<T> {
 	pub cols: usize,
@@ -87,10 +87,28 @@ impl<T: Zero + One + Copy> Matrix<T> {
     }
 }
 
-impl<T: Copy + One + Zero + Add<T, Output=T> + Mul<T, Output=T>> Matrix<T> {
+impl<T: Copy + One + Zero + Add<T, Output=T> + Mul<T, Output=T> + PartialOrd> Matrix<T> {
     pub fn plu_decomp(&self) -> (Matrix<T>, Matrix<T>) {
-        let a = Matrix { cols: self.cols, rows: self.rows, data: vec![T::zero();self.rows*self.cols] };
-        let b = Matrix { cols: self.cols, rows: self.rows, data: vec![T::zero();self.rows*self.cols] };
+        assert!(self.rows == self.cols);
+
+        let mut l = Matrix { cols: self.cols, rows: self.rows, data: vec![T::zero();self.rows*self.cols] };
+        let mut u = Matrix { cols: self.cols, rows: self.rows, data: vec![T::zero();self.rows*self.cols] };
+
+        let mt = self.transpose();
+
+        let mut p = Matrix::<T>::identity(self.cols);
+
+        for i in 0..self.cols {
+            let row = argmax(&mt.data[i*(self.cols+1)..(i+1)*self.cols]);
+
+            if row != i {
+                for j in 0..self.cols {
+                    p.data.swap(i*self.cols + j, row*self.cols+j)
+                }
+            }
+        }
+
+        let a_2 = &p * self;
 
         unimplemented!();
     }
@@ -111,16 +129,40 @@ impl<T: Copy + One + Zero + Mul<T, Output=T>> Mul<T> for Matrix<T> {
     }
 }
 
-impl<T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<Matrix<T>> for Matrix<T> {
+impl <T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<Matrix<T>> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn mul(self, m: Matrix<T>) -> Matrix<T> {
+        (&self) * (&m)
+    }
+}
+
+impl <'a, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<Matrix<T>> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn mul(self, m: Matrix<T>) -> Matrix<T> {
+        self * (&m)
+    }
+}
+
+impl <'a, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'a Matrix<T>> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn mul(self, m: &Matrix<T>) -> Matrix<T> {
+        (&self) * m
+    }
+}
+
+impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b Matrix<T>> for &'a Matrix<T> {
 	type Output = Matrix<T>;
 
-	fn mul(self, m: Matrix<T>) -> Matrix<T> {
+	fn mul(self, m: &Matrix<T>) -> Matrix<T> {
 		// Will use Strassen algorithm if large, traditional otherwise
 		assert!(self.cols == m.rows);
 
         let mut new_data = vec![T::zero(); self.rows * m.cols];
 
-        let mt = &m.transpose();
+        let mt = m.transpose();
 
         for i in 0..self.rows
         {
