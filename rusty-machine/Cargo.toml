@@ -1,5 +1,5 @@
 [package]
-name = "rusty_collaborative_filter"
+name = "rusty-machine"
 version = "0.0.1"
 authors = ["AtheMathmo"]
 repository = "https://github.com/bluss/rust-ndarray"

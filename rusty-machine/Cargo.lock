@@ -1,5 +1,5 @@
 [root]
-name = "rusty_collaborative_filter"
+name = "rusty-machine"
 version = "0.0.1"
 dependencies = [
  "num 0.1.28 (registry+https://github.com/rust-lang/crates.io-index)",
