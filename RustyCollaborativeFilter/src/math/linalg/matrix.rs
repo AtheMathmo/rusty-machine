@@ -87,9 +87,67 @@ impl<T: Zero + One + Copy> Matrix<T> {
     }
 }
 
+impl<T: Copy + Zero + PartialEq> Matrix<T> {
+    pub fn is_diag(&self) -> bool {
+
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                if (i != j) && (self[[i,j]] != T::zero()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+}
+
 impl<T: Copy + One + Zero + Add<T, Output=T>
         + Mul<T, Output=T> + Sub<T, Output=T>
         + Div<T, Output=T> + PartialOrd> Matrix<T> {
+
+    pub fn inverse(&self) -> Matrix<T> {
+        let (l,u,p) = self.lup_decomp();
+
+        unimplemented!();
+    }
+
+    pub fn det(&self) -> T {
+        assert_eq!(self.rows, self.cols);
+
+        let n = self.cols;
+
+        if self.is_diag() {
+            let mut d = T::one();
+
+            for i in 0..n {
+                d = d * self[[i,i]];
+            }
+
+            return d;
+        }
+
+        if n == 2 {
+            return (self[[0,0]] * self[[1,1]]) - (self[[0,1]] * self[[1,0]]);
+        }
+
+        if n == 3 {
+            return (self[[0,0]] * self[[1,1]] * self[[2,2]]) + (self[[0,1]] * self[[1,2]] * self[[2,0]])
+                    + (self[[0,2]] * self[[1,0]] * self[[2,1]]) - (self[[0,0]] * self[[1,2]] * self[[2,1]])
+                    - (self[[0,1]] * self[[1,0]] * self[[2,2]]) - (self[[0,2]] * self[[1,1]] * self[[2,0]]);
+        }
+
+        let (l,u,p) = self.lup_decomp();
+
+        let mut d = T::one();
+
+        for i in 0..n {
+            d = d * l[[i,i]];
+            d = d * u[[i,i]];
+        }
+
+        return d;
+    }
 
     pub fn lup_decomp(&self) -> (Matrix<T>, Matrix<T>, Matrix<T>) {
         assert!(self.rows == self.cols);
