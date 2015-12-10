@@ -203,12 +203,35 @@ impl<T: Copy + One + Zero + Add<T, Output=T>
     }
 }
 
-
-impl<T: Copy + One + Zero + Mul<T, Output=T>> Mul<T> for Matrix<T> {
+impl <T: Copy + One + Zero + Mul<T, Output=T>> Mul<T> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn mul(self, f: T) -> Matrix<T> {
-        let new_data = self.data.into_iter().map(|v| v * f).collect();
+        (&self) * (&f)
+    }
+}
+
+impl <'a, T: Copy + One + Zero + Mul<T, Output=T>> Mul<&'a T> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn mul(self, f: &T) -> Matrix<T> {
+        (&self) * f
+    }
+}
+
+impl <'a, T: Copy + One + Zero + Mul<T, Output=T>> Mul<T> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn mul(self, f: T) -> Matrix<T> {
+        self * (&f)
+    }
+}
+
+impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output=T>> Mul<&'b T> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn mul(self, f: &T) -> Matrix<T> {
+        let new_data : Vec<T> = self.data.iter().map(|v| (*v) * (*f)).collect();
 
         Matrix {
             cols: self.cols,

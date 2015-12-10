@@ -1,9 +1,15 @@
 [package]
 name = "rusty-machine"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["AtheMathmo"]
-repository = "https://github.com/bluss/rust-ndarray"
 
-[dependencies.num]
-version = "0.1.28"
+description = "A machine learning library. (Currently only a simple linear algebra library!)"
+repository = "https://github.com/AtheMathmo/rusty-machine"
+keywords = ["machine","learning","stats","statistics","linear","algebra"]
+readme = "../README.md"
+license = "MIT"
+
+
+[dependencies]
+num = "0.1.28"
 
