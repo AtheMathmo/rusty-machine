@@ -292,10 +292,34 @@ impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
 	}
 }
 
-impl<T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<Vector<T>> for Matrix<T> {
+impl <T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<Vector<T>> for Matrix<T> {
     type Output = Vector<T>;
 
-    fn mul(self, v: Vector<T>) -> Vector<T> {
+    fn mul(self, m: Vector<T>) -> Vector<T> {
+        (&self) * (&m)
+    }
+}
+
+impl <'a, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<Vector<T>> for &'a Matrix<T> {
+    type Output = Vector<T>;
+
+    fn mul(self, m: Vector<T>) -> Vector<T> {
+        self * (&m)
+    }
+}
+
+impl <'a, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'a Vector<T>> for Matrix<T> {
+    type Output = Vector<T>;
+
+    fn mul(self, m: &Vector<T>) -> Vector<T> {
+        (&self) * m
+    }
+}
+
+impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b Vector<T>> for &'a Matrix<T> {
+    type Output = Vector<T>;
+
+    fn mul(self, v: &Vector<T>) -> Vector<T> {
         assert!(v.size == self.cols);
 
         let mut new_data = vec![T::zero(); self.rows];
@@ -313,10 +337,34 @@ impl<T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<Vector<T>> 
 }
 
 impl<T: Copy + One + Zero + Add<T, Output=T>> Add<T> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn add(self, f: T) -> Matrix<T> {
+        (&self) + (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<T> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn add(self, f: T) -> Matrix<T> {
+        self + (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<&'a T> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn add(self, f: &T) -> Matrix<T> {
+        (&self) + f
+    }
+}
+
+impl<'a, 'b, T: Copy + One + Zero + Add<T, Output=T>> Add<&'b T> for &'a Matrix<T> {
 	type Output = Matrix<T>;
 
-	fn add(self, f: T) -> Matrix<T> {
-		let new_data = self.data.into_iter().map(|v| v + f).collect();
+	fn add(self, f: &T) -> Matrix<T> {
+		let new_data : Vec<T> = self.data.iter().map(|v| (*v) + (*f)).collect();
 
         Matrix {
             cols: self.cols,
@@ -327,13 +375,37 @@ impl<T: Copy + One + Zero + Add<T, Output=T>> Add<T> for Matrix<T> {
 }
 
 impl<T: Copy + One + Zero + Add<T, Output=T>> Add<Matrix<T>> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn add(self, f: Matrix<T>) -> Matrix<T> {
+        (&self) + (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<Matrix<T>> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn add(self, f: Matrix<T>) -> Matrix<T> {
+        self + (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<&'a Matrix<T>> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn add(self, f: &Matrix<T>) -> Matrix<T> {
+        (&self) + f
+    }
+}
+
+impl<'a, 'b, T: Copy + One + Zero + Add<T, Output=T>> Add<&'b Matrix<T>> for &'a Matrix<T> {
 	type Output = Matrix<T>;
 
-	fn add(self, m: Matrix<T>) -> Matrix<T> {
+	fn add(self, m: &Matrix<T>) -> Matrix<T> {
 		assert!(self.cols == m.cols);
 		assert!(self.rows == m.rows);
 
-		let new_data = self.data.into_iter().enumerate().map(|(i,v)| v + m.data[i]).collect();
+		let new_data = self.data.iter().enumerate().map(|(i,v)| *v + m.data[i]).collect();
 
         Matrix {
             cols: self.cols,
@@ -347,7 +419,31 @@ impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<T> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn sub(self, f: T) -> Matrix<T> {
-        let new_data = self.data.into_iter().map(|v| v - f).collect();
+        (&self) - (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'a T> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn sub(self, f: &T) -> Matrix<T> {
+        (&self) - f
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<T> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn sub(self, f: T) -> Matrix<T> {
+        self - (&f)
+    }
+}
+
+impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'b T> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn sub(self, f: &T) -> Matrix<T> {
+        let new_data = self.data.iter().map(|v| *v - *f).collect();
 
         Matrix {
             cols: self.cols,
@@ -358,13 +454,37 @@ impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<T> for Matrix<T> {
 }
 
 impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<Matrix<T>> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn sub(self, f: Matrix<T>) -> Matrix<T> {
+        (&self) - (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<Matrix<T>> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn sub(self, f: Matrix<T>) -> Matrix<T> {
+        self - (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'a Matrix<T>> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn sub(self, f: &Matrix<T>) -> Matrix<T> {
+        (&self) - f
+    }
+}
+
+impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'b Matrix<T>> for &'a Matrix<T> {
 	type Output = Matrix<T>;
 
-	fn sub(self, m: Matrix<T>) -> Matrix<T> {
+	fn sub(self, m: &Matrix<T>) -> Matrix<T> {
 		assert!(self.cols == m.cols);
 		assert!(self.rows == m.rows);
 
-		let new_data = self.data.into_iter().enumerate().map(|(i,v)| v - m.data[i]).collect();
+		let new_data = self.data.iter().enumerate().map(|(i,v)| *v - m.data[i]).collect();
 
         Matrix {
             cols: self.cols,
@@ -375,12 +495,36 @@ impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<Matrix<T>> for Matrix<T> {
 }
 
 impl<T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<T> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn div(self, f: T) -> Matrix<T> {
+        (&self) / (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<T> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn div(self, f: T) -> Matrix<T> {
+        self / (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<&'a T> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn div(self, f: &T) -> Matrix<T> {
+        (&self) / f
+    }
+}
+
+impl<'a, 'b, T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<&'b T> for &'a Matrix<T> {
 	type Output = Matrix<T>;
 
-	fn div(self, f: T) -> Matrix<T> {
-		assert!(f != T::zero());
+	fn div(self, f: &T) -> Matrix<T> {
+		assert!(*f != T::zero());
 		
-		let new_data = self.data.into_iter().map(|v| v / f).collect();
+		let new_data = self.data.iter().map(|v| *v / *f).collect();
 
         Matrix {
             cols: self.cols,
