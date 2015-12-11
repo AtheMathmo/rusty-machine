@@ -1,6 +1,6 @@
-extern crate rusty_collaborative_filter as rcf;
+extern crate rusty_machine as rm;
 
-use rcf::math::utils;
+use rm::math::utils;
 
 #[test]
 fn argmax() {

@@ -1,7 +1,7 @@
-extern crate rusty_collaborative_filter as rcf;
+extern crate rusty_machine as rm;
 
-use rcf::math::linalg::vector::Vector;
-use rcf::math::linalg::Metric;
+use rm::math::linalg::vector::Vector;
+use rm::math::linalg::Metric;
 
 #[test]
 fn create_vector_new() {

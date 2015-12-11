@@ -1,8 +1,8 @@
-extern crate rusty_collaborative_filter as rcf;
+extern crate rusty_machine as rm;
 extern crate num as libnum;
 
-use rcf::math::linalg::matrix::Matrix;
-use rcf::math::linalg::vector::Vector;
+use rm::math::linalg::matrix::Matrix;
+use rm::math::linalg::vector::Vector;
 use libnum::abs;
 
 #[test]
