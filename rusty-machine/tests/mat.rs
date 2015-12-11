@@ -234,6 +234,20 @@ fn matrix_lup_decomp() {
 	assert_eq!(p.data, p_true);
 	assert_eq!(l.data, l_true);
 	assert_eq!(u.data, u_true);
+
+	let e = Matrix::<f64>::new(5,5, vec![1.,2.,3.,4.,5.,
+									3.,0.,4.,5.,6.,
+									2.,1.,2.,3.,4.,
+									0.,0.,0.,6.,5.,
+									0.,0.,0.,5.,6.]);
+
+	let (l,u,p) = e.lup_decomp();
+	let k = p.transpose() * l * u;
+
+	for i in 0..25 {
+		println!("{0},{1}", e.data[i], k.data[i]);
+		assert_eq!(e.data[i], k.data[i]);
+	}
 }
 
 #[test]

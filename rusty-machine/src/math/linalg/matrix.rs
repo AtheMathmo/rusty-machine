@@ -107,7 +107,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         + Div<T, Output=T> + PartialOrd> Matrix<T> {
 
     pub fn inverse(&self) -> Matrix<T> {
-        let (l,u,p) = self.lup_decomp();
+        //let (l,u,p) = self.lup_decomp();
 
         unimplemented!();
     }
@@ -148,7 +148,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
 
         let sgn = p.parity();
 
-        return -sgn * d;
+        return sgn * d;
     }
 
     fn parity(&self) -> T {
@@ -163,8 +163,9 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
                 while !visited[next] {
                     len += 1;
                     visited[next] = true;
-                    next = find(&self.data[k*self.cols..(k+1)*self.cols], T::one());
+                    next = find(&self.data[next*self.cols..(next+1)*self.cols], T::one());
                 }
+
                 if len % 2 == 0 {
                     sgn = -sgn;
                 }
