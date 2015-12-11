@@ -12,6 +12,7 @@ pub mod math {
 		pub mod vector;
 	}
 
+	// this should be private and tested in document.
 	pub mod utils;
 }
 
