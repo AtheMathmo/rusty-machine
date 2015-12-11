@@ -13,3 +13,14 @@ fn argmax() {
 	let c = vec![0., 1., 0.];
 	assert_eq!(utils::argmax(&c), 1);
 }
+
+#[test]
+fn find() {
+	let a = vec![1.0, 2.0, 4.0, 5.0];
+
+	let b = utils::find(&a, 1.0);
+	let c = utils::find(&a, 4.0);
+
+	assert_eq!(b, 0);
+	assert_eq!(c, 2);
+}

@@ -81,3 +81,13 @@ pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> usize {
 
     max_index
 }
+
+pub fn find<T: PartialEq>(p: &[T], u: T) -> usize {
+        for (i, v) in p.iter().enumerate() {
+            if *v == u {
+                return i;
+            }
+        }
+
+        panic!("Value not found.")
+    }
