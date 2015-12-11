@@ -45,7 +45,31 @@ impl<T: Copy + One + Zero + Mul<T, Output=T>> Mul<T> for Vector<T> {
     type Output = Vector<T>;
 
     fn mul(self, f: T) -> Vector<T> {
-        let new_data = self.data.into_iter().map(|v| v * f).collect();
+        (&self) * (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Mul<T, Output=T>> Mul<T> for &'a Vector<T> {
+    type Output = Vector<T>;
+
+    fn mul(self, f: T) -> Vector<T> {
+        self * (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Mul<T, Output=T>> Mul<&'a T> for Vector<T> {
+    type Output = Vector<T>;
+
+    fn mul(self, f: &T) -> Vector<T> {
+        (&self) * f
+    }
+}
+
+impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output=T>> Mul<&'b T> for &'a Vector<T> {
+    type Output = Vector<T>;
+
+    fn mul(self, f: &T) -> Vector<T> {
+        let new_data = self.data.iter().map(|v| (*v) * (*f)).collect();
 
         Vector {
             size: self.size,
@@ -58,9 +82,33 @@ impl<T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<T> for Vector<T> {
     type Output = Vector<T>;
 
     fn div(self, f: T) -> Vector<T> {
-    	assert!(f != T::zero());
+        (&self) * (&f)
+    }
+}
 
-        let new_data = self.data.into_iter().map(|v| v / f).collect();
+impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<T> for &'a Vector<T> {
+    type Output = Vector<T>;
+
+    fn div(self, f: T) -> Vector<T> {
+        self * (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<&'a T> for Vector<T> {
+    type Output = Vector<T>;
+
+    fn div(self, f: &T) -> Vector<T> {
+        (&self) * f
+    }
+}
+
+impl<'a, 'b, T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<&'b T> for &'a Vector<T> {
+    type Output = Vector<T>;
+
+    fn div(self, f: &T) -> Vector<T> {
+    	assert!(*f != T::zero());
+
+        let new_data = self.data.iter().map(|v| *v / *f).collect();
 
         Vector {
             size: self.size,
@@ -70,10 +118,34 @@ impl<T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<T> for Vector<T> {
 }
 
 impl<T: Copy + One + Zero + Add<T, Output=T>> Add<T> for Vector<T> {
+    type Output = Vector<T>;
+
+    fn add(self, f: T) -> Vector<T> {
+        (&self) * (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<T> for &'a Vector<T> {
+    type Output = Vector<T>;
+
+    fn add(self, f: T) -> Vector<T> {
+        self * (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<&'a T> for Vector<T> {
+    type Output = Vector<T>;
+
+    fn add(self, f: &T) -> Vector<T> {
+        (&self) * f
+    }
+}
+
+impl<'a, 'b, T: Copy + One + Zero + Add<T, Output=T>> Add<&'b T> for &'a Vector<T> {
 	type Output = Vector<T>;
 
-	fn add(self, f: T) -> Vector<T> {
-		let new_data = self.data.into_iter().map(|v| v + f).collect();
+	fn add(self, f: &T) -> Vector<T> {
+		let new_data = self.data.iter().map(|v| *v + *f).collect();
 
         Vector {
             size: self.size,
@@ -83,12 +155,36 @@ impl<T: Copy + One + Zero + Add<T, Output=T>> Add<T> for Vector<T> {
 }
 
 impl<T: Copy + One + Zero + Add<T, Output=T>> Add<Vector<T>> for Vector<T> {
+    type Output = Vector<T>;
+
+    fn add(self, v: Vector<T>) -> Vector<T> {
+        (&self) + (&v)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<Vector<T>> for &'a Vector<T> {
+    type Output = Vector<T>;
+
+    fn add(self, v: Vector<T>) -> Vector<T> {
+        self + (&v)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<&'a Vector<T>> for Vector<T> {
+    type Output = Vector<T>;
+
+    fn add(self, v: &Vector<T>) -> Vector<T> {
+        (&self) + v
+    }
+}
+
+impl<'a, 'b, T: Copy + One + Zero + Add<T, Output=T>> Add<&'b Vector<T>> for &'a Vector<T> {
 	type Output = Vector<T>;
 
-	fn add(self, v: Vector<T>) -> Vector<T> {
+	fn add(self, v: &Vector<T>) -> Vector<T> {
 		assert!(self.size == v.size);
 
-		let new_data = self.data.into_iter().enumerate().map(|(i,s)| s + v.data[i]).collect();
+		let new_data = self.data.iter().enumerate().map(|(i,s)| *s + v.data[i]).collect();
 
         Vector {
             size: self.size,
@@ -98,10 +194,34 @@ impl<T: Copy + One + Zero + Add<T, Output=T>> Add<Vector<T>> for Vector<T> {
 }
 
 impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<T> for Vector<T> {
+    type Output = Vector<T>;
+
+    fn sub(self, f: T) -> Vector<T> {
+        (&self) - (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<T> for &'a Vector<T> {
+    type Output = Vector<T>;
+
+    fn sub(self, f: T) -> Vector<T> {
+        self - (&f)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'a T> for Vector<T> {
+    type Output = Vector<T>;
+
+    fn sub(self, f: &T) -> Vector<T> {
+            (&self) - f
+        }
+    }
+
+impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'b T> for &'a Vector<T> {
 	type Output = Vector<T>;
 
-	fn sub(self, f: T) -> Vector<T> {
-		let new_data = self.data.into_iter().map(|v| v - f).collect();
+	fn sub(self, f: &T) -> Vector<T> {
+		let new_data = self.data.iter().map(|v| *v - *f).collect();
 
         Vector {
             size: self.size,
@@ -111,12 +231,36 @@ impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<T> for Vector<T> {
 }
 
 impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<Vector<T>> for Vector<T> {
+    type Output = Vector<T>;
+
+    fn sub(self, v: Vector<T>) -> Vector<T> {
+        (&self) - (&v)
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<Vector<T>> for &'a Vector<T> {
+    type Output = Vector<T>;
+
+    fn sub(self, v: Vector<T>) -> Vector<T> {
+        (&self) - v
+    }
+}
+
+impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'a Vector<T>> for Vector<T> {
+    type Output = Vector<T>;
+
+    fn sub(self, v: &Vector<T>) -> Vector<T> {
+        (&self) - v
+    }
+}
+
+impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'b Vector<T>> for &'a Vector<T> {
 	type Output = Vector<T>;
 
-	fn sub(self, v: Vector<T>) -> Vector<T> {
+	fn sub(self, v: &Vector<T>) -> Vector<T> {
 		assert!(self.size == v.size);
 
-		let new_data = self.data.into_iter().enumerate().map(|(i,s)| s - v.data[i]).collect();
+		let new_data = self.data.iter().enumerate().map(|(i,s)| *s - v.data[i]).collect();
 
         Vector {
             size: self.size,
