@@ -242,7 +242,7 @@ impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<Vector<T>> for &'a Vector<
     type Output = Vector<T>;
 
     fn sub(self, v: Vector<T>) -> Vector<T> {
-        (&self) - v
+        self - (&v)
     }
 }
 
