@@ -36,7 +36,7 @@ pub fn dot<T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>>(u: &[T], v: &[T
     s
  }
 
-pub fn sum<T: Copy + Zero + Add<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
+pub fn unrolled_sum<T: Copy + Zero + Add<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
     let len = cmp::min(u.len(), v.len());
     let mut xs = &u[..len];
     let mut ys = &v[..len];
@@ -61,7 +61,7 @@ pub fn sum<T: Copy + Zero + Add<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
     }
 
     for i in 0..xs.len() {
-        sum_data[0+holder] = xs[i] + ys[i];
+        sum_data[i+holder] = xs[i] + ys[i];
     }
     sum_data
 }
@@ -72,7 +72,7 @@ pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> usize {
     let mut max_index = 0;
     let mut max = u[max_index];
 
-    for (i, v) in (u.into_iter()).enumerate() {
+    for (i, v) in (u.iter()).enumerate() {
         if max < *v {
             max_index = i;
             max = *v;

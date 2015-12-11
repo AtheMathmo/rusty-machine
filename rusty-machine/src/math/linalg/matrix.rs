@@ -406,6 +406,7 @@ impl<'a, 'b, T: Copy + One + Zero + Add<T, Output=T>> Add<&'b Matrix<T>> for &'a
 		assert!(self.rows == m.rows);
 
 		let new_data = self.data.iter().enumerate().map(|(i,v)| *v + m.data[i]).collect();
+        //let new_data = unrolled_sum(&self.data, &m.data);
 
         Matrix {
             cols: self.cols,
