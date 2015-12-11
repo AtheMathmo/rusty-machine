@@ -82,7 +82,7 @@ impl<T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<T> for Vector<T> {
     type Output = Vector<T>;
 
     fn div(self, f: T) -> Vector<T> {
-        (&self) * (&f)
+        (&self) / (&f)
     }
 }
 
@@ -90,7 +90,7 @@ impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<T> for &'a Vec
     type Output = Vector<T>;
 
     fn div(self, f: T) -> Vector<T> {
-        self * (&f)
+        self / (&f)
     }
 }
 
@@ -98,7 +98,7 @@ impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<&'a T> for Vec
     type Output = Vector<T>;
 
     fn div(self, f: &T) -> Vector<T> {
-        (&self) * f
+        (&self) / f
     }
 }
 
@@ -107,7 +107,6 @@ impl<'a, 'b, T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<&'b T> for
 
     fn div(self, f: &T) -> Vector<T> {
     	assert!(*f != T::zero());
-
         let new_data = self.data.iter().map(|v| *v / *f).collect();
 
         Vector {
@@ -121,7 +120,7 @@ impl<T: Copy + One + Zero + Add<T, Output=T>> Add<T> for Vector<T> {
     type Output = Vector<T>;
 
     fn add(self, f: T) -> Vector<T> {
-        (&self) * (&f)
+        (&self) + (&f)
     }
 }
 
@@ -129,7 +128,7 @@ impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<T> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn add(self, f: T) -> Vector<T> {
-        self * (&f)
+        self + (&f)
     }
 }
 
@@ -137,7 +136,7 @@ impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
     fn add(self, f: &T) -> Vector<T> {
-        (&self) * f
+        (&self) + f
     }
 }
 
