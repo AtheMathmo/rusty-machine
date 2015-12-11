@@ -1,9 +1,9 @@
-use std::ops::{Mul, Add, Div, Sub, Index};
+use std::ops::{Mul, Add, Div, Sub, Index, Neg};
 use libnum::{One, Zero, Float};
 use std::cmp::PartialEq;
 use math::linalg::Metric;
 use math::linalg::vector::Vector;
-use math::utils::{dot, argmax};
+use math::utils::{dot, argmax, find};
 
 pub struct Matrix<T> {
 	pub cols: usize,
@@ -102,7 +102,7 @@ impl<T: Copy + Zero + PartialEq> Matrix<T> {
     }
 }
 
-impl<T: Copy + One + Zero + Add<T, Output=T>
+impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         + Mul<T, Output=T> + Sub<T, Output=T>
         + Div<T, Output=T> + PartialOrd> Matrix<T> {
 
@@ -146,7 +146,31 @@ impl<T: Copy + One + Zero + Add<T, Output=T>
             d = d * u[[i,i]];
         }
 
-        return d;
+        let sgn = p.parity();
+
+        return -sgn * d;
+    }
+
+    fn parity(&self) -> T {
+        let mut visited = vec![false; self.rows];
+        let mut sgn = T::one();
+
+        for k in 0..self.rows {
+            if !visited[k] {
+                let mut next = k;
+                let mut len = 0;
+
+                while !visited[next] {
+                    len += 1;
+                    visited[next] = true;
+                    next = find(&self.data[k*self.cols..(k+1)*self.cols], T::one());
+                }
+                if len % 2 == 0 {
+                    sgn = -sgn;
+                }
+            }
+        }
+        sgn
     }
 
     pub fn lup_decomp(&self) -> (Matrix<T>, Matrix<T>, Matrix<T>) {

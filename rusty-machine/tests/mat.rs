@@ -262,13 +262,15 @@ fn matrix_det() {
 
 	assert_eq!(d, 0.);
 
-	let e = Matrix::new(5,5, vec![1.,2.,3.,4.,5.,
+	let e = Matrix::<f64>::new(5,5, vec![1.,2.,3.,4.,5.,
 									3.,0.,4.,5.,6.,
 									2.,1.,2.,3.,4.,
 									0.,0.,0.,6.,5.,
 									0.,0.,0.,5.,6.]);
+
 	let f = e.det();
 
+	println!("det is {0}", f);
 	let error = abs(f-99.);
 	assert!(error < 1e-10);
 }
