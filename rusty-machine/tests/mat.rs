@@ -288,3 +288,17 @@ fn matrix_det() {
 	let error = abs(f-99.);
 	assert!(error < 1e-10);
 }
+
+#[test]
+fn matrix_solve() {
+	let a = Matrix::new(2,2, vec![2.,3.,1.,2.]);
+
+	let y = Vector::new(vec![8., 5.]);
+
+	let x = a.solve(y);
+
+	assert_eq!(x.size, 2);
+
+	assert_eq!(x[0], 1.);
+	assert_eq!(x[1], 2.);
+}

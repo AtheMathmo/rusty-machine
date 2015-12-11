@@ -106,9 +106,52 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         + Mul<T, Output=T> + Sub<T, Output=T>
         + Div<T, Output=T> + PartialOrd> Matrix<T> {
 
-    pub fn inverse(&self) -> Matrix<T> {
-        //let (l,u,p) = self.lup_decomp();
+    fn solve_u_triangular(&self, y: Vector<T>) -> Vector<T> {
+        assert!(self.cols == y.size);
 
+        let mut x = vec![T::zero(); y.size];
+
+        let mut holding_u_sum = T::zero();
+        x[y.size-1] = y[y.size-1] / self[[y.size-1,y.size-1]];
+
+        for i in (0..y.size-1).rev() {
+            holding_u_sum = holding_u_sum + self[[i,i+1]];
+            x[i] = (y[i] - holding_u_sum*x[i+1]) / self[[i,i]];
+        }
+
+        Vector {
+            size: y.size,
+            data: x
+        }
+    }
+
+    fn solve_l_triangular(&self, y: Vector<T>) -> Vector<T> {
+        assert!(self.cols == y.size);
+
+        let mut x = vec![T::zero(); y.size];
+
+        let mut holding_l_sum = T::zero();
+        x[0] = y[0] / self[[0,0]];
+
+        for i in 1..y.size {
+            holding_l_sum = holding_l_sum + self[[i,i-1]];
+            x[i] = (y[i] - holding_l_sum*x[i-1]) / self[[i,i]];
+        }
+
+        Vector {
+            size: y.size,
+            data: x
+        }
+    }
+
+    pub fn solve(&self, y: Vector<T>) -> Vector<T> {
+        let (l,u,p) = self.lup_decomp();
+
+        let b = l.solve_l_triangular(p * y);
+        u.solve_u_triangular(b)
+    }
+
+    pub fn inverse(&self) -> Matrix<T> {
         unimplemented!();
     }
 
