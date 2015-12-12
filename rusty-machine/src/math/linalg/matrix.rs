@@ -795,6 +795,7 @@ impl<T> Index<[usize; 2]> for Matrix<T> {
 }
 
 impl<T: Float> Metric<T> for Matrix<T> {
+    
     /// Compute euclidean norm for matrix.
     ///
     /// # Examples
