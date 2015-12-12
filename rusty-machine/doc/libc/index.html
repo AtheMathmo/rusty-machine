@@ -1,0 +1,2541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `libc` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, libc">
+
+    <title>libc - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    <link rel="shortcut icon" href="https://doc.rust-lang.org/favicon.ico">
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        <a href='../libc/index.html'><img src='https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png' alt='' width='100'></a>
+        <p class='location'></p><script>window.sidebarCurrent = {name: 'libc', ty: 'mod', relpath: '../'};</script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>libc</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-0' class='srclink' href='../src/libc/lib.rs.html#11-245' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Crate docs</p>
+</div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
+<table><tr><td><code>pub use self::notbsd::*;</code></td></tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.Dl_info.html'
+                               title='libc::Dl_info'>Dl_info</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.in6_addr.html'
+                               title='libc::in6_addr'>in6_addr</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.in_addr.html'
+                               title='libc::in_addr'>in_addr</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.ip_mreq.html'
+                               title='libc::ip_mreq'>ip_mreq</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.ipv6_mreq.html'
+                               title='libc::ipv6_mreq'>ipv6_mreq</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.rlimit.html'
+                               title='libc::rlimit'>rlimit</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.rusage.html'
+                               title='libc::rusage'>rusage</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.timespec.html'
+                               title='libc::timespec'>timespec</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.timeval.html'
+                               title='libc::timeval'>timeval</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.utimbuf.html'
+                               title='libc::utimbuf'>utimbuf</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                </table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.DIR.html'
+                               title='libc::DIR'>DIR</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.FILE.html'
+                               title='libc::FILE'>FILE</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.c_void.html'
+                               title='libc::c_void'>c_void</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='enum' href='enum.fpos_t.html'
+                               title='libc::fpos_t'>fpos_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                </table><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.SIG_DFL.html'
+                               title='libc::SIG_DFL'>SIG_DFL</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.SIG_ERR.html'
+                               title='libc::SIG_ERR'>SIG_ERR</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.SIG_IGN.html'
+                               title='libc::SIG_IGN'>SIG_IGN</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='constant' href='constant.WNOHANG.html'
+                               title='libc::WNOHANG'>WNOHANG</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                </table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn._exit.html'
+                               title='libc::_exit'>_exit</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.abs.html'
+                               title='libc::abs'>abs</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.accept.html'
+                               title='libc::accept'>accept</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.access.html'
+                               title='libc::access'>access</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.alarm.html'
+                               title='libc::alarm'>alarm</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.atexit.html'
+                               title='libc::atexit'>atexit</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.atof.html'
+                               title='libc::atof'>atof</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.atoi.html'
+                               title='libc::atoi'>atoi</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.bind.html'
+                               title='libc::bind'>bind</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.calloc.html'
+                               title='libc::calloc'>calloc</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.chdir.html'
+                               title='libc::chdir'>chdir</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.chmod.html'
+                               title='libc::chmod'>chmod</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.chown.html'
+                               title='libc::chown'>chown</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.close.html'
+                               title='libc::close'>close</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.closedir.html'
+                               title='libc::closedir'>closedir</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.connect.html'
+                               title='libc::connect'>connect</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.creat.html'
+                               title='libc::creat'>creat</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.dladdr.html'
+                               title='libc::dladdr'>dladdr</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.dlclose.html'
+                               title='libc::dlclose'>dlclose</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.dlerror.html'
+                               title='libc::dlerror'>dlerror</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.dlopen.html'
+                               title='libc::dlopen'>dlopen</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.dlsym.html'
+                               title='libc::dlsym'>dlsym</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.dup.html'
+                               title='libc::dup'>dup</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.dup2.html'
+                               title='libc::dup2'>dup2</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.execv.html'
+                               title='libc::execv'>execv</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.execve.html'
+                               title='libc::execve'>execve</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.execvp.html'
+                               title='libc::execvp'>execvp</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.exit.html'
+                               title='libc::exit'>exit</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fchmod.html'
+                               title='libc::fchmod'>fchmod</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fclose.html'
+                               title='libc::fclose'>fclose</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fcntl.html'
+                               title='libc::fcntl'>fcntl</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fdopen.html'
+                               title='libc::fdopen'>fdopen</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.feof.html'
+                               title='libc::feof'>feof</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.ferror.html'
+                               title='libc::ferror'>ferror</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fflush.html'
+                               title='libc::fflush'>fflush</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fgetc.html'
+                               title='libc::fgetc'>fgetc</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fgetpos.html'
+                               title='libc::fgetpos'>fgetpos</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fgets.html'
+                               title='libc::fgets'>fgets</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fileno.html'
+                               title='libc::fileno'>fileno</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.flock.html'
+                               title='libc::flock'>flock</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fopen.html'
+                               title='libc::fopen'>fopen</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fork.html'
+                               title='libc::fork'>fork</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fpathconf.html'
+                               title='libc::fpathconf'>fpathconf</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fputc.html'
+                               title='libc::fputc'>fputc</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fputs.html'
+                               title='libc::fputs'>fputs</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fread.html'
+                               title='libc::fread'>fread</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.free.html'
+                               title='libc::free'>free</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.freeaddrinfo.html'
+                               title='libc::freeaddrinfo'>freeaddrinfo</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.freeifaddrs.html'
+                               title='libc::freeifaddrs'>freeifaddrs</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.freopen.html'
+                               title='libc::freopen'>freopen</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fseek.html'
+                               title='libc::fseek'>fseek</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fseeko.html'
+                               title='libc::fseeko'>fseeko</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fsetpos.html'
+                               title='libc::fsetpos'>fsetpos</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fstat.html'
+                               title='libc::fstat'>fstat</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fstatvfs.html'
+                               title='libc::fstatvfs'>fstatvfs</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fsync.html'
+                               title='libc::fsync'>fsync</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.ftell.html'
+                               title='libc::ftell'>ftell</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.ftello.html'
+                               title='libc::ftello'>ftello</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.ftruncate.html'
+                               title='libc::ftruncate'>ftruncate</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.fwrite.html'
+                               title='libc::fwrite'>fwrite</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.gai_strerror.html'
+                               title='libc::gai_strerror'>gai_strerror</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getaddrinfo.html'
+                               title='libc::getaddrinfo'>getaddrinfo</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getcwd.html'
+                               title='libc::getcwd'>getcwd</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getdtablesize.html'
+                               title='libc::getdtablesize'>getdtablesize</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getegid.html'
+                               title='libc::getegid'>getegid</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getenv.html'
+                               title='libc::getenv'>getenv</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.geteuid.html'
+                               title='libc::geteuid'>geteuid</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getgid.html'
+                               title='libc::getgid'>getgid</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getgroups.html'
+                               title='libc::getgroups'>getgroups</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getifaddrs.html'
+                               title='libc::getifaddrs'>getifaddrs</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getlogin.html'
+                               title='libc::getlogin'>getlogin</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getopt.html'
+                               title='libc::getopt'>getopt</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getpeername.html'
+                               title='libc::getpeername'>getpeername</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getpgrp.html'
+                               title='libc::getpgrp'>getpgrp</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getpid.html'
+                               title='libc::getpid'>getpid</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getppid.html'
+                               title='libc::getppid'>getppid</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getpwuid_r.html'
+                               title='libc::getpwuid_r'>getpwuid_r</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getrlimit.html'
+                               title='libc::getrlimit'>getrlimit</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getrusage.html'
+                               title='libc::getrusage'>getrusage</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getsid.html'
+                               title='libc::getsid'>getsid</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getsockname.html'
+                               title='libc::getsockname'>getsockname</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getsockopt.html'
+                               title='libc::getsockopt'>getsockopt</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.gettimeofday.html'
+                               title='libc::gettimeofday'>gettimeofday</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.getuid.html'
+                               title='libc::getuid'>getuid</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.glob.html'
+                               title='libc::glob'>glob</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.globfree.html'
+                               title='libc::globfree'>globfree</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.gmtime_r.html'
+                               title='libc::gmtime_r'>gmtime_r</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.if_nametoindex.html'
+                               title='libc::if_nametoindex'>if_nametoindex</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.isalnum.html'
+                               title='libc::isalnum'>isalnum</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.isalpha.html'
+                               title='libc::isalpha'>isalpha</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.isatty.html'
+                               title='libc::isatty'>isatty</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.iscntrl.html'
+                               title='libc::iscntrl'>iscntrl</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.isdigit.html'
+                               title='libc::isdigit'>isdigit</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.isgraph.html'
+                               title='libc::isgraph'>isgraph</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.islower.html'
+                               title='libc::islower'>islower</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.isprint.html'
+                               title='libc::isprint'>isprint</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.ispunct.html'
+                               title='libc::ispunct'>ispunct</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.isspace.html'
+                               title='libc::isspace'>isspace</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.isupper.html'
+                               title='libc::isupper'>isupper</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.isxdigit.html'
+                               title='libc::isxdigit'>isxdigit</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.kill.html'
+                               title='libc::kill'>kill</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.labs.html'
+                               title='libc::labs'>labs</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.link.html'
+                               title='libc::link'>link</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.listen.html'
+                               title='libc::listen'>listen</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.localtime_r.html'
+                               title='libc::localtime_r'>localtime_r</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.lseek.html'
+                               title='libc::lseek'>lseek</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.lstat.html'
+                               title='libc::lstat'>lstat</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.madvise.html'
+                               title='libc::madvise'>madvise</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.malloc.html'
+                               title='libc::malloc'>malloc</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.memchr.html'
+                               title='libc::memchr'>memchr</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.memcmp.html'
+                               title='libc::memcmp'>memcmp</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.mkdir.html'
+                               title='libc::mkdir'>mkdir</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.mkfifo.html'
+                               title='libc::mkfifo'>mkfifo</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.mktime.html'
+                               title='libc::mktime'>mktime</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.mlock.html'
+                               title='libc::mlock'>mlock</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.mlockall.html'
+                               title='libc::mlockall'>mlockall</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.mmap.html'
+                               title='libc::mmap'>mmap</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.msync.html'
+                               title='libc::msync'>msync</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.munlock.html'
+                               title='libc::munlock'>munlock</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.munlockall.html'
+                               title='libc::munlockall'>munlockall</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.munmap.html'
+                               title='libc::munmap'>munmap</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.nanosleep.html'
+                               title='libc::nanosleep'>nanosleep</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.open.html'
+                               title='libc::open'>open</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.opendir.html'
+                               title='libc::opendir'>opendir</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pathconf.html'
+                               title='libc::pathconf'>pathconf</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pause.html'
+                               title='libc::pause'>pause</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pclose.html'
+                               title='libc::pclose'>pclose</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.perror.html'
+                               title='libc::perror'>perror</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pipe.html'
+                               title='libc::pipe'>pipe</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.popen.html'
+                               title='libc::popen'>popen</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.posix_madvise.html'
+                               title='libc::posix_madvise'>posix_madvise</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.posix_memalign.html'
+                               title='libc::posix_memalign'>posix_memalign</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pread.html'
+                               title='libc::pread'>pread</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pselect.html'
+                               title='libc::pselect'>pselect</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_attr_destroy.html'
+                               title='libc::pthread_attr_destroy'>pthread_attr_destroy</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_attr_init.html'
+                               title='libc::pthread_attr_init'>pthread_attr_init</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_attr_setdetachstate.html'
+                               title='libc::pthread_attr_setdetachstate'>pthread_attr_setdetachstate</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_attr_setstacksize.html'
+                               title='libc::pthread_attr_setstacksize'>pthread_attr_setstacksize</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_cond_broadcast.html'
+                               title='libc::pthread_cond_broadcast'>pthread_cond_broadcast</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_cond_destroy.html'
+                               title='libc::pthread_cond_destroy'>pthread_cond_destroy</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_cond_signal.html'
+                               title='libc::pthread_cond_signal'>pthread_cond_signal</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_cond_timedwait.html'
+                               title='libc::pthread_cond_timedwait'>pthread_cond_timedwait</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_cond_wait.html'
+                               title='libc::pthread_cond_wait'>pthread_cond_wait</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_create.html'
+                               title='libc::pthread_create'>pthread_create</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_detach.html'
+                               title='libc::pthread_detach'>pthread_detach</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_getspecific.html'
+                               title='libc::pthread_getspecific'>pthread_getspecific</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_join.html'
+                               title='libc::pthread_join'>pthread_join</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_key_create.html'
+                               title='libc::pthread_key_create'>pthread_key_create</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_key_delete.html'
+                               title='libc::pthread_key_delete'>pthread_key_delete</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_mutex_destroy.html'
+                               title='libc::pthread_mutex_destroy'>pthread_mutex_destroy</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_mutex_init.html'
+                               title='libc::pthread_mutex_init'>pthread_mutex_init</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_mutex_lock.html'
+                               title='libc::pthread_mutex_lock'>pthread_mutex_lock</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_mutex_trylock.html'
+                               title='libc::pthread_mutex_trylock'>pthread_mutex_trylock</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_mutex_unlock.html'
+                               title='libc::pthread_mutex_unlock'>pthread_mutex_unlock</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_mutexattr_destroy.html'
+                               title='libc::pthread_mutexattr_destroy'>pthread_mutexattr_destroy</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_mutexattr_init.html'
+                               title='libc::pthread_mutexattr_init'>pthread_mutexattr_init</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_mutexattr_settype.html'
+                               title='libc::pthread_mutexattr_settype'>pthread_mutexattr_settype</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_rwlock_destroy.html'
+                               title='libc::pthread_rwlock_destroy'>pthread_rwlock_destroy</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_rwlock_rdlock.html'
+                               title='libc::pthread_rwlock_rdlock'>pthread_rwlock_rdlock</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_rwlock_tryrdlock.html'
+                               title='libc::pthread_rwlock_tryrdlock'>pthread_rwlock_tryrdlock</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_rwlock_trywrlock.html'
+                               title='libc::pthread_rwlock_trywrlock'>pthread_rwlock_trywrlock</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_rwlock_unlock.html'
+                               title='libc::pthread_rwlock_unlock'>pthread_rwlock_unlock</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_rwlock_wrlock.html'
+                               title='libc::pthread_rwlock_wrlock'>pthread_rwlock_wrlock</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_self.html'
+                               title='libc::pthread_self'>pthread_self</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_setspecific.html'
+                               title='libc::pthread_setspecific'>pthread_setspecific</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pthread_sigmask.html'
+                               title='libc::pthread_sigmask'>pthread_sigmask</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.putenv.html'
+                               title='libc::putenv'>putenv</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.puts.html'
+                               title='libc::puts'>puts</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.pwrite.html'
+                               title='libc::pwrite'>pwrite</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.raise.html'
+                               title='libc::raise'>raise</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.rand.html'
+                               title='libc::rand'>rand</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.read.html'
+                               title='libc::read'>read</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.readdir_r.html'
+                               title='libc::readdir_r'>readdir_r</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.readlink.html'
+                               title='libc::readlink'>readlink</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.realloc.html'
+                               title='libc::realloc'>realloc</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.realpath.html'
+                               title='libc::realpath'>realpath</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.recv.html'
+                               title='libc::recv'>recv</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.recvfrom.html'
+                               title='libc::recvfrom'>recvfrom</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.remove.html'
+                               title='libc::remove'>remove</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.rename.html'
+                               title='libc::rename'>rename</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.rewind.html'
+                               title='libc::rewind'>rewind</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.rewinddir.html'
+                               title='libc::rewinddir'>rewinddir</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.rmdir.html'
+                               title='libc::rmdir'>rmdir</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.sched_yield.html'
+                               title='libc::sched_yield'>sched_yield</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.seekdir.html'
+                               title='libc::seekdir'>seekdir</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.select.html'
+                               title='libc::select'>select</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.send.html'
+                               title='libc::send'>send</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.sendto.html'
+                               title='libc::sendto'>sendto</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.setbuf.html'
+                               title='libc::setbuf'>setbuf</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.setenv.html'
+                               title='libc::setenv'>setenv</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.setgid.html'
+                               title='libc::setgid'>setgid</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.setpgid.html'
+                               title='libc::setpgid'>setpgid</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.setrlimit.html'
+                               title='libc::setrlimit'>setrlimit</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.setsid.html'
+                               title='libc::setsid'>setsid</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.setsockopt.html'
+                               title='libc::setsockopt'>setsockopt</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.setuid.html'
+                               title='libc::setuid'>setuid</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.setvbuf.html'
+                               title='libc::setvbuf'>setvbuf</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.shm_unlink.html'
+                               title='libc::shm_unlink'>shm_unlink</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.shutdown.html'
+                               title='libc::shutdown'>shutdown</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.sigaction.html'
+                               title='libc::sigaction'>sigaction</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.sigaddset.html'
+                               title='libc::sigaddset'>sigaddset</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.sigaltstack.html'
+                               title='libc::sigaltstack'>sigaltstack</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.sigdelset.html'
+                               title='libc::sigdelset'>sigdelset</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.sigemptyset.html'
+                               title='libc::sigemptyset'>sigemptyset</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.sigfillset.html'
+                               title='libc::sigfillset'>sigfillset</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.sigismember.html'
+                               title='libc::sigismember'>sigismember</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.signal.html'
+                               title='libc::signal'>signal</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.sleep.html'
+                               title='libc::sleep'>sleep</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.socket.html'
+                               title='libc::socket'>socket</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.socketpair.html'
+                               title='libc::socketpair'>socketpair</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.srand.html'
+                               title='libc::srand'>srand</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.stat.html'
+                               title='libc::stat'>stat</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.statvfs.html'
+                               title='libc::statvfs'>statvfs</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strcat.html'
+                               title='libc::strcat'>strcat</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strchr.html'
+                               title='libc::strchr'>strchr</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strcmp.html'
+                               title='libc::strcmp'>strcmp</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strcoll.html'
+                               title='libc::strcoll'>strcoll</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strcpy.html'
+                               title='libc::strcpy'>strcpy</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strcspn.html'
+                               title='libc::strcspn'>strcspn</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strerror.html'
+                               title='libc::strerror'>strerror</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strerror_r.html'
+                               title='libc::strerror_r'>strerror_r</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strlen.html'
+                               title='libc::strlen'>strlen</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strncat.html'
+                               title='libc::strncat'>strncat</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strncmp.html'
+                               title='libc::strncmp'>strncmp</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strncpy.html'
+                               title='libc::strncpy'>strncpy</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strpbrk.html'
+                               title='libc::strpbrk'>strpbrk</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strrchr.html'
+                               title='libc::strrchr'>strrchr</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strspn.html'
+                               title='libc::strspn'>strspn</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strstr.html'
+                               title='libc::strstr'>strstr</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strtod.html'
+                               title='libc::strtod'>strtod</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strtok.html'
+                               title='libc::strtok'>strtok</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strtol.html'
+                               title='libc::strtol'>strtol</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strtoul.html'
+                               title='libc::strtoul'>strtoul</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.strxfrm.html'
+                               title='libc::strxfrm'>strxfrm</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.symlink.html'
+                               title='libc::symlink'>symlink</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.sysconf.html'
+                               title='libc::sysconf'>sysconf</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.system.html'
+                               title='libc::system'>system</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.tcgetpgrp.html'
+                               title='libc::tcgetpgrp'>tcgetpgrp</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.telldir.html'
+                               title='libc::telldir'>telldir</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.timegm.html'
+                               title='libc::timegm'>timegm</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.tmpfile.html'
+                               title='libc::tmpfile'>tmpfile</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.tolower.html'
+                               title='libc::tolower'>tolower</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.toupper.html'
+                               title='libc::toupper'>toupper</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.ttyname.html'
+                               title='libc::ttyname'>ttyname</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.ungetc.html'
+                               title='libc::ungetc'>ungetc</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.unlink.html'
+                               title='libc::unlink'>unlink</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.unsetenv.html'
+                               title='libc::unsetenv'>unsetenv</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.usleep.html'
+                               title='libc::usleep'>usleep</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.utime.html'
+                               title='libc::utime'>utime</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.utimes.html'
+                               title='libc::utimes'>utimes</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.wait.html'
+                               title='libc::wait'>wait</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.waitpid.html'
+                               title='libc::waitpid'>waitpid</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.wcslen.html'
+                               title='libc::wcslen'>wcslen</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='fn' href='fn.write.html'
+                               title='libc::write'>write</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                </table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.c_double.html'
+                               title='libc::c_double'>c_double</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.c_float.html'
+                               title='libc::c_float'>c_float</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.c_int.html'
+                               title='libc::c_int'>c_int</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.c_longlong.html'
+                               title='libc::c_longlong'>c_longlong</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.c_schar.html'
+                               title='libc::c_schar'>c_schar</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.c_short.html'
+                               title='libc::c_short'>c_short</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.c_uchar.html'
+                               title='libc::c_uchar'>c_uchar</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.c_uint.html'
+                               title='libc::c_uint'>c_uint</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.c_ulonglong.html'
+                               title='libc::c_ulonglong'>c_ulonglong</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.c_ushort.html'
+                               title='libc::c_ushort'>c_ushort</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.gid_t.html'
+                               title='libc::gid_t'>gid_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.in_addr_t.html'
+                               title='libc::in_addr_t'>in_addr_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.in_port_t.html'
+                               title='libc::in_port_t'>in_port_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.int16_t.html'
+                               title='libc::int16_t'>int16_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.int32_t.html'
+                               title='libc::int32_t'>int32_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.int64_t.html'
+                               title='libc::int64_t'>int64_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.int8_t.html'
+                               title='libc::int8_t'>int8_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.intmax_t.html'
+                               title='libc::intmax_t'>intmax_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.intptr_t.html'
+                               title='libc::intptr_t'>intptr_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.pid_t.html'
+                               title='libc::pid_t'>pid_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.ptrdiff_t.html'
+                               title='libc::ptrdiff_t'>ptrdiff_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.sighandler_t.html'
+                               title='libc::sighandler_t'>sighandler_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.size_t.html'
+                               title='libc::size_t'>size_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.ssize_t.html'
+                               title='libc::ssize_t'>ssize_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.uid_t.html'
+                               title='libc::uid_t'>uid_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.uint16_t.html'
+                               title='libc::uint16_t'>uint16_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.uint32_t.html'
+                               title='libc::uint32_t'>uint32_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.uint64_t.html'
+                               title='libc::uint64_t'>uint64_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.uint8_t.html'
+                               title='libc::uint8_t'>uint8_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.uintmax_t.html'
+                               title='libc::uintmax_t'>uintmax_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='type' href='type.uintptr_t.html'
+                               title='libc::uintptr_t'>uintptr_t</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                </table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "libc";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script async src="../search-index.js"></script>
+</body>
+</html>
