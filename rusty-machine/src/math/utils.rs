@@ -1,3 +1,7 @@
+//! Linear algebra utils module.
+//! 
+//! Contains support methods for linear algebra structs.
+
 use std::cmp;
 use libnum::{Zero};
 use std::ops::{Add, Mul};
