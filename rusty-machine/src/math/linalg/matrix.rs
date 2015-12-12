@@ -162,7 +162,7 @@ impl<T: Zero + One + Copy> Matrix<T> {
     }
 }
 
-impl<T: Copy + Zero + PartialEq> Matrix<T> {
+impl<T: Copy + Zero + One + PartialEq> Matrix<T> {
 
     /// Checks if matrix is diagonal.
     ///
@@ -265,9 +265,45 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
 
     /// Computes the inverse of the matrix.
     ///
-    /// Currently not implemented.
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::math::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(2,2, vec![2.,3.,1.,2.]);
+    /// let inv = a.inverse();
+    ///
+    /// let I = a * inv;
+    ///
+    /// assert_eq!(I.data, vec![1.0,0.0,0.0,1.0]);
+    /// ```
     pub fn inverse(&self) -> Matrix<T> {
-        unimplemented!();
+        assert_eq!(self.rows, self.cols);
+
+        let mut new_t_data = Vec::<T>::new();
+        let (l,u,p) = self.lup_decomp();
+
+        let mut d = T::one();
+
+        for i in 0..l.cols {
+            d = d * l[[i,i]];
+            d = d * u[[i,i]];
+        }
+
+        if d == T::zero() {
+            panic!("Matrix has zero determinant.")
+        }
+
+        for i in 0..self.rows {
+            let mut id_col = vec![T::zero(); self.cols];
+            id_col[i] = T::one();
+
+            let b = l.solve_l_triangular(&p * Vector::new(id_col));
+            new_t_data.append(&mut u.solve_u_triangular(b).data);
+
+        }
+
+        Matrix::new(self.rows, self.cols, new_t_data).transpose()
     }
 
     /// Computes the determinant of the matrix.
@@ -310,17 +346,17 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         }
 
         let (l,u,p) = self.lup_decomp();
-
+        
         let mut d = T::one();
 
-        for i in 0..n {
+        for i in 0..l.cols {
             d = d * l[[i,i]];
             d = d * u[[i,i]];
         }
 
         let sgn = p.parity();
 
-        return sgn * d;
+        return sgn * d;   
     }
 
     /// Computes the parity of a permutation matrix.
