@@ -2,6 +2,17 @@ use std::cmp;
 use libnum::{Zero};
 use std::ops::{Add, Mul};
 
+/// Compute dot product of two slices.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::math::utils;
+/// let a = vec![1.0,2.0,3.0,4.0];
+/// let b = vec![1.0,2.0,3.0,4.0];
+///
+/// let c = utils::dot(&a,&b);
+/// ```
 pub fn dot<T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>>(u: &[T], v: &[T]) -> T {
     let len = cmp::min(u.len(), v.len());
     let mut xs = &u[..len];
@@ -36,6 +47,17 @@ pub fn dot<T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>>(u: &[T], v: &[T
     s
  }
 
+/// Compute sum of two slices.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::math::utils;
+/// let a = vec![1.0,2.0,3.0,4.0];
+/// let b = vec![1.0,2.0,3.0,4.0];
+///
+/// let c = utils::unrolled_sum(&a,&b);
+/// ```
 pub fn unrolled_sum<T: Copy + Zero + Add<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
     let len = cmp::min(u.len(), v.len());
     let mut xs = &u[..len];
@@ -66,6 +88,19 @@ pub fn unrolled_sum<T: Copy + Zero + Add<T, Output=T>> (u: &[T], v: &[T]) -> Vec
     sum_data
 }
 
+/// Find argmax of slice.
+///
+/// Returns index of first occuring maximum.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::math::utils;
+/// let a = vec![1.0,2.0,3.0,4.0];
+///
+/// let c = utils::argmax(&a);
+/// assert_eq!(c, 3);
+/// ```
 pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> usize {
     assert!(u.len() != 0);
 
@@ -82,6 +117,19 @@ pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> usize {
     max_index
 }
 
+/// Find index of value in slice.
+///
+/// Returns index of first occuring value.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::math::utils;
+/// let a = vec![1.0,2.0,3.0,4.0];
+///
+/// let c = utils::find(&a, 3.0);
+/// assert_eq!(c, 2);
+/// ```
 pub fn find<T: PartialEq>(p: &[T], u: T) -> usize {
         for (i, v) in p.iter().enumerate() {
             if *v == u {
