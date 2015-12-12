@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Vector",""]]});
+initSidebarItems({"struct":[["Vector","The Vector struct."]]});
