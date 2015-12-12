@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["linalg",""],["utils",""]]});
+initSidebarItems({"mod":[["linalg",""],["utils","Linear algebra utils module."]]});

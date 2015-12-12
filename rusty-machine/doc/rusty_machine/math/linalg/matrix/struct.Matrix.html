@@ -117,7 +117,7 @@
 <span class='kw'>let</span> <span class='ident'>mat</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>,<span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>,<span class='number'>2.0</span>,<span class='number'>3.0</span>,<span class='number'>4.0</span>,<span class='number'>5.0</span>,<span class='number'>6.0</span>]);
 
 <span class='kw'>let</span> <span class='ident'>mt</span> <span class='op'>=</span> <span class='ident'>mat</span>.<span class='ident'>transpose</span>();</pre>
-</div></div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../../../libnum/traits/trait.Zero.html' title='libnum::traits::Zero'>Zero</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a>&gt; <a class='struct' href='../../../../rusty_machine/math/linalg/matrix/struct.Matrix.html' title='rusty_machine::math::linalg::matrix::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.is_diag' class='method'><code>fn <a href='#method.is_diag' class='fnname'>is_diag</a>(&amp;self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+</div></div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../../../libnum/traits/trait.Zero.html' title='libnum::traits::Zero'>Zero</a> + <a class='trait' href='../../../../libnum/traits/trait.One.html' title='libnum::traits::One'>One</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a>&gt; <a class='struct' href='../../../../rusty_machine/math/linalg/matrix/struct.Matrix.html' title='rusty_machine::math::linalg::matrix::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.is_diag' class='method'><code>fn <a href='#method.is_diag' class='fnname'>is_diag</a>(&amp;self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
 <div class='docblock'><p>Checks if matrix is diagonal.</p>
 
 <h1 id="examples" class='section-header'><a
@@ -152,7 +152,16 @@
 </div><h4 id='method.inverse' class='method'><code>fn <a href='#method.inverse' class='fnname'>inverse</a>(&amp;self) -&gt; <a class='struct' href='../../../../rusty_machine/math/linalg/matrix/struct.Matrix.html' title='rusty_machine::math::linalg::matrix::Matrix'>Matrix</a>&lt;T&gt;</code></h4>
 <div class='docblock'><p>Computes the inverse of the matrix.</p>
 
-<p>Currently not implemented.</p>
+<h1 id="examples" class='section-header'><a
+                           href="#examples">Examples</a></h1><pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>math</span>::<span class='ident'>linalg</span>::<span class='ident'>matrix</span>::<span class='ident'>Matrix</span>;
+
+<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>,<span class='number'>2</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>2.</span>,<span class='number'>3.</span>,<span class='number'>1.</span>,<span class='number'>2.</span>]);
+<span class='kw'>let</span> <span class='ident'>inv</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>inverse</span>();
+
+<span class='kw'>let</span> <span class='ident'>I</span> <span class='op'>=</span> <span class='ident'>a</span> <span class='op'>*</span> <span class='ident'>inv</span>;
+
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>I</span>.<span class='ident'>data</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>,<span class='number'>0.0</span>,<span class='number'>0.0</span>,<span class='number'>1.0</span>]);</pre>
 </div><h4 id='method.det' class='method'><code>fn <a href='#method.det' class='fnname'>det</a>(&amp;self) -&gt; T</code></h4>
 <div class='docblock'><p>Computes the determinant of the matrix.</p>
 
