@@ -1,7 +1,7 @@
 extern crate rusty_machine as rm;
 extern crate num as libnum;
 
-pub mod math {
+pub mod linalg {
 	mod mat;
 	mod utils;
 	mod vector;

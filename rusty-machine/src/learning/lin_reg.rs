@@ -1,6 +1,6 @@
 use learning::Model;
-use math::linalg::matrix::Matrix;
-use math::linalg::vector::Vector;
+use linalg::matrix::Matrix;
+use linalg::vector::Vector;
 
 pub struct LinRegressor {
 	pub b: Vector<f64>

@@ -1,5 +1,5 @@
-use rm::math::linalg::matrix::Matrix;
-use rm::math::linalg::vector::Vector;
+use rm::linalg::matrix::Matrix;
+use rm::linalg::vector::Vector;
 use rm::learning::Model;
 use rm::learning::lin_reg::LinRegressor;
 use libnum::abs;
