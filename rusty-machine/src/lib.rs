@@ -15,7 +15,3 @@ pub mod math {
 	// this should be private and tested in document.
 	pub mod utils;
 }
-
-pub mod optim {
-
-}
