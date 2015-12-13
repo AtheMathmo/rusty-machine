@@ -118,7 +118,7 @@ impl<T: Copy + Zero + Add<T, Output=T>> Vector<T> {
     }
 }
 
-impl<T: Copy + Zero + Add<T, Output=T> + Div<T, Output=T> + FromPrimitive> Vector<T> {
+impl<T: Copy + Zero + Float + FromPrimitive> Vector<T> {
 
     /// The mean of the vector.
     ///
@@ -137,6 +137,31 @@ impl<T: Copy + Zero + Add<T, Output=T> + Div<T, Output=T> + FromPrimitive> Vecto
     pub fn mean(&self) -> T {
         let sum = self.sum();
         sum / FromPrimitive::from_usize(self.data.len()).unwrap()
+    }
+
+    /// The variance of the vector.
+    ///
+    /// Returns the unbiased sample variance of the vector.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::vector::Vector;
+    ///
+    /// let a = Vector::<f32>::new(vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = a.variance();
+    /// assert_eq!(c, 5.0/3.0);
+    /// ```
+    pub fn variance(&self) -> T {
+        let m = self.mean();
+        let mut var = T::zero();
+
+        for u in &self.data {
+            var = var + (*u-m)*(*u-m);
+        }
+
+        var / FromPrimitive::from_usize(self.data.len() - 1).unwrap()
     }
 }
 
