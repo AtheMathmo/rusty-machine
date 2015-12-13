@@ -28,7 +28,9 @@ pub mod stats {
 
 			fn logpdf(&self, x: T) -> f64;
 
-			fn sample(&self) -> T;
+			fn cdf(&self, x: T)-> f64;
 		}
+
+		pub mod exponential;
 	}
 }
