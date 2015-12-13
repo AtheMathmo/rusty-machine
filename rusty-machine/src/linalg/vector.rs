@@ -7,7 +7,7 @@ use std::ops::{Mul, Add, Div, Sub, Index};
 use libnum::{One, Zero, Float, FromPrimitive};
 use std::cmp::PartialEq;
 use linalg::Metric;
-use linalg::utils::dot;
+use linalg::utils;
 
 /// The Vector struct.
 ///
@@ -93,7 +93,7 @@ impl<T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Vector<T> {
     /// assert_eq!(c, 20.0);
     /// ```
 	pub fn dot(&self, v: &Vector<T>) -> T {
-    	dot(&self.data, &v.data)
+    	utils::dot(&self.data, &v.data)
     }
 }
 
@@ -298,7 +298,7 @@ impl<'a, 'b, T: Copy + One + Zero + Add<T, Output=T>> Add<&'b Vector<T>> for &'a
 	fn add(self, v: &Vector<T>) -> Vector<T> {
 		assert!(self.size == v.size);
 
-		let new_data = self.data.iter().enumerate().map(|(i,s)| *s + v.data[i]).collect();
+		let new_data = utils::vec_sum(&self.data, &v.data);
 
         Vector {
             size: self.size,
@@ -382,7 +382,7 @@ impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'b Vector<T>> for &'a
 	fn sub(self, v: &Vector<T>) -> Vector<T> {
 		assert!(self.size == v.size);
 
-		let new_data = self.data.iter().enumerate().map(|(i,s)| *s - v.data[i]).collect();
+		let new_data = utils::vec_sub(&self.data, &v.data);
 
         Vector {
             size: self.size,

@@ -8,7 +8,7 @@ use libnum::{One, Zero, Float};
 use std::cmp::PartialEq;
 use linalg::Metric;
 use linalg::vector::Vector;
-use linalg::utils::{dot, argmax, find};
+use linalg::utils;
 
 /// The Matrix struct.
 ///
@@ -372,7 +372,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
                 while !visited[next] {
                     len += 1;
                     visited[next] = true;
-                    next = find(&self.data[next*self.cols..(next+1)*self.cols], T::one());
+                    next = utils::find(&self.data[next*self.cols..(next+1)*self.cols], T::one());
                 }
 
                 if len % 2 == 0 {
@@ -413,7 +413,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
 
         // Compute the permutation matrix
         for i in 0..n {
-            let row = argmax(&mt.data[i*(n+1)..(i+1)*n]) + i;
+            let row = utils::argmax(&mt.data[i*(n+1)..(i+1)*n]) + i;
 
             if row != i {
                 for j in 0..n {
@@ -538,7 +538,7 @@ impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
         {
             for j in 0..m.cols
             {
-                new_data[i * m.cols + j] = dot( &self.data[(i * self.cols)..((i+1)*self.cols)], &mt.data[(j*m.rows)..((j+1)*m.rows)] );
+                new_data[i * m.cols + j] = utils::dot( &self.data[(i * self.cols)..((i+1)*self.cols)], &mt.data[(j*m.rows)..((j+1)*m.rows)] );
             }
         }
 
@@ -588,7 +588,7 @@ impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
 
         for i in 0..self.rows
         {
-            new_data[i] = dot(&self.data[i*self.cols..(i+1)*self.cols], &v.data);
+            new_data[i] = utils::dot(&self.data[i*self.cols..(i+1)*self.cols], &v.data);
         }
 
         return Vector {
@@ -674,8 +674,7 @@ impl<'a, 'b, T: Copy + One + Zero + Add<T, Output=T>> Add<&'b Matrix<T>> for &'a
 		assert!(self.cols == m.cols);
 		assert!(self.rows == m.rows);
 
-		let new_data = self.data.iter().enumerate().map(|(i,v)| *v + m.data[i]).collect();
-        //let new_data = unrolled_sum(&self.data, &m.data);
+		let new_data = utils::vec_sum(&self.data, &m.data);
 
         Matrix {
             cols: self.cols,
@@ -762,7 +761,7 @@ impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'b Matrix<T>> for &'a
 		assert!(self.cols == m.cols);
 		assert!(self.rows == m.rows);
 
-		let new_data = self.data.iter().enumerate().map(|(i,v)| *v - m.data[i]).collect();
+		let new_data = utils::vec_sub(&self.data, &m.data);
 
         Matrix {
             cols: self.cols,
