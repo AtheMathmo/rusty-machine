@@ -61,27 +61,29 @@
 <span id="19">19</span>
 <span id="20">20</span>
 <span id="21">21</span>
+<span id="22">22</span>
 </pre><pre class='rust '>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>num</span> <span class='kw'>as</span> <span class='ident'>libnum</span>;
 
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>math</span> {
-	
-	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>linalg</span> {
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>linalg</span> {
 
-		<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Metric</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-			<span class='kw'>fn</span> <span class='ident'>norm</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span>;
-		}
-
-		<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>matrix</span>;
-		<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>vector</span>;
+	<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Metric</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+		<span class='kw'>fn</span> <span class='ident'>norm</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span>;
 	}
 
-	<span class='comment'>// this should be private and tested in document.</span>
+	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>matrix</span>;
+	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>vector</span>;
 	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>utils</span>;
 }
 
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>optim</span> {
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>learning</span> {
+	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>lin_reg</span>;
 
+	<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Model</span><span class='op'>&lt;</span><span class='ident'>T</span>,<span class='ident'>U</span><span class='op'>&gt;</span> {
+		<span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>:<span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>U</span>;
+
+		<span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>:<span class='ident'>T</span>, <span class='ident'>value</span>:<span class='ident'>U</span>);
+	}
 }</pre>
 </section>
     <section id='search' class="content hidden"></section>
