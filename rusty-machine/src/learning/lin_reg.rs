@@ -39,6 +39,11 @@ impl Model<Matrix<f64>, Vector<f64>> for LinRegressor {
 	/// # Examples
 	///
 	/// ```
+	/// use rusty_machine::learning::lin_reg::LinRegressor;
+	/// use rusty_machine::linalg::matrix::Matrix;
+	/// use rusty_machine::linalg::vector::Vector;
+	/// use rusty_machine::learning::Model;
+	///
 	/// let mut lin_mod = LinRegressor::new();
 	/// let data = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
 	/// let values = Vector::new(vec![5.0, 6.0, 7.0]);
