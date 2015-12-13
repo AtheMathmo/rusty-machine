@@ -20,3 +20,15 @@ pub mod learning {
 		fn train(&mut self, data:T, value:U);
 	}
 }
+
+pub mod stats {
+	pub mod dist {
+		pub trait Distribution<T> {
+			fn pdf(&self, x:T) -> f64;
+
+			fn logpdf(&self, x: T) -> f64;
+
+			fn sample(&self) -> T;
+		}
+	}
+}
