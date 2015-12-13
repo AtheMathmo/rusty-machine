@@ -11,7 +11,7 @@ use std::ops::{Add, Mul};
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::math::utils;
+/// use rusty_machine::linalg::utils;
 /// let a = vec![1.0,2.0,3.0,4.0];
 /// let b = vec![1.0,2.0,3.0,4.0];
 ///
@@ -56,7 +56,7 @@ pub fn dot<T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>>(u: &[T], v: &[T
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::math::utils;
+/// use rusty_machine::linalg::utils;
 /// let a = vec![1.0,2.0,3.0,4.0];
 /// let b = vec![1.0,2.0,3.0,4.0];
 ///
@@ -99,7 +99,7 @@ pub fn unrolled_sum<T: Copy + Zero + Add<T, Output=T>> (u: &[T], v: &[T]) -> Vec
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::math::utils;
+/// use rusty_machine::linalg::utils;
 /// let a = vec![1.0,2.0,3.0,4.0];
 ///
 /// let c = utils::argmax(&a);
@@ -128,7 +128,7 @@ pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> usize {
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::math::utils;
+/// use rusty_machine::linalg::utils;
 /// let a = vec![1.0,2.0,3.0,4.0];
 ///
 /// let c = utils::find(&a, 3.0);

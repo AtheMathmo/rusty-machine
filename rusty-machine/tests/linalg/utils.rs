@@ -1,6 +1,4 @@
-extern crate rusty_machine as rm;
-
-use rm::math::utils;
+use rm::linalg::utils;
 
 #[test]
 fn argmax() {

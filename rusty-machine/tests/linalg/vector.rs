@@ -1,7 +1,5 @@
-extern crate rusty_machine as rm;
-
-use rm::math::linalg::vector::Vector;
-use rm::math::linalg::Metric;
+use rm::linalg::vector::Vector;
+use rm::linalg::Metric;
 
 #[test]
 fn create_vector_new() {

@@ -6,9 +6,9 @@
 use std::ops::{Mul, Add, Div, Sub, Index, Neg};
 use libnum::{One, Zero, Float};
 use std::cmp::PartialEq;
-use math::linalg::Metric;
-use math::linalg::vector::Vector;
-use math::utils::{dot, argmax, find};
+use linalg::Metric;
+use linalg::vector::Vector;
+use linalg::utils::{dot, argmax, find};
 
 /// The Matrix struct.
 ///
@@ -28,7 +28,7 @@ impl<T: Zero + One + Copy> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::Matrix;
     ///
     /// let mat = Matrix::new(2,2, vec![1.0,2.0,3.0,4.0]);
     /// ```
@@ -49,7 +49,7 @@ impl<T: Zero + One + Copy> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::Matrix;
     ///
     /// let mat = Matrix::<f64>::zeros(2,3);
     /// ```
@@ -68,7 +68,7 @@ impl<T: Zero + One + Copy> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::Matrix;
     ///
     /// let mat = Matrix::<f64>::ones(2,3);
     /// ```
@@ -87,7 +87,7 @@ impl<T: Zero + One + Copy> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::Matrix;
     ///
     /// let I = Matrix::<f64>::identity(4);
     /// ```
@@ -113,7 +113,7 @@ impl<T: Zero + One + Copy> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::Matrix;
     ///
     /// let mat = Matrix::from_diag(&vec![1.0,2.0,3.0,4.0]);
     /// ```
@@ -138,7 +138,7 @@ impl<T: Zero + One + Copy> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::Matrix;
     /// 
     /// let mat = Matrix::new(2,3, vec![1.0,2.0,3.0,4.0,5.0,6.0]);
     ///
@@ -169,7 +169,7 @@ impl<T: Copy + Zero + One + PartialEq> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(2,2, vec![1.0,0.0,0.0,1.0]);
     /// let a_diag = a.is_diag();
@@ -246,8 +246,8 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::matrix::Matrix;
-    /// use rusty_machine::math::linalg::vector::Vector;
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::vector::Vector;
     ///
     /// let a = Matrix::new(2,2, vec![2.0,3.0,1.0,2.0]);
     /// let y = Vector::new(vec![13.0,8.0]);
@@ -268,7 +268,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(2,2, vec![2.,3.,1.,2.]);
     /// let inv = a.inverse();
@@ -311,7 +311,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
     ///                               0.0,3.0,4.0,
@@ -390,7 +390,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
     ///                               0.0,3.0,4.0,
@@ -837,8 +837,8 @@ impl<T: Float> Metric<T> for Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::matrix::Matrix;
-    /// use rusty_machine::math::linalg::Metric;
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::Metric;
     ///
     /// let a = Matrix::new(2,1, vec![3.0,4.0]);
     /// let c = a.norm();

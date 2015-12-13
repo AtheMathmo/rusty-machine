@@ -4,10 +4,10 @@
 //! relating to the vector linear algebra struct.
 
 use std::ops::{Mul, Add, Div, Sub, Index};
-use libnum::{One, Zero, Float};
+use libnum::{One, Zero, Float, FromPrimitive};
 use std::cmp::PartialEq;
-use math::linalg::Metric;
-use math::utils::dot;
+use linalg::Metric;
+use linalg::utils::dot;
 
 /// The Vector struct.
 ///
@@ -26,7 +26,7 @@ impl<T: Zero + One + Copy> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::vector::Vector;
+    /// use rusty_machine::linalg::vector::Vector;
     ///
     /// let vec = Vector::new(vec![1.0,2.0,3.0,4.0]);
     /// ```
@@ -47,7 +47,7 @@ impl<T: Zero + One + Copy> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::vector::Vector;
+    /// use rusty_machine::linalg::vector::Vector;
     ///
     /// let vec = Vector::<f64>::zeros(10);
     /// ```
@@ -65,7 +65,7 @@ impl<T: Zero + One + Copy> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::vector::Vector;
+    /// use rusty_machine::linalg::vector::Vector;
     ///
     /// let vec = Vector::<f64>::ones(10);
     /// ```
@@ -84,7 +84,7 @@ impl<T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::vector::Vector;
+    /// use rusty_machine::linalg::vector::Vector;
     ///
     /// let a = Vector::new(vec![1.0,2.0,3.0,4.0]);
     /// let b = Vector::new(vec![2.0; 4]);
@@ -94,6 +94,49 @@ impl<T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Vector<T> {
     /// ```
 	pub fn dot(&self, v: &Vector<T>) -> T {
     	dot(&self.data, &v.data)
+    }
+}
+
+impl<T: Copy + Zero + Add<T, Output=T>> Vector<T> {
+
+    /// The sum of the vector.
+    ///
+    /// Returns the sum of all elements in the vector.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::vector::Vector;
+    ///
+    /// let a = Vector::new(vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = a.sum();
+    /// assert_eq!(c, 10.0);
+    /// ```
+    pub fn sum(&self) -> T {
+        self.data.iter().fold(T::zero(), |sum, &val| sum + val)
+    }
+}
+
+impl<T: Copy + Zero + Add<T, Output=T> + Div<T, Output=T> + FromPrimitive> Vector<T> {
+
+    /// The mean of the vector.
+    ///
+    /// Returns the arithmetic mean of the vector.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::vector::Vector;
+    ///
+    /// let a = Vector::<f32>::new(vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = a.mean();
+    /// assert_eq!(c, 2.5);
+    /// ```
+    pub fn mean(&self) -> T {
+        let sum = self.sum();
+        sum / FromPrimitive::from_usize(self.data.len()).unwrap()
     }
 }
 
@@ -366,8 +409,8 @@ impl<T: Float> Metric<T> for Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::math::linalg::vector::Vector;
-    /// use rusty_machine::math::linalg::Metric;
+    /// use rusty_machine::linalg::vector::Vector;
+    /// use rusty_machine::linalg::Metric;
     ///
     /// let a = Vector::new(vec![3.0,4.0]);
     /// let c = a.norm();
