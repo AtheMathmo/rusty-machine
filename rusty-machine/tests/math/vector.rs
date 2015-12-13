@@ -1,5 +1,3 @@
-extern crate rusty_machine as rm;
-
 use rm::math::linalg::vector::Vector;
 use rm::math::linalg::Metric;
 

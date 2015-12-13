@@ -1,5 +1,3 @@
-extern crate rusty_machine as rm;
-
 use rm::math::utils;
 
 #[test]
