@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["matrix","The matrix module."],["utils","Linear algebra utils module."],["vector","The vector module."]],"trait":[["Metric",""]]});
