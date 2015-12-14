@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `dot` fn in crate `rusty_machine`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, dot">
+    <meta name="description" content="API documentation for the Rust `vec_sub` fn in crate `rusty_machine`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, vec_sub">
 
-    <title>rusty_machine::linalg::utils::dot - Rust</title>
+    <title>rusty_machine::linalg::utils::vec_sub - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
@@ -26,7 +26,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'><a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>linalg</a>::<wbr><a href='index.html'>utils</a></p><script>window.sidebarCurrent = {name: 'dot', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'><a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>linalg</a>::<wbr><a href='index.html'>utils</a></p><script>window.sidebarCurrent = {name: 'vec_sub', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -41,12 +41,12 @@
     </nav>
 
     <section id='main' class="content fn">
-<h1 class='fqn'><span class='in-band'>Function <a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>linalg</a>::<wbr><a href='index.html'>utils</a>::<wbr><a class='fn' href=''>dot</a></span><span class='out-of-band'><span id='render-detail'>
+<h1 class='fqn'><span class='in-band'>Function <a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>linalg</a>::<wbr><a href='index.html'>utils</a>::<wbr><a class='fn' href=''>vec_sub</a></span><span class='out-of-band'><span id='render-detail'>
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-5668' class='srclink' href='../../../src/rusty_machine/linalg/utils.rs.html#20-52' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn dot&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../../libnum/traits/trait.Zero.html' title='libnum::traits::Zero'>Zero</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Add.html' title='core::ops::Add'>Add</a>&lt;T, Output=T&gt; + <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Mul.html' title='core::ops::Mul'>Mul</a>&lt;T, Output=T&gt;&gt;(u: <a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a>T<a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>, v: <a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a>T<a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; T</pre><div class='docblock'><p>Compute dot product of two slices.</p>
+        </span><a id='src-6038' class='srclink' href='../../../src/rusty_machine/linalg/utils.rs.html#93-104' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn vec_sub&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../../libnum/traits/trait.Zero.html' title='libnum::traits::Zero'>Zero</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Sub.html' title='core::ops::Sub'>Sub</a>&lt;T, Output=T&gt;&gt;(u: <a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a>T<a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>, v: <a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a>T<a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;</pre><div class='docblock'><p>Compute vector difference two slices.</p>
 
 <h1 id="examples" class='section-header'><a
                            href="#examples">Examples</a></h1><pre class='rust rust-example-rendered'>
@@ -54,7 +54,9 @@
 <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>,<span class='number'>2.0</span>,<span class='number'>3.0</span>,<span class='number'>4.0</span>];
 <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>,<span class='number'>2.0</span>,<span class='number'>3.0</span>,<span class='number'>4.0</span>];
 
-<span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>utils</span>::<span class='ident'>dot</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>,<span class='kw-2'>&amp;</span><span class='ident'>b</span>);</pre>
+<span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>utils</span>::<span class='ident'>vec_sub</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>,<span class='kw-2'>&amp;</span><span class='ident'>b</span>);
+
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0.0</span>; <span class='number'>4</span>]);</pre>
 </div></section>
     <section id='search' class="content hidden"></section>
 
