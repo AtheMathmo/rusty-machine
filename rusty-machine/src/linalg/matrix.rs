@@ -4,7 +4,7 @@
 //! relating to the matrix linear algebra struct.
 
 use std::ops::{Mul, Add, Div, Sub, Index, Neg};
-use libnum::{One, Zero, Float};
+use libnum::{One, Zero, Float, FromPrimitive};
 use std::cmp::PartialEq;
 use linalg::Metric;
 use linalg::vector::Vector;
@@ -243,6 +243,35 @@ impl<T: Copy + Zero + One + Add<T, Output=T>> Matrix<T> {
             } 
         }
         Vector::new(col_sum)
+    }
+}
+
+impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
+
+    /// The mean of the matrix along the specified axis.
+    ///
+    /// Axis 0 - Arithmetic mean of rows.
+    /// Axis 1 - Arithmetic mean of columns.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::<f64>::new(2,2, vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = a.mean(0);
+    /// assert_eq!(c.data, vec![2.0, 3.0]);
+    /// ```
+    pub fn mean(&self, axis: usize) -> Vector<T> {
+        let m : Vector<T>;
+        let n : T;
+        match axis {
+            0 => {m = self.sum_rows(); n = FromPrimitive::from_usize(self.rows).unwrap();},
+            1 => {m = self.sum_cols(); n = FromPrimitive::from_usize(self.cols).unwrap();},
+            _ => panic!("Axis must be 0 or 1."),
+        }
+        m / n
     }
 }
 
