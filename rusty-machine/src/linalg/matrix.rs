@@ -195,6 +195,57 @@ impl<T: Copy + Zero + One + PartialEq> Matrix<T> {
     }
 }
 
+impl<T: Copy + Zero + One + Add<T, Output=T>> Matrix<T> {
+
+    /// The sum of the rows of the matrix.
+    ///
+    /// Returns a Vector equal to the sum of the matrices rows.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = a.sum_rows();
+    /// assert_eq!(c.data, vec![4.0, 6.0]);
+    /// ```
+    pub fn sum_rows(&self) -> Vector<T> {
+        let mut row_sum = vec![T::zero(); self.cols];
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                row_sum[j] = row_sum[j] + self[[i, j]];
+            } 
+        }
+        Vector::new(row_sum)
+    }
+
+    /// The sum of the columns of the matrix.
+    ///
+    /// Returns a Vector equal to the sum of the matrices columns.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = a.sum_cols();
+    /// assert_eq!(c.data, vec![3.0, 7.0]);
+    /// ```
+    pub fn sum_cols(&self) -> Vector<T> {
+        let mut col_sum = vec![T::zero(); self.rows];
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                col_sum[i] = col_sum[i] + self[[i, j]];
+            } 
+        }
+        Vector::new(col_sum)
+    }
+}
+
 impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         + Mul<T, Output=T> + Sub<T, Output=T>
         + Div<T, Output=T> + PartialOrd> Matrix<T> {
