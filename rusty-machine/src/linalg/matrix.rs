@@ -262,6 +262,9 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
     ///
     /// let c = a.mean(0);
     /// assert_eq!(c.data, vec![2.0, 3.0]);
+    ///
+    /// let d = a.mean(1);
+    /// assert_eq!(d.data, vec![1.5, 3.5]);
     /// ```
     pub fn mean(&self, axis: usize) -> Vector<T> {
         let m : Vector<T>;
