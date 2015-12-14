@@ -1,9 +1,9 @@
 [package]
 name = "rusty-machine"
-version = "0.0.5"
+version = "0.0.6"
 authors = ["AtheMathmo"]
 
-description = "A machine learning library. (Currently only a simple linear algebra library!)"
+description = "A machine learning library. (Currently little more than a simple linear algebra library!)"
 repository = "https://github.com/AtheMathmo/rusty-machine"
 documentation = "https://AtheMathmo.github.io/rusty-machine/"
 keywords = ["machine","learning","stats","statistics","algebra"]

@@ -6,6 +6,9 @@ This project was originally intended to be an implementation of Online Collabora
 
 So this project is now going to be a machine learning crate for Rust. I began this project as a fun way to learn Rust and so there will be lots of things that need improving (I'm still not very familiar with LLVM). I hope that this crate will provide a number of standard out-the-box machine learning algorithms.
 
+#### Help!
+I've probably introduced some bad practices as I've been learning Rust. If you have any suggestions for structure or optimization please let me know.
+
 ## Implementation
 
 This project is implemented using [Rust](https://www.rust-lang.org/).
@@ -16,15 +19,15 @@ This key motivation behind this project was for me to learn some systems program
 
 ## Current Progress
 
-Working on the linear algebra library that will power the machine learning algorithms. Once this implemented the core algorithms should be easy to add on.
+I have completed a first pass at the linear algebra library. It is now functional enough that I can start adding some ML! I've implemented a basic linear regression module.
+
+I will need to update and optimize the linear algebra library but should be able to do this in tandem.
 
 ### TODO:
 
-- Implement linear systems solving using LPU (which will give inversion).
 - Multi-threaded divide and conquer matrix multiplication (currently iterative).
 - Tidy up indexing.
-
-After the above are done I will move onto the actual machine learning stuff!
+- Start work on statistics components - R.V. sampling etc.
 
 ## References
 

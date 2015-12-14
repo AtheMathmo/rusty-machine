@@ -4,7 +4,7 @@
 
 use std::cmp;
 use libnum::{Zero};
-use std::ops::{Add, Mul};
+use std::ops::{Add, Mul, Sub};
 
 /// Compute dot product of two slices.
 ///
@@ -51,7 +51,7 @@ pub fn dot<T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>>(u: &[T], v: &[T
     s
  }
 
-/// Compute sum of two slices.
+/// Compute vector sum of two slices.
 ///
 /// # Examples
 ///
@@ -60,34 +60,45 @@ pub fn dot<T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>>(u: &[T], v: &[T
 /// let a = vec![1.0,2.0,3.0,4.0];
 /// let b = vec![1.0,2.0,3.0,4.0];
 ///
-/// let c = utils::unrolled_sum(&a,&b);
+/// let c = utils::vec_sum(&a,&b);
+///
+/// assert_eq!(c, vec![2.0,4.0, 6.0, 8.0]);
 /// ```
-pub fn unrolled_sum<T: Copy + Zero + Add<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
+pub fn vec_sum<T: Copy + Zero + Add<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
     let len = cmp::min(u.len(), v.len());
-    let mut xs = &u[..len];
-    let mut ys = &v[..len];
+    let xs = &u[..len];
+    let ys = &v[..len];
     
     let mut sum_data = vec![T::zero(); len];
-    let mut holder = 0;
 
-    while xs.len() >= 8 {
-        sum_data[0+holder] = xs[0] + ys[0];
-        sum_data[1+holder] = xs[1] + ys[1];
-        sum_data[2+holder] = xs[2] + ys[2];
-        sum_data[3+holder] = xs[3] + ys[3];
-        sum_data[4+holder] = xs[4] + ys[4];
-        sum_data[5+holder] = xs[5] + ys[5];
-        sum_data[6+holder] = xs[6] + ys[6];
-        sum_data[7+holder] = xs[7] + ys[7];
-
-        xs = &xs[8..];
-        ys = &ys[8..];
-        
-        holder += 8;
+    for i in 0..len {
+        sum_data[i] = xs[i] + ys[i];
     }
+    sum_data
+}
 
-    for i in 0..xs.len() {
-        sum_data[i+holder] = xs[i] + ys[i];
+/// Compute vector difference two slices.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::linalg::utils;
+/// let a = vec![1.0,2.0,3.0,4.0];
+/// let b = vec![1.0,2.0,3.0,4.0];
+///
+/// let c = utils::vec_sub(&a,&b);
+///
+/// assert_eq!(c, vec![0.0; 4]);
+/// ```
+pub fn vec_sub<T: Copy + Zero + Sub<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
+    let len = cmp::min(u.len(), v.len());
+    let xs = &u[..len];
+    let ys = &v[..len];
+    
+    let mut sum_data = vec![T::zero(); len];
+
+    for i in 0..len {
+        sum_data[i] = xs[i] - ys[i];
     }
     sum_data
 }

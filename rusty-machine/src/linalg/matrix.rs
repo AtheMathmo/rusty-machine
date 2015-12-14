@@ -4,11 +4,11 @@
 //! relating to the matrix linear algebra struct.
 
 use std::ops::{Mul, Add, Div, Sub, Index, Neg};
-use libnum::{One, Zero, Float};
+use libnum::{One, Zero, Float, FromPrimitive};
 use std::cmp::PartialEq;
 use linalg::Metric;
 use linalg::vector::Vector;
-use linalg::utils::{dot, argmax, find};
+use linalg::utils;
 
 /// The Matrix struct.
 ///
@@ -195,6 +195,89 @@ impl<T: Copy + Zero + One + PartialEq> Matrix<T> {
     }
 }
 
+impl<T: Copy + Zero + One + Add<T, Output=T>> Matrix<T> {
+
+    /// The sum of the rows of the matrix.
+    ///
+    /// Returns a Vector equal to the sum of the matrices rows.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = a.sum_rows();
+    /// assert_eq!(c.data, vec![4.0, 6.0]);
+    /// ```
+    pub fn sum_rows(&self) -> Vector<T> {
+        let mut row_sum = vec![T::zero(); self.cols];
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                row_sum[j] = row_sum[j] + self[[i, j]];
+            } 
+        }
+        Vector::new(row_sum)
+    }
+
+    /// The sum of the columns of the matrix.
+    ///
+    /// Returns a Vector equal to the sum of the matrices columns.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = a.sum_cols();
+    /// assert_eq!(c.data, vec![3.0, 7.0]);
+    /// ```
+    pub fn sum_cols(&self) -> Vector<T> {
+        let mut col_sum = vec![T::zero(); self.rows];
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                col_sum[i] = col_sum[i] + self[[i, j]];
+            } 
+        }
+        Vector::new(col_sum)
+    }
+}
+
+impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
+
+    /// The mean of the matrix along the specified axis.
+    ///
+    /// Axis 0 - Arithmetic mean of rows.
+    /// Axis 1 - Arithmetic mean of columns.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::<f64>::new(2,2, vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = a.mean(0);
+    /// assert_eq!(c.data, vec![2.0, 3.0]);
+    ///
+    /// let d = a.mean(1);
+    /// assert_eq!(d.data, vec![1.5, 3.5]);
+    /// ```
+    pub fn mean(&self, axis: usize) -> Vector<T> {
+        let m : Vector<T>;
+        let n : T;
+        match axis {
+            0 => {m = self.sum_rows(); n = FromPrimitive::from_usize(self.rows).unwrap();},
+            1 => {m = self.sum_cols(); n = FromPrimitive::from_usize(self.cols).unwrap();},
+            _ => panic!("Axis must be 0 or 1."),
+        }
+        m / n
+    }
+}
+
 impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         + Mul<T, Output=T> + Sub<T, Output=T>
         + Div<T, Output=T> + PartialOrd> Matrix<T> {
@@ -372,7 +455,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
                 while !visited[next] {
                     len += 1;
                     visited[next] = true;
-                    next = find(&self.data[next*self.cols..(next+1)*self.cols], T::one());
+                    next = utils::find(&self.data[next*self.cols..(next+1)*self.cols], T::one());
                 }
 
                 if len % 2 == 0 {
@@ -413,7 +496,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
 
         // Compute the permutation matrix
         for i in 0..n {
-            let row = argmax(&mt.data[i*(n+1)..(i+1)*n]) + i;
+            let row = utils::argmax(&mt.data[i*(n+1)..(i+1)*n]) + i;
 
             if row != i {
                 for j in 0..n {
@@ -538,7 +621,7 @@ impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
         {
             for j in 0..m.cols
             {
-                new_data[i * m.cols + j] = dot( &self.data[(i * self.cols)..((i+1)*self.cols)], &mt.data[(j*m.rows)..((j+1)*m.rows)] );
+                new_data[i * m.cols + j] = utils::dot( &self.data[(i * self.cols)..((i+1)*self.cols)], &mt.data[(j*m.rows)..((j+1)*m.rows)] );
             }
         }
 
@@ -588,7 +671,7 @@ impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
 
         for i in 0..self.rows
         {
-            new_data[i] = dot(&self.data[i*self.cols..(i+1)*self.cols], &v.data);
+            new_data[i] = utils::dot(&self.data[i*self.cols..(i+1)*self.cols], &v.data);
         }
 
         return Vector {
@@ -674,8 +757,7 @@ impl<'a, 'b, T: Copy + One + Zero + Add<T, Output=T>> Add<&'b Matrix<T>> for &'a
 		assert!(self.cols == m.cols);
 		assert!(self.rows == m.rows);
 
-		let new_data = self.data.iter().enumerate().map(|(i,v)| *v + m.data[i]).collect();
-        //let new_data = unrolled_sum(&self.data, &m.data);
+		let new_data = utils::vec_sum(&self.data, &m.data);
 
         Matrix {
             cols: self.cols,
@@ -762,7 +844,7 @@ impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'b Matrix<T>> for &'a
 		assert!(self.cols == m.cols);
 		assert!(self.rows == m.rows);
 
-		let new_data = self.data.iter().enumerate().map(|(i,v)| *v - m.data[i]).collect();
+		let new_data = utils::vec_sub(&self.data, &m.data);
 
         Matrix {
             cols: self.cols,
