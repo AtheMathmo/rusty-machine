@@ -422,8 +422,9 @@ impl<T> Index<usize> for Vector<T> {
 
 	fn index(&self, idx : usize) -> &T {
 		assert!(idx < self.size);
-
-		&self.data[idx]
+        unsafe {
+            &self.data.get_unchecked(idx)
+        }
 	}
 }
 

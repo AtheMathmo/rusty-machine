@@ -907,8 +907,9 @@ impl<T> Index<[usize; 2]> for Matrix<T> {
 	fn index(&self, idx : [usize; 2]) -> &T {
 		assert!(idx[0] < self.rows);
 		assert!(idx[1] < self.cols);
-
-		&self.data[idx[0] * self.cols + idx[1]]
+        unsafe {
+		  &self.data.get_unchecked(idx[0] * self.cols + idx[1])
+        }
 	}
 }
 
