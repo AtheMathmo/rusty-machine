@@ -17,8 +17,7 @@ pub struct Vector<T> {
 	pub data: Vec<T>
 }
 
-impl<T: Zero + One + Copy> Vector<T> {
-
+impl<T> Vector<T> {
     /// Constructor for Vector struct.
     ///
     /// Requires the vector data.
@@ -32,13 +31,16 @@ impl<T: Zero + One + Copy> Vector<T> {
     /// ```
     pub fn new(data: Vec<T>) -> Vector<T> {
 
-    	let size = data.len();
+        let size = data.len();
 
         Vector {
             size: size,
             data: data
         }
     }
+}
+
+impl<T: Zero + One + Copy> Vector<T> {
 
     /// Constructs Vector of all zeros.
     ///
@@ -115,6 +117,48 @@ impl<T: Copy + Zero + Add<T, Output=T>> Vector<T> {
     /// ```
     pub fn sum(&self) -> T {
         self.data.iter().fold(T::zero(), |sum, &val| sum + val)
+    }
+}
+
+impl<T: Copy + Zero + Mul<T, Output=T>> Vector<T> {
+
+    /// The elementwise product of two vectors.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::vector::Vector;
+    ///
+    /// let a = Vector::new(vec![1.0,2.0,3.0,4.0]);
+    /// let b = Vector::new(vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = &a.elemul(&b);
+    /// assert_eq!(c.data, vec![1.0, 4.0, 9.0, 16.0]);
+    /// ```
+    pub fn elemul(&self, v: &Vector<T>) -> Vector<T> {
+        assert_eq!(self.size, v.size);
+        Vector::new(utils::ele_mul(&self.data, &v.data))
+    }
+}
+
+impl<T: Copy + Zero + Div<T, Output=T>> Vector<T> {
+
+    /// The elementwise division of two vectors.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::vector::Vector;
+    ///
+    /// let a = Vector::new(vec![1.0,2.0,3.0,4.0]);
+    /// let b = Vector::new(vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = &a.elediv(&b);
+    /// assert_eq!(c.data, vec![1.0; 4]);
+    /// ```
+    pub fn elediv(&self, v: &Vector<T>) -> Vector<T> {
+        assert_eq!(self.size, v.size);
+        Vector::new(utils::ele_div(&self.data, &v.data))
     }
 }
 
@@ -422,8 +466,9 @@ impl<T> Index<usize> for Vector<T> {
 
 	fn index(&self, idx : usize) -> &T {
 		assert!(idx < self.size);
-
-		&self.data[idx]
+        unsafe {
+            &self.data.get_unchecked(idx)
+        }
 	}
 }
 

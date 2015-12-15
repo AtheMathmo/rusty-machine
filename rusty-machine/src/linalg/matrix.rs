@@ -19,7 +19,7 @@ pub struct Matrix<T> {
 	pub data: Vec<T>
 }
 
-impl<T: Zero + One + Copy> Matrix<T> {
+impl<T> Matrix<T> {
 
     /// Constructor for Matrix struct.
     ///
@@ -41,6 +41,10 @@ impl<T: Zero + One + Copy> Matrix<T> {
             data: data
         }
     }
+
+}
+
+impl<T: Zero + One + Copy> Matrix<T> {
 
     /// Constructs matrix of all zeros.
     ///
@@ -246,6 +250,52 @@ impl<T: Copy + Zero + One + Add<T, Output=T>> Matrix<T> {
     }
 }
 
+impl<T: Copy + Zero + Mul<T, Output=T>> Matrix<T> {
+
+    /// The elementwise product of two matrices.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
+    /// let b = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = &a.elemul(&b);
+    /// assert_eq!(c.data, vec![1.0, 4.0, 9.0, 16.0]);
+    /// ```
+    pub fn elemul(&self, m: &Matrix<T>) -> Matrix<T> {
+        assert_eq!(self.rows, m.rows);
+        assert_eq!(self.cols, m.cols);
+
+        Matrix::new(self.rows, self.cols, utils::ele_mul(&self.data, &m.data))
+    }
+}
+
+impl<T: Copy + Zero + Div<T, Output=T>> Matrix<T> {
+
+    /// The elementwise division of two matrices.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
+    /// let b = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = &a.elediv(&b);
+    /// assert_eq!(c.data, vec![1.0; 4]);
+    /// ```
+    pub fn elediv(&self, m: &Matrix<T>) -> Matrix<T> {
+        assert_eq!(self.rows, m.rows);
+        assert_eq!(self.cols, m.cols);
+
+        Matrix::new(self.rows, self.cols, utils::ele_div(&self.data, &m.data))
+    }
+}
+
 impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
 
     /// The mean of the matrix along the specified axis.
@@ -275,6 +325,59 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
             _ => panic!("Axis must be 0 or 1."),
         }
         m / n
+    }
+
+    /// The variance of the matrix along the specified axis.
+    ///
+    /// Axis 0 - Sample variance of rows.
+    /// Axis 1 - Sample variance of columns.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::<f32>::new(2,2,vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = a.variance(0);
+    /// assert_eq!(c.data, vec![2.0, 2.0]);
+    ///
+    /// let d = a.variance(1);
+    /// assert_eq!(d.data, vec![0.5, 0.5]);
+    /// ```
+    pub fn variance(&self, axis: usize) -> Vector<T> {
+        let mean = self.mean(axis);
+
+        let n : usize;
+        let m : usize;
+
+        match axis { 
+            0 => {n = self.rows; m = self.cols;},
+            1 => {n = self.cols; m = self.rows;},
+            _ => panic!("Axis must be 0 or 1."),
+        }
+
+        let mut variance = Vector::new(vec![T::zero(); m]);
+
+        for i in 0..n {
+            let mut t = Vec::<T>::new();
+
+            for j in 0..m {
+                match axis {
+                    0 => t.push( self[[i,j]] ),
+                    1 => t.push( self[[j,i]] ),
+                    _ => panic!("Axis must be 0 or 1."),
+                }
+                
+            }
+
+            let v = Vector::new(t);
+
+            variance = variance + &(&v-&mean).elemul(&(&v-&mean));
+        }
+
+        let var_size:T = FromPrimitive::from_usize(n-1).unwrap();
+        variance / var_size
     }
 }
 
@@ -907,8 +1010,9 @@ impl<T> Index<[usize; 2]> for Matrix<T> {
 	fn index(&self, idx : [usize; 2]) -> &T {
 		assert!(idx[0] < self.rows);
 		assert!(idx[1] < self.cols);
-
-		&self.data[idx[0] * self.cols + idx[1]]
+        unsafe {
+		  &self.data.get_unchecked(idx[0] * self.cols + idx[1])
+        }
 	}
 }
 
