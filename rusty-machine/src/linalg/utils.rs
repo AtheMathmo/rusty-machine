@@ -4,7 +4,7 @@
 
 use std::cmp;
 use libnum::{Zero};
-use std::ops::{Add, Mul, Sub};
+use std::ops::{Add, Mul, Sub, Div};
 
 /// Compute dot product of two slices.
 ///
@@ -99,6 +99,58 @@ pub fn vec_sub<T: Copy + Zero + Sub<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
 
     for i in 0..len {
         sum_data[i] = xs[i] - ys[i];
+    }
+    sum_data
+}
+
+/// Computes elementwise multiplication.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::linalg::utils;
+/// let a = vec![1.0,2.0,3.0,4.0];
+/// let b = vec![1.0,2.0,3.0,4.0];
+///
+/// let c = utils::ele_mul(&a,&b);
+///
+/// assert_eq!(c, vec![1.0,4.0,9.0,16.0]);
+/// ```
+pub fn ele_mul<T: Copy + Zero + Mul<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
+    let len = cmp::min(u.len(), v.len());
+    let xs = &u[..len];
+    let ys = &v[..len];
+    
+    let mut sum_data = vec![T::zero(); len];
+
+    for i in 0..len {
+        sum_data[i] = xs[i] * ys[i];
+    }
+    sum_data
+}
+
+/// Computes elementwise division.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::linalg::utils;
+/// let a = vec![1.0,2.0,3.0,4.0];
+/// let b = vec![1.0,2.0,3.0,4.0];
+///
+/// let c = utils::ele_div(&a,&b);
+///
+/// assert_eq!(c, vec![1.0,4.0,9.0,16.0]);
+/// ```
+pub fn ele_div<T: Copy + Zero + Div<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
+    let len = cmp::min(u.len(), v.len());
+    let xs = &u[..len];
+    let ys = &v[..len];
+    
+    let mut sum_data = vec![T::zero(); len];
+
+    for i in 0..len {
+        sum_data[i] = xs[i] / ys[i];
     }
     sum_data
 }
