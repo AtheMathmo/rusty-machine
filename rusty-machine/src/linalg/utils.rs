@@ -140,7 +140,7 @@ pub fn ele_mul<T: Copy + Zero + Mul<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
 ///
 /// let c = utils::ele_div(&a,&b);
 ///
-/// assert_eq!(c, vec![1.0,4.0,9.0,16.0]);
+/// assert_eq!(c, vec![1.0; 4]);
 /// ```
 pub fn ele_div<T: Copy + Zero + Div<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
     let len = cmp::min(u.len(), v.len());
