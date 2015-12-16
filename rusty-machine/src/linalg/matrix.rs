@@ -1,5 +1,5 @@
 //! The matrix module.
-//! 
+//!
 //! Currently contains all code
 //! relating to the matrix linear algebra struct.
 
@@ -14,13 +14,12 @@ use linalg::utils;
 ///
 /// Can be instantiated with any type.
 pub struct Matrix<T> {
-	pub cols: usize,
-	pub rows: usize,
-	pub data: Vec<T>
+    pub cols: usize,
+    pub rows: usize,
+    pub data: Vec<T>,
 }
 
 impl<T> Matrix<T> {
-
     /// Constructor for Matrix struct.
     ///
     /// Requires both the row and column dimensions.
@@ -34,18 +33,16 @@ impl<T> Matrix<T> {
     /// ```
     pub fn new(rows: usize, cols: usize, data: Vec<T>) -> Matrix<T> {
 
-        assert_eq!(cols*rows, data.len());
+        assert_eq!(cols * rows, data.len());
         Matrix {
             cols: cols,
             rows: rows,
-            data: data
+            data: data,
         }
     }
-
 }
 
 impl<T: Zero + One + Copy> Matrix<T> {
-
     /// Constructs matrix of all zeros.
     ///
     /// Requires both the row and the column dimensions.
@@ -58,10 +55,10 @@ impl<T: Zero + One + Copy> Matrix<T> {
     /// let mat = Matrix::<f64>::zeros(2,3);
     /// ```
     pub fn zeros(rows: usize, cols: usize) -> Matrix<T> {
-    	Matrix {
+        Matrix {
             cols: cols,
             rows: rows,
-            data: vec![T::zero(); cols*rows]
+            data: vec![T::zero(); cols*rows],
         }
     }
 
@@ -80,7 +77,7 @@ impl<T: Zero + One + Copy> Matrix<T> {
         Matrix {
             cols: cols,
             rows: rows,
-            data: vec![T::one(); cols*rows]
+            data: vec![T::one(); cols*rows],
         }
     }
 
@@ -96,17 +93,16 @@ impl<T: Zero + One + Copy> Matrix<T> {
     /// let I = Matrix::<f64>::identity(4);
     /// ```
     pub fn identity(size: usize) -> Matrix<T> {
-    	let mut data = vec![T::zero(); size * size];
+        let mut data = vec![T::zero(); size * size];
 
-    	for i in 0..size
-    	{
-    		data[(i*(size+1)) as usize] = T::one();
-    	}
+        for i in 0..size {
+            data[(i * (size + 1)) as usize] = T::one();
+        }
 
-    	Matrix {
+        Matrix {
             cols: size,
             rows: size,
-            data: data
+            data: data,
         }
     }
 
@@ -122,18 +118,17 @@ impl<T: Zero + One + Copy> Matrix<T> {
     /// let mat = Matrix::from_diag(&vec![1.0,2.0,3.0,4.0]);
     /// ```
     pub fn from_diag(diag: &[T]) -> Matrix<T> {
-    	let size = diag.len();
-    	let mut data = vec![T::zero(); size * size];
+        let size = diag.len();
+        let mut data = vec![T::zero(); size * size];
 
-    	for i in 0..size
-    	{
-    		data[(i*(size+1)) as usize] = diag[i];
-    	}
+        for i in 0..size {
+            data[(i * (size + 1)) as usize] = diag[i];
+        }
 
-    	Matrix {
+        Matrix {
             cols: size,
             rows: size,
-            data: data
+            data: data,
         }
     }
 
@@ -150,24 +145,21 @@ impl<T: Zero + One + Copy> Matrix<T> {
     /// ```
     pub fn transpose(&self) -> Matrix<T> {
         let mut new_data = vec![T::zero(); self.cols * self.rows];
-        for i in 0..self.cols
-        {
-            for j in 0..self.rows
-            {
-                new_data[i*self.rows+j] = self.data[j*self.cols + i];
+        for i in 0..self.cols {
+            for j in 0..self.rows {
+                new_data[i * self.rows + j] = self.data[j * self.cols + i];
             }
         }
 
         Matrix {
             cols: self.rows,
             rows: self.cols,
-            data: new_data
+            data: new_data,
         }
     }
 }
 
 impl<T: Copy + Zero + One + PartialEq> Matrix<T> {
-
     /// Checks if matrix is diagonal.
     ///
     /// # Examples
@@ -189,7 +181,7 @@ impl<T: Copy + Zero + One + PartialEq> Matrix<T> {
 
         for i in 0..self.rows {
             for j in 0..self.cols {
-                if (i != j) && (self[[i,j]] != T::zero()) {
+                if (i != j) && (self[[i, j]] != T::zero()) {
                     return false;
                 }
             }
@@ -199,8 +191,7 @@ impl<T: Copy + Zero + One + PartialEq> Matrix<T> {
     }
 }
 
-impl<T: Copy + Zero + One + Add<T, Output=T>> Matrix<T> {
-
+impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
     /// The sum of the rows of the matrix.
     ///
     /// Returns a Vector equal to the sum of the matrices rows.
@@ -220,7 +211,7 @@ impl<T: Copy + Zero + One + Add<T, Output=T>> Matrix<T> {
         for i in 0..self.rows {
             for j in 0..self.cols {
                 row_sum[j] = row_sum[j] + self[[i, j]];
-            } 
+            }
         }
         Vector::new(row_sum)
     }
@@ -244,14 +235,13 @@ impl<T: Copy + Zero + One + Add<T, Output=T>> Matrix<T> {
         for i in 0..self.rows {
             for j in 0..self.cols {
                 col_sum[i] = col_sum[i] + self[[i, j]];
-            } 
+            }
         }
         Vector::new(col_sum)
     }
 }
 
-impl<T: Copy + Zero + Mul<T, Output=T>> Matrix<T> {
-
+impl<T: Copy + Zero + Mul<T, Output = T>> Matrix<T> {
     /// The elementwise product of two matrices.
     ///
     /// # Examples
@@ -273,8 +263,7 @@ impl<T: Copy + Zero + Mul<T, Output=T>> Matrix<T> {
     }
 }
 
-impl<T: Copy + Zero + Div<T, Output=T>> Matrix<T> {
-
+impl<T: Copy + Zero + Div<T, Output = T>> Matrix<T> {
     /// The elementwise division of two matrices.
     ///
     /// # Examples
@@ -297,7 +286,6 @@ impl<T: Copy + Zero + Div<T, Output=T>> Matrix<T> {
 }
 
 impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
-
     /// The mean of the matrix along the specified axis.
     ///
     /// Axis 0 - Arithmetic mean of rows.
@@ -317,11 +305,17 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
     /// assert_eq!(d.data, vec![1.5, 3.5]);
     /// ```
     pub fn mean(&self, axis: usize) -> Vector<T> {
-        let m : Vector<T>;
-        let n : T;
+        let m: Vector<T>;
+        let n: T;
         match axis {
-            0 => {m = self.sum_rows(); n = FromPrimitive::from_usize(self.rows).unwrap();},
-            1 => {m = self.sum_cols(); n = FromPrimitive::from_usize(self.cols).unwrap();},
+            0 => {
+                m = self.sum_rows();
+                n = FromPrimitive::from_usize(self.rows).unwrap();
+            }
+            1 => {
+                m = self.sum_cols();
+                n = FromPrimitive::from_usize(self.cols).unwrap();
+            }
             _ => panic!("Axis must be 0 or 1."),
         }
         m / n
@@ -348,12 +342,18 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
     pub fn variance(&self, axis: usize) -> Vector<T> {
         let mean = self.mean(axis);
 
-        let n : usize;
-        let m : usize;
+        let n: usize;
+        let m: usize;
 
         match axis { 
-            0 => {n = self.rows; m = self.cols;},
-            1 => {n = self.cols; m = self.rows;},
+            0 => {
+                n = self.rows;
+                m = self.cols;
+            }
+            1 => {
+                n = self.cols;
+                m = self.rows;
+            }
             _ => panic!("Axis must be 0 or 1."),
         }
 
@@ -364,19 +364,19 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
 
             for j in 0..m {
                 match axis {
-                    0 => t.push( self[[i,j]] ),
-                    1 => t.push( self[[j,i]] ),
+                    0 => t.push(self[[i, j]]),
+                    1 => t.push(self[[j, i]]),
                     _ => panic!("Axis must be 0 or 1."),
                 }
-                
+
             }
 
             let v = Vector::new(t);
 
-            variance = variance + &(&v-&mean).elemul(&(&v-&mean));
+            variance = variance + &(&v - &mean).elemul(&(&v - &mean));
         }
 
-        let var_size:T = FromPrimitive::from_usize(n-1).unwrap();
+        let var_size: T = FromPrimitive::from_usize(n - 1).unwrap();
         variance / var_size
     }
 }
@@ -385,7 +385,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         + Mul<T, Output=T> + Sub<T, Output=T>
         + Div<T, Output=T> + PartialOrd> Matrix<T> {
 
-    /// Solves an upper triangular linear system.
+/// Solves an upper triangular linear system.
     fn solve_u_triangular(&self, y: Vector<T>) -> Vector<T> {
         assert!(self.cols == y.size);
 
@@ -405,7 +405,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         }
     }
 
-    /// Solves a lower triangular linear system.
+/// Solves a lower triangular linear system.
     fn solve_l_triangular(&self, y: Vector<T>) -> Vector<T> {
         assert!(self.cols == y.size);
 
@@ -425,23 +425,23 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         }
     }
 
-    /// Solves the equation Ax = y.
-    ///
-    /// Requires a Vector y as input.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::vector::Vector;
-    ///
-    /// let a = Matrix::new(2,2, vec![2.0,3.0,1.0,2.0]);
-    /// let y = Vector::new(vec![13.0,8.0]);
-    ///
-    /// let x = a.solve(y);
-    ///
-    /// assert_eq!(x.data, vec![2.0, 3.0]);
-    /// ```
+/// Solves the equation Ax = y.
+///
+/// Requires a Vector y as input.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::linalg::matrix::Matrix;
+/// use rusty_machine::linalg::vector::Vector;
+///
+/// let a = Matrix::new(2,2, vec![2.0,3.0,1.0,2.0]);
+/// let y = Vector::new(vec![13.0,8.0]);
+///
+/// let x = a.solve(y);
+///
+/// assert_eq!(x.data, vec![2.0, 3.0]);
+/// ```
     pub fn solve(&self, y: Vector<T>) -> Vector<T> {
         let (l,u,p) = self.lup_decomp();
 
@@ -449,20 +449,20 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         u.solve_u_triangular(b)
     }
 
-    /// Computes the inverse of the matrix.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    ///
-    /// let a = Matrix::new(2,2, vec![2.,3.,1.,2.]);
-    /// let inv = a.inverse();
-    ///
-    /// let I = a * inv;
-    ///
-    /// assert_eq!(I.data, vec![1.0,0.0,0.0,1.0]);
-    /// ```
+/// Computes the inverse of the matrix.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::linalg::matrix::Matrix;
+///
+/// let a = Matrix::new(2,2, vec![2.,3.,1.,2.]);
+/// let inv = a.inverse();
+///
+/// let I = a * inv;
+///
+/// assert_eq!(I.data, vec![1.0,0.0,0.0,1.0]);
+/// ```
     pub fn inverse(&self) -> Matrix<T> {
         assert_eq!(self.rows, self.cols);
 
@@ -492,20 +492,20 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         Matrix::new(self.rows, self.cols, new_t_data).transpose()
     }
 
-    /// Computes the determinant of the matrix.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    ///
-    /// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
-    ///                               0.0,3.0,4.0,
-    ///                               5.0, 1.0, 2.0]);
-    ///
-    /// let det = a.det();
-    ///
-    /// ```
+/// Computes the determinant of the matrix.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::linalg::matrix::Matrix;
+///
+/// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
+///                               0.0,3.0,4.0,
+///                               5.0, 1.0, 2.0]);
+///
+/// let det = a.det();
+///
+/// ```
     pub fn det(&self) -> T {
         assert_eq!(self.rows, self.cols);
 
@@ -532,7 +532,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         }
 
         let (l,u,p) = self.lup_decomp();
-        
+
         let mut d = T::one();
 
         for i in 0..l.cols {
@@ -542,10 +542,10 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
 
         let sgn = p.parity();
 
-        return sgn * d;   
+        return sgn * d;
     }
 
-    /// Computes the parity of a permutation matrix.
+/// Computes the parity of a permutation matrix.
     fn parity(&self) -> T {
         let mut visited = vec![false; self.rows];
         let mut sgn = T::one();
@@ -569,22 +569,22 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         sgn
     }
 
-    /// Computes L, U, and P for LUP decomposition.
-    ///
-    /// Returns L,U, and P respectively.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    ///
-    /// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
-    ///                               0.0,3.0,4.0,
-    ///                               5.0, 1.0, 2.0]);
-    ///
-    /// let (l,u,p) = a.lup_decomp();
-    ///
-    /// ``` 
+/// Computes L, U, and P for LUP decomposition.
+///
+/// Returns L,U, and P respectively.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::linalg::matrix::Matrix;
+///
+/// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
+///                               0.0,3.0,4.0,
+///                               5.0, 1.0, 2.0]);
+///
+/// let (l,u,p) = a.lup_decomp();
+///
+/// ```
     pub fn lup_decomp(&self) -> (Matrix<T>, Matrix<T>, Matrix<T>) {
         assert!(self.rows == self.cols);
 
@@ -597,7 +597,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
 
         let mut p = Matrix::<T>::identity(n);
 
-        // Compute the permutation matrix
+// Compute the permutation matrix
         for i in 0..n {
             let row = utils::argmax(&mt.data[i*(n+1)..(i+1)*n]) + i;
 
@@ -640,7 +640,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
 }
 
 /// Multiplies matrix by scalar.
-impl <T: Copy + One + Zero + Mul<T, Output=T>> Mul<T> for Matrix<T> {
+impl<T: Copy + One + Zero + Mul<T, Output = T>> Mul<T> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn mul(self, f: T) -> Matrix<T> {
@@ -649,7 +649,7 @@ impl <T: Copy + One + Zero + Mul<T, Output=T>> Mul<T> for Matrix<T> {
 }
 
 /// Multiplies matrix by scalar.
-impl <'a, T: Copy + One + Zero + Mul<T, Output=T>> Mul<&'a T> for Matrix<T> {
+impl<'a, T: Copy + One + Zero + Mul<T, Output = T>> Mul<&'a T> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn mul(self, f: &T) -> Matrix<T> {
@@ -658,7 +658,7 @@ impl <'a, T: Copy + One + Zero + Mul<T, Output=T>> Mul<&'a T> for Matrix<T> {
 }
 
 /// Multiplies matrix by scalar.
-impl <'a, T: Copy + One + Zero + Mul<T, Output=T>> Mul<T> for &'a Matrix<T> {
+impl<'a, T: Copy + One + Zero + Mul<T, Output = T>> Mul<T> for &'a Matrix<T> {
     type Output = Matrix<T>;
 
     fn mul(self, f: T) -> Matrix<T> {
@@ -667,22 +667,22 @@ impl <'a, T: Copy + One + Zero + Mul<T, Output=T>> Mul<T> for &'a Matrix<T> {
 }
 
 /// Multiplies matrix by scalar.
-impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output=T>> Mul<&'b T> for &'a Matrix<T> {
+impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output = T>> Mul<&'b T> for &'a Matrix<T> {
     type Output = Matrix<T>;
 
     fn mul(self, f: &T) -> Matrix<T> {
-        let new_data : Vec<T> = self.data.iter().map(|v| (*v) * (*f)).collect();
+        let new_data: Vec<T> = self.data.iter().map(|v| (*v) * (*f)).collect();
 
         Matrix {
             cols: self.cols,
             rows: self.rows,
-            data: new_data
+            data: new_data,
         }
     }
 }
 
 /// Multiplies matrix by matrix.
-impl <T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<Matrix<T>> for Matrix<T> {
+impl<T: Copy + Zero + One + Mul<T, Output = T> + Add<T, Output = T>> Mul<Matrix<T>> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn mul(self, m: Matrix<T>) -> Matrix<T> {
@@ -713,7 +713,7 @@ impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
 	type Output = Matrix<T>;
 
 	fn mul(self, m: &Matrix<T>) -> Matrix<T> {
-		// Will use Strassen algorithm if large, traditional otherwise
+// Will use Strassen algorithm if large, traditional otherwise
 		assert!(self.cols == m.rows);
 
         let mut new_data = vec![T::zero(); self.rows * m.cols];
@@ -737,7 +737,7 @@ impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
 }
 
 /// Multiplies matrix by vector.
-impl <T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<Vector<T>> for Matrix<T> {
+impl<T: Copy + Zero + One + Mul<T, Output = T> + Add<T, Output = T>> Mul<Vector<T>> for Matrix<T> {
     type Output = Vector<T>;
 
     fn mul(self, m: Vector<T>) -> Vector<T> {
@@ -785,7 +785,7 @@ impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
 }
 
 /// Adds scalar to matrix.
-impl<T: Copy + One + Zero + Add<T, Output=T>> Add<T> for Matrix<T> {
+impl<T: Copy + One + Zero + Add<T, Output = T>> Add<T> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn add(self, f: T) -> Matrix<T> {
@@ -794,7 +794,7 @@ impl<T: Copy + One + Zero + Add<T, Output=T>> Add<T> for Matrix<T> {
 }
 
 /// Adds scalar to matrix.
-impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<T> for &'a Matrix<T> {
+impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<T> for &'a Matrix<T> {
     type Output = Matrix<T>;
 
     fn add(self, f: T) -> Matrix<T> {
@@ -803,7 +803,7 @@ impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<T> for &'a Matrix<T> {
 }
 
 /// Adds scalar to matrix.
-impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<&'a T> for Matrix<T> {
+impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<&'a T> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn add(self, f: &T) -> Matrix<T> {
@@ -811,22 +811,22 @@ impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<&'a T> for Matrix<T> {
     }
 }
 
-impl<'a, 'b, T: Copy + One + Zero + Add<T, Output=T>> Add<&'b T> for &'a Matrix<T> {
-	type Output = Matrix<T>;
+impl<'a, 'b, T: Copy + One + Zero + Add<T, Output = T>> Add<&'b T> for &'a Matrix<T> {
+    type Output = Matrix<T>;
 
-	fn add(self, f: &T) -> Matrix<T> {
-		let new_data : Vec<T> = self.data.iter().map(|v| (*v) + (*f)).collect();
+    fn add(self, f: &T) -> Matrix<T> {
+        let new_data: Vec<T> = self.data.iter().map(|v| (*v) + (*f)).collect();
 
         Matrix {
             cols: self.cols,
             rows: self.rows,
-            data: new_data
+            data: new_data,
         }
     }
 }
 
 /// Adds matrix to matrix.
-impl<T: Copy + One + Zero + Add<T, Output=T>> Add<Matrix<T>> for Matrix<T> {
+impl<T: Copy + One + Zero + Add<T, Output = T>> Add<Matrix<T>> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn add(self, f: Matrix<T>) -> Matrix<T> {
@@ -835,7 +835,7 @@ impl<T: Copy + One + Zero + Add<T, Output=T>> Add<Matrix<T>> for Matrix<T> {
 }
 
 /// Adds matrix to matrix.
-impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<Matrix<T>> for &'a Matrix<T> {
+impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<Matrix<T>> for &'a Matrix<T> {
     type Output = Matrix<T>;
 
     fn add(self, f: Matrix<T>) -> Matrix<T> {
@@ -844,7 +844,7 @@ impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<Matrix<T>> for &'a Matrix<
 }
 
 /// Adds matrix to matrix.
-impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<&'a Matrix<T>> for Matrix<T> {
+impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<&'a Matrix<T>> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn add(self, f: &Matrix<T>) -> Matrix<T> {
@@ -853,25 +853,25 @@ impl<'a, T: Copy + One + Zero + Add<T, Output=T>> Add<&'a Matrix<T>> for Matrix<
 }
 
 /// Adds matrix to matrix.
-impl<'a, 'b, T: Copy + One + Zero + Add<T, Output=T>> Add<&'b Matrix<T>> for &'a Matrix<T> {
-	type Output = Matrix<T>;
+impl<'a, 'b, T: Copy + One + Zero + Add<T, Output = T>> Add<&'b Matrix<T>> for &'a Matrix<T> {
+    type Output = Matrix<T>;
 
-	fn add(self, m: &Matrix<T>) -> Matrix<T> {
-		assert!(self.cols == m.cols);
-		assert!(self.rows == m.rows);
+    fn add(self, m: &Matrix<T>) -> Matrix<T> {
+        assert!(self.cols == m.cols);
+        assert!(self.rows == m.rows);
 
-		let new_data = utils::vec_sum(&self.data, &m.data);
+        let new_data = utils::vec_sum(&self.data, &m.data);
 
         Matrix {
             cols: self.cols,
             rows: self.rows,
-            data: new_data
+            data: new_data,
         }
-	}
+    }
 }
 
 /// Subtracts scalar from matrix.
-impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<T> for Matrix<T> {
+impl<T: Copy + One + Zero + Sub<T, Output = T>> Sub<T> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn sub(self, f: T) -> Matrix<T> {
@@ -880,7 +880,7 @@ impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<T> for Matrix<T> {
 }
 
 /// Subtracts scalar from matrix.
-impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'a T> for Matrix<T> {
+impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'a T> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn sub(self, f: &T) -> Matrix<T> {
@@ -889,7 +889,7 @@ impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'a T> for Matrix<T> {
 }
 
 /// Subtracts scalar from matrix.
-impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<T> for &'a Matrix<T> {
+impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<T> for &'a Matrix<T> {
     type Output = Matrix<T>;
 
     fn sub(self, f: T) -> Matrix<T> {
@@ -898,7 +898,7 @@ impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<T> for &'a Matrix<T> {
 }
 
 /// Subtracts scalar from matrix.
-impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'b T> for &'a Matrix<T> {
+impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'b T> for &'a Matrix<T> {
     type Output = Matrix<T>;
 
     fn sub(self, f: &T) -> Matrix<T> {
@@ -907,13 +907,13 @@ impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'b T> for &'a Matrix<
         Matrix {
             cols: self.cols,
             rows: self.rows,
-            data: new_data
+            data: new_data,
         }
     }
 }
 
 /// Subtracts matrix from matrix.
-impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<Matrix<T>> for Matrix<T> {
+impl<T: Copy + One + Zero + Sub<T, Output = T>> Sub<Matrix<T>> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn sub(self, f: Matrix<T>) -> Matrix<T> {
@@ -922,7 +922,7 @@ impl<T: Copy + One + Zero + Sub<T, Output=T>> Sub<Matrix<T>> for Matrix<T> {
 }
 
 /// Subtracts matrix from matrix.
-impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<Matrix<T>> for &'a Matrix<T> {
+impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<Matrix<T>> for &'a Matrix<T> {
     type Output = Matrix<T>;
 
     fn sub(self, f: Matrix<T>) -> Matrix<T> {
@@ -931,7 +931,7 @@ impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<Matrix<T>> for &'a Matrix<
 }
 
 /// Subtracts matrix from matrix.
-impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'a Matrix<T>> for Matrix<T> {
+impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'a Matrix<T>> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn sub(self, f: &Matrix<T>) -> Matrix<T> {
@@ -940,25 +940,25 @@ impl<'a, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'a Matrix<T>> for Matrix<
 }
 
 /// Subtracts matrix from matrix.
-impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output=T>> Sub<&'b Matrix<T>> for &'a Matrix<T> {
-	type Output = Matrix<T>;
+impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'b Matrix<T>> for &'a Matrix<T> {
+    type Output = Matrix<T>;
 
-	fn sub(self, m: &Matrix<T>) -> Matrix<T> {
-		assert!(self.cols == m.cols);
-		assert!(self.rows == m.rows);
+    fn sub(self, m: &Matrix<T>) -> Matrix<T> {
+        assert!(self.cols == m.cols);
+        assert!(self.rows == m.rows);
 
-		let new_data = utils::vec_sub(&self.data, &m.data);
+        let new_data = utils::vec_sub(&self.data, &m.data);
 
         Matrix {
             cols: self.cols,
             rows: self.rows,
-            data: new_data
+            data: new_data,
         }
-	}
+    }
 }
 
 /// Divides matrix by scalar.
-impl<T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<T> for Matrix<T> {
+impl<T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<T> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn div(self, f: T) -> Matrix<T> {
@@ -967,7 +967,7 @@ impl<T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<T> for Matrix<T> {
 }
 
 /// Divides matrix by scalar.
-impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<T> for &'a Matrix<T> {
+impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<T> for &'a Matrix<T> {
     type Output = Matrix<T>;
 
     fn div(self, f: T) -> Matrix<T> {
@@ -976,7 +976,7 @@ impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<T> for &'a Mat
 }
 
 /// Divides matrix by scalar.
-impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<&'a T> for Matrix<T> {
+impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<&'a T> for Matrix<T> {
     type Output = Matrix<T>;
 
     fn div(self, f: &T) -> Matrix<T> {
@@ -985,39 +985,36 @@ impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<&'a T> for Mat
 }
 
 /// Divides matrix by scalar.
-impl<'a, 'b, T: Copy + One + Zero + PartialEq + Div<T, Output=T>> Div<&'b T> for &'a Matrix<T> {
-	type Output = Matrix<T>;
+impl<'a, 'b, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<&'b T> for &'a Matrix<T> {
+    type Output = Matrix<T>;
 
-	fn div(self, f: &T) -> Matrix<T> {
-		assert!(*f != T::zero());
-		
-		let new_data = self.data.iter().map(|v| *v / *f).collect();
+    fn div(self, f: &T) -> Matrix<T> {
+        assert!(*f != T::zero());
+
+        let new_data = self.data.iter().map(|v| *v / *f).collect();
 
         Matrix {
             cols: self.cols,
             rows: self.rows,
-            data: new_data
+            data: new_data,
         }
-	}
+    }
 }
 
 /// Indexes matrix.
 ///
 /// Takes row index first then column.
 impl<T> Index<[usize; 2]> for Matrix<T> {
-	type Output = T;
+    type Output = T;
 
-	fn index(&self, idx : [usize; 2]) -> &T {
-		assert!(idx[0] < self.rows);
-		assert!(idx[1] < self.cols);
-        unsafe {
-		  &self.data.get_unchecked(idx[0] * self.cols + idx[1])
-        }
-	}
+    fn index(&self, idx: [usize; 2]) -> &T {
+        assert!(idx[0] < self.rows);
+        assert!(idx[1] < self.cols);
+        unsafe { &self.data.get_unchecked(idx[0] * self.cols + idx[1]) }
+    }
 }
 
 impl<T: Float> Metric<T> for Matrix<T> {
-    
     /// Compute euclidean norm for matrix.
     ///
     /// # Examples

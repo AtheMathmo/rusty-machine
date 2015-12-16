@@ -1,9 +1,9 @@
 //! Linear algebra utils module.
-//! 
+//!
 //! Contains support methods for linear algebra structs.
 
 use std::cmp;
-use libnum::{Zero};
+use libnum::Zero;
 use std::ops::{Add, Mul, Sub, Div};
 
 /// Compute dot product of two slices.
@@ -17,15 +17,27 @@ use std::ops::{Add, Mul, Sub, Div};
 ///
 /// let c = utils::dot(&a,&b);
 /// ```
-pub fn dot<T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>>(u: &[T], v: &[T]) -> T {
+pub fn dot<T: Copy + Zero + Add<T, Output = T> + Mul<T, Output = T>>(u: &[T], v: &[T]) -> T {
     let len = cmp::min(u.len(), v.len());
     let mut xs = &u[..len];
     let mut ys = &v[..len];
 
     let mut s = T::zero();
-    let (mut p0, mut p1, mut p2, mut p3, mut p4, mut p5, mut p6, mut p7) =
-        (T::zero(), T::zero(), T::zero(), T::zero(),
-            T::zero(), T::zero(), T::zero(), T::zero());
+    let (mut p0,
+         mut p1,
+         mut p2,
+         mut p3,
+         mut p4,
+         mut p5,
+         mut p6,
+         mut p7) = (T::zero(),
+                    T::zero(),
+                    T::zero(),
+                    T::zero(),
+                    T::zero(),
+                    T::zero(),
+                    T::zero(),
+                    T::zero());
 
     while xs.len() >= 8 {
         p0 = p0 + xs[0] * ys[0];
@@ -49,7 +61,7 @@ pub fn dot<T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>>(u: &[T], v: &[T
         s = s + xs[i] * ys[i];
     }
     s
- }
+}
 
 /// Compute vector sum of two slices.
 ///
@@ -64,11 +76,11 @@ pub fn dot<T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>>(u: &[T], v: &[T
 ///
 /// assert_eq!(c, vec![2.0,4.0, 6.0, 8.0]);
 /// ```
-pub fn vec_sum<T: Copy + Zero + Add<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
+pub fn vec_sum<T: Copy + Zero + Add<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
     let len = cmp::min(u.len(), v.len());
     let xs = &u[..len];
     let ys = &v[..len];
-    
+
     let mut sum_data = vec![T::zero(); len];
 
     for i in 0..len {
@@ -90,11 +102,11 @@ pub fn vec_sum<T: Copy + Zero + Add<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
 ///
 /// assert_eq!(c, vec![0.0; 4]);
 /// ```
-pub fn vec_sub<T: Copy + Zero + Sub<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
+pub fn vec_sub<T: Copy + Zero + Sub<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
     let len = cmp::min(u.len(), v.len());
     let xs = &u[..len];
     let ys = &v[..len];
-    
+
     let mut sum_data = vec![T::zero(); len];
 
     for i in 0..len {
@@ -116,11 +128,11 @@ pub fn vec_sub<T: Copy + Zero + Sub<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
 ///
 /// assert_eq!(c, vec![1.0,4.0,9.0,16.0]);
 /// ```
-pub fn ele_mul<T: Copy + Zero + Mul<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
+pub fn ele_mul<T: Copy + Zero + Mul<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
     let len = cmp::min(u.len(), v.len());
     let xs = &u[..len];
     let ys = &v[..len];
-    
+
     let mut sum_data = vec![T::zero(); len];
 
     for i in 0..len {
@@ -142,11 +154,11 @@ pub fn ele_mul<T: Copy + Zero + Mul<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
 ///
 /// assert_eq!(c, vec![1.0; 4]);
 /// ```
-pub fn ele_div<T: Copy + Zero + Div<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
+pub fn ele_div<T: Copy + Zero + Div<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
     let len = cmp::min(u.len(), v.len());
     let xs = &u[..len];
     let ys = &v[..len];
-    
+
     let mut sum_data = vec![T::zero(); len];
 
     for i in 0..len {
@@ -198,11 +210,11 @@ pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> usize {
 /// assert_eq!(c, 2);
 /// ```
 pub fn find<T: PartialEq>(p: &[T], u: T) -> usize {
-        for (i, v) in p.iter().enumerate() {
-            if *v == u {
-                return i;
-            }
+    for (i, v) in p.iter().enumerate() {
+        if *v == u {
+            return i;
         }
-
-        panic!("Value not found.")
     }
+
+    panic!("Value not found.")
+}
