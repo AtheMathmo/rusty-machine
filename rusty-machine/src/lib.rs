@@ -14,10 +14,17 @@ pub mod linalg {
 
 pub mod learning {
     pub mod lin_reg;
+    pub mod k_means;
 
-    pub trait Model<T,U> {
+    pub trait SupModel<T,U> {
         fn predict(&self, data: T) -> U;
 
         fn train(&mut self, data: T, value: U);
+	}
+
+	pub trait UnSupModel<T, U> {
+        fn predict(&self, data: T) -> U;
+
+        fn train(&mut self, data: T);
 	}
 }

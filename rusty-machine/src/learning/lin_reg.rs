@@ -6,7 +6,7 @@
 //!
 //! Currently only OLS solution - gradient descent not yet implemented.
 
-use learning::Model;
+use learning::SupModel;
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
 
@@ -29,7 +29,7 @@ impl LinRegressor {
     }
 }
 
-impl Model<Matrix<f64>, Vector<f64>> for LinRegressor {
+impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
     /// Train the linear regression model.
     ///
     /// Takes training data and output values as input.
