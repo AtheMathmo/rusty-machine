@@ -3,7 +3,7 @@
 //! Currently contains all code
 //! relating to the vector linear algebra struct.
 
-use std::ops::{Mul, Add, Div, Sub, Index};
+use std::ops::{Mul, Add, Div, Sub, Index, Neg};
 use libnum::{One, Zero, Float, FromPrimitive};
 use std::cmp::PartialEq;
 use linalg::Metric;
@@ -37,6 +37,43 @@ impl<T> Vector<T> {
             size: size,
             data: data,
         }
+    }
+}
+
+impl<T: Copy + PartialOrd> Vector<T> {
+
+    /// Find the argmax of the Vector.
+    ///
+    /// Returns the index of the largest value in the vector.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::vector::Vector;
+    ///
+    /// let a = Vector::new(vec![1.0,2.0,0.0,5.0]);
+    /// let b = a.argmax();
+    /// assert_eq!(b, 3);
+    /// ```
+    pub fn argmax(&self) -> usize {
+        utils::argmax(&self.data)
+    }
+
+    /// Find the argmin of the Vector.
+    ///
+    /// Returns the index of the smallest value in the vector.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::vector::Vector;
+    ///
+    /// let a = Vector::new(vec![1.0,2.0,0.0,5.0]);
+    /// let b = a.argmin();
+    /// assert_eq!(b, 2);
+    /// ```
+    pub fn argmin(&self) -> usize {
+        utils::argmin(&self.data)
     }
 }
 
@@ -451,6 +488,28 @@ impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'b Vector<T>> for &
             size: self.size,
             data: new_data,
         }
+    }
+}
+
+/// Gets negative of vector.
+impl<T: Neg<Output=T> + Copy> Neg for Vector<T> {
+    type Output = Vector<T>;
+
+    fn neg(self) -> Vector<T> {
+        let new_data = self.data.iter().map(|v| -*v).collect();
+
+        Vector::new(new_data)
+    }
+}
+
+/// Gets negative of vector.
+impl<'a, T: Neg<Output=T> + Copy> Neg for &'a Vector<T> {
+    type Output = Vector<T>;
+
+    fn neg(self) -> Vector<T> {
+        let new_data = self.data.iter().map(|v| -*v).collect();
+
+        Vector::new(new_data)
     }
 }
 

@@ -196,6 +196,35 @@ pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> usize {
     max_index
 }
 
+/// Find argmin of slice.
+///
+/// Returns index of first occuring minimum.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::linalg::utils;
+/// let a = vec![5.0,2.0,3.0,4.0];
+///
+/// let c = utils::argmin(&a);
+/// assert_eq!(c, 1);
+/// ```
+pub fn argmin<T: Copy + PartialOrd>(u: &[T]) -> usize {
+    assert!(u.len() != 0);
+
+    let mut min_index = 0;
+    let mut min = u[min_index];
+
+    for (i, v) in (u.iter()).enumerate() {
+        if min > *v {
+            min_index = i;
+            min = *v;
+        }
+    }
+
+    min_index
+}
+
 /// Find index of value in slice.
 ///
 /// Returns index of first occuring value.
