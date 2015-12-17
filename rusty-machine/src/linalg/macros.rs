@@ -1,5 +1,10 @@
 //! Macros for the linear algebra modules.
 
+macro_rules! count {
+    () => (0usize);
+    ( $x:tt $($xs:tt)* ) => (1usize + count!($($xs)*));
+}
+
 /// Should be able to do the following:
 ///
 /// # Specification
@@ -19,34 +24,25 @@
 /// This macro currently supports the use cases described
 /// by a,b,c in the specification above. 
 macro_rules! mat {
-	( $($( $x:expr ),*);* ) => {
-		{
-			let mut vec = Vec::new();
-			let mut rows = 0;
-			let mut cols = 0;
-			
-			let mut _started_row = false;
-			
-			$(  
-			    let mut inter_cols = 0;
-			    
-				$(
-				    inter_cols += 1;
-				    vec.push($x);
-				)*
-				rows += 1;
-				
-				if !_started_row {
-				    cols = inter_cols;
-				}
-				
-				if cols != inter_cols {
-				    panic!("Must have equal numbers of elements in each row.");
-				}
-				
-				_started_row = true;
-			)*
-			Matrix { cols : vec.len()/rows, rows: rows, data: vec}
-        }
-    };
+    ( $( $x:expr ),* ) => { {
+        let vec = vec![$($x),*];
+        Matrix { cols : vec.len(), rows: 1, data: vec }
+    } };
+    ( $( $x0:expr ),* ; $($( $x:expr ),*);* ) => { {
+        let mut _assert_width0 = [(); count!($($x0)*)];
+        let mut vec = Vec::new();
+        let rows = 1usize;
+        let cols = count!($($x0)*);
+
+        $( vec.push($x0); )*
+
+        $(
+            let rows = rows + 1usize;
+            let _assert_width = [(); count!($($x)*)];
+            _assert_width0 = _assert_width;
+            $( vec.push($x); )*
+        )*
+
+        Matrix { cols : cols, rows: rows, data: vec }
+    } }
 }
