@@ -25,7 +25,7 @@ macro_rules! mat {
 			let mut rows = 0;
 			let mut cols = 0;
 			
-			let mut started_row = false;
+			let mut _started_row = false;
 			
 			$(  
 			    let mut inter_cols = 0;
@@ -36,7 +36,7 @@ macro_rules! mat {
 				)*
 				rows += 1;
 				
-				if !started_row {
+				if !_started_row {
 				    cols = inter_cols;
 				}
 				
@@ -44,7 +44,7 @@ macro_rules! mat {
 				    panic!("Must have equal numbers of elements in each row.");
 				}
 				
-				started_row = true;
+				_started_row = true;
 			)*
 			Matrix { cols : vec.len()/rows, rows: rows, data: vec}
         }
