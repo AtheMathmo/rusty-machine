@@ -16,9 +16,9 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
     fn train(&mut self, data: Matrix<f64>) {
     	self.init_centroids(data.cols);
 
-    	for i in self.iters {
+    	for i in 0..self.iters {
     		let idx = self.find_closest_centroids(&data);
-    		self.compute_means(data, idx);
+    		self.compute_means(&data, idx);
     	}
     }
 }
@@ -44,14 +44,15 @@ impl KMeansClassifier {
     	idx
     }
 
-    fn compute_means(&mut self, data: Matrix<f64>, classes: Vector<usize>)
+    fn compute_means(&mut self, data: &Matrix<f64>, classes: Vector<usize>)
     {
     	for i in 0..self.k {
     		let mut vec_k = Vec::new();
 
-    		for j in classes {
-    			if j == k }
-    			vec_k.push(j);
+    		for j in classes.data.iter() {
+    			if *j == i {
+    				vec_k.push(j);
+    			}
     		}
 
     		// index out these rows from data
@@ -60,3 +61,4 @@ impl KMeansClassifier {
     	}
     }
 }
+
