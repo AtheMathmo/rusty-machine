@@ -2,7 +2,7 @@ use linalg::matrix::Matrix;
 use linalg::vector::Vector;
 use learning::UnSupModel;
 
-struct KMeansClassifier {
+pub struct KMeansClassifier {
     iters: usize,
     k: usize,
     centroids: Option<Matrix<f64>>,
@@ -10,15 +10,19 @@ struct KMeansClassifier {
 
 impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
     fn predict(&self, data: Matrix<f64>) -> Vector<usize> {
-        Vector::new(vec![0])
+        match self.centroids {
+            Some(ref _c) => return self.find_closest_centroids(&data),
+            None => panic!("Model has not been trained."),
+        }
+        
     }
 
     fn train(&mut self, data: Matrix<f64>) {
         self.init_centroids(data.cols);
 
-        for i in 0..self.iters {
+        for _i in 0..self.iters {
             let idx = self.find_closest_centroids(&data);
-            self.compute_means(&data, idx);
+            self.update_centroids(&data, idx);
         }
     }
 }
@@ -43,9 +47,12 @@ impl KMeansClassifier {
         match self.centroids {
             Some(ref c) => {
                 for i in 0..data.rows {
-                    let centroid_dist = c - data.select_rows(&vec![i; c.rows]);
-                    let dist = &centroid_dist.elemul(&centroid_dist).sum_cols();
+                    // This works like repmat pulling out row i repeatedly.
+                    let centroid_diff = c - data.select_rows(&vec![i; c.rows]);
+                    let dist = &centroid_diff.elemul(&centroid_diff).sum_cols();
+
                     // Now take argmin and this is the centroid.
+                    idx.data[i] = dist.argmin();
 
                 }
             }
@@ -55,19 +62,22 @@ impl KMeansClassifier {
         idx
     }
 
-    fn compute_means(&mut self, data: &Matrix<f64>, classes: Vector<usize>) {
+    fn update_centroids(&mut self, data: &Matrix<f64>, classes: Vector<usize>) {
+        let mut new_centroids = Vec::with_capacity(self.k * classes.size);
         for i in 0..self.k {
-            let mut vec_k = Vec::new();
+            let mut vec_i = Vec::with_capacity(classes.size);
 
             for j in classes.data.iter() {
                 if *j == i {
-                    vec_k.push(j);
+                    vec_i.push(*j);
                 }
             }
 
-            // index out these rows from data
-            // make a new matrix
-            // compute average of it's rows
+            let mat_i = data.select_rows(&vec_i);
+
+            new_centroids.extend(mat_i.mean(0).data);
         }
+
+        self.centroids = Some(Matrix::new(self.k, classes.size, new_centroids));
     }
 }
