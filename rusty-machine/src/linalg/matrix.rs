@@ -42,6 +42,86 @@ impl<T> Matrix<T> {
     }
 }
 
+impl<T: Copy> Matrix<T> {
+    /// Select rows from matrix
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::<f64>::ones(3,3);
+    ///
+    /// let b = &a.select_rows(&[2]);
+    /// assert_eq!(b.rows, 1);
+    /// assert_eq!(b.cols, 3);
+    ///
+    /// let c = &a.select_rows(&[1,2]);
+    /// assert_eq!(c.rows, 2);
+    /// assert_eq!(c.cols, 3);
+    /// ```
+    pub fn select_rows(&self, rows: &[usize]) -> Matrix<T> {
+
+        let mut mat_vec = Vec::new();
+
+        for row in rows {
+            assert!(*row < self.rows);
+        }
+
+        unsafe {
+            for row in rows {
+                for i in 0..self.cols {
+                    mat_vec.push(*self.data.get_unchecked(*row * self.cols + i));
+                }
+            }
+        }
+        Matrix {
+            cols: self.cols,
+            rows: rows.len(),
+            data: mat_vec,
+        }
+    }
+
+    /// Select columns from matrix
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::<f64>::ones(3,3);
+    /// let b = &a.select_cols(&[2]);
+    /// assert_eq!(b.rows, 3);
+    /// assert_eq!(b.cols, 1);
+    ///
+    /// let c = &a.select_cols(&[1,2]);
+    /// assert_eq!(c.rows, 3);
+    /// assert_eq!(c.cols, 2);
+    /// ```
+    pub fn select_cols(&self, cols: &[usize]) -> Matrix<T> {
+
+        let mut mat_vec = Vec::new();
+
+        for col in cols {
+            assert!(*col < self.cols);
+        }
+
+        unsafe {
+            for i in 0..self.rows {
+                for col in cols.iter() {
+                    mat_vec.push(*self.data.get_unchecked(i * self.cols + col));
+                }
+            }
+        }
+
+        Matrix {
+            cols: cols.len(),
+            rows: self.rows,
+            data: mat_vec,
+        }
+    }
+}
+
 impl<T: Zero + One + Copy> Matrix<T> {
     /// Constructs matrix of all zeros.
     ///
