@@ -5,7 +5,7 @@ use learning::UnSupModel;
 struct KMeansClassifier {
     iters: usize,
     k: usize,
-    centroids: Matrix<f64>,
+    centroids: Option<Matrix<f64>>,
 }
 
 impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
@@ -13,11 +13,50 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
         Vector::new(vec![0])
     }
 
-    fn train(&mut self, data: Matrix<f64>) {}
+    fn train(&mut self, data: Matrix<f64>) {
+    	self.init_centroids(data.cols);
+
+    	for i in self.iters {
+    		let idx = self.find_closest_centroids(&data);
+    		self.compute_means(data, idx);
+    	}
+    }
 }
 
-fn init_centroids(kmeans: KMeansClassifier) {}
+impl KMeansClassifier {
+	pub fn new(k: usize) -> KMeansClassifier {
+		KMeansClassifier{ iters: 100, k:k, centroids: None}
+	}
 
-fn find_closest_centroids(kmeans: KMeansClassifier, data: Matrix<f64>) {}
+    fn init_centroids(&mut self, dim: usize) {
+    	// These should not all be equal!
+    	self.centroids = Some(Matrix::zeros(self.k, dim));
+    }
 
-fn compute_means(kmeans: KMeansClassifier, data: Matrix<f64>, classes: Vector<usize>) {}
+    fn find_closest_centroids(&self, data: &Matrix<f64>) -> Vector<usize> {
+    	let mut idx = Vector::zeros(data.rows);
+
+    	for i in 0..data.rows {
+    		for j in 0..self.k {
+    			// idx[i] = argmin distance to centroid;
+    		}
+    	}
+    	idx
+    }
+
+    fn compute_means(&mut self, data: Matrix<f64>, classes: Vector<usize>)
+    {
+    	for i in 0..self.k {
+    		let mut vec_k = Vec::new();
+
+    		for j in classes {
+    			if j == k }
+    			vec_k.push(j);
+    		}
+
+    		// index out these rows from data
+    		// make a new matrix
+    		// compute average of it's rows
+    	}
+    }
+}
