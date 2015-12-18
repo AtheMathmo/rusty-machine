@@ -9,4 +9,5 @@ pub mod linalg {
 
 pub mod learning {
     mod lin_reg;
+    mod k_means;
 }

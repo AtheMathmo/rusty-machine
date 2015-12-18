@@ -10,23 +10,11 @@ use learning::SupModel;
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
 
+/// Linear Regression Model.
+///
+/// Contains option for optimized parameter.
 pub struct LinRegressor {
     pub b: Option<Vector<f64>>,
-}
-
-impl LinRegressor {
-    /// Constructs untrained linear regression model.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::learning::lin_reg::LinRegressor;
-    ///
-    /// let mut lin_mod = LinRegressor::new();
-    /// ```
-    pub fn new() -> LinRegressor {
-        LinRegressor { b: None }
-    }
 }
 
 impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
@@ -62,5 +50,20 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
             Some(ref v) => data * v,
             None => panic!("Model has not been trained."),
         }
+    }
+}
+
+impl LinRegressor {
+    /// Constructs untrained linear regression model.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::lin_reg::LinRegressor;
+    ///
+    /// let mut lin_mod = LinRegressor::new();
+    /// ```
+    pub fn new() -> LinRegressor {
+        LinRegressor { b: None }
     }
 }

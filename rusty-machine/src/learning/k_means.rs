@@ -1,16 +1,31 @@
+//! K Means Classification
+//!
+//! 
+//!
+//!
+
+
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
 use learning::UnSupModel;
 use rand;
 use rand::Rng;
 
+/// K-Means Classification model.
+///
+/// Contains option for centroids.
+/// Specifies iterations and number of classes.
 pub struct KMeansClassifier {
-    iters: usize,
-    k: usize,
-    centroids: Option<Matrix<f64>>,
+    pub iters: usize,
+    pub k: usize,
+    pub centroids: Option<Matrix<f64>>,
 }
 
 impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
+
+    /// Predict classes from data.
+    ///
+    /// Model must be trained.
     fn predict(&self, data: Matrix<f64>) -> Vector<usize> {
         match self.centroids {
             Some(ref _c) => return self.find_closest_centroids(&data),
@@ -19,6 +34,7 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
         
     }
 
+    /// Train the classifier using input data.
     fn train(&mut self, data: Matrix<f64>) {
         self.init_centroids(&data);
 
@@ -30,6 +46,19 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
 }
 
 impl KMeansClassifier {
+
+    /// Constructs untrained k-means classifier model.
+    ///
+    /// Requires number of classes to be specified.
+    /// Defaults to 100 iterations.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::k_means::KMeansClassifier;
+    ///
+    /// let model = KMeansClassifier::new(5);
+    /// ```
     pub fn new(k: usize) -> KMeansClassifier {
         KMeansClassifier {
             iters: 100,
@@ -38,11 +67,17 @@ impl KMeansClassifier {
         }
     }
 
+    /// Initialize the centroids.
+    ///
+    /// Used internally within model.
     fn init_centroids(&mut self, data: &Matrix<f64>) {
         // These should not all be equal!
         self.centroids = Some(forgy_init(self.k, data));
     }
 
+    /// Find the centroid closest to each data point.
+    ///
+    /// Used internally within model.
     fn find_closest_centroids(&self, data: &Matrix<f64>) -> Vector<usize> {
         let mut idx = Vector::zeros(data.rows);
 
@@ -64,10 +99,13 @@ impl KMeansClassifier {
         idx
     }
 
+    /// Updated the centroids by computing means of assigned classes.
+    ///
+    /// Used internally within model.
     fn update_centroids(&mut self, data: &Matrix<f64>, classes: Vector<usize>) {
-        let mut new_centroids = Vec::with_capacity(self.k * classes.size);
+        let mut new_centroids = Vec::with_capacity(self.k * data.cols);
         for i in 0..self.k {
-            let mut vec_i = Vec::with_capacity(classes.size);
+            let mut vec_i = Vec::new();
 
             for j in classes.data.iter() {
                 if *j == i {
@@ -76,14 +114,16 @@ impl KMeansClassifier {
             }
 
             let mat_i = data.select_rows(&vec_i);
-
             new_centroids.extend(mat_i.mean(0).data);
         }
-
-        self.centroids = Some(Matrix::new(self.k, classes.size, new_centroids));
+        
+        self.centroids = Some(Matrix::new(self.k, data.cols, new_centroids));
     }
 }
 
+/// Compute initial centroids using Forgy scheme.
+///
+/// Selects k random points in data for centroids.
 fn forgy_init(k: usize, data: &Matrix<f64>) -> Matrix<f64> {
 	let mut random_choices = Vec::with_capacity(k);
 	while random_choices.len() < k {
