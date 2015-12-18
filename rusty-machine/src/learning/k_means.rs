@@ -1,6 +1,8 @@
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
 use learning::UnSupModel;
+use rand;
+use rand::Rng;
 
 pub struct KMeansClassifier {
     iters: usize,
@@ -18,7 +20,7 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
     }
 
     fn train(&mut self, data: Matrix<f64>) {
-        self.init_centroids(data.cols);
+        self.init_centroids(&data);
 
         for _i in 0..self.iters {
             let idx = self.find_closest_centroids(&data);
@@ -36,9 +38,9 @@ impl KMeansClassifier {
         }
     }
 
-    fn init_centroids(&mut self, dim: usize) {
+    fn init_centroids(&mut self, data: &Matrix<f64>) {
         // These should not all be equal!
-        self.centroids = Some(Matrix::zeros(self.k, dim));
+        self.centroids = Some(forgy_init(self.k, data));
     }
 
     fn find_closest_centroids(&self, data: &Matrix<f64>) -> Vector<usize> {
@@ -80,4 +82,17 @@ impl KMeansClassifier {
 
         self.centroids = Some(Matrix::new(self.k, classes.size, new_centroids));
     }
+}
+
+fn forgy_init(k: usize, data: &Matrix<f64>) -> Matrix<f64> {
+	let mut random_choices = Vec::with_capacity(k);
+	while random_choices.len() < k {
+		let r = rand::thread_rng().gen_range(0, data.rows);
+
+		if !random_choices.contains(&r) {
+			random_choices.push(r);
+		}
+	}
+
+	data.select_rows(&random_choices)
 }
