@@ -1,5 +1,4 @@
 use rm::linalg::matrix::Matrix;
-use rm::linalg::vector::Vector;
 use rm::learning::UnSupModel;
 use rm::learning::k_means::KMeansClassifier;
 

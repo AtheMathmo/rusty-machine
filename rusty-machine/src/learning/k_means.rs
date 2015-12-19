@@ -11,6 +11,12 @@ use learning::UnSupModel;
 use rand;
 use rand::Rng;
 
+pub enum InitAlgorithm {
+    Forgy,
+    RandomPartition,
+    KPlusPlus,
+}
+
 /// K-Means Classification model.
 ///
 /// Contains option for centroids.
@@ -19,6 +25,7 @@ pub struct KMeansClassifier {
     pub iters: usize,
     pub k: usize,
     pub centroids: Option<Matrix<f64>>,
+    pub init_algorithm: InitAlgorithm,
 }
 
 impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
@@ -64,15 +71,19 @@ impl KMeansClassifier {
             iters: 100,
             k: k,
             centroids: None,
+            init_algorithm: InitAlgorithm::Forgy,
         }
     }
 
     /// Initialize the centroids.
     ///
     /// Used internally within model.
+    /// Currently only supports Forgy initialization.
     fn init_centroids(&mut self, data: &Matrix<f64>) {
-        // These should not all be equal!
-        self.centroids = Some(forgy_init(self.k, data));
+        match self.init_algorithm {
+            InitAlgorithm::Forgy => self.centroids = Some(forgy_init(self.k, data)),
+            _ => self.centroids = Some(forgy_init(self.k, data)),
+        }
     }
 
     /// Find the centroid closest to each data point.
