@@ -1,8 +1,6 @@
 //! K Means Classification
 //!
-//!
-//!
-//!
+//! 
 
 
 use linalg::matrix::Matrix;
@@ -161,7 +159,12 @@ impl KMeansClassifier {
 
         let mut random_assignments = Vec::with_capacity(data.rows);
 
-        for _i in 0..data.rows {
+        // Populate so we have something in each class.
+        for i in 0..k {
+            random_assignments.push(i);
+        }
+
+        for _i in k..data.rows {
             random_assignments.push(rand::thread_rng().gen_range(0, k));
         }
 
