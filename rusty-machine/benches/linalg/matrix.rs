@@ -7,25 +7,27 @@ fn empty(b: &mut Bencher) {
 }
 
 #[bench]
-fn mat_mul(b: &mut Bencher) {
-
-	let a = Matrix::new(10,10, vec![2.0;100]);
-	let c = Matrix::new(10,10, vec![3.0;100]);
-
-    b.iter(|| &a * &c)
-}
-
-#[bench]
 fn mat_add(b: &mut Bencher) {
-	let a = Matrix::new(10,10, vec![2.0;100]);
-	let c = Matrix::new(10,10, vec![3.0;100]);
+	
+    let a = Matrix::new(10, 10, vec![2.0;100]);
+    let c = Matrix::new(10, 10, vec![3.0;100]);
 
     b.iter(|| &a + &c)
 }
 
 #[bench]
-fn mat_det(b: &mut Bencher) {
-	let a = Matrix::new(10,10, vec![2.0;100]);
+fn mat_mul(b: &mut Bencher) {
 
-	b.iter(|| a.det());
+    let a = Matrix::new(10, 10, vec![2.0;100]);
+    let c = Matrix::new(10, 10, vec![3.0;100]);
+
+    b.iter(|| &a * &c)
+}
+
+#[bench]
+fn mat_det(b: &mut Bencher) {
+
+    let a = Matrix::new(10, 10, vec![2.0;100]);
+
+    b.iter(|| a.det());
 }
