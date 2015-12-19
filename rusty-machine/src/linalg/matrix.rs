@@ -572,20 +572,20 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         Matrix::new(self.rows, self.cols, new_t_data).transpose()
     }
 
-/// Computes the determinant of the matrix.
-///
-/// # Examples
-///
-/// ```
-/// use rusty_machine::linalg::matrix::Matrix;
-///
-/// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
-///                               0.0,3.0,4.0,
-///                               5.0, 1.0, 2.0]);
-///
-/// let det = a.det();
-///
-/// ```
+    /// Computes the determinant of the matrix.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
+    ///                               0.0,3.0,4.0,
+    ///                               5.0, 1.0, 2.0]);
+    ///
+    /// let det = a.det();
+    ///
+    /// ```
     pub fn det(&self) -> T {
         assert_eq!(self.rows, self.cols);
 
@@ -649,22 +649,22 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         sgn
     }
 
-/// Computes L, U, and P for LUP decomposition.
-///
-/// Returns L,U, and P respectively.
-///
-/// # Examples
-///
-/// ```
-/// use rusty_machine::linalg::matrix::Matrix;
-///
-/// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
-///                               0.0,3.0,4.0,
-///                               5.0, 1.0, 2.0]);
-///
-/// let (l,u,p) = a.lup_decomp();
-///
-/// ```
+    /// Computes L, U, and P for LUP decomposition.
+    ///
+    /// Returns L,U, and P respectively.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
+    ///                               0.0,3.0,4.0,
+    ///                               5.0, 1.0, 2.0]);
+    ///
+    /// let (l,u,p) = a.lup_decomp();
+    ///
+    /// ```
     pub fn lup_decomp(&self) -> (Matrix<T>, Matrix<T>, Matrix<T>) {
         assert!(self.rows == self.cols);
 
@@ -677,7 +677,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
 
         let mut p = Matrix::<T>::identity(n);
 
-// Compute the permutation matrix
+        // Compute the permutation matrix
         for i in 0..n {
             let row = utils::argmax(&mt.data[i*(n+1)..(i+1)*n]) + i;
 
@@ -797,8 +797,6 @@ impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
 
         let mut new_data = Vec::with_capacity(self.rows * m.cols);
 
-        let mt = m.transpose();
-
         unsafe {
             for i in 0..self.rows
             {
@@ -807,7 +805,7 @@ impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
                     let mut sum = T::zero();
                     for k in 0..m.rows
                     {
-                        sum = sum + *self.data.get_unchecked(i * self.cols + k) * *mt.data.get_unchecked(j*m.rows + k);
+                        sum = sum + *self.data.get_unchecked(i * self.cols + k) * *m.data.get_unchecked(k*m.cols + j);
                     }
                     new_data.push(sum);
                 }
