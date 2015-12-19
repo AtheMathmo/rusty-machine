@@ -1,7 +1,39 @@
-//! K Means Classification
+//! K-means Classification
 //!
-//! 
-
+//! Provides implementation of K-Means classification.
+//!
+//! # Usage
+//!
+//! ```
+//! // Create model with k classes.
+//! let mut model = KMeansClassifier::new(k);
+//!
+//! // Where train_data is a Matrix with features in columns.
+//! model.train(train_data); 
+//!
+//! // Where pred_data is a Matrix with features in columns.
+//! let a = model.predict(pred_data);
+//! ```
+//!
+//! Additionally you can control the initialization
+//! algorithm and max number of iterations.
+//!
+//! # Initializations
+//!
+//! Three initialization algorithms are supported.
+//!
+//! ## Forgy initialization
+//!
+//! Choose initial centroids randomly from the data.
+//!
+//! ## Random Partition initialization
+//!
+//! Randomly assign each data point to one of k clusters.
+//! The initial centroids are the mean of the data in their class.
+//!
+//! ## K-means++ initialization
+//!
+//! The [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) scheme.
 
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
@@ -9,6 +41,7 @@ use learning::UnSupModel;
 use rand;
 use rand::Rng;
 
+/// Initialization Algorithm enum.
 pub enum InitAlgorithm {
     Forgy,
     RandomPartition,
