@@ -1,6 +1,6 @@
 //! K Means Classification
 //!
-//! 
+//!
 //!
 //!
 
@@ -29,7 +29,6 @@ pub struct KMeansClassifier {
 }
 
 impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
-
     /// Predict classes from data.
     ///
     /// Model must be trained.
@@ -38,7 +37,7 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
             Some(ref _c) => return self.find_closest_centroids(&data),
             None => panic!("Model has not been trained."),
         }
-        
+
     }
 
     /// Train the classifier using input data.
@@ -53,7 +52,6 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
 }
 
 impl KMeansClassifier {
-
     /// Constructs untrained k-means classifier model.
     ///
     /// Requires number of classes to be specified.
@@ -81,8 +79,13 @@ impl KMeansClassifier {
     /// Currently only supports Forgy initialization.
     fn init_centroids(&mut self, data: &Matrix<f64>) {
         match self.init_algorithm {
-            InitAlgorithm::Forgy => self.centroids = Some(forgy_init(self.k, data)),
-            _ => self.centroids = Some(forgy_init(self.k, data)),
+            InitAlgorithm::Forgy => {
+                self.centroids = Some(KMeansClassifier::forgy_init(self.k, data))
+            }
+            InitAlgorithm::RandomPartition => {
+                self.centroids = Some(KMeansClassifier::ran_partition_init(self.k, data))
+            }
+            _ => self.centroids = Some(KMeansClassifier::forgy_init(self.k, data)),
         }
     }
 
@@ -127,23 +130,55 @@ impl KMeansClassifier {
             let mat_i = data.select_rows(&vec_i);
             new_centroids.extend(mat_i.mean(0).data);
         }
-        
+
         self.centroids = Some(Matrix::new(self.k, data.cols, new_centroids));
     }
-}
 
-/// Compute initial centroids using Forgy scheme.
-///
-/// Selects k random points in data for centroids.
-fn forgy_init(k: usize, data: &Matrix<f64>) -> Matrix<f64> {
-	let mut random_choices = Vec::with_capacity(k);
-	while random_choices.len() < k {
-		let r = rand::thread_rng().gen_range(0, data.rows);
+    /// Compute initial centroids using Forgy scheme.
+    ///
+    /// Selects k random points in data for centroids.
+    fn forgy_init(k: usize, data: &Matrix<f64>) -> Matrix<f64> {
+        assert!(k <= data.rows);
 
-		if !random_choices.contains(&r) {
-			random_choices.push(r);
-		}
-	}
+        let mut random_choices = Vec::with_capacity(k);
+        while random_choices.len() < k {
+            let r = rand::thread_rng().gen_range(0, data.rows);
 
-	data.select_rows(&random_choices)
+            if !random_choices.contains(&r) {
+                random_choices.push(r);
+            }
+        }
+
+        data.select_rows(&random_choices)
+    }
+
+    /// Compute initial centroids using random partition.
+    ///
+    /// Selects centroids by assigning each point randomly to a class
+    /// and computing the mean of each class.
+    fn ran_partition_init(k: usize, data: &Matrix<f64>) -> Matrix<f64> {
+        assert!(k <= data.rows);
+
+        let mut random_assignments = Vec::with_capacity(data.rows);
+
+        for _i in 0..data.rows {
+            random_assignments.push(rand::thread_rng().gen_range(0, k));
+        }
+
+        let mut init_centroids = Vec::with_capacity(k * data.cols);
+        for i in 0..k {
+            let mut vec_i = Vec::new();
+
+            for j in random_assignments.iter() {
+                if *j == i {
+                    vec_i.push(*j);
+                }
+            }
+
+            let mat_i = data.select_rows(&vec_i);
+            init_centroids.extend(mat_i.mean(0).data);
+        }
+
+        Matrix::new(k, data.cols, init_centroids)
+    }
 }
