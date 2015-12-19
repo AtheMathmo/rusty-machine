@@ -793,18 +793,24 @@ impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
 	type Output = Matrix<T>;
 
 	fn mul(self, m: &Matrix<T>) -> Matrix<T> {
-// Will use Strassen algorithm if large, traditional otherwise
 		assert!(self.cols == m.rows);
 
-        let mut new_data = vec![T::zero(); self.rows * m.cols];
+        let mut new_data = Vec::with_capacity(self.rows * m.cols);
 
         let mt = m.transpose();
 
-        for i in 0..self.rows
-        {
-            for j in 0..m.cols
+        unsafe {
+            for i in 0..self.rows
             {
-                new_data[i * m.cols + j] = utils::dot( &self.data[(i * self.cols)..((i+1)*self.cols)], &mt.data[(j*m.rows)..((j+1)*m.rows)] );
+                for j in 0..m.cols
+                {
+                    let mut sum = T::zero();
+                    for k in 0..m.rows
+                    {
+                        sum = sum + *self.data.get_unchecked(i * self.cols + k) * *mt.data.get_unchecked(j*m.rows + k);
+                    }
+                    new_data.push(sum);
+                }
             }
         }
 
