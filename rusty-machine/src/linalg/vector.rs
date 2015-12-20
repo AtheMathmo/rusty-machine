@@ -53,9 +53,10 @@ impl<T: Copy + PartialOrd> Vector<T> {
     ///
     /// let a = Vector::new(vec![1.0,2.0,0.0,5.0]);
     /// let b = a.argmax();
-    /// assert_eq!(b, 3);
+    /// assert_eq!(b.0, 3);
+    /// assert_eq!(b.1, 5.0);
     /// ```
-    pub fn argmax(&self) -> usize {
+    pub fn argmax(&self) -> (usize, T) {
         utils::argmax(&self.data)
     }
 
@@ -70,9 +71,10 @@ impl<T: Copy + PartialOrd> Vector<T> {
     ///
     /// let a = Vector::new(vec![1.0,2.0,0.0,5.0]);
     /// let b = a.argmin();
-    /// assert_eq!(b, 2);
+    /// assert_eq!(b.0, 2);
+    /// assert_eq!(b.1, 0.0);
     /// ```
-    pub fn argmin(&self) -> usize {
+    pub fn argmin(&self) -> (usize, T) {
         utils::argmin(&self.data)
     }
 }

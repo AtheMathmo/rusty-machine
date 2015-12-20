@@ -132,6 +132,7 @@ impl KMeansClassifier {
     /// Used internally within model.
     fn find_closest_centroids(&self, data: &Matrix<f64>) -> Vector<usize> {
         let mut idx = Vector::zeros(data.rows);
+        let mut distances = Vector::zeros(data.rows);
 
         match self.centroids {
             Some(ref c) => {
@@ -141,7 +142,9 @@ impl KMeansClassifier {
                     let dist = &centroid_diff.elemul(&centroid_diff).sum_cols();
 
                     // Now take argmin and this is the centroid.
-                    idx.data[i] = dist.argmin();
+                    let (min_idx, min_dist) = dist.argmin();
+                    idx.data[i]= min_idx;
+                    distances.data[i] = min_dist;
 
                 }
             }

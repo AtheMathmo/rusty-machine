@@ -178,9 +178,10 @@ pub fn ele_div<T: Copy + Zero + Div<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> 
 /// let a = vec![1.0,2.0,3.0,4.0];
 ///
 /// let c = utils::argmax(&a);
-/// assert_eq!(c, 3);
+/// assert_eq!(c.0, 3);
+/// assert_eq!(c.1, 4.0);
 /// ```
-pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> usize {
+pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> (usize, T) {
     assert!(u.len() != 0);
 
     let mut max_index = 0;
@@ -193,7 +194,7 @@ pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> usize {
         }
     }
 
-    max_index
+    (max_index, max)
 }
 
 /// Find argmin of slice.
@@ -207,9 +208,10 @@ pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> usize {
 /// let a = vec![5.0,2.0,3.0,4.0];
 ///
 /// let c = utils::argmin(&a);
-/// assert_eq!(c, 1);
+/// assert_eq!(c.0, 1);
+/// assert_eq!(c.1, 2.0);
 /// ```
-pub fn argmin<T: Copy + PartialOrd>(u: &[T]) -> usize {
+pub fn argmin<T: Copy + PartialOrd>(u: &[T]) -> (usize, T) {
     assert!(u.len() != 0);
 
     let mut min_index = 0;
@@ -222,7 +224,7 @@ pub fn argmin<T: Copy + PartialOrd>(u: &[T]) -> usize {
         }
     }
 
-    min_index
+    (min_index, min)
 }
 
 /// Find index of value in slice.

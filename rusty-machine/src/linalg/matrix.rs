@@ -749,9 +749,9 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
 
         // Compute the permutation matrix
         for i in 0..n {
-            let row = utils::argmax(&mt.data[i*(n+1)..(i+1)*n]) + i;
+            let (row,_) = utils::argmax(&mt.data[i*(n+1)..(i+1)*n]);
 
-            if row != i {
+            if row != 0 {
                 for j in 0..n {
                     p.data.swap(i*n + j, row*n+j)
                 }
