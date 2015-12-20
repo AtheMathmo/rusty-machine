@@ -71,11 +71,12 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
     ///
     /// Model must be trained.
     fn predict(&self, data: Matrix<f64>) -> Vector<usize> {
-        match self.centroids {
-            Some(ref _c) => return self.find_closest_centroids(&data).0,
-            None => panic!("Model has not been trained."),
+        if let Some(ref centroids) = self.centroids {
+            return KMeansClassifier::find_closest_centroids(centroids, &data).0;
         }
-
+        else {
+            panic!("Model has not been trained.");
+        }
     }
 
     /// Train the classifier using input data.
@@ -83,8 +84,8 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
         self.init_centroids(&data);
 
         for _i in 0..self.iters {
-            let (idx,_) = self.find_closest_centroids(&data);
-            self.update_centroids(&data, idx);
+                let (idx,_) = self.get_closest_centroids(&data);
+                self.update_centroids(&data, idx);
         }
     }
 }
@@ -114,7 +115,6 @@ impl KMeansClassifier {
     /// Initialize the centroids.
     ///
     /// Used internally within model.
-    /// Currently only supports Forgy initialization.
     fn init_centroids(&mut self, data: &Matrix<f64>) {
         match self.init_algorithm {
             InitAlgorithm::Forgy => {
@@ -127,39 +127,11 @@ impl KMeansClassifier {
         }
     }
 
-    /// Find the centroid closest to each data point.
-    ///
-    /// Used internally within model.
-    /// Returns the index of the closest centroid and the distance to it.
-    fn find_closest_centroids(&self, data: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
-        let mut idx = Vector::zeros(data.rows);
-        let mut distances = Vector::zeros(data.rows);
-
-        match self.centroids {
-            Some(ref c) => {
-                for i in 0..data.rows {
-                    // This works like repmat pulling out row i repeatedly.
-                    let centroid_diff = c - data.select_rows(&vec![i; c.rows]);
-                    let dist = &centroid_diff.elemul(&centroid_diff).sum_cols();
-
-                    // Now take argmin and this is the centroid.
-                    let (min_idx, min_dist) = dist.argmin();
-                    idx.data[i]= min_idx;
-                    distances.data[i] = min_dist;
-
-                }
-            }
-            None => panic!("Centroids not defined."),
-        }
-
-        (idx, distances)
-    }
-
     /// Updated the centroids by computing means of assigned classes.
     ///
     /// Used internally within model.
     fn update_centroids(&mut self, data: &Matrix<f64>, classes: Vector<usize>) {
-        let mut new_centroids = Vec::with_capacity(self.k * data.cols);
+        let mut new_centroids = Vec::with_capacity(self.k * data.cols());
         for i in 0..self.k {
             let mut vec_i = Vec::new();
 
@@ -173,18 +145,50 @@ impl KMeansClassifier {
             new_centroids.extend(mat_i.mean(0).data);
         }
 
-        self.centroids = Some(Matrix::new(self.k, data.cols, new_centroids));
+        self.centroids = Some(Matrix::new(self.k, data.cols(), new_centroids));
+    }
+
+    fn get_closest_centroids(&self, data: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
+        if let Some(ref c) = self.centroids {
+            return KMeansClassifier::find_closest_centroids(&c, data);
+        }
+        else {
+            panic!("Centroids not correctly initialized.");
+        }
+    }
+
+    /// Find the centroid closest to each data point.
+    ///
+    /// Used internally within model.
+    /// Returns the index of the closest centroid and the distance to it.
+    fn find_closest_centroids(centroids: &Matrix<f64>, data: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
+        let mut idx = Vector::zeros(data.rows());
+        let mut distances = Vector::zeros(data.rows());
+
+        for i in 0..data.rows() {
+            // This works like repmat pulling out row i repeatedly.
+            let centroid_diff = centroids - data.select_rows(&vec![i; centroids.rows()]);
+            let dist = &centroid_diff.elemul(&centroid_diff).sum_cols();
+
+            // Now take argmin and this is the centroid.
+            let (min_idx, min_dist) = dist.argmin();
+            idx.data[i]= min_idx;
+            distances.data[i] = min_dist;
+
+        }
+
+        (idx, distances)
     }
 
     /// Compute initial centroids using Forgy scheme.
     ///
     /// Selects k random points in data for centroids.
     fn forgy_init(k: usize, data: &Matrix<f64>) -> Matrix<f64> {
-        assert!(k <= data.rows);
+        assert!(k <= data.rows());
 
         let mut random_choices = Vec::with_capacity(k);
         while random_choices.len() < k {
-            let r = rand::thread_rng().gen_range(0, data.rows);
+            let r = rand::thread_rng().gen_range(0, data.rows());
 
             if !random_choices.contains(&r) {
                 random_choices.push(r);
@@ -199,20 +203,20 @@ impl KMeansClassifier {
     /// Selects centroids by assigning each point randomly to a class
     /// and computing the mean of each class.
     fn ran_partition_init(k: usize, data: &Matrix<f64>) -> Matrix<f64> {
-        assert!(k <= data.rows);
+        assert!(k <= data.rows());
 
-        let mut random_assignments = Vec::with_capacity(data.rows);
+        let mut random_assignments = Vec::with_capacity(data.rows());
 
         // Populate so we have something in each class.
         for i in 0..k {
             random_assignments.push(i);
         }
 
-        for _i in k..data.rows {
+        for _i in k..data.rows() {
             random_assignments.push(rand::thread_rng().gen_range(0, k));
         }
 
-        let mut init_centroids = Vec::with_capacity(k * data.cols);
+        let mut init_centroids = Vec::with_capacity(k * data.cols());
         for i in 0..k {
             let mut vec_i = Vec::new();
 
@@ -226,17 +230,17 @@ impl KMeansClassifier {
             init_centroids.extend(mat_i.mean(0).data);
         }
 
-        Matrix::new(k, data.cols, init_centroids)
+        Matrix::new(k, data.cols(), init_centroids)
     }
 
     fn plusplus_init(k: usize, data: &Matrix<f64>) -> Matrix<f64> {
-        assert!(k <= data.rows);
+        assert!(k <= data.rows());
 
-        let mut init_centroids = Vec::with_capacity(k * data.cols);
+        let mut init_centroids = Vec::with_capacity(k * data.cols());
 
-        let first_cen = rand::thread_rng().gen_range(0, data.rows);
+        let first_cen = rand::thread_rng().gen_range(0, data.rows());
         unimplemented!();
 
-        Matrix::new(k, data.cols, init_centroids)
+        Matrix::new(k, data.cols(), init_centroids)
     }
 }

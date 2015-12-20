@@ -14,8 +14,8 @@ use linalg::utils;
 ///
 /// Can be instantiated with any type.
 pub struct Matrix<T> {
-    pub cols: usize,
-    pub rows: usize,
+    rows: usize,
+    cols: usize,
     pub data: Vec<T>,
 }
 
@@ -40,6 +40,14 @@ impl<T> Matrix<T> {
             data: data,
         }
     }
+
+    pub fn rows(&self) -> usize {
+        self.rows
+    }
+
+    pub fn cols(&self) -> usize {
+        self.cols
+    }
 }
 
 impl<T: Copy> Matrix<T> {
@@ -53,16 +61,16 @@ impl<T: Copy> Matrix<T> {
     /// let a = Matrix::<f64>::ones(3,3);
     ///
     /// let b = &a.select_rows(&[2]);
-    /// assert_eq!(b.rows, 1);
-    /// assert_eq!(b.cols, 3);
+    /// assert_eq!(b.rows(), 1);
+    /// assert_eq!(b.cols(), 3);
     ///
     /// let c = &a.select_rows(&[1,2]);
-    /// assert_eq!(c.rows, 2);
-    /// assert_eq!(c.cols, 3);
+    /// assert_eq!(c.rows(), 2);
+    /// assert_eq!(c.cols(), 3);
     /// ```
     pub fn select_rows(&self, rows: &[usize]) -> Matrix<T> {
 
-        let mut mat_vec = Vec::new();
+        let mut mat_vec = Vec::with_capacity(rows.len() * self.cols);
 
         for row in rows {
             assert!(*row < self.rows);
@@ -91,16 +99,16 @@ impl<T: Copy> Matrix<T> {
     ///
     /// let a = Matrix::<f64>::ones(3,3);
     /// let b = &a.select_cols(&[2]);
-    /// assert_eq!(b.rows, 3);
-    /// assert_eq!(b.cols, 1);
+    /// assert_eq!(b.rows(), 3);
+    /// assert_eq!(b.cols(), 1);
     ///
     /// let c = &a.select_cols(&[1,2]);
-    /// assert_eq!(c.rows, 3);
-    /// assert_eq!(c.cols, 2);
+    /// assert_eq!(c.rows(), 3);
+    /// assert_eq!(c.cols(), 2);
     /// ```
     pub fn select_cols(&self, cols: &[usize]) -> Matrix<T> {
 
-        let mut mat_vec = Vec::new();
+        let mut mat_vec = Vec::with_capacity(cols.len() * self.rows);
 
         for col in cols {
             assert!(*col < self.cols);
@@ -132,7 +140,7 @@ impl<T: Copy> Matrix<T> {
     /// let b = Matrix::new(3,1, vec![4.0,5.0,6.0]);
     ///
     /// let c = &a.hcat(&b);
-    /// assert_eq!(c.cols, a.cols + b.cols);
+    /// assert_eq!(c.cols(), a.cols() + b.cols());
     /// assert_eq!(c[[1, 2]], 5.0);
     /// ```
     pub fn hcat(&self, m: &Matrix<T>) -> Matrix<T> {
@@ -166,7 +174,7 @@ impl<T: Copy> Matrix<T> {
     /// let b = Matrix::new(1,3, vec![4.0,5.0,6.0]);
     ///
     /// let c = &a.vcat(&b);
-    /// assert_eq!(c.rows, a.rows + b.rows);
+    /// assert_eq!(c.rows(), a.rows() + b.rows());
     /// assert_eq!(c[[2, 2]], 6.0);
     /// ```
     pub fn vcat(&self, m: &Matrix<T>) -> Matrix<T> {
@@ -329,10 +337,12 @@ impl<T: Copy + Zero + One + PartialEq> Matrix<T> {
     /// ```
     pub fn is_diag(&self) -> bool {
 
-        for i in 0..self.rows {
-            for j in 0..self.cols {
-                if (i != j) && (self[[i, j]] != T::zero()) {
-                    return false;
+        unsafe {
+            for i in 0..self.rows {
+                for j in 0..self.cols {
+                    if (i != j) && (*self.data.get_unchecked(i*self.cols + j) != T::zero()) {
+                        return false;
+                    }
                 }
             }
         }
@@ -358,9 +368,12 @@ impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
     /// ```
     pub fn sum_rows(&self) -> Vector<T> {
         let mut row_sum = vec![T::zero(); self.cols];
-        for i in 0..self.rows {
-            for j in 0..self.cols {
-                row_sum[j] = row_sum[j] + self[[i, j]];
+
+        unsafe {
+            for i in 0..self.rows {
+                for j in 0..self.cols {
+                    row_sum[j] = row_sum[j] + *self.data.get_unchecked(i*self.cols + j);
+                }
             }
         }
         Vector::new(row_sum)
@@ -382,9 +395,12 @@ impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
     /// ```
     pub fn sum_cols(&self) -> Vector<T> {
         let mut col_sum = vec![T::zero(); self.rows];
-        for i in 0..self.rows {
-            for j in 0..self.cols {
-                col_sum[i] = col_sum[i] + self[[i, j]];
+
+        unsafe {
+            for i in 0..self.rows {
+                for j in 0..self.cols {
+                    col_sum[i] = col_sum[i] + *self.data.get_unchecked(i*self.cols + j);
+                }
             }
         }
         Vector::new(col_sum)
@@ -510,15 +526,17 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
         let mut variance = Vector::new(vec![T::zero(); m]);
 
         for i in 0..n {
-            let mut t = Vec::<T>::new();
+            let mut t = Vec::<T>::with_capacity(m);
 
-            for j in 0..m {
-                match axis {
-                    0 => t.push(self[[i, j]]),
-                    1 => t.push(self[[j, i]]),
-                    _ => panic!("Axis must be 0 or 1."),
+            unsafe {
+                for j in 0..m {
+                    match axis {
+                        0 => t.push(*self.data.get_unchecked(i*m + j)),
+                        1 => t.push(*self.data.get_unchecked(j*n + i)),
+                        _ => panic!("Axis must be 0 or 1."),
+                    }
+
                 }
-
             }
 
             let v = Vector::new(t);
@@ -535,7 +553,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         + Mul<T, Output=T> + Sub<T, Output=T>
         + Div<T, Output=T> + PartialOrd> Matrix<T> {
 
-/// Solves an upper triangular linear system.
+    /// Solves an upper triangular linear system.
     fn solve_u_triangular(&self, y: Vector<T>) -> Vector<T> {
         assert!(self.cols == y.size);
 
@@ -544,9 +562,11 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         let mut holding_u_sum = T::zero();
         x[y.size-1] = y[y.size-1] / self[[y.size-1,y.size-1]];
 
-        for i in (0..y.size-1).rev() {
-            holding_u_sum = holding_u_sum + self[[i,i+1]];
-            x[i] = (y[i] - holding_u_sum*x[i+1]) / self[[i,i]];
+        unsafe {
+            for i in (0..y.size-1).rev() {
+                holding_u_sum = holding_u_sum + *self.data.get_unchecked(i*(self.cols+1) + 1);
+                x[i] = (y[i] - holding_u_sum*x[i+1]) / *self.data.get_unchecked(i*(self.cols+1));
+            }
         }
 
         Vector {
@@ -555,7 +575,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         }
     }
 
-/// Solves a lower triangular linear system.
+    /// Solves a lower triangular linear system.
     fn solve_l_triangular(&self, y: Vector<T>) -> Vector<T> {
         assert!(self.cols == y.size);
 
@@ -564,9 +584,11 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         let mut holding_l_sum = T::zero();
         x[0] = y[0] / self[[0,0]];
 
-        for i in 1..y.size {
-            holding_l_sum = holding_l_sum + self[[i,i-1]];
-            x[i] = (y[i] - holding_l_sum*x[i-1]) / self[[i,i]];
+        unsafe {
+            for i in 1..y.size {
+                holding_l_sum = holding_l_sum + *self.data.get_unchecked(i*(self.cols + 1) - 1);
+                x[i] = (y[i] - holding_l_sum*x[i-1]) / *self.data.get_unchecked(i*(self.cols+1));
+            }
         }
 
         Vector {
@@ -575,23 +597,23 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         }
     }
 
-/// Solves the equation Ax = y.
-///
-/// Requires a Vector y as input.
-///
-/// # Examples
-///
-/// ```
-/// use rusty_machine::linalg::matrix::Matrix;
-/// use rusty_machine::linalg::vector::Vector;
-///
-/// let a = Matrix::new(2,2, vec![2.0,3.0,1.0,2.0]);
-/// let y = Vector::new(vec![13.0,8.0]);
-///
-/// let x = a.solve(y);
-///
-/// assert_eq!(x.data, vec![2.0, 3.0]);
-/// ```
+    /// Solves the equation Ax = y.
+    ///
+    /// Requires a Vector y as input.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::vector::Vector;
+    ///
+    /// let a = Matrix::new(2,2, vec![2.0,3.0,1.0,2.0]);
+    /// let y = Vector::new(vec![13.0,8.0]);
+    ///
+    /// let x = a.solve(y);
+    ///
+    /// assert_eq!(x.data, vec![2.0, 3.0]);
+    /// ```
     pub fn solve(&self, y: Vector<T>) -> Vector<T> {
         let (l,u,p) = self.lup_decomp();
 
@@ -599,20 +621,20 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         u.solve_u_triangular(b)
     }
 
-/// Computes the inverse of the matrix.
-///
-/// # Examples
-///
-/// ```
-/// use rusty_machine::linalg::matrix::Matrix;
-///
-/// let a = Matrix::new(2,2, vec![2.,3.,1.,2.]);
-/// let inv = a.inverse();
-///
-/// let I = a * inv;
-///
-/// assert_eq!(I.data, vec![1.0,0.0,0.0,1.0]);
-/// ```
+    /// Computes the inverse of the matrix.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(2,2, vec![2.,3.,1.,2.]);
+    /// let inv = a.inverse();
+    ///
+    /// let I = a * inv;
+    ///
+    /// assert_eq!(I.data, vec![1.0,0.0,0.0,1.0]);
+    /// ```
     pub fn inverse(&self) -> Matrix<T> {
         assert_eq!(self.rows, self.cols);
 
@@ -621,9 +643,11 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
 
         let mut d = T::one();
 
-        for i in 0..l.cols {
-            d = d * l[[i,i]];
-            d = d * u[[i,i]];
+        unsafe {
+            for i in 0..l.cols {
+                d = d * *l.data.get_unchecked(i*(l.cols+1));
+                d = d * *u.data.get_unchecked(i*(u.cols+1));
+            }
         }
 
         if d == T::zero() {
@@ -664,8 +688,10 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         if self.is_diag() {
             let mut d = T::one();
 
-            for i in 0..n {
-                d = d * self[[i,i]];
+            unsafe {
+                for i in 0..n {
+                    d = d * *self.data.get_unchecked(i*(self.cols+1));
+                }
             }
 
             return d;
@@ -685,9 +711,11 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
 
         let mut d = T::one();
 
-        for i in 0..l.cols {
-            d = d * l[[i,i]];
-            d = d * u[[i,i]];
+        unsafe {
+            for i in 0..l.cols {
+                d = d * *l.data.get_unchecked(i*(l.cols+1));
+                d = d * *u.data.get_unchecked(i*(u.cols+1));
+            }
         }
 
         let sgn = p.parity();
@@ -695,7 +723,7 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
         return sgn * d;
     }
 
-/// Computes the parity of a permutation matrix.
+    /// Computes the parity of a permutation matrix.
     fn parity(&self) -> T {
         let mut visited = vec![false; self.rows];
         let mut sgn = T::one();

@@ -6,16 +6,16 @@ use libnum::abs;
 fn create_mat_new() {
     let a = Matrix::new(4, 3, vec![0.0; 12]);
 
-    assert_eq!(a.rows, 4);
-    assert_eq!(a.cols, 3);
+    assert_eq!(a.rows(), 4);
+    assert_eq!(a.cols(), 3);
 }
 
 #[test]
 fn create_mat_zeros() {
     let a = Matrix::<f32>::zeros(10, 10);
 
-    assert_eq!(a.rows, 10);
-    assert_eq!(a.cols, 10);
+    assert_eq!(a.rows(), 10);
+    assert_eq!(a.cols(), 10);
 
     for i in 0..10 {
         for j in 0..10 {
@@ -28,8 +28,8 @@ fn create_mat_zeros() {
 fn create_mat_identity() {
     let a = Matrix::<f32>::identity(4);
 
-    assert_eq!(a.rows, 4);
-    assert_eq!(a.cols, 4);
+    assert_eq!(a.rows(), 4);
+    assert_eq!(a.cols(), 4);
 
     assert_eq!(a[[0, 0]], 1.0);
     assert_eq!(a[[1, 1]], 1.0);
@@ -45,8 +45,8 @@ fn create_mat_identity() {
 fn create_mat_diag() {
     let a = Matrix::from_diag(&[1.0, 2.0, 3.0, 4.0]);
 
-    assert_eq!(a.rows, 4);
-    assert_eq!(a.cols, 4);
+    assert_eq!(a.rows(), 4);
+    assert_eq!(a.cols(), 4);
 
     assert_eq!(a[[0, 0]], 1.0);
     assert_eq!(a[[1, 1]], 2.0);
@@ -64,8 +64,8 @@ fn transpose_mat() {
 
     let c = a.transpose();
 
-    assert_eq!(c.cols, a.rows);
-    assert_eq!(c.rows, a.cols);
+    assert_eq!(c.cols(), a.rows());
+    assert_eq!(c.rows(), a.cols());
 
     assert_eq!(a[[0, 0]], c[[0, 0]]);
     assert_eq!(a[[1, 0]], c[[0, 1]]);
@@ -99,8 +99,8 @@ fn matrix_mul() {
 
     let c = a * b;
 
-    assert_eq!(c.rows, 3);
-    assert_eq!(c.cols, 3);
+    assert_eq!(c.rows(), 3);
+    assert_eq!(c.cols(), 3);
 
     assert_eq!(c[[0, 0]], 9.0);
     assert_eq!(c[[0, 1]], 12.0);
