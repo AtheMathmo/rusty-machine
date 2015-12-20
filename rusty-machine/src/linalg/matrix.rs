@@ -53,12 +53,14 @@ impl<T> Matrix<T> {
 }
 
 impl<T: Clone> Clone for Matrix<T> {
-
     /// Clones the Matrix.
     fn clone(&self) -> Matrix<T> {
-        Matrix{ rows: self.rows, cols: self.cols, data: self.data.clone() }
+        Matrix {
+            rows: self.rows,
+            cols: self.cols,
+            data: self.data.clone(),
+        }
     }
-
 }
 
 impl<T: Copy> Matrix<T> {
@@ -162,16 +164,20 @@ impl<T: Copy> Matrix<T> {
         unsafe {
             for i in 0..self.rows {
                 for j in 0..self.cols {
-                    new_data.push(*self.data.get_unchecked(i*self.cols + j));
+                    new_data.push(*self.data.get_unchecked(i * self.cols + j));
                 }
 
                 for j in 0..m.cols {
-                    new_data.push(*m.data.get_unchecked(i*m.cols + j));
+                    new_data.push(*m.data.get_unchecked(i * m.cols + j));
                 }
             }
         }
 
-        Matrix { cols: (self.cols + m.cols), rows: self.rows, data: new_data }
+        Matrix {
+            cols: (self.cols + m.cols),
+            rows: self.rows,
+            data: new_data,
+        }
     }
 
     /// Vertically concatenates two matrices. With self on top.
@@ -196,18 +202,22 @@ impl<T: Copy> Matrix<T> {
         unsafe {
             for i in 0..self.rows {
                 for j in 0..self.cols {
-                    new_data.push(*self.data.get_unchecked(i*self.cols + j));
+                    new_data.push(*self.data.get_unchecked(i * self.cols + j));
                 }
             }
 
             for i in 0..m.rows {
                 for j in 0..m.cols {
-                    new_data.push(*m.data.get_unchecked(i*m.cols + j));
+                    new_data.push(*m.data.get_unchecked(i * m.cols + j));
                 }
             }
         }
 
-        Matrix { cols: self.cols, rows: (self.rows + m.rows), data: new_data }
+        Matrix {
+            cols: self.cols,
+            rows: (self.rows + m.rows),
+            data: new_data,
+        }
     }
 }
 
@@ -351,7 +361,7 @@ impl<T: Copy + Zero + One + PartialEq> Matrix<T> {
         unsafe {
             for i in 0..self.rows {
                 for j in 0..self.cols {
-                    if (i != j) && (*self.data.get_unchecked(i*self.cols + j) != T::zero()) {
+                    if (i != j) && (*self.data.get_unchecked(i * self.cols + j) != T::zero()) {
                         return false;
                     }
                 }
@@ -383,7 +393,7 @@ impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
         unsafe {
             for i in 0..self.rows {
                 for j in 0..self.cols {
-                    row_sum[j] = row_sum[j] + *self.data.get_unchecked(i*self.cols + j);
+                    row_sum[j] = row_sum[j] + *self.data.get_unchecked(i * self.cols + j);
                 }
             }
         }
@@ -410,7 +420,7 @@ impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
         unsafe {
             for i in 0..self.rows {
                 for j in 0..self.cols {
-                    col_sum[i] = col_sum[i] + *self.data.get_unchecked(i*self.cols + j);
+                    col_sum[i] = col_sum[i] + *self.data.get_unchecked(i * self.cols + j);
                 }
             }
         }
@@ -542,8 +552,8 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
             unsafe {
                 for j in 0..m {
                     match axis {
-                        0 => t.push(*self.data.get_unchecked(i*m + j)),
-                        1 => t.push(*self.data.get_unchecked(j*n + i)),
+                        0 => t.push(*self.data.get_unchecked(i * m + j)),
+                        1 => t.push(*self.data.get_unchecked(j * n + i)),
                         _ => panic!("Axis must be 0 or 1."),
                     }
 
@@ -560,9 +570,10 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
     }
 }
 
-impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
-        + Mul<T, Output=T> + Sub<T, Output=T>
-        + Div<T, Output=T> + PartialOrd> Matrix<T> {
+impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
+                           Add<T, Output=T> + Mul<T, Output=T> +
+                           Sub<T, Output=T> + Div<T, Output=T> +
+                           PartialOrd {
 
     /// Solves an upper triangular linear system.
     fn solve_u_triangular(&self, y: Vector<T>) -> Vector<T> {
@@ -893,10 +904,10 @@ impl <'a, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'a Ma
 
 /// Multiplies matrix by matrix.
 impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b Matrix<T>> for &'a Matrix<T> {
-	type Output = Matrix<T>;
+    type Output = Matrix<T>;
 
-	fn mul(self, m: &Matrix<T>) -> Matrix<T> {
-		assert!(self.cols == m.rows);
+    fn mul(self, m: &Matrix<T>) -> Matrix<T> {
+        assert!(self.cols == m.rows);
 
         let mut new_data = Vec::with_capacity(self.rows * m.cols);
 
@@ -920,7 +931,7 @@ impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
             cols: m.cols,
             data: new_data
         }
-	}
+    }
 }
 
 /// Multiplies matrix by vector.
