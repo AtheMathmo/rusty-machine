@@ -52,6 +52,15 @@ impl<T> Matrix<T> {
     }
 }
 
+impl<T: Clone> Clone for Matrix<T> {
+
+    /// Clones the Matrix.
+    fn clone(&self) -> Matrix<T> {
+        Matrix{ rows: self.rows, cols: self.cols, data: self.data.clone() }
+    }
+
+}
+
 impl<T: Copy> Matrix<T> {
     /// Select rows from matrix
     ///

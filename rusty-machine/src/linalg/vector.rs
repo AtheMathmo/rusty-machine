@@ -45,6 +45,15 @@ impl<T> Vector<T> {
     }
 }
 
+impl<T: Clone> Clone for Vector<T> {
+
+    /// Clones the Vector.
+    fn clone(&self) -> Vector<T> {
+        Vector{ size: self.size, data: self.data.clone() }
+    }
+
+}
+
 impl<T: Copy + PartialOrd> Vector<T> {
 
     /// Find the argmax of the Vector.
