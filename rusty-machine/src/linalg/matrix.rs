@@ -41,10 +41,12 @@ impl<T> Matrix<T> {
         }
     }
 
+    /// Returns the number of rows in the Matrix.
     pub fn rows(&self) -> usize {
         self.rows
     }
 
+    /// Returns the number of columns in the Matrix.
     pub fn cols(&self) -> usize {
         self.cols
     }
@@ -555,46 +557,40 @@ impl<T: Copy + One + Zero + Neg<Output=T> + Add<T, Output=T>
 
     /// Solves an upper triangular linear system.
     fn solve_u_triangular(&self, y: Vector<T>) -> Vector<T> {
-        assert!(self.cols == y.size);
+        assert!(self.cols == y.size());
 
-        let mut x = vec![T::zero(); y.size];
+        let mut x = vec![T::zero(); y.size()];
 
         let mut holding_u_sum = T::zero();
-        x[y.size-1] = y[y.size-1] / self[[y.size-1,y.size-1]];
+        x[y.size()-1] = y[y.size()-1] / self[[y.size()-1,y.size()-1]];
 
         unsafe {
-            for i in (0..y.size-1).rev() {
+            for i in (0..y.size()-1).rev() {
                 holding_u_sum = holding_u_sum + *self.data.get_unchecked(i*(self.cols+1) + 1);
                 x[i] = (y[i] - holding_u_sum*x[i+1]) / *self.data.get_unchecked(i*(self.cols+1));
             }
         }
 
-        Vector {
-            size: y.size,
-            data: x
-        }
+        Vector::new(x)
     }
 
     /// Solves a lower triangular linear system.
     fn solve_l_triangular(&self, y: Vector<T>) -> Vector<T> {
-        assert!(self.cols == y.size);
+        assert!(self.cols == y.size());
 
-        let mut x = vec![T::zero(); y.size];
+        let mut x = vec![T::zero(); y.size()];
 
         let mut holding_l_sum = T::zero();
         x[0] = y[0] / self[[0,0]];
 
         unsafe {
-            for i in 1..y.size {
+            for i in 1..y.size() {
                 holding_l_sum = holding_l_sum + *self.data.get_unchecked(i*(self.cols + 1) - 1);
                 x[i] = (y[i] - holding_l_sum*x[i-1]) / *self.data.get_unchecked(i*(self.cols+1));
             }
         }
 
-        Vector {
-            size: y.size,
-            data: x
-        }
+        Vector::new(x)
     }
 
     /// Solves the equation Ax = y.
@@ -950,7 +946,7 @@ impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
     type Output = Vector<T>;
 
     fn mul(self, v: &Vector<T>) -> Vector<T> {
-        assert!(v.size == self.cols);
+        assert!(v.size() == self.cols);
 
         let mut new_data = vec![T::zero(); self.rows];
 
@@ -959,10 +955,7 @@ impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
             new_data[i] = utils::dot(&self.data[i*self.cols..(i+1)*self.cols], &v.data);
         }
 
-        return Vector {
-            size: self.rows,
-            data: new_data
-        }
+        return Vector::new(new_data)
     }
 }
 

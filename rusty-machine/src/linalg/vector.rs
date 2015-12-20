@@ -13,7 +13,7 @@ use linalg::utils;
 ///
 /// Can be instantiated with any type.
 pub struct Vector<T> {
-    pub size: usize,
+    size: usize,
     pub data: Vec<T>,
 }
 
@@ -37,6 +37,11 @@ impl<T> Vector<T> {
             size: size,
             data: data,
         }
+    }
+
+    /// Returns the size of the Vector.
+    pub fn size(&self) -> usize {
+        self.size
     }
 }
 

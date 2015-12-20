@@ -120,7 +120,7 @@ fn matrix_vec_mul() {
 
     let c = a * b;
 
-    assert_eq!(c.size, 3);
+    assert_eq!(c.size(), 3);
 
     assert_eq!(c[0], 18.0);
     assert_eq!(c[1], 40.0);
@@ -290,7 +290,7 @@ fn matrix_solve() {
 
     let x = a.solve(y);
 
-    assert_eq!(x.size, 2);
+    assert_eq!(x.size(), 2);
 
     assert_eq!(x[0], 1.);
     assert_eq!(x[1], 2.);

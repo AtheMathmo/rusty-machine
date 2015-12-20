@@ -5,7 +5,7 @@ use rm::linalg::Metric;
 fn create_vector_new() {
     let a = Vector::new(vec![1.0; 12]);
 
-    assert_eq!(a.size, 12);
+    assert_eq!(a.size(), 12);
 
     for i in 0..12 {
         assert_eq!(a[i], 1.0);
@@ -16,7 +16,7 @@ fn create_vector_new() {
 fn create_vector_zeros() {
     let a = Vector::<f32>::zeros(7);
 
-    assert_eq!(a.size, 7);
+    assert_eq!(a.size(), 7);
 
     for i in 0..7 {
         assert_eq!(a[i], 0.0);
