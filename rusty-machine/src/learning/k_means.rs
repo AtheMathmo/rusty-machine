@@ -5,8 +5,15 @@
 //! # Usage
 //!
 //! ```
-//! // Create model with k classes.
-//! let mut model = KMeansClassifier::new(k);
+//! use rusty_machine::linalg::matrix::Matrix;
+//! use rusty_machine::learning::k_means::KMeansClassifier;
+//! use rusty_machine::learning::UnSupModel;
+//!
+//! let train_data = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
+//! let pred_data = Matrix::new(1,2, vec![0.0, 0.0]);
+//! 
+//! // Create model with k(=2) classes.
+//! let mut model = KMeansClassifier::new(2);
 //!
 //! // Where train_data is a Matrix with features in columns.
 //! model.train(train_data); 
