@@ -57,3 +57,17 @@ fn test_model_ran_partition() {
 
     assert_eq!(a.data.len(), 3);
 }
+
+#[test]
+fn test_model_kplusplus() {
+    let mut model = KMeansClassifier::new(3);
+    let data = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
+    let pred_data = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
+
+    model.init_algorithm = InitAlgorithm::KPlusPlus;
+    model.train(data);
+
+    let a = model.predict(pred_data);
+
+    assert_eq!(a.data.len(), 3);
+}

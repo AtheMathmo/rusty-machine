@@ -45,8 +45,7 @@
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
 use learning::UnSupModel;
-use rand;
-use rand::Rng;
+use rand::{Rng, thread_rng};
 
 /// Initialization Algorithm enum.
 pub enum InitAlgorithm {
@@ -123,7 +122,9 @@ impl KMeansClassifier {
             InitAlgorithm::RandomPartition => {
                 self.centroids = Some(KMeansClassifier::ran_partition_init(self.k, data))
             }
-            _ => self.centroids = Some(KMeansClassifier::forgy_init(self.k, data)),
+            InitAlgorithm::KPlusPlus => {
+                self.centroids = Some(KMeansClassifier::plusplus_init(self.k, data))
+            }
         }
     }
 
@@ -187,8 +188,9 @@ impl KMeansClassifier {
         assert!(k <= data.rows());
 
         let mut random_choices = Vec::with_capacity(k);
+        let mut rng = thread_rng();
         while random_choices.len() < k {
-            let r = rand::thread_rng().gen_range(0, data.rows());
+            let r = rng.gen_range(0, data.rows());
 
             if !random_choices.contains(&r) {
                 random_choices.push(r);
@@ -212,8 +214,9 @@ impl KMeansClassifier {
             random_assignments.push(i);
         }
 
+        let mut rng = thread_rng();
         for _i in k..data.rows() {
-            random_assignments.push(rand::thread_rng().gen_range(0, k));
+            random_assignments.push(rng.gen_range(0, k));
         }
 
         let mut init_centroids = Vec::with_capacity(k * data.cols());
@@ -236,11 +239,39 @@ impl KMeansClassifier {
     fn plusplus_init(k: usize, data: &Matrix<f64>) -> Matrix<f64> {
         assert!(k <= data.rows());
 
+        let mut rng = thread_rng();
+
         let mut init_centroids = Vec::with_capacity(k * data.cols());
+        let first_cen = rng.gen_range(0usize, data.rows());
+        
+        init_centroids.append(&mut data.select_rows(&vec![first_cen]).data);
 
-        let first_cen = rand::thread_rng().gen_range(0, data.rows());
-        unimplemented!();
-
+        for i in 1..k {
+            let temp_centroids = Matrix::new(i, data.cols(), init_centroids.clone());
+            let (_, dist) = KMeansClassifier::find_closest_centroids(&temp_centroids, &data);
+            let next_cen = sample_discretely(dist);
+            init_centroids.append(&mut data.select_rows(&vec![next_cen]).data)
+        }
+        
         Matrix::new(k, data.cols(), init_centroids)
     }
+}
+
+fn sample_discretely(unnorm_dist: Vector<f64>) -> usize {
+    assert!(unnorm_dist.size() > 0);
+
+    let sum = unnorm_dist.sum();
+
+    let rand = thread_rng().gen_range(0.0f64, sum);
+
+    let mut tempsum = 0.0;
+    for (i,p) in unnorm_dist.data.iter().enumerate() {
+        tempsum += *p;
+
+        if rand < tempsum {
+            return i;
+        }
+    }
+
+    panic!("No random value was sampled! This should never happen...");
 }
