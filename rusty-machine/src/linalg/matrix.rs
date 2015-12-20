@@ -120,6 +120,76 @@ impl<T: Copy> Matrix<T> {
             data: mat_vec,
         }
     }
+
+    /// Horizontally concatenates two matrices. With self on the left.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(3,2, vec![1.0,2.0,3.0,4.0,5.0,6.0]);
+    /// let b = Matrix::new(3,1, vec![4.0,5.0,6.0]);
+    ///
+    /// let c = &a.hcat(&b);
+    /// assert_eq!(c.cols, a.cols + b.cols);
+    /// assert_eq!(c[[1, 2]], 5.0);
+    /// ```
+    pub fn hcat(&self, m: &Matrix<T>) -> Matrix<T> {
+        assert_eq!(self.rows, m.rows);
+
+        let mut new_data = Vec::with_capacity((self.cols + m.cols) * self.rows);
+
+        unsafe {
+            for i in 0..self.rows {
+                for j in 0..self.cols {
+                    new_data.push(*self.data.get_unchecked(i*self.cols + j));
+                }
+
+                for j in 0..m.cols {
+                    new_data.push(*m.data.get_unchecked(i*m.cols + j));
+                }
+            }
+        }
+
+        Matrix { cols: (self.cols + m.cols), rows: self.rows, data: new_data }
+    }
+
+    /// Vertically concatenates two matrices. With self on top.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(2,3, vec![1.0,2.0,3.0,4.0,5.0,6.0]);
+    /// let b = Matrix::new(1,3, vec![4.0,5.0,6.0]);
+    ///
+    /// let c = &a.vcat(&b);
+    /// assert_eq!(c.rows, a.rows + b.rows);
+    /// assert_eq!(c[[2, 2]], 6.0);
+    /// ```
+    pub fn vcat(&self, m: &Matrix<T>) -> Matrix<T> {
+        assert_eq!(self.cols, m.cols);
+
+        let mut new_data = Vec::with_capacity((self.rows + m.rows) * self.cols);
+
+        unsafe {
+            for i in 0..self.rows {
+                for j in 0..self.cols {
+                    new_data.push(*self.data.get_unchecked(i*self.cols + j));
+                }
+            }
+
+            for i in 0..m.rows {
+                for j in 0..m.cols {
+                    new_data.push(*m.data.get_unchecked(i*m.cols + j));
+                }
+            }
+        }
+
+        Matrix { cols: self.cols, rows: (self.rows + m.rows), data: new_data }
+    }
 }
 
 impl<T: Zero + One + Copy> Matrix<T> {
