@@ -72,7 +72,7 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
     /// Model must be trained.
     fn predict(&self, data: Matrix<f64>) -> Vector<usize> {
         match self.centroids {
-            Some(ref _c) => return self.find_closest_centroids(&data),
+            Some(ref _c) => return self.find_closest_centroids(&data).0,
             None => panic!("Model has not been trained."),
         }
 
@@ -83,7 +83,7 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
         self.init_centroids(&data);
 
         for _i in 0..self.iters {
-            let idx = self.find_closest_centroids(&data);
+            let (idx,_) = self.find_closest_centroids(&data);
             self.update_centroids(&data, idx);
         }
     }
@@ -130,7 +130,8 @@ impl KMeansClassifier {
     /// Find the centroid closest to each data point.
     ///
     /// Used internally within model.
-    fn find_closest_centroids(&self, data: &Matrix<f64>) -> Vector<usize> {
+    /// Returns the index of the closest centroid and the distance to it.
+    fn find_closest_centroids(&self, data: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
         let mut idx = Vector::zeros(data.rows);
         let mut distances = Vector::zeros(data.rows);
 
@@ -151,7 +152,7 @@ impl KMeansClassifier {
             None => panic!("Centroids not defined."),
         }
 
-        idx
+        (idx, distances)
     }
 
     /// Updated the centroids by computing means of assigned classes.
@@ -224,6 +225,17 @@ impl KMeansClassifier {
             let mat_i = data.select_rows(&vec_i);
             init_centroids.extend(mat_i.mean(0).data);
         }
+
+        Matrix::new(k, data.cols, init_centroids)
+    }
+
+    fn plusplus_init(k: usize, data: &Matrix<f64>) -> Matrix<f64> {
+        assert!(k <= data.rows);
+
+        let mut init_centroids = Vec::with_capacity(k * data.cols);
+
+        let first_cen = rand::thread_rng().gen_range(0, data.rows);
+        unimplemented!();
 
         Matrix::new(k, data.cols, init_centroids)
     }
