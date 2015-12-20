@@ -236,6 +236,10 @@ impl KMeansClassifier {
         Matrix::new(k, data.cols(), init_centroids)
     }
 
+    /// Compute initial centroids using k-means++.
+    ///
+    /// Selects centroids using weighted probability from
+    /// distances.
     fn plusplus_init(k: usize, data: &Matrix<f64>) -> Matrix<f64> {
         assert!(k <= data.rows());
 
@@ -257,6 +261,9 @@ impl KMeansClassifier {
     }
 }
 
+/// Sample from an unnormalized distribution.
+///
+/// 
 fn sample_discretely(unnorm_dist: Vector<f64>) -> usize {
     assert!(unnorm_dist.size() > 0);
 
@@ -273,5 +280,5 @@ fn sample_discretely(unnorm_dist: Vector<f64>) -> usize {
         }
     }
 
-    panic!("No random value was sampled! This should never happen...");
+    panic!("No random value was sampled! There may be more clusters than unique data points.");
 }
