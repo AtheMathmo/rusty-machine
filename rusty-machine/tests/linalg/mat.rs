@@ -3,14 +3,6 @@ use rm::linalg::vector::Vector;
 use libnum::abs;
 
 #[test]
-fn create_mat_new() {
-    let a = Matrix::new(4, 3, vec![0.0; 12]);
-
-    assert_eq!(a.rows(), 4);
-    assert_eq!(a.cols(), 3);
-}
-
-#[test]
 fn create_mat_zeros() {
     let a = Matrix::<f32>::zeros(10, 10);
 

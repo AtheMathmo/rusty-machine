@@ -30,6 +30,9 @@ impl<T> Matrix<T> {
     /// use rusty_machine::linalg::matrix::Matrix;
     ///
     /// let mat = Matrix::new(2,2, vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// assert_eq!(mat.rows(), 2);
+    /// assert_eq!(mat.cols(), 2);
     /// ```
     pub fn new(rows: usize, cols: usize, data: Vec<T>) -> Matrix<T> {
 
