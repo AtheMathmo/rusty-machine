@@ -1,9 +1,9 @@
 [package]
 name = "rusty-machine"
-version = "0.0.7"
+version = "0.0.8"
 authors = ["AtheMathmo"]
 
-description = "A machine learning library. (Currently little more than a simple linear algebra library!)"
+description = "An early stage machine learning library."
 repository = "https://github.com/AtheMathmo/rusty-machine"
 documentation = "https://AtheMathmo.github.io/rusty-machine/"
 keywords = ["machine","learning","stats","statistics","algebra"]
@@ -13,4 +13,5 @@ license = "MIT"
 
 [dependencies]
 num = "0.1.28"
+rand = "0.3.*"
 
