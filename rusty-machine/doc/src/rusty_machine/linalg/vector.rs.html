@@ -9,6 +9,7 @@
 
     <title>vector.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -539,13 +540,79 @@
 <span id="497">497</span>
 <span id="498">498</span>
 <span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The vector module.</span>
-<span class='doccomment'>//! </span>
+<span class='doccomment'>//!</span>
 <span class='doccomment'>//! Currently contains all code</span>
 <span class='doccomment'>//! relating to the vector linear algebra struct.</span>
 
-<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::{<span class='ident'>Mul</span>, <span class='ident'>Add</span>, <span class='ident'>Div</span>, <span class='ident'>Sub</span>, <span class='ident'>Index</span>};
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::{<span class='ident'>Mul</span>, <span class='ident'>Add</span>, <span class='ident'>Div</span>, <span class='ident'>Sub</span>, <span class='ident'>Index</span>, <span class='ident'>Neg</span>};
 <span class='kw'>use</span> <span class='ident'>libnum</span>::{<span class='ident'>One</span>, <span class='ident'>Zero</span>, <span class='ident'>Float</span>, <span class='ident'>FromPrimitive</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cmp</span>::<span class='ident'>PartialEq</span>;
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>Metric</span>;
@@ -555,8 +622,8 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Can be instantiated with any type.</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-	<span class='kw'>pub</span> <span class='ident'>size</span>: <span class='ident'>usize</span>,
-	<span class='kw'>pub</span> <span class='ident'>data</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>
+    <span class='ident'>size</span>: <span class='ident'>usize</span>,
+    <span class='kw'>pub</span> <span class='ident'>data</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>,
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -577,13 +644,65 @@
 
         <span class='ident'>Vector</span> {
             <span class='ident'>size</span>: <span class='ident'>size</span>,
-            <span class='ident'>data</span>: <span class='ident'>data</span>
+            <span class='ident'>data</span>: <span class='ident'>data</span>,
         }
+    }
+
+    <span class='doccomment'>/// Returns the size of the Vector.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>size</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
+        <span class='self'>self</span>.<span class='ident'>size</span>
+    }
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Clone</span><span class='op'>&gt;</span> <span class='ident'>Clone</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+
+    <span class='doccomment'>/// Clones the Vector.</span>
+    <span class='kw'>fn</span> <span class='ident'>clone</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='ident'>Vector</span>{ <span class='ident'>size</span>: <span class='self'>self</span>.<span class='ident'>size</span>, <span class='ident'>data</span>: <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>clone</span>() }
+    }
+
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>PartialOrd</span><span class='op'>&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+
+    <span class='doccomment'>/// Find the argmax of the Vector.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Returns the index of the largest value in the vector.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::vector::Vector;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let a = Vector::new(vec![1.0,2.0,0.0,5.0]);</span>
+    <span class='doccomment'>/// let b = a.argmax();</span>
+    <span class='doccomment'>/// assert_eq!(b.0, 3);</span>
+    <span class='doccomment'>/// assert_eq!(b.1, 5.0);</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>argmax</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>usize</span>, <span class='ident'>T</span>) {
+        <span class='ident'>utils</span>::<span class='ident'>argmax</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>)
+    }
+
+    <span class='doccomment'>/// Find the argmin of the Vector.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Returns the index of the smallest value in the vector.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::vector::Vector;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let a = Vector::new(vec![1.0,2.0,0.0,5.0]);</span>
+    <span class='doccomment'>/// let b = a.argmin();</span>
+    <span class='doccomment'>/// assert_eq!(b.0, 2);</span>
+    <span class='doccomment'>/// assert_eq!(b.1, 0.0);</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>argmin</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>usize</span>, <span class='ident'>T</span>) {
+        <span class='ident'>utils</span>::<span class='ident'>argmin</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>)
     }
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Copy</span><span class='op'>&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-
     <span class='doccomment'>/// Constructs Vector of all zeros.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Requires the size of the vector.</span>
@@ -596,9 +715,9 @@
     <span class='doccomment'>/// let vec = Vector::&lt;f64&gt;::zeros(10);</span>
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>zeros</span>(<span class='ident'>size</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-    	<span class='ident'>Vector</span> {
+        <span class='ident'>Vector</span> {
             <span class='ident'>size</span>: <span class='ident'>size</span>,
-            <span class='ident'>data</span>: <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>zero</span>(); <span class='ident'>size</span>]
+            <span class='ident'>data</span>: <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>zero</span>(); <span class='ident'>size</span>],
         }
     }
 
@@ -614,15 +733,14 @@
     <span class='doccomment'>/// let vec = Vector::&lt;f64&gt;::ones(10);</span>
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ones</span>(<span class='ident'>size</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-    	<span class='ident'>Vector</span> {
+        <span class='ident'>Vector</span> {
             <span class='ident'>size</span>: <span class='ident'>size</span>,
-            <span class='ident'>data</span>: <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>one</span>(); <span class='ident'>size</span>]
+            <span class='ident'>data</span>: <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>one</span>(); <span class='ident'>size</span>],
         }
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Compute dot product with specified Vector.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Examples</span>
@@ -636,13 +754,12 @@
     <span class='doccomment'>/// let c = a.dot(&amp;b);</span>
     <span class='doccomment'>/// assert_eq!(c, 20.0);</span>
     <span class='doccomment'>/// ```</span>
-	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>dot</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span> {
-    	<span class='ident'>utils</span>::<span class='ident'>dot</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>, <span class='kw-2'>&amp;</span><span class='ident'>v</span>.<span class='ident'>data</span>)
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>dot</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span> {
+        <span class='ident'>utils</span>::<span class='ident'>dot</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>, <span class='kw-2'>&amp;</span><span class='ident'>v</span>.<span class='ident'>data</span>)
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// The sum of the vector.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Returns the sum of all elements in the vector.</span>
@@ -662,8 +779,7 @@
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// The elementwise product of two vectors.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Examples</span>
@@ -683,8 +799,7 @@
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// The elementwise division of two vectors.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Examples</span>
@@ -705,7 +820,6 @@
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Float</span> <span class='op'>+</span> <span class='ident'>FromPrimitive</span><span class='op'>&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-
     <span class='doccomment'>/// The mean of the vector.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Returns the arithmetic mean of the vector.</span>
@@ -744,7 +858,7 @@
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>var</span> <span class='op'>=</span> <span class='ident'>T</span>::<span class='ident'>zero</span>();
 
         <span class='kw'>for</span> <span class='ident'>u</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span> {
-            <span class='ident'>var</span> <span class='op'>=</span> <span class='ident'>var</span> <span class='op'>+</span> (<span class='op'>*</span><span class='ident'>u</span><span class='op'>-</span><span class='ident'>m</span>)<span class='op'>*</span>(<span class='op'>*</span><span class='ident'>u</span><span class='op'>-</span><span class='ident'>m</span>);
+            <span class='ident'>var</span> <span class='op'>=</span> <span class='ident'>var</span> <span class='op'>+</span> (<span class='op'>*</span><span class='ident'>u</span> <span class='op'>-</span> <span class='ident'>m</span>) <span class='op'>*</span> (<span class='op'>*</span><span class='ident'>u</span> <span class='op'>-</span> <span class='ident'>m</span>);
         }
 
         <span class='ident'>var</span> <span class='op'>/</span> <span class='ident'>FromPrimitive</span>::<span class='ident'>from_usize</span>(<span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>).<span class='ident'>unwrap</span>()
@@ -752,7 +866,7 @@
 }
 
 <span class='doccomment'>/// Multiplies vector by scalar.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>mul</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -761,7 +875,7 @@
 }
 
 <span class='doccomment'>/// Multiplies vector by scalar.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>mul</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -770,7 +884,7 @@
 }
 
 <span class='doccomment'>/// Multiplies vector by scalar.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>mul</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -779,7 +893,7 @@
 }
 
 <span class='doccomment'>/// Multiplies vector by scalar.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='lifetime'>&#39;b</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='lifetime'>&#39;b</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>mul</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -787,13 +901,13 @@
 
         <span class='ident'>Vector</span> {
             <span class='ident'>size</span>: <span class='self'>self</span>.<span class='ident'>size</span>,
-            <span class='ident'>data</span>: <span class='ident'>new_data</span>
+            <span class='ident'>data</span>: <span class='ident'>new_data</span>,
         }
     }
 }
 
 <span class='doccomment'>/// Divides vector by scalar.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>PartialEq</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>PartialEq</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>div</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -802,7 +916,7 @@
 }
 
 <span class='doccomment'>/// Divides vector by scalar.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>PartialEq</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>PartialEq</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>div</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -811,7 +925,7 @@
 }
 
 <span class='doccomment'>/// Divides vector by scalar.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>PartialEq</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>PartialEq</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>div</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -820,22 +934,22 @@
 }
 
 <span class='doccomment'>/// Divides vector by scalar.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='lifetime'>&#39;b</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>PartialEq</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='lifetime'>&#39;b</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>PartialEq</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>div</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-    	<span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>*</span><span class='ident'>f</span> <span class='op'>!=</span> <span class='ident'>T</span>::<span class='ident'>zero</span>());
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>*</span><span class='ident'>f</span> <span class='op'>!=</span> <span class='ident'>T</span>::<span class='ident'>zero</span>());
         <span class='kw'>let</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>v</span> <span class='op'>/</span> <span class='op'>*</span><span class='ident'>f</span>).<span class='ident'>collect</span>();
 
         <span class='ident'>Vector</span> {
             <span class='ident'>size</span>: <span class='self'>self</span>.<span class='ident'>size</span>,
-            <span class='ident'>data</span>: <span class='ident'>new_data</span>
+            <span class='ident'>data</span>: <span class='ident'>new_data</span>,
         }
     }
 }
 
 <span class='doccomment'>/// Adds scalar to vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>add</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -844,7 +958,7 @@
 }
 
 <span class='doccomment'>/// Adds scalar to vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>add</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -853,7 +967,7 @@
 }
 
 <span class='doccomment'>/// Adds scalar to vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>add</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -862,21 +976,21 @@
 }
 
 <span class='doccomment'>/// Adds scalar to vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='lifetime'>&#39;b</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-	<span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='lifetime'>&#39;b</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
-	<span class='kw'>fn</span> <span class='ident'>add</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-		<span class='kw'>let</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>v</span> <span class='op'>+</span> <span class='op'>*</span><span class='ident'>f</span>).<span class='ident'>collect</span>();
+    <span class='kw'>fn</span> <span class='ident'>add</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>v</span> <span class='op'>+</span> <span class='op'>*</span><span class='ident'>f</span>).<span class='ident'>collect</span>();
 
         <span class='ident'>Vector</span> {
             <span class='ident'>size</span>: <span class='self'>self</span>.<span class='ident'>size</span>,
-            <span class='ident'>data</span>: <span class='ident'>new_data</span>
+            <span class='ident'>data</span>: <span class='ident'>new_data</span>,
         }
     }
 }
 
 <span class='doccomment'>/// Adds vector to vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>add</span>(<span class='self'>self</span>, <span class='ident'>v</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -885,7 +999,7 @@
 }
 
 <span class='doccomment'>/// Adds vector to vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>add</span>(<span class='self'>self</span>, <span class='ident'>v</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -894,7 +1008,7 @@
 }
 
 <span class='doccomment'>/// Adds vector to vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>add</span>(<span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -903,23 +1017,23 @@
 }
 
 <span class='doccomment'>/// Adds vector to vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='lifetime'>&#39;b</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-	<span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='lifetime'>&#39;b</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
-	<span class='kw'>fn</span> <span class='ident'>add</span>(<span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-		<span class='macro'>assert</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>size</span> <span class='op'>==</span> <span class='ident'>v</span>.<span class='ident'>size</span>);
+    <span class='kw'>fn</span> <span class='ident'>add</span>(<span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>size</span> <span class='op'>==</span> <span class='ident'>v</span>.<span class='ident'>size</span>);
 
-		<span class='kw'>let</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='ident'>utils</span>::<span class='ident'>vec_sum</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>, <span class='kw-2'>&amp;</span><span class='ident'>v</span>.<span class='ident'>data</span>);
+        <span class='kw'>let</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='ident'>utils</span>::<span class='ident'>vec_sum</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>, <span class='kw-2'>&amp;</span><span class='ident'>v</span>.<span class='ident'>data</span>);
 
         <span class='ident'>Vector</span> {
             <span class='ident'>size</span>: <span class='self'>self</span>.<span class='ident'>size</span>,
-            <span class='ident'>data</span>: <span class='ident'>new_data</span>
+            <span class='ident'>data</span>: <span class='ident'>new_data</span>,
         }
-	}
+    }
 }
 
 <span class='doccomment'>/// Subtracts scalar from vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>sub</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -928,7 +1042,7 @@
 }
 
 <span class='doccomment'>/// Subtracts scalar from vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>sub</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -937,30 +1051,30 @@
 }
 
 <span class='doccomment'>/// Subtracts scalar from vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>sub</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-            (<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-</span> <span class='ident'>f</span>
-        }
+        (<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-</span> <span class='ident'>f</span>
     }
+}
 
 <span class='doccomment'>/// Subtracts scalar from vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='lifetime'>&#39;b</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-	<span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='lifetime'>&#39;b</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
-	<span class='kw'>fn</span> <span class='ident'>sub</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-		<span class='kw'>let</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>v</span> <span class='op'>-</span> <span class='op'>*</span><span class='ident'>f</span>).<span class='ident'>collect</span>();
+    <span class='kw'>fn</span> <span class='ident'>sub</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>v</span> <span class='op'>-</span> <span class='op'>*</span><span class='ident'>f</span>).<span class='ident'>collect</span>();
 
         <span class='ident'>Vector</span> {
             <span class='ident'>size</span>: <span class='self'>self</span>.<span class='ident'>size</span>,
-            <span class='ident'>data</span>: <span class='ident'>new_data</span>
+            <span class='ident'>data</span>: <span class='ident'>new_data</span>,
         }
     }
 }
 
 <span class='doccomment'>/// Subtracts vector from vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>sub</span>(<span class='self'>self</span>, <span class='ident'>v</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -969,7 +1083,7 @@
 }
 
 <span class='doccomment'>/// Subtracts vector from vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>sub</span>(<span class='self'>self</span>, <span class='ident'>v</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -978,7 +1092,7 @@
 }
 
 <span class='doccomment'>/// Subtracts vector from vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
     <span class='kw'>fn</span> <span class='ident'>sub</span>(<span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -987,35 +1101,54 @@
 }
 
 <span class='doccomment'>/// Subtracts vector from vector.</span>
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='lifetime'>&#39;b</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-	<span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='lifetime'>&#39;b</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;b</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
-	<span class='kw'>fn</span> <span class='ident'>sub</span>(<span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-		<span class='macro'>assert</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>size</span> <span class='op'>==</span> <span class='ident'>v</span>.<span class='ident'>size</span>);
+    <span class='kw'>fn</span> <span class='ident'>sub</span>(<span class='self'>self</span>, <span class='ident'>v</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>size</span> <span class='op'>==</span> <span class='ident'>v</span>.<span class='ident'>size</span>);
 
-		<span class='kw'>let</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='ident'>utils</span>::<span class='ident'>vec_sub</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>, <span class='kw-2'>&amp;</span><span class='ident'>v</span>.<span class='ident'>data</span>);
+        <span class='kw'>let</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='ident'>utils</span>::<span class='ident'>vec_sub</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>, <span class='kw-2'>&amp;</span><span class='ident'>v</span>.<span class='ident'>data</span>);
 
         <span class='ident'>Vector</span> {
             <span class='ident'>size</span>: <span class='self'>self</span>.<span class='ident'>size</span>,
-            <span class='ident'>data</span>: <span class='ident'>new_data</span>
+            <span class='ident'>data</span>: <span class='ident'>new_data</span>,
         }
-	}
+    }
+}
+
+<span class='doccomment'>/// Gets negative of vector.</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Neg</span><span class='op'>&lt;</span><span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='op'>+</span> <span class='ident'>Copy</span><span class='op'>&gt;</span> <span class='ident'>Neg</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
+
+    <span class='kw'>fn</span> <span class='ident'>neg</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='op'>-</span><span class='op'>*</span><span class='ident'>v</span>).<span class='ident'>collect</span>();
+
+        <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>new_data</span>)
+    }
+}
+
+<span class='doccomment'>/// Gets negative of vector.</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Neg</span><span class='op'>&lt;</span><span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='op'>+</span> <span class='ident'>Copy</span><span class='op'>&gt;</span> <span class='ident'>Neg</span> <span class='kw'>for</span> <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
+
+    <span class='kw'>fn</span> <span class='ident'>neg</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='op'>-</span><span class='op'>*</span><span class='ident'>v</span>).<span class='ident'>collect</span>();
+
+        <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>new_data</span>)
+    }
 }
 
 <span class='doccomment'>/// Indexes vector.</span>
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>Index</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-	<span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span>;
+    <span class='kw'>type</span> <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span>;
 
-	<span class='kw'>fn</span> <span class='ident'>index</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>idx</span> : <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>T</span> {
-		<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>idx</span> <span class='op'>&lt;</span> <span class='self'>self</span>.<span class='ident'>size</span>);
-        <span class='kw'>unsafe</span> {
-            <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>get_unchecked</span>(<span class='ident'>idx</span>)
-        }
-	}
+    <span class='kw'>fn</span> <span class='ident'>index</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>idx</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>T</span> {
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>idx</span> <span class='op'>&lt;</span> <span class='self'>self</span>.<span class='ident'>size</span>);
+        <span class='kw'>unsafe</span> { <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>get_unchecked</span>(<span class='ident'>idx</span>) }
+    }
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Float</span><span class='op'>&gt;</span> <span class='ident'>Metric</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-
     <span class='doccomment'>/// Compute euclidean norm for vector.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Examples</span>
@@ -1038,7 +1171,8 @@
 
         <span class='ident'>s</span>.<span class='ident'>sqrt</span>()
     }
-}</pre>
+}
+</pre>
 </section>
     <section id='search' class="content hidden"></section>
 
@@ -1098,6 +1232,6 @@
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

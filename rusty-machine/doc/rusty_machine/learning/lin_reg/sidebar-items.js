@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["LinRegressor",""]]});
+initSidebarItems({"struct":[["LinRegressor","Linear Regression Model."]]});

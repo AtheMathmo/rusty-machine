@@ -9,6 +9,7 @@
 
     <title>lib.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     
@@ -62,29 +63,64 @@
 <span id="20">20</span>
 <span id="21">21</span>
 <span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
 </pre><pre class='rust '>
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>num</span> <span class='kw'>as</span> <span class='ident'>libnum</span>;
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rand</span>;
 
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>linalg</span> {
 
-	<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Metric</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-		<span class='kw'>fn</span> <span class='ident'>norm</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span>;
+    <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Metric</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='kw'>fn</span> <span class='ident'>norm</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span>;
 	}
 
-	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>matrix</span>;
-	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>vector</span>;
-	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>utils</span>;
+    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>matrix</span>;
+    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>vector</span>;
+    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>utils</span>;
+    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>macros</span>;
 }
 
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>learning</span> {
-	<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>lin_reg</span>;
+    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>lin_reg</span>;
+    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>k_means</span>;
 
-	<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Model</span><span class='op'>&lt;</span><span class='ident'>T</span>,<span class='ident'>U</span><span class='op'>&gt;</span> {
-		<span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>:<span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>U</span>;
+    <span class='doccomment'>/// Trait for supervised model.</span>
+    <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>SupModel</span><span class='op'>&lt;</span><span class='ident'>T</span>,<span class='ident'>U</span><span class='op'>&gt;</span> {
 
-		<span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>:<span class='ident'>T</span>, <span class='ident'>value</span>:<span class='ident'>U</span>);
+        <span class='doccomment'>/// Predict output from data.</span>
+        <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>U</span>;
+
+        <span class='doccomment'>/// Train the model using data and outputs.</span>
+        <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>T</span>, <span class='ident'>value</span>: <span class='ident'>U</span>);
 	}
-}</pre>
+
+    <span class='doccomment'>/// Trait for unsupervised model.</span>
+	<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>UnSupModel</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>U</span><span class='op'>&gt;</span> {
+
+        <span class='doccomment'>/// Predict output from data.</span>
+        <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>U</span>;
+
+        <span class='doccomment'>/// Train the model using data.</span>
+        <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>T</span>);
+	}
+}
+</pre>
 </section>
     <section id='search' class="content hidden"></section>
 
@@ -144,6 +180,6 @@
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

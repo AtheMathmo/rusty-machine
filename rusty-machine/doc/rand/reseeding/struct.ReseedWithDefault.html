@@ -9,6 +9,7 @@
 
     <title>rand::reseeding::ReseedWithDefault - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     <link rel="shortcut icon" href="https://www.rust-lang.org/favicon.ico">
@@ -45,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-11315' class='srclink' href='../../src/rand/reseeding.rs.html#136' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-952' class='srclink' href='../../src/rand/reseeding.rs.html#136' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct ReseedWithDefault;</pre><div class='docblock'><p>Reseed an RNG using a <code>Default</code> instance. This reseeds by
 replacing the RNG with the result of a <code>Default::default</code> call.</p>
 </div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;R: <a class='trait' href='../../rand/trait.Rng.html' title='rand::Rng'>Rng</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a>&gt; <a class='trait' href='../../rand/reseeding/trait.Reseeder.html' title='rand::reseeding::Reseeder'>Reseeder</a>&lt;R&gt; for <a class='struct' href='../../rand/reseeding/struct.ReseedWithDefault.html' title='rand::reseeding::ReseedWithDefault'>ReseedWithDefault</a></code></h3><div class='impl-items'><h4 id='method.reseed' class='method'><code>fn <a href='../../rand/reseeding/trait.Reseeder.html#method.reseed' class='fnname'>reseed</a>(&amp;mut self, rng: &amp;mut R)</code></h4>
@@ -111,6 +112,6 @@ replacing the RNG with the result of a <code>Default::default</code> call.</p>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

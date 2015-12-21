@@ -9,6 +9,7 @@
 
     <title>num::traits::Signed - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     <link rel="shortcut icon" href="http://rust-num.github.io/num/favicon.ico">
@@ -45,13 +46,13 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-23816' class='srclink' href='../../src/num/traits.rs.html#309-343' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-3820' class='srclink' href='../../src/num/traits.rs.html#309-343' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Signed: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html' title='core::marker::Sized'>Sized</a> + <a class='trait' href='../../num/traits/trait.Num.html' title='num::traits::Num'>Num</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Neg.html' title='core::ops::Neg'>Neg</a>&lt;Output=Self&gt; {
     fn <a href='#tymethod.abs' class='fnname'>abs</a>(&amp;self) -&gt; Self;
     fn <a href='#tymethod.abs_sub' class='fnname'>abs_sub</a>(&amp;self, other: &amp;Self) -&gt; Self;
     fn <a href='#tymethod.signum' class='fnname'>signum</a>(&amp;self) -&gt; Self;
-    fn <a href='#tymethod.is_positive' class='fnname'>is_positive</a>(&amp;self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
-    fn <a href='#tymethod.is_negative' class='fnname'>is_negative</a>(&amp;self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
+    fn <a href='#tymethod.is_positive' class='fnname'>is_positive</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
+    fn <a href='#tymethod.is_negative' class='fnname'>is_negative</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
 }</pre><div class='docblock'><p>Useful functions for signed numbers (i.e. numbers that can be negative).</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
@@ -82,19 +83,19 @@ between <code>self</code> and <code>other</code> is returned.</p>
 <li><code>1</code> if the number is positive</li>
 <li><code>-1</code> if the number is negative</li>
 </ul>
-</div><h3 id='tymethod.is_positive' class='method stab '><code>fn <a href='#tymethod.is_positive' class='fnname'>is_positive</a>(&amp;self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns true if the number is positive and false if the number is zero or negative.</p>
-</div><h3 id='tymethod.is_negative' class='method stab '><code>fn <a href='#tymethod.is_negative' class='fnname'>is_negative</a>(&amp;self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns true if the number is negative and false if the number is zero or positive.</p>
+</div><h3 id='tymethod.is_positive' class='method stab '><code>fn <a href='#tymethod.is_positive' class='fnname'>is_positive</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns true if the number is positive and false if the number is zero or negative.</p>
+</div><h3 id='tymethod.is_negative' class='method stab '><code>fn <a href='#tymethod.is_negative' class='fnname'>is_negative</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns true if the number is negative and false if the number is zero or positive.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
     <li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a class='struct' href='../../num/bigint/struct.BigInt.html' title='num::bigint::BigInt'>BigInt</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.f32.html'>f32</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f32.html'>f32</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></li>
 <li><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> + <a class='trait' href='../../num/integer/trait.Integer.html' title='num::integer::Integer'>Integer</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html' title='core::cmp::PartialOrd'>PartialOrd</a> + <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a>&gt; <a class='trait' href='../../num/traits/trait.Signed.html' title='num::traits::Signed'>Signed</a> for <a class='struct' href='../../num/rational/struct.Ratio.html' title='num::rational::Ratio'>Ratio</a>&lt;T&gt;</code></li>
 </ul><script type="text/javascript" async
                               src="../../implementors/num/traits/trait.Signed.js">
@@ -157,6 +158,6 @@ between <code>self</code> and <code>other</code> is returned.</p>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script src="../../playpen.js"></script>
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

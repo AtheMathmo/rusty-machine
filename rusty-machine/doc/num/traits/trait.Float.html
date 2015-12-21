@@ -9,6 +9,7 @@
 
     <title>num::traits::Float - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     <link rel="shortcut icon" href="http://rust-num.github.io/num/favicon.ico">
@@ -45,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-37240' class='srclink' href='../../src/num/traits.rs.html#1339-2197' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-5628' class='srclink' href='../../src/num/traits.rs.html#1339-2197' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Float: <a class='trait' href='../../num/traits/trait.Num.html' title='num::traits::Num'>Num</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../num/traits/trait.NumCast.html' title='num::traits::NumCast'>NumCast</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html' title='core::cmp::PartialOrd'>PartialOrd</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Neg.html' title='core::ops::Neg'>Neg</a>&lt;Output=Self&gt; {
     fn <a href='#tymethod.nan' class='fnname'>nan</a>() -&gt; Self;
     fn <a href='#tymethod.infinity' class='fnname'>infinity</a>() -&gt; Self;
@@ -54,10 +55,10 @@
     fn <a href='#tymethod.min_value' class='fnname'>min_value</a>() -&gt; Self;
     fn <a href='#tymethod.min_positive_value' class='fnname'>min_positive_value</a>() -&gt; Self;
     fn <a href='#tymethod.max_value' class='fnname'>max_value</a>() -&gt; Self;
-    fn <a href='#tymethod.is_nan' class='fnname'>is_nan</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
-    fn <a href='#tymethod.is_infinite' class='fnname'>is_infinite</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
-    fn <a href='#tymethod.is_finite' class='fnname'>is_finite</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
-    fn <a href='#tymethod.is_normal' class='fnname'>is_normal</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
+    fn <a href='#tymethod.is_nan' class='fnname'>is_nan</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
+    fn <a href='#tymethod.is_infinite' class='fnname'>is_infinite</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
+    fn <a href='#tymethod.is_finite' class='fnname'>is_finite</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
+    fn <a href='#tymethod.is_normal' class='fnname'>is_normal</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
     fn <a href='#tymethod.classify' class='fnname'>classify</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/num/enum.FpCategory.html' title='core::num::FpCategory'>FpCategory</a>;
     fn <a href='#tymethod.floor' class='fnname'>floor</a>(self) -&gt; Self;
     fn <a href='#tymethod.ceil' class='fnname'>ceil</a>(self) -&gt; Self;
@@ -66,11 +67,11 @@
     fn <a href='#tymethod.fract' class='fnname'>fract</a>(self) -&gt; Self;
     fn <a href='#tymethod.abs' class='fnname'>abs</a>(self) -&gt; Self;
     fn <a href='#tymethod.signum' class='fnname'>signum</a>(self) -&gt; Self;
-    fn <a href='#tymethod.is_sign_positive' class='fnname'>is_sign_positive</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
-    fn <a href='#tymethod.is_sign_negative' class='fnname'>is_sign_negative</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
+    fn <a href='#tymethod.is_sign_positive' class='fnname'>is_sign_positive</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
+    fn <a href='#tymethod.is_sign_negative' class='fnname'>is_sign_negative</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>;
     fn <a href='#tymethod.mul_add' class='fnname'>mul_add</a>(self, a: Self, b: Self) -&gt; Self;
     fn <a href='#tymethod.recip' class='fnname'>recip</a>(self) -&gt; Self;
-    fn <a href='#tymethod.powi' class='fnname'>powi</a>(self, n: <a href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>) -&gt; Self;
+    fn <a href='#tymethod.powi' class='fnname'>powi</a>(self, n: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>) -&gt; Self;
     fn <a href='#tymethod.powf' class='fnname'>powf</a>(self, n: Self) -&gt; Self;
     fn <a href='#tymethod.sqrt' class='fnname'>sqrt</a>(self) -&gt; Self;
     fn <a href='#tymethod.exp' class='fnname'>exp</a>(self) -&gt; Self;
@@ -91,7 +92,7 @@
     fn <a href='#tymethod.acos' class='fnname'>acos</a>(self) -&gt; Self;
     fn <a href='#tymethod.atan' class='fnname'>atan</a>(self) -&gt; Self;
     fn <a href='#tymethod.atan2' class='fnname'>atan2</a>(self, other: Self) -&gt; Self;
-    fn <a href='#tymethod.sin_cos' class='fnname'>sin_cos</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(Self, Self)</a>;
+    fn <a href='#tymethod.sin_cos' class='fnname'>sin_cos</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(Self, Self)</a>;
     fn <a href='#tymethod.exp_m1' class='fnname'>exp_m1</a>(self) -&gt; Self;
     fn <a href='#tymethod.ln_1p' class='fnname'>ln_1p</a>(self) -&gt; Self;
     fn <a href='#tymethod.sinh' class='fnname'>sinh</a>(self) -&gt; Self;
@@ -100,7 +101,7 @@
     fn <a href='#tymethod.asinh' class='fnname'>asinh</a>(self) -&gt; Self;
     fn <a href='#tymethod.acosh' class='fnname'>acosh</a>(self) -&gt; Self;
     fn <a href='#tymethod.atanh' class='fnname'>atanh</a>(self) -&gt; Self;
-    fn <a href='#tymethod.integer_decode' class='fnname'>integer_decode</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, <a href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a>, <a href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a>)</a>;
+    fn <a href='#tymethod.integer_decode' class='fnname'>integer_decode</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a>)</a>;
 }</pre>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
@@ -233,7 +234,7 @@ fn main() {
 
 <span class='kw'>let</span> <span class='ident'>x</span>: <span class='ident'>f64</span> <span class='op'>=</span> <span class='ident'>Float</span>::<span class='ident'>max_value</span>();
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>x</span>, <span class='ident'>f64</span>::<span class='ident'>MAX</span>);</pre>
-</div><h3 id='tymethod.is_nan' class='method stab '><code>fn <a href='#tymethod.is_nan' class='fnname'>is_nan</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if this value is <code>NaN</code> and false otherwise.</p>
+</div><h3 id='tymethod.is_nan' class='method stab '><code>fn <a href='#tymethod.is_nan' class='fnname'>is_nan</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if this value is <code>NaN</code> and false otherwise.</p>
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -254,7 +255,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>nan</span>.<span class='ident'>is_nan</span>());
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>f</span>.<span class='ident'>is_nan</span>());</pre>
-</div><h3 id='tymethod.is_infinite' class='method stab '><code>fn <a href='#tymethod.is_infinite' class='fnname'>is_infinite</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if this value is positive infinity or negative infinity and
+</div><h3 id='tymethod.is_infinite' class='method stab '><code>fn <a href='#tymethod.is_infinite' class='fnname'>is_infinite</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if this value is positive infinity or negative infinity and
 false otherwise.</p>
 <span class='rusttest'>extern crate num;
 fn main() {
@@ -286,7 +287,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>inf</span>.<span class='ident'>is_infinite</span>());
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>neg_inf</span>.<span class='ident'>is_infinite</span>());</pre>
-</div><h3 id='tymethod.is_finite' class='method stab '><code>fn <a href='#tymethod.is_finite' class='fnname'>is_finite</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if this number is neither infinite nor <code>NaN</code>.</p>
+</div><h3 id='tymethod.is_finite' class='method stab '><code>fn <a href='#tymethod.is_finite' class='fnname'>is_finite</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if this number is neither infinite nor <code>NaN</code>.</p>
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -317,7 +318,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>nan</span>.<span class='ident'>is_finite</span>());
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>inf</span>.<span class='ident'>is_finite</span>());
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>neg_inf</span>.<span class='ident'>is_finite</span>());</pre>
-</div><h3 id='tymethod.is_normal' class='method stab '><code>fn <a href='#tymethod.is_normal' class='fnname'>is_normal</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if the number is neither zero, infinite,
+</div><h3 id='tymethod.is_normal' class='method stab '><code>fn <a href='#tymethod.is_normal' class='fnname'>is_normal</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if the number is neither zero, infinite,
 <a href="http://en.wikipedia.org/wiki/Denormal_number">subnormal</a>, or <code>NaN</code>.</p>
 <span class='rusttest'>extern crate num;
 fn main() {
@@ -541,7 +542,7 @@ fn main() {
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>f64</span>::<span class='ident'>NEG_INFINITY</span>.<span class='ident'>signum</span>(), <span class='op'>-</span><span class='number'>1.0</span>);
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>f64</span>::<span class='ident'>NAN</span>.<span class='ident'>signum</span>().<span class='ident'>is_nan</span>());</pre>
-</div><h3 id='tymethod.is_sign_positive' class='method stab '><code>fn <a href='#tymethod.is_sign_positive' class='fnname'>is_sign_positive</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if <code>self</code> is positive, including <code>+0.0</code> and
+</div><h3 id='tymethod.is_sign_positive' class='method stab '><code>fn <a href='#tymethod.is_sign_positive' class='fnname'>is_sign_positive</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if <code>self</code> is positive, including <code>+0.0</code> and
 <code>Float::infinity()</code>.</p>
 <span class='rusttest'>extern crate num;
 fn main() {
@@ -571,7 +572,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>g</span>.<span class='ident'>is_sign_positive</span>());
 <span class='comment'>// Requires both tests to determine if is `NaN`</span>
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>nan</span>.<span class='ident'>is_sign_positive</span>() <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ident'>nan</span>.<span class='ident'>is_sign_negative</span>());</pre>
-</div><h3 id='tymethod.is_sign_negative' class='method stab '><code>fn <a href='#tymethod.is_sign_negative' class='fnname'>is_sign_negative</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if <code>self</code> is negative, including <code>-0.0</code> and
+</div><h3 id='tymethod.is_sign_negative' class='method stab '><code>fn <a href='#tymethod.is_sign_negative' class='fnname'>is_sign_negative</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if <code>self</code> is negative, including <code>-0.0</code> and
 <code>Float::neg_infinity()</code>.</p>
 <span class='rusttest'>extern crate num;
 fn main() {
@@ -645,7 +646,7 @@ fn main() {
 <span class='kw'>let</span> <span class='ident'>abs_difference</span> <span class='op'>=</span> (<span class='ident'>x</span>.<span class='ident'>recip</span>() <span class='op'>-</span> (<span class='number'>1.0</span><span class='op'>/</span><span class='ident'>x</span>)).<span class='ident'>abs</span>();
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
-</div><h3 id='tymethod.powi' class='method stab '><code>fn <a href='#tymethod.powi' class='fnname'>powi</a>(self, n: <a href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>) -&gt; Self</code></h3><div class='docblock'><p>Raise a number to an integer power.</p>
+</div><h3 id='tymethod.powi' class='method stab '><code>fn <a href='#tymethod.powi' class='fnname'>powi</a>(self, n: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>) -&gt; Self</code></h3><div class='docblock'><p>Raise a number to an integer power.</p>
 
 <p>Using this function is generally faster than using <code>powf</code></p>
 <span class='rusttest'>extern crate num;
@@ -1140,7 +1141,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference_1</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference_2</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
-</div><h3 id='tymethod.sin_cos' class='method stab '><code>fn <a href='#tymethod.sin_cos' class='fnname'>sin_cos</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(Self, Self)</a></code></h3><div class='docblock'><p>Simultaneously computes the sine and cosine of the number, <code>x</code>. Returns
+</div><h3 id='tymethod.sin_cos' class='method stab '><code>fn <a href='#tymethod.sin_cos' class='fnname'>sin_cos</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(Self, Self)</a></code></h3><div class='docblock'><p>Simultaneously computes the sine and cosine of the number, <code>x</code>. Returns
 <code>(sin(x), cos(x))</code>.</p>
 <span class='rusttest'>extern crate num;
 fn main() {
@@ -1366,7 +1367,7 @@ fn main() {
 <span class='kw'>let</span> <span class='ident'>abs_difference</span> <span class='op'>=</span> (<span class='ident'>f</span> <span class='op'>-</span> <span class='ident'>e</span>).<span class='ident'>abs</span>();
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1.0e-10</span>);</pre>
-</div><h3 id='tymethod.integer_decode' class='method stab '><code>fn <a href='#tymethod.integer_decode' class='fnname'>integer_decode</a>(self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, <a href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a>, <a href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a>)</a></code></h3><div class='docblock'><p>Returns the mantissa, base 2 exponent, and sign as integers, respectively.
+</div><h3 id='tymethod.integer_decode' class='method stab '><code>fn <a href='#tymethod.integer_decode' class='fnname'>integer_decode</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a>)</a></code></h3><div class='docblock'><p>Returns the mantissa, base 2 exponent, and sign as integers, respectively.
 The original number can be recovered by <code>sign * mantissa * 2 ^ exponent</code>.
 The floating point encoding is documented in the <a href="../../../../../reference.html#machine-types">Reference</a>.</p>
 <span class='rusttest'>extern crate num;
@@ -1404,8 +1405,8 @@ fn main() {
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl <a class='trait' href='../../num/traits/trait.Float.html' title='num::traits::Float'>Float</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.f32.html'>f32</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.Float.html' title='num::traits::Float'>Float</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></li>
+    <li><code>impl <a class='trait' href='../../num/traits/trait.Float.html' title='num::traits::Float'>Float</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f32.html'>f32</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.Float.html' title='num::traits::Float'>Float</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></li>
 </ul><script type="text/javascript" async
                               src="../../implementors/num/traits/trait.Float.js">
                       </script></section>
@@ -1467,6 +1468,6 @@ fn main() {
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script src="../../playpen.js"></script>
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

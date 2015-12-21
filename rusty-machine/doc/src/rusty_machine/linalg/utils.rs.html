@@ -9,6 +9,7 @@
 
     <title>utils.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -248,13 +249,56 @@
 <span id="206">206</span>
 <span id="207">207</span>
 <span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Linear algebra utils module.</span>
-<span class='doccomment'>//! </span>
+<span class='doccomment'>//!</span>
 <span class='doccomment'>//! Contains support methods for linear algebra structs.</span>
 
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>cmp</span>;
-<span class='kw'>use</span> <span class='ident'>libnum</span>::{<span class='ident'>Zero</span>};
+<span class='kw'>use</span> <span class='ident'>libnum</span>::<span class='ident'>Zero</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::{<span class='ident'>Add</span>, <span class='ident'>Mul</span>, <span class='ident'>Sub</span>, <span class='ident'>Div</span>};
 
 <span class='doccomment'>/// Compute dot product of two slices.</span>
@@ -268,15 +312,27 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// let c = utils::dot(&amp;a,&amp;b);</span>
 <span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>dot</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>T</span> {
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>dot</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>T</span> {
     <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>xs</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>u</span>[..<span class='ident'>len</span>];
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ys</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>v</span>[..<span class='ident'>len</span>];
 
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>T</span>::<span class='ident'>zero</span>();
-    <span class='kw'>let</span> (<span class='kw-2'>mut</span> <span class='ident'>p0</span>, <span class='kw-2'>mut</span> <span class='ident'>p1</span>, <span class='kw-2'>mut</span> <span class='ident'>p2</span>, <span class='kw-2'>mut</span> <span class='ident'>p3</span>, <span class='kw-2'>mut</span> <span class='ident'>p4</span>, <span class='kw-2'>mut</span> <span class='ident'>p5</span>, <span class='kw-2'>mut</span> <span class='ident'>p6</span>, <span class='kw-2'>mut</span> <span class='ident'>p7</span>) <span class='op'>=</span>
-        (<span class='ident'>T</span>::<span class='ident'>zero</span>(), <span class='ident'>T</span>::<span class='ident'>zero</span>(), <span class='ident'>T</span>::<span class='ident'>zero</span>(), <span class='ident'>T</span>::<span class='ident'>zero</span>(),
-            <span class='ident'>T</span>::<span class='ident'>zero</span>(), <span class='ident'>T</span>::<span class='ident'>zero</span>(), <span class='ident'>T</span>::<span class='ident'>zero</span>(), <span class='ident'>T</span>::<span class='ident'>zero</span>());
+    <span class='kw'>let</span> (<span class='kw-2'>mut</span> <span class='ident'>p0</span>,
+         <span class='kw-2'>mut</span> <span class='ident'>p1</span>,
+         <span class='kw-2'>mut</span> <span class='ident'>p2</span>,
+         <span class='kw-2'>mut</span> <span class='ident'>p3</span>,
+         <span class='kw-2'>mut</span> <span class='ident'>p4</span>,
+         <span class='kw-2'>mut</span> <span class='ident'>p5</span>,
+         <span class='kw-2'>mut</span> <span class='ident'>p6</span>,
+         <span class='kw-2'>mut</span> <span class='ident'>p7</span>) <span class='op'>=</span> (<span class='ident'>T</span>::<span class='ident'>zero</span>(),
+                    <span class='ident'>T</span>::<span class='ident'>zero</span>(),
+                    <span class='ident'>T</span>::<span class='ident'>zero</span>(),
+                    <span class='ident'>T</span>::<span class='ident'>zero</span>(),
+                    <span class='ident'>T</span>::<span class='ident'>zero</span>(),
+                    <span class='ident'>T</span>::<span class='ident'>zero</span>(),
+                    <span class='ident'>T</span>::<span class='ident'>zero</span>(),
+                    <span class='ident'>T</span>::<span class='ident'>zero</span>());
 
     <span class='kw'>while</span> <span class='ident'>xs</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>8</span> {
         <span class='ident'>p0</span> <span class='op'>=</span> <span class='ident'>p0</span> <span class='op'>+</span> <span class='ident'>xs</span>[<span class='number'>0</span>] <span class='op'>*</span> <span class='ident'>ys</span>[<span class='number'>0</span>];
@@ -300,7 +356,7 @@
         <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>s</span> <span class='op'>+</span> <span class='ident'>xs</span>[<span class='ident'>i</span>] <span class='op'>*</span> <span class='ident'>ys</span>[<span class='ident'>i</span>];
     }
     <span class='ident'>s</span>
- }
+}
 
 <span class='doccomment'>/// Compute vector sum of two slices.</span>
 <span class='doccomment'>///</span>
@@ -315,11 +371,11 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// assert_eq!(c, vec![2.0,4.0, 6.0, 8.0]);</span>
 <span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>vec_sum</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> (<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>vec_sum</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());
     <span class='kw'>let</span> <span class='ident'>xs</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>u</span>[..<span class='ident'>len</span>];
     <span class='kw'>let</span> <span class='ident'>ys</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>v</span>[..<span class='ident'>len</span>];
-    
+
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sum_data</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>zero</span>(); <span class='ident'>len</span>];
 
     <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>len</span> {
@@ -341,11 +397,11 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// assert_eq!(c, vec![0.0; 4]);</span>
 <span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>vec_sub</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> (<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>vec_sub</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());
     <span class='kw'>let</span> <span class='ident'>xs</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>u</span>[..<span class='ident'>len</span>];
     <span class='kw'>let</span> <span class='ident'>ys</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>v</span>[..<span class='ident'>len</span>];
-    
+
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sum_data</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>zero</span>(); <span class='ident'>len</span>];
 
     <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>len</span> {
@@ -367,11 +423,11 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// assert_eq!(c, vec![1.0,4.0,9.0,16.0]);</span>
 <span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ele_mul</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> (<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ele_mul</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());
     <span class='kw'>let</span> <span class='ident'>xs</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>u</span>[..<span class='ident'>len</span>];
     <span class='kw'>let</span> <span class='ident'>ys</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>v</span>[..<span class='ident'>len</span>];
-    
+
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sum_data</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>zero</span>(); <span class='ident'>len</span>];
 
     <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>len</span> {
@@ -393,11 +449,11 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// assert_eq!(c, vec![1.0; 4]);</span>
 <span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ele_div</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> (<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ele_div</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());
     <span class='kw'>let</span> <span class='ident'>xs</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>u</span>[..<span class='ident'>len</span>];
     <span class='kw'>let</span> <span class='ident'>ys</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>v</span>[..<span class='ident'>len</span>];
-    
+
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sum_data</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>zero</span>(); <span class='ident'>len</span>];
 
     <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>len</span> {
@@ -417,9 +473,10 @@
 <span class='doccomment'>/// let a = vec![1.0,2.0,3.0,4.0];</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// let c = utils::argmax(&amp;a);</span>
-<span class='doccomment'>/// assert_eq!(c, 3);</span>
+<span class='doccomment'>/// assert_eq!(c.0, 3);</span>
+<span class='doccomment'>/// assert_eq!(c.1, 4.0);</span>
 <span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>argmax</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>PartialOrd</span><span class='op'>&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>argmax</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>PartialOrd</span><span class='op'>&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> (<span class='ident'>usize</span>, <span class='ident'>T</span>) {
     <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>u</span>.<span class='ident'>len</span>() <span class='op'>!=</span> <span class='number'>0</span>);
 
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>max_index</span> <span class='op'>=</span> <span class='number'>0</span>;
@@ -432,7 +489,37 @@
         }
     }
 
-    <span class='ident'>max_index</span>
+    (<span class='ident'>max_index</span>, <span class='ident'>max</span>)
+}
+
+<span class='doccomment'>/// Find argmin of slice.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// Returns index of first occuring minimum.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// # Examples</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// ```</span>
+<span class='doccomment'>/// use rusty_machine::linalg::utils;</span>
+<span class='doccomment'>/// let a = vec![5.0,2.0,3.0,4.0];</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// let c = utils::argmin(&amp;a);</span>
+<span class='doccomment'>/// assert_eq!(c.0, 1);</span>
+<span class='doccomment'>/// assert_eq!(c.1, 2.0);</span>
+<span class='doccomment'>/// ```</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>argmin</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>PartialOrd</span><span class='op'>&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> (<span class='ident'>usize</span>, <span class='ident'>T</span>) {
+    <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>u</span>.<span class='ident'>len</span>() <span class='op'>!=</span> <span class='number'>0</span>);
+
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>min_index</span> <span class='op'>=</span> <span class='number'>0</span>;
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>min</span> <span class='op'>=</span> <span class='ident'>u</span>[<span class='ident'>min_index</span>];
+
+    <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>v</span>) <span class='kw'>in</span> (<span class='ident'>u</span>.<span class='ident'>iter</span>()).<span class='ident'>enumerate</span>() {
+        <span class='kw'>if</span> <span class='ident'>min</span> <span class='op'>&gt;</span> <span class='op'>*</span><span class='ident'>v</span> {
+            <span class='ident'>min_index</span> <span class='op'>=</span> <span class='ident'>i</span>;
+            <span class='ident'>min</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>v</span>;
+        }
+    }
+
+    (<span class='ident'>min_index</span>, <span class='ident'>min</span>)
 }
 
 <span class='doccomment'>/// Find index of value in slice.</span>
@@ -449,14 +536,15 @@
 <span class='doccomment'>/// assert_eq!(c, 2);</span>
 <span class='doccomment'>/// ```</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>find</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>PartialEq</span><span class='op'>&gt;</span>(<span class='ident'>p</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>u</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
-        <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>v</span>) <span class='kw'>in</span> <span class='ident'>p</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
-            <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>v</span> <span class='op'>==</span> <span class='ident'>u</span> {
-                <span class='kw'>return</span> <span class='ident'>i</span>;
-            }
+    <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>v</span>) <span class='kw'>in</span> <span class='ident'>p</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
+        <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>v</span> <span class='op'>==</span> <span class='ident'>u</span> {
+            <span class='kw'>return</span> <span class='ident'>i</span>;
         }
+    }
 
-        <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Value not found.&quot;</span>)
-    }</pre>
+    <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Value not found.&quot;</span>)
+}
+</pre>
 </section>
     <section id='search' class="content hidden"></section>
 
@@ -516,6 +604,6 @@
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

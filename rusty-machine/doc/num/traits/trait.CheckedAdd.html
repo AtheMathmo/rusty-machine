@@ -9,6 +9,7 @@
 
     <title>num::traits::CheckedAdd - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     <link rel="shortcut icon" href="http://rust-num.github.io/num/favicon.ico">
@@ -45,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-26535' class='srclink' href='../../src/num/traits.rs.html#535-539' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-4258' class='srclink' href='../../src/num/traits.rs.html#535-539' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait CheckedAdd: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html' title='core::marker::Sized'>Sized</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Add.html' title='core::ops::Add'>Add</a>&lt;Self, Output=Self&gt; {
     fn <a href='#tymethod.checked_add' class='fnname'>checked_add</a>(&amp;self, v: &amp;Self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;Self&gt;;
 }</pre><div class='docblock'><p>Performs addition that returns <code>None</code> instead of wrapping around on
@@ -60,16 +61,16 @@ returned.</p>
         <ul class='item-list' id='implementors-list'>
     <li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a></code></li>
 <li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a class='struct' href='../../num/bigint/struct.BigInt.html' title='num::bigint::BigInt'>BigInt</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code></li>
-<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code></li>
+<li><code>impl <a class='trait' href='../../num/traits/trait.CheckedAdd.html' title='num::traits::CheckedAdd'>CheckedAdd</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a></code></li>
 </ul><script type="text/javascript" async
                               src="../../implementors/num/traits/trait.CheckedAdd.js">
                       </script></section>
@@ -131,6 +132,6 @@ returned.</p>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script src="../../playpen.js"></script>
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

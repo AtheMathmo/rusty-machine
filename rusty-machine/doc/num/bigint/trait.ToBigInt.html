@@ -9,6 +9,7 @@
 
     <title>num::bigint::ToBigInt - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     <link rel="shortcut icon" href="http://rust-num.github.io/num/favicon.ico">
@@ -45,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-8582' class='srclink' href='../../src/num/bigint.rs.html#1767-1770' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-1279' class='srclink' href='../../src/num/bigint.rs.html#1767-1770' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait ToBigInt {
     fn <a href='#tymethod.to_bigint' class='fnname'>to_bigint</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../num/bigint/struct.BigInt.html' title='num::bigint::BigInt'>BigInt</a>&gt;;
 }</pre><div class='docblock'><p>A generic trait for converting a value to a <code>BigInt</code>.</p>
@@ -58,16 +59,16 @@
         <ul class='item-list' id='implementors-list'>
     <li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a class='struct' href='../../num/bigint/struct.BigInt.html' title='num::bigint::BigInt'>BigInt</a></code></li>
 <li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a></code></li>
-<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a></code></li>
-<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a></code></li>
-<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a></code></li>
-<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code></li>
-<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code></li>
-<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></li>
-<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a></code></li>
-<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a></code></li>
-<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code></li>
-<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a></code></li>
+<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a></code></li>
+<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a></code></li>
+<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a></code></li>
+<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code></li>
+<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code></li>
+<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></li>
+<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a></code></li>
+<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a></code></li>
+<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code></li>
+<li><code>impl <a class='trait' href='../../num/bigint/trait.ToBigInt.html' title='num::bigint::ToBigInt'>ToBigInt</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a></code></li>
 </ul><script type="text/javascript" async
                               src="../../implementors/num/bigint/trait.ToBigInt.js">
                       </script></section>
@@ -129,6 +130,6 @@
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script src="../../playpen.js"></script>
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

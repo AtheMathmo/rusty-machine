@@ -9,6 +9,7 @@
 
     <title>rand::distributions::Sample - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     <link rel="shortcut icon" href="https://www.rust-lang.org/favicon.ico">
@@ -45,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-3069' class='srclink' href='../../src/rand/distributions/mod.rs.html#35-39' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-510' class='srclink' href='../../src/rand/distributions/mod.rs.html#35-39' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Sample&lt;Support&gt; {
     fn <a href='#tymethod.sample' class='fnname'>sample</a>&lt;R: <a class='trait' href='../../rand/trait.Rng.html' title='rand::Rng'>Rng</a>&gt;(&amp;mut self, rng: &amp;mut R) -&gt; Support;
 }</pre><div class='docblock'><p>Types that can be used to create a random instance of <code>Support</code>.</p>
@@ -58,13 +59,13 @@ source of randomness.</p>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
     <li><code>impl&lt;Sup: <a class='trait' href='../../rand/distributions/range/trait.SampleRange.html' title='rand::distributions::range::SampleRange'>SampleRange</a>&gt; <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;Sup&gt; for <a class='struct' href='../../rand/distributions/range/struct.Range.html' title='rand::distributions::range::Range'>Range</a>&lt;Sup&gt;</code></li>
-<li><code>impl <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../rand/distributions/gamma/struct.Gamma.html' title='rand::distributions::gamma::Gamma'>Gamma</a></code></li>
-<li><code>impl <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../rand/distributions/gamma/struct.ChiSquared.html' title='rand::distributions::gamma::ChiSquared'>ChiSquared</a></code></li>
-<li><code>impl <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../rand/distributions/gamma/struct.FisherF.html' title='rand::distributions::gamma::FisherF'>FisherF</a></code></li>
-<li><code>impl <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../rand/distributions/gamma/struct.StudentT.html' title='rand::distributions::gamma::StudentT'>StudentT</a></code></li>
-<li><code>impl <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../rand/distributions/normal/struct.Normal.html' title='rand::distributions::normal::Normal'>Normal</a></code></li>
-<li><code>impl <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../rand/distributions/normal/struct.LogNormal.html' title='rand::distributions::normal::LogNormal'>LogNormal</a></code></li>
-<li><code>impl <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../rand/distributions/exponential/struct.Exp.html' title='rand::distributions::exponential::Exp'>Exp</a></code></li>
+<li><code>impl <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../rand/distributions/gamma/struct.Gamma.html' title='rand::distributions::gamma::Gamma'>Gamma</a></code></li>
+<li><code>impl <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../rand/distributions/gamma/struct.ChiSquared.html' title='rand::distributions::gamma::ChiSquared'>ChiSquared</a></code></li>
+<li><code>impl <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../rand/distributions/gamma/struct.FisherF.html' title='rand::distributions::gamma::FisherF'>FisherF</a></code></li>
+<li><code>impl <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../rand/distributions/gamma/struct.StudentT.html' title='rand::distributions::gamma::StudentT'>StudentT</a></code></li>
+<li><code>impl <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../rand/distributions/normal/struct.Normal.html' title='rand::distributions::normal::Normal'>Normal</a></code></li>
+<li><code>impl <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../rand/distributions/normal/struct.LogNormal.html' title='rand::distributions::normal::LogNormal'>LogNormal</a></code></li>
+<li><code>impl <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../rand/distributions/exponential/struct.Exp.html' title='rand::distributions::exponential::Exp'>Exp</a></code></li>
 <li><code>impl&lt;Sup: <a class='trait' href='../../rand/trait.Rand.html' title='rand::Rand'>Rand</a>&gt; <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;Sup&gt; for <a class='struct' href='../../rand/distributions/struct.RandSample.html' title='rand::distributions::RandSample'>RandSample</a>&lt;Sup&gt;</code></li>
 <li><code>impl&lt;'a, T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a>&gt; <a class='trait' href='../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;T&gt; for <a class='struct' href='../../rand/distributions/struct.WeightedChoice.html' title='rand::distributions::WeightedChoice'>WeightedChoice</a>&lt;'a, T&gt;</code></li>
 </ul><script type="text/javascript" async
@@ -128,6 +129,6 @@ source of randomness.</p>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

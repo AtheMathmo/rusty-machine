@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["lin_reg","Linear Regression module"]],"trait":[["Model",""]]});
+initSidebarItems({"mod":[["k_means","K-means Classification"],["lin_reg","Linear Regression module"]],"trait":[["SupModel","Trait for supervised model."],["UnSupModel","Trait for unsupervised model."]]});

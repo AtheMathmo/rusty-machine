@@ -9,6 +9,7 @@
 
     <title>num::bigint::RandBigInt - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     <link rel="shortcut icon" href="http://rust-num.github.io/num/favicon.ico">
@@ -45,18 +46,18 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-8795' class='srclink' href='../../src/num/bigint.rs.html#1812-1832' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-1318' class='srclink' href='../../src/num/bigint.rs.html#1812-1832' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait RandBigInt {
-    fn <a href='#tymethod.gen_biguint' class='fnname'>gen_biguint</a>(&amp;mut self, bit_size: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a>;
-    fn <a href='#tymethod.gen_bigint' class='fnname'>gen_bigint</a>(&amp;mut self, bit_size: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../../num/bigint/struct.BigInt.html' title='num::bigint::BigInt'>BigInt</a>;
+    fn <a href='#tymethod.gen_biguint' class='fnname'>gen_biguint</a>(&amp;mut self, bit_size: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a>;
+    fn <a href='#tymethod.gen_bigint' class='fnname'>gen_bigint</a>(&amp;mut self, bit_size: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../../num/bigint/struct.BigInt.html' title='num::bigint::BigInt'>BigInt</a>;
     fn <a href='#tymethod.gen_biguint_below' class='fnname'>gen_biguint_below</a>(&amp;mut self, bound: &amp;<a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a>) -&gt; <a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a>;
     fn <a href='#tymethod.gen_biguint_range' class='fnname'>gen_biguint_range</a>(&amp;mut self, lbound: &amp;<a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a>, ubound: &amp;<a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a>) -&gt; <a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a>;
     fn <a href='#tymethod.gen_bigint_range' class='fnname'>gen_bigint_range</a>(&amp;mut self, lbound: &amp;<a class='struct' href='../../num/bigint/struct.BigInt.html' title='num::bigint::BigInt'>BigInt</a>, ubound: &amp;<a class='struct' href='../../num/bigint/struct.BigInt.html' title='num::bigint::BigInt'>BigInt</a>) -&gt; <a class='struct' href='../../num/bigint/struct.BigInt.html' title='num::bigint::BigInt'>BigInt</a>;
 }</pre>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.gen_biguint' class='method stab '><code>fn <a href='#tymethod.gen_biguint' class='fnname'>gen_biguint</a>(&amp;mut self, bit_size: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a></code></h3><div class='docblock'><p>Generate a random <code>BigUint</code> of the given bit size.</p>
-</div><h3 id='tymethod.gen_bigint' class='method stab '><code>fn <a href='#tymethod.gen_bigint' class='fnname'>gen_bigint</a>(&amp;mut self, bit_size: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../../num/bigint/struct.BigInt.html' title='num::bigint::BigInt'>BigInt</a></code></h3><div class='docblock'><p>Generate a random BigInt of the given bit size.</p>
+        <h3 id='tymethod.gen_biguint' class='method stab '><code>fn <a href='#tymethod.gen_biguint' class='fnname'>gen_biguint</a>(&amp;mut self, bit_size: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a></code></h3><div class='docblock'><p>Generate a random <code>BigUint</code> of the given bit size.</p>
+</div><h3 id='tymethod.gen_bigint' class='method stab '><code>fn <a href='#tymethod.gen_bigint' class='fnname'>gen_bigint</a>(&amp;mut self, bit_size: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../../num/bigint/struct.BigInt.html' title='num::bigint::BigInt'>BigInt</a></code></h3><div class='docblock'><p>Generate a random BigInt of the given bit size.</p>
 </div><h3 id='tymethod.gen_biguint_below' class='method stab '><code>fn <a href='#tymethod.gen_biguint_below' class='fnname'>gen_biguint_below</a>(&amp;mut self, bound: &amp;<a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a>) -&gt; <a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a></code></h3><div class='docblock'><p>Generate a random <code>BigUint</code> less than the given bound. Fails
 when the bound is zero.</p>
 </div><h3 id='tymethod.gen_biguint_range' class='method stab '><code>fn <a href='#tymethod.gen_biguint_range' class='fnname'>gen_biguint_range</a>(&amp;mut self, lbound: &amp;<a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a>, ubound: &amp;<a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a>) -&gt; <a class='struct' href='../../num/bigint/struct.BigUint.html' title='num::bigint::BigUint'>BigUint</a></code></h3><div class='docblock'><p>Generate a random <code>BigUint</code> within the given range. The lower
@@ -129,6 +130,6 @@ the upper bound is not greater than the lower bound.</p>
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script src="../../playpen.js"></script>
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

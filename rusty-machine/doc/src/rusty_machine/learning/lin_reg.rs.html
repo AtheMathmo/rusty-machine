@@ -9,6 +9,7 @@
 
     <title>lin_reg.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -108,76 +109,77 @@
 <span id="66">66</span>
 <span id="67">67</span>
 <span id="68">68</span>
+<span id="69">69</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Linear Regression module</span>
-<span class='doccomment'>//! </span>
+<span class='doccomment'>//!</span>
 <span class='doccomment'>//! Contains implementation of linear regression models.</span>
 <span class='doccomment'>//! Allows training and prediction of linear regression model</span>
 <span class='doccomment'>//! using least squares optimization.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! Currently only OLS solution - gradient descent not yet implemented.</span>
 
-<span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>Model</span>;
+<span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>SupModel</span>;
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>matrix</span>::<span class='ident'>Matrix</span>;
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>vector</span>::<span class='ident'>Vector</span>;
 
+<span class='doccomment'>/// Linear Regression Model.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// Contains option for optimized parameter.</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>LinRegressor</span> {
-	<span class='kw'>pub</span> <span class='ident'>b</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span>
+    <span class='kw'>pub</span> <span class='ident'>b</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span>,
+}
+
+<span class='kw'>impl</span> <span class='ident'>SupModel</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>LinRegressor</span> {
+    <span class='doccomment'>/// Train the linear regression model.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Takes training data and output values as input.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::learning::lin_reg::LinRegressor;</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::matrix::Matrix;</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::vector::Vector;</span>
+    <span class='doccomment'>/// use rusty_machine::learning::SupModel;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let mut lin_mod = LinRegressor::new();</span>
+    <span class='doccomment'>/// let data = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);</span>
+    <span class='doccomment'>/// let values = Vector::new(vec![5.0, 6.0, 7.0]);</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// lin_mod.train(data, values);</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>values</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
+        <span class='kw'>let</span> <span class='ident'>xt</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>transpose</span>();
+
+        <span class='self'>self</span>.<span class='ident'>b</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(((<span class='kw-2'>&amp;</span><span class='ident'>xt</span> <span class='op'>*</span> <span class='ident'>data</span>).<span class='ident'>inverse</span>() <span class='op'>*</span> <span class='kw-2'>&amp;</span><span class='ident'>xt</span>) <span class='op'>*</span> <span class='ident'>values</span>);
+    }
+
+    <span class='doccomment'>/// Predict output value from input data.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Model must be trained before prediction can be made.</span>
+    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>b</span> {
+            <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>data</span> <span class='op'>*</span> <span class='ident'>v</span>,
+            <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Model has not been trained.&quot;</span>),
+        }
+    }
 }
 
 <span class='kw'>impl</span> <span class='ident'>LinRegressor</span> {
-
-	<span class='doccomment'>/// Constructs untrained linear regression model.</span>
-	<span class='doccomment'>///</span>
-	<span class='doccomment'>/// # Examples</span>
-	<span class='doccomment'>///</span>
-	<span class='doccomment'>/// ```</span>
-	<span class='doccomment'>/// use rusty_machine::learning::lin_reg::LinRegressor;</span>
-	<span class='doccomment'>///</span>
-	<span class='doccomment'>/// let mut lin_mod = LinRegressor::new();</span>
-	<span class='doccomment'>/// ```</span>
-	<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>LinRegressor</span> {
-		<span class='ident'>LinRegressor</span> { <span class='ident'>b</span>: <span class='prelude-val'>None</span> }
-	}
-}
-
-<span class='kw'>impl</span> <span class='ident'>Model</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>LinRegressor</span> {
-
-	<span class='doccomment'>/// Train the linear regression model.</span>
-	<span class='doccomment'>///</span>
-	<span class='doccomment'>/// Takes training data and output values as input.</span>
-	<span class='doccomment'>///</span>
-	<span class='doccomment'>/// # Examples</span>
-	<span class='doccomment'>///</span>
-	<span class='doccomment'>/// ```</span>
-	<span class='doccomment'>/// use rusty_machine::learning::lin_reg::LinRegressor;</span>
-	<span class='doccomment'>/// use rusty_machine::linalg::matrix::Matrix;</span>
-	<span class='doccomment'>/// use rusty_machine::linalg::vector::Vector;</span>
-	<span class='doccomment'>/// use rusty_machine::learning::Model;</span>
-	<span class='doccomment'>///</span>
-	<span class='doccomment'>/// let mut lin_mod = LinRegressor::new();</span>
-	<span class='doccomment'>/// let data = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);</span>
-	<span class='doccomment'>/// let values = Vector::new(vec![5.0, 6.0, 7.0]);</span>
-	<span class='doccomment'>///</span>
-	<span class='doccomment'>/// lin_mod.train(data, values);</span>
-	<span class='doccomment'>/// ```</span>
-	<span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>values</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
-		<span class='kw'>let</span> <span class='ident'>xt</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>transpose</span>();
-
-		<span class='self'>self</span>.<span class='ident'>b</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(((<span class='kw-2'>&amp;</span><span class='ident'>xt</span> <span class='op'>*</span> <span class='ident'>data</span>).<span class='ident'>inverse</span>() <span class='op'>*</span> <span class='kw-2'>&amp;</span><span class='ident'>xt</span>) <span class='op'>*</span> <span class='ident'>values</span>);
-	}
-
-	<span class='doccomment'>/// Predict output value from input data.</span>
-	<span class='doccomment'>///</span>
-	<span class='doccomment'>/// Model must be trained before prediction can be made.</span>
-	<span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-		<span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>b</span> {
-			<span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>v</span>) <span class='op'>=&gt;</span> <span class='ident'>data</span> <span class='op'>*</span> <span class='ident'>v</span>,
-			<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Model has not been trained.&quot;</span>)
-		}
-	}
-}
-</pre>
+    <span class='doccomment'>/// Constructs untrained linear regression model.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::learning::lin_reg::LinRegressor;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let mut lin_mod = LinRegressor::new();</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>() <span class='op'>-&gt;</span> <span class='ident'>LinRegressor</span> {
+        <span class='ident'>LinRegressor</span> { <span class='ident'>b</span>: <span class='prelude-val'>None</span> }
+    }
+}</pre>
 </section>
     <section id='search' class="content hidden"></section>
 
@@ -237,6 +239,6 @@
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>
