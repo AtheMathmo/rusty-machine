@@ -81,10 +81,18 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
     /// Train the classifier using input data.
     fn train(&mut self, data: Matrix<f64>) {
         self.init_centroids(&data);
+        let mut cost = 0.0;
 
         for _i in 0..self.iters {
-                let (idx,_) = self.get_closest_centroids(&data);
+                let (idx, distances) = self.get_closest_centroids(&data);
                 self.update_centroids(&data, idx);
+
+                let cost_i = distances.sum();
+                if cost == cost_i {
+                    break;
+                }
+
+                cost = cost_i;
         }
     }
 }
@@ -93,7 +101,7 @@ impl KMeansClassifier {
     /// Constructs untrained k-means classifier model.
     ///
     /// Requires number of classes to be specified.
-    /// Defaults to 100 iterations.
+    /// Defaults to 100 iterations and kmeans++ initialization.
     ///
     /// # Examples
     ///
@@ -107,7 +115,7 @@ impl KMeansClassifier {
             iters: 100,
             k: k,
             centroids: None,
-            init_algorithm: InitAlgorithm::Forgy,
+            init_algorithm: InitAlgorithm::KPlusPlus,
         }
     }
 
