@@ -22,10 +22,7 @@ This marks my intended release goals. I won't estimate the actual dates of relea
         <th>Version</th><th>Features</th><th>Dependencies</th>
     </tr>
     <tr>
-        <td>0.0.8</td><td><ul><li>K-means Clustering</li></ul></td><td><ul><li>None</li></ul></td>
-    </tr>
-    <tr>
-        <td>0.0.9</td><td><ul><li>Matrix macros</li></ul></td><td><ul><li>None</li></ul></td>
+        <td>0.0.9</td><td><ul><li>Gradient descent.</li></ul></td><td><ul><li>None</li></ul></td>
     </tr>
     <tr>
         <td>0.1.0</td><td><ul><li>Feed forward neural net</li></ul></td><td><ul><li>Matrix Macros</li><li>Gradient descent</li></ul></td>
@@ -43,10 +40,9 @@ This marks my intended release goals. I won't estimate the actual dates of relea
 
 I have chosen to push out a number of different algorithms before focused optimizing. This is partly so I can have use-cases for profiling but mostly for fun!  I will also be working through optimization throughout this process.
 
-The term "Matrix Macros" is a little ambiguous. By this I mean matlab style matrix construction, i.e. [Vector; Matrix] would create a new matrix with the leftmost column being the vector. This may require a compiler plugin...
-
 ### Unplanned:
 
 - Multi-threaded divide and conquer matrix multiplication (currently iterative).
 - Tidy up indexing.
 - Start work on statistics components - R.V. sampling etc.
+- Data Handling.
