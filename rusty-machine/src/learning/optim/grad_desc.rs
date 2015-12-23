@@ -1,13 +1,13 @@
-use linalg::matrix::Matrix;
+use std::ops::{Mul, Sub};
 use learning::optim::OptimAlgorithm;
 
-struct GradientDesc {
+pub struct GradientDesc {
 	alpha: f64,
 	iters: usize
 }
 
-impl OptimAlgorithm<Matrix<f64>> for GradientDesc {
-	fn optimize(&self, start: Matrix<f64>, f: &Fn(Matrix<f64>) -> (f64, Matrix<f64>)) -> Matrix<f64> {
+impl<T: Clone + Mul<f64, Output=T> + Sub<T, Output=T>> OptimAlgorithm<T> for GradientDesc {
+	fn optimize(&self, start: T, f: &Fn(T) -> (f64, T)) -> T {
 
 		let mut optimizing_val = start.clone();
 
