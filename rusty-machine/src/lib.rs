@@ -16,6 +16,7 @@ pub mod linalg {
 pub mod learning {
     pub mod lin_reg;
     pub mod k_means;
+    pub mod nnet;
 
     /// Trait for supervised model.
     pub trait SupModel<T,U> {
@@ -36,4 +37,12 @@ pub mod learning {
         /// Train the model using data.
         fn train(&mut self, data: T);
 	}
+
+    pub mod optim {
+        pub trait OptimAlgorithm<T> {
+            fn optimize(&self, start: T, f: &Fn(T) -> (f64, T)) -> T;
+        }
+
+        pub mod grad_desc;
+    }
 }
