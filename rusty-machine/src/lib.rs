@@ -1,6 +1,7 @@
 extern crate num as libnum;
 extern crate rand;
 
+/// Module for linear algebra.
 pub mod linalg {
 
     pub trait Metric<T> {
@@ -13,6 +14,7 @@ pub mod linalg {
     pub mod macros;
 }
 
+/// Module for machine learning.
 pub mod learning {
     pub mod lin_reg;
     pub mod k_means;
@@ -38,6 +40,7 @@ pub mod learning {
         fn train(&mut self, data: T);
 	}
 
+    /// Module for optimization in machine learning setting.
     pub mod optim {
         pub trait OptimAlgorithm<T> {
             fn optimize(&self, start: T, f: &Fn(T) -> (f64, T)) -> T;
