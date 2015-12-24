@@ -254,6 +254,32 @@ impl<T: Copy> Matrix<T> {
         }
         Vector::new(diagonal)
     }
+
+    /// Applies a function to each element in the matrix.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// fn add_two(a: f64) -> f64 {
+    ///     a + 2f64
+    /// }
+    ///
+    /// let a = Matrix::new(2, 2, vec![0.;4]);
+    ///
+    /// let b = a.apply(&add_two);
+    ///
+    /// assert_eq!(b.data, vec![2.0; 4]);
+    /// ```
+    pub fn apply(&self, f: &Fn(T) -> T) -> Matrix<T> {
+        let new_data = self.data.iter().map(|v| f(*v)).collect();
+
+        Matrix {
+            rows: self.rows,
+            cols: self.cols,
+            data: new_data,
+        }
+    }
 }
 
 impl<T: Zero + One + Copy> Matrix<T> {
