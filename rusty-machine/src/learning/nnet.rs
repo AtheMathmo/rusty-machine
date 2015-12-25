@@ -66,6 +66,73 @@ impl<'a> NeuralNet<'a> {
 
         weights
     }
+
+    /// Gets matrix of weights between specified layer and forward layer.
+	///
+	/// # Examples
+	///
+	/// ```
+	/// use rusty_machine::learning::nnet::NeuralNet;
+	///
+	/// // Create a neural net with 4 layers, 3 neurons in each.
+	/// let layers = &[3; 4];
+	/// let mut a = NeuralNet::new(layers);
+	///
+	/// let w = &a.get_layer_weights(2);
+	/// assert_eq!(w.rows(), 4);
+	/// assert_eq!(w.cols(), 3);
+	/// ```
+    pub fn get_layer_weights(&self, idx: usize) -> Matrix<f64> {
+    	assert!(idx < self.layer_sizes.len()-1);
+
+    	let mut start = 0usize;
+
+        for l in 0..idx {
+            start += (self.layer_sizes[l]+1) * self.layer_sizes[l + 1]
+        }
+
+        let capacity = (self.layer_sizes[idx]+1) * self.layer_sizes[idx + 1];
+
+        let mut weights = Vec::with_capacity((self.layer_sizes[idx]+1) * self.layer_sizes[idx + 1]);
+        unsafe {
+	        for i in start..start+capacity {
+	        	weights.push(*self.weights.get_unchecked(i));
+	        }
+    	}
+
+        Matrix::new(self.layer_sizes[idx]+1, self.layer_sizes[idx + 1], weights)
+
+    }
+
+    fn compute_cost_grad(&self, data: &Matrix<f64>, outputs: &Matrix<f64>) {
+    	assert_eq!(data.cols(), self.layer_sizes[0]);
+
+    	let mut forward_weights = Vec::with_capacity(self.layer_sizes.len()-1);
+    	let mut activations = Vec::with_capacity(self.layer_sizes.len());
+
+    	activations.push(data.clone());
+
+    	// Forward propagation
+    	{
+	    	let mut a = self.get_layer_weights(0) * data;
+	    	activations.push(a.clone());
+
+	    	for l in 1..self.layer_sizes.len()-1 {
+	    		let z = self.get_layer_weights(l) * a.clone();
+	    		forward_weights.push(z.clone());
+
+	    		activations.push(z.apply(&sigmoid));
+	    	}
+
+	    }
+
+	    // Backward propagation
+	    {
+	    	let mut delta = &activations[self.layer_sizes.len()-1] - outputs;
+
+	    }
+    }
+
 }
 
 impl<'a> SupModel<Matrix<f64>, Vector<usize>> for NeuralNet<'a> {
@@ -76,4 +143,18 @@ impl<'a> SupModel<Matrix<f64>, Vector<usize>> for NeuralNet<'a> {
     fn train(&mut self, data: Matrix<f64>, values: Vector<usize>) {
         unimplemented!()
     }
+}
+
+/// Sigmoid function.
+///
+/// Returns 1 / ( 1 + e^-t).
+fn sigmoid(t: f64) -> f64 {
+	1.0 / (1.0 + (-t).exp() )
+}
+
+/// Gradient of sigmoid function.
+///
+/// Evaluates to (1 - e^-t) / (1 + e^-t)^2
+fn sigmoid_grad(t: f64) -> f64 {
+	sigmoid(t) * (1f64-sigmoid(t))
 }
