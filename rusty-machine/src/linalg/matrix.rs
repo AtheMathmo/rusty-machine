@@ -271,8 +271,8 @@ impl<T: Copy> Matrix<T> {
     ///
     /// assert_eq!(b.data, vec![2.0; 4]);
     /// ```
-    pub fn apply(&self, f: &Fn(T) -> T) -> Matrix<T> {
-        let new_data = self.data.iter().map(|v| f(*v)).collect();
+    pub fn apply(self, f: &Fn(T) -> T) -> Matrix<T> {
+        let new_data = self.data.into_iter().map(|v| f(v)).collect();
 
         Matrix {
             rows: self.rows,
