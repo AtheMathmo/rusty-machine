@@ -126,11 +126,26 @@ impl<'a> NeuralNet<'a> {
 
 	    }
 
+	    let mut deltas = Vec::with_capacity(self.layer_sizes.len()-1);
 	    // Backward propagation
 	    {
 	    	let mut delta = &activations[self.layer_sizes.len()-1] - outputs;
+	    	deltas.push(delta.clone());
 
+	    	for l in (0..self.layer_sizes.len()-1).rev() {
+	    		let g = forward_weights[l].clone().apply(&sigmoid_grad);
+	    		delta = (self.get_layer_weights(l).transpose() * delta.clone()).elemul(&g);
+	    		deltas.push(delta.clone());
+	    	}
 	    }
+
+
+	    let mut grad = Vec::with_capacity(self.layer_sizes.len()-1);
+	   	for l in 0..self.layer_sizes.len()-1 {
+	   		// Probably need to remove the first column on the deltas.
+	   		let g = deltas[l].clone() * activations[l].clone().transpose();
+	   		grad.push(g / (data.rows() as f64))
+	   	}
     }
 
 }
