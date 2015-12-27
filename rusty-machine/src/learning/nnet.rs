@@ -104,7 +104,7 @@ impl<'a> NeuralNet<'a> {
 
     }
 
-    fn compute_cost_grad(&self, data: &Matrix<f64>, outputs: &Matrix<f64>) {
+    fn compute_cost_grad(&self, data: &Matrix<f64>, outputs: &Matrix<f64>) -> Vec<f64> {
     	assert_eq!(data.cols(), self.layer_sizes[0]);
 
     	let mut forward_weights = Vec::with_capacity(self.layer_sizes.len()-1);
@@ -141,11 +141,22 @@ impl<'a> NeuralNet<'a> {
 
 
 	    let mut grad = Vec::with_capacity(self.layer_sizes.len()-1);
+	   	let mut capacity = 0;
+
 	   	for l in 0..self.layer_sizes.len()-1 {
 	   		// Probably need to remove the first column on the deltas.
 	   		let g = deltas[l].clone() * activations[l].clone().transpose();
-	   		grad.push(g / (data.rows() as f64))
+	   		capacity += g.cols() * g.rows();
+	   		grad.push(g / (data.rows() as f64));
 	   	}
+
+	   	let mut gradients = Vec::with_capacity(capacity);
+
+	   	for g in grad {
+	   		gradients.append(&mut g.data.clone());
+	   	}
+
+	   	gradients
     }
 
 }
