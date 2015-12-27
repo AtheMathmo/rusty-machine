@@ -42,8 +42,13 @@ pub mod learning {
 
     /// Module for optimization in machine learning setting.
     pub mod optim {
-        pub trait OptimAlgorithm<T> {
-            fn optimize(&self, start: T, f: &Fn(T) -> (f64, T)) -> T;
+
+        pub trait Optimizable<T, U> {
+            fn compute_grad(&self, params: &[f64], data: &T, outputs: &U) -> Vec<f64>;
+        }
+
+        pub trait OptimAlgorithm<T,U,M: Optimizable<T,U>> {
+            fn optimize(&self, model: M, start: &[f64], data: &T, outputs: &U) -> Vec<f64>;
         }
 
         pub mod grad_desc;

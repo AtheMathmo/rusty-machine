@@ -1,6 +1,7 @@
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
 use learning::SupModel;
+use learning::optim::Optimizable;
 use rand::{Rng, thread_rng};
 
 /// Neural Network struct
@@ -104,7 +105,7 @@ impl<'a> NeuralNet<'a> {
 
     }
 
-    fn compute_cost_grad(&self, data: &Matrix<f64>, outputs: &Matrix<f64>) -> Vec<f64> {
+    fn compute_grad(&self, data: &Matrix<f64>, outputs: &Matrix<f64>) -> Vec<f64> {
     	assert_eq!(data.cols(), self.layer_sizes[0]);
 
     	let mut forward_weights = Vec::with_capacity(self.layer_sizes.len()-1);
@@ -169,6 +170,12 @@ impl<'a> SupModel<Matrix<f64>, Vector<usize>> for NeuralNet<'a> {
     fn train(&mut self, data: Matrix<f64>, values: Vector<usize>) {
         unimplemented!()
     }
+}
+
+impl<'a> Optimizable<Matrix<f64>, Matrix<f64>> for NeuralNet<'a> {
+	fn compute_grad(&self, params: &[f64], data: &Matrix<f64>, outputs: &Matrix<f64>) -> Vec<f64> {
+		self.compute_grad(data, outputs)
+	}
 }
 
 /// Sigmoid function.
