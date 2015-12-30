@@ -12,6 +12,6 @@ license = "MIT"
 
 
 [dependencies]
-num = "0.1.28"
+num = {version = "0.1.28", default-feature="false" }
 rand = "0.3.*"
 
