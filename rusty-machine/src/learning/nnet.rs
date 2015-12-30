@@ -1,3 +1,29 @@
+//! Neural Network module
+//!
+//! Contains implementation of simple feed forward neural network.
+//!
+//! # Usage
+//!
+//! ```
+//! use rusty_machine::learning::nnet::NeuralNet;
+//! use rusty_machine::linalg::matrix::Matrix;
+//! use rusty_machine::learning::SupModel;
+//! 
+//! let data = Matrix::new(5,3, vec![1.,1.,1.,2.,2.,2.,3.,3.,3.,
+//!								4.,4.,4.,5.,5.,5.,]);
+//! let outputs = Matrix::new(5,3, vec![1.,0.,0.,0.,1.,0.,0.,0.,1.,
+//!									0.,0.,1.,0.,0.,1.]);
+//!
+//! let layers = &[3,5,11,7,3];
+//! let mut model = NeuralNet::new(layers);
+//!
+//! model.train(&data, &outputs);
+//!
+//! let test_data = Matrix::new(2,3, vec![1.5,1.5,1.5,5.1,5.1,5.1]);
+//!
+//! model.predict(&test_data);
+//! ```
+
 use linalg::matrix::Matrix;
 use learning::SupModel;
 use learning::optim::{Optimizable, OptimAlgorithm};
@@ -5,8 +31,6 @@ use learning::optim::grad_desc::GradientDesc;
 use rand::{Rng, thread_rng};
 
 /// Neural Network struct
-///
-/// Requires the number of neurons in each layer to be specified.
 pub struct NeuralNet<'a> {
     layer_sizes: &'a [usize],
     pub weights: Vec<f64>,
@@ -18,6 +42,8 @@ impl<'a> NeuralNet<'a> {
 	/// Create a new neural network with the specified layer sizes.
 	///
 	/// The layer sizes slice should include the input, hidden layers, and output layer sizes.
+	///
+	/// Currently defaults to simple batch Gradient Descent for optimization.
 	///
 	/// # Examples
 	///

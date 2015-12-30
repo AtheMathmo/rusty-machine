@@ -16,10 +16,10 @@
 //! let mut model = KMeansClassifier::new(2);
 //!
 //! // Where train_data is a Matrix with features in columns.
-//! model.train(train_data); 
+//! model.train(&train_data); 
 //!
 //! // Where pred_data is a Matrix with features in columns.
-//! let a = model.predict(pred_data);
+//! let a = model.predict(&pred_data);
 //! ```
 //!
 //! Additionally you can control the initialization
