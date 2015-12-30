@@ -22,10 +22,10 @@ This marks my intended release goals. I won't estimate the actual dates of relea
         <th>Version</th><th>Features</th><th>Dependencies</th>
     </tr>
     <tr>
-        <td>0.0.9</td><td><ul><li>Gradient descent.</li></ul></td><td><ul><li>None</li></ul></td>
+        <td>0.0.9</td><td><ul><li>Gradient descent.</li><li>Neural Nets</li></ul></td><td><ul><li>None</li></ul></td>
     </tr>
     <tr>
-        <td>0.1.0</td><td><ul><li>Feed forward neural net</li></ul></td><td><ul><li>Matrix Macros</li><li>Gradient descent</li></ul></td>
+        <td>0.1.0</td><td><ul><li>Optimization (with basic data handling - unreleased).</li></ul></td><td></td>
     </tr>
     <tr>
         <td>0.1.1.</td><td><ul><li>Cholesky Decomp</li></ul></td><td><ul><li>None</li></ul></td>
