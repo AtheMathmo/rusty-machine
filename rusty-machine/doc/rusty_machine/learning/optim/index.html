@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `InitAlgorithm` enum in crate `rusty_machine`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, InitAlgorithm">
+    <meta name="description" content="API documentation for the Rust `optim` mod in crate `rusty_machine`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, optim">
 
-    <title>rusty_machine::learning::k_means::InitAlgorithm - Rust</title>
+    <title>rusty_machine::learning::optim - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
@@ -27,7 +27,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'><a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>learning</a>::<wbr><a href='index.html'>k_means</a></p><script>window.sidebarCurrent = {name: 'InitAlgorithm', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'><a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>learning</a></p><script>window.sidebarCurrent = {name: 'optim', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -41,19 +41,43 @@
         </form>
     </nav>
 
-    <section id='main' class="content enum">
-<h1 class='fqn'><span class='in-band'>Enum <a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>learning</a>::<wbr><a href='index.html'>k_means</a>::<wbr><a class='enum' href=''>InitAlgorithm</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Module <a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>learning</a>::<wbr><a class='mod' href=''>optim</a></span><span class='out-of-band'><span id='render-detail'>
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1062' class='srclink' href='../../../src/rusty_machine/learning/k_means.rs.html#51-55' title='goto source code'>[src]</a></span></h1>
-<pre class='rust enum'>pub enum InitAlgorithm {
-    Forgy,
-    RandomPartition,
-    KPlusPlus,
-}</pre><div class='docblock'><p>Initialization Algorithm enum.</p>
-</div><h2 class='variants'>Variants</h2>
-<table><tr><td id='variant.Forgy'><code>Forgy</code></td><td></td></tr><tr><td id='variant.RandomPartition'><code>RandomPartition</code></td><td></td></tr><tr><td id='variant.KPlusPlus'><code>KPlusPlus</code></td><td></td></tr></table></section>
+        </span><a id='src-1337' class='srclink' href='../../../src/rusty_machine/lib.rs.html#44-65' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Module for optimization in machine learning setting.</p>
+</div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='grad_desc/index.html'
+                               title='rusty_machine::learning::optim::grad_desc'>grad_desc</a></td>
+                        <td class='docblock short'>
+                             <p>Gradient Descent</p>
+
+                        </td>
+                    </tr>
+                </table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='trait' href='trait.OptimAlgorithm.html'
+                               title='rusty_machine::learning::optim::OptimAlgorithm'>OptimAlgorithm</a></td>
+                        <td class='docblock short'>
+                             <p>Trait for optimization algorithms.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='trait' href='trait.Optimizable.html'
+                               title='rusty_machine::learning::optim::Optimizable'>Optimizable</a></td>
+                        <td class='docblock short'>
+                             <p>Trait for models which can be gradient-optimized.</p>
+
+                        </td>
+                    </tr>
+                </table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

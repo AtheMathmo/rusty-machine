@@ -352,10 +352,10 @@
 <span class='doccomment'>//! let mut model = KMeansClassifier::new(2);</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Where train_data is a Matrix with features in columns.</span>
-<span class='doccomment'>//! model.train(train_data); </span>
+<span class='doccomment'>//! model.train(&amp;train_data); </span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Where pred_data is a Matrix with features in columns.</span>
-<span class='doccomment'>//! let a = model.predict(pred_data);</span>
+<span class='doccomment'>//! let a = model.predict(&amp;pred_data);</span>
 <span class='doccomment'>//! ```</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! Additionally you can control the initialization</span>
@@ -405,9 +405,9 @@
     <span class='doccomment'>/// Predict classes from data.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Model must be trained.</span>
-    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>centroids</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>centroids</span> {
-            <span class='kw'>return</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='ident'>centroids</span>, <span class='kw-2'>&amp;</span><span class='ident'>data</span>).<span class='number'>0</span>;
+            <span class='kw'>return</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='ident'>centroids</span>, <span class='ident'>data</span>).<span class='number'>0</span>;
         }
         <span class='kw'>else</span> {
             <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Model has not been trained.&quot;</span>);
@@ -415,13 +415,13 @@
     }
 
     <span class='doccomment'>/// Train the classifier using input data.</span>
-    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
-        <span class='self'>self</span>.<span class='ident'>init_centroids</span>(<span class='kw-2'>&amp;</span><span class='ident'>data</span>);
+    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
+        <span class='self'>self</span>.<span class='ident'>init_centroids</span>(<span class='ident'>data</span>);
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cost</span> <span class='op'>=</span> <span class='number'>0.0</span>;
 
         <span class='kw'>for</span> <span class='ident'>_i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>iters</span> {
-                <span class='kw'>let</span> (<span class='ident'>idx</span>, <span class='ident'>distances</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>get_closest_centroids</span>(<span class='kw-2'>&amp;</span><span class='ident'>data</span>);
-                <span class='self'>self</span>.<span class='ident'>update_centroids</span>(<span class='kw-2'>&amp;</span><span class='ident'>data</span>, <span class='ident'>idx</span>);
+                <span class='kw'>let</span> (<span class='ident'>idx</span>, <span class='ident'>distances</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>get_closest_centroids</span>(<span class='ident'>data</span>);
+                <span class='self'>self</span>.<span class='ident'>update_centroids</span>(<span class='ident'>data</span>, <span class='ident'>idx</span>);
 
                 <span class='kw'>let</span> <span class='ident'>cost_i</span> <span class='op'>=</span> <span class='ident'>distances</span>.<span class='ident'>sum</span>();
                 <span class='kw'>if</span> <span class='ident'>cost</span> <span class='op'>==</span> <span class='ident'>cost_i</span> {

@@ -4,13 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `InitAlgorithm` enum in crate `rusty_machine`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, InitAlgorithm">
+    <meta name="description" content="API documentation for the Rust `grad_desc` mod in crate `rusty_machine`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, grad_desc">
 
-    <title>rusty_machine::learning::k_means::InitAlgorithm - Rust</title>
+    <title>rusty_machine::learning::optim::grad_desc - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
-    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css">
 
     
     
@@ -27,7 +27,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'><a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>learning</a>::<wbr><a href='index.html'>k_means</a></p><script>window.sidebarCurrent = {name: 'InitAlgorithm', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+        <p class='location'><a href='../../../index.html'>rusty_machine</a>::<wbr><a href='../../index.html'>learning</a>::<wbr><a href='../index.html'>optim</a></p><script>window.sidebarCurrent = {name: 'grad_desc', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -41,19 +41,31 @@
         </form>
     </nav>
 
-    <section id='main' class="content enum">
-<h1 class='fqn'><span class='in-band'>Enum <a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>learning</a>::<wbr><a href='index.html'>k_means</a>::<wbr><a class='enum' href=''>InitAlgorithm</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Module <a href='../../../index.html'>rusty_machine</a>::<wbr><a href='../../index.html'>learning</a>::<wbr><a href='../index.html'>optim</a>::<wbr><a class='mod' href=''>grad_desc</a></span><span class='out-of-band'><span id='render-detail'>
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1062' class='srclink' href='../../../src/rusty_machine/learning/k_means.rs.html#51-55' title='goto source code'>[src]</a></span></h1>
-<pre class='rust enum'>pub enum InitAlgorithm {
-    Forgy,
-    RandomPartition,
-    KPlusPlus,
-}</pre><div class='docblock'><p>Initialization Algorithm enum.</p>
-</div><h2 class='variants'>Variants</h2>
-<table><tr><td id='variant.Forgy'><code>Forgy</code></td><td></td></tr><tr><td id='variant.RandomPartition'><code>RandomPartition</code></td><td></td></tr><tr><td id='variant.KPlusPlus'><code>KPlusPlus</code></td><td></td></tr></table></section>
+        </span><a id='src-1355' class='srclink' href='../../../../src/rusty_machine/learning/optim/grad_desc.rs.html#1-42' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Gradient Descent</p>
+
+<p>Implementation of gradient descent algorithm. Module contains
+the struct GradientDesc which is instantiated within models
+implementing the Optimizable trait.</p>
+
+<p>Currently standard batch gradient descent is the only implemented
+optimization algorithm but there is flexibility to introduce new
+algorithms and git them into the same scheme easily.</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.GradientDesc.html'
+                               title='rusty_machine::learning::optim::grad_desc::GradientDesc'>GradientDesc</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                </table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>
@@ -105,13 +117,13 @@
     
 
     <script>
-        window.rootPath = "../../../";
+        window.rootPath = "../../../../";
         window.currentCrate = "rusty_machine";
         window.playgroundUrl = "";
     </script>
-    <script src="../../../jquery.js"></script>
-    <script src="../../../main.js"></script>
+    <script src="../../../../jquery.js"></script>
+    <script src="../../../../main.js"></script>
     
-    <script defer src="../../../search-index.js"></script>
+    <script defer src="../../../../search-index.js"></script>
 </body>
 </html>

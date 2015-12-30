@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["learning",""],["linalg",""]]});
+initSidebarItems({"mod":[["learning","Module for machine learning."],["linalg","Module for linear algebra."]]});
