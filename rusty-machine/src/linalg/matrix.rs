@@ -5,7 +5,7 @@
 
 use std::ops::{Mul, Add, Div, Sub, Index, Neg};
 use libnum::{One, Zero, Float, FromPrimitive};
-use std::cmp::PartialEq;
+use std::cmp::{PartialEq, min};
 use linalg::Metric;
 use linalg::vector::Vector;
 use linalg::utils;
@@ -67,6 +67,7 @@ impl<T: Clone> Clone for Matrix<T> {
 }
 
 impl<T: Copy> Matrix<T> {
+
     /// Select rows from matrix
     ///
     /// # Examples
@@ -219,6 +220,64 @@ impl<T: Copy> Matrix<T> {
         Matrix {
             cols: self.cols,
             rows: (self.rows + m.rows),
+            data: new_data,
+        }
+    }
+
+    /// Extract the diagonal of the matrix
+    ///
+    /// Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::vector::Vector;
+    ///
+    /// let a = Matrix::new(3,3,vec![1,2,3,4,5,6,7,8,9]);
+    /// let b = Matrix::new(3,2,vec![1,2,3,4,5,6]);
+    /// let c = Matrix::new(2,3,vec![1,2,3,4,5,6]);
+    ///
+    /// let d = &a.diag(); // 1,5,9
+    /// let e = &b.diag(); // 1,4
+    /// let f = &c.diag(); // 1,5
+    ///
+    /// assert_eq!(d.data, vec![1,5,9]);
+    /// assert_eq!(e.data, vec![1,4]);
+    /// assert_eq!(f.data, vec![1,5]);
+    /// ```
+    pub fn diag(&self) -> Vector<T> {
+        let mat_min = min(self.rows, self.cols);
+
+        let mut diagonal = Vec::with_capacity(mat_min);
+        unsafe {
+            for i in 0..mat_min {
+                diagonal.push(*self.data.get_unchecked(i*self.cols + i));
+            }
+        }
+        Vector::new(diagonal)
+    }
+
+    /// Applies a function to each element in the matrix.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// fn add_two(a: f64) -> f64 {
+    ///     a + 2f64
+    /// }
+    ///
+    /// let a = Matrix::new(2, 2, vec![0.;4]);
+    ///
+    /// let b = a.apply(&add_two);
+    ///
+    /// assert_eq!(b.data, vec![2.0; 4]);
+    /// ```
+    pub fn apply(self, f: &Fn(T) -> T) -> Matrix<T> {
+        let new_data = self.data.into_iter().map(|v| f(v)).collect();
+
+        Matrix {
+            rows: self.rows,
+            cols: self.cols,
             data: new_data,
         }
     }

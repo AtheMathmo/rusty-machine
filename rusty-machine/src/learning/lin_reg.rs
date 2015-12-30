@@ -34,9 +34,9 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
     /// let data = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
     /// let values = Vector::new(vec![5.0, 6.0, 7.0]);
     ///
-    /// lin_mod.train(data, values);
+    /// lin_mod.train(&data, &values);
     /// ```
-    fn train(&mut self, data: Matrix<f64>, values: Vector<f64>) {
+    fn train(&mut self, data: &Matrix<f64>, values: &Vector<f64>) {
         let xt = data.transpose();
 
         self.b = Some(((&xt * data).inverse() * &xt) * values);
@@ -45,7 +45,7 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
     /// Predict output value from input data.
     ///
     /// Model must be trained before prediction can be made.
-    fn predict(&self, data: Matrix<f64>) -> Vector<f64> {
+    fn predict(&self, data: &Matrix<f64>) -> Vector<f64> {
         match self.b {
             Some(ref v) => data * v,
             None => panic!("Model has not been trained."),
