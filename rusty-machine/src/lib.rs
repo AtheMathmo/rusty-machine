@@ -24,20 +24,20 @@ pub mod learning {
     pub trait SupModel<T,U> {
 
         /// Predict output from data.
-        fn predict(&self, data: T) -> U;
+        fn predict(&self, data: &T) -> U;
 
         /// Train the model using data and outputs.
-        fn train(&mut self, data: T, value: U);
+        fn train(&mut self, data: &T, value: &U);
 	}
 
     /// Trait for unsupervised model.
 	pub trait UnSupModel<T, U> {
 
         /// Predict output from data.
-        fn predict(&self, data: T) -> U;
+        fn predict(&self, data: &T) -> U;
 
         /// Train the model using data.
-        fn train(&mut self, data: T);
+        fn train(&mut self, data: &T);
 	}
 
     /// Module for optimization in machine learning setting.

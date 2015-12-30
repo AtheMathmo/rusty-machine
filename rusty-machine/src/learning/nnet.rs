@@ -217,13 +217,13 @@ impl<'a> Optimizable for NeuralNet<'a> {
 }
 
 impl<'a> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a> {
-    fn predict(&self, data: Matrix<f64>) -> Matrix<f64> {
-        self.forward_prop(&data)
+    fn predict(&self, data: &Matrix<f64>) -> Matrix<f64> {
+        self.forward_prop(data)
     }
 
-    fn train(&mut self, data: Matrix<f64>, values: Matrix<f64>) {
+    fn train(&mut self, data: &Matrix<f64>, values: &Matrix<f64>) {
     	let start = self.weights.clone();
-        let optimal_w = self.gd.optimize(self, &start[..], &data, &values);
+        let optimal_w = self.gd.optimize(self, &start[..], data, values);
         self.weights = optimal_w;
     }
 }

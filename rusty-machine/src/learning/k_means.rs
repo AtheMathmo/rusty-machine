@@ -69,9 +69,9 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
     /// Predict classes from data.
     ///
     /// Model must be trained.
-    fn predict(&self, data: Matrix<f64>) -> Vector<usize> {
+    fn predict(&self, data: &Matrix<f64>) -> Vector<usize> {
         if let Some(ref centroids) = self.centroids {
-            return KMeansClassifier::find_closest_centroids(centroids, &data).0;
+            return KMeansClassifier::find_closest_centroids(centroids, data).0;
         }
         else {
             panic!("Model has not been trained.");
@@ -79,13 +79,13 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
     }
 
     /// Train the classifier using input data.
-    fn train(&mut self, data: Matrix<f64>) {
-        self.init_centroids(&data);
+    fn train(&mut self, data: &Matrix<f64>) {
+        self.init_centroids(data);
         let mut cost = 0.0;
 
         for _i in 0..self.iters {
-                let (idx, distances) = self.get_closest_centroids(&data);
-                self.update_centroids(&data, idx);
+                let (idx, distances) = self.get_closest_centroids(data);
+                self.update_centroids(data, idx);
 
                 let cost_i = distances.sum();
                 if cost == cost_i {
