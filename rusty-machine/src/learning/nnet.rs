@@ -187,6 +187,23 @@ impl<'a> NeuralNet<'a> {
 	   	gradients
     }
 
+    fn forward_prop(&self, data: &Matrix<f64>) -> Matrix<f64> {
+    	assert_eq!(data.cols(), self.layer_sizes[0]);
+
+    	let net_data = Matrix::ones(data.rows(), 1).hcat(data);
+
+   		let mut z = net_data * self.get_net_weights(0);
+   		let mut a = z.clone().apply(&sigmoid);
+
+    	for l in 1..self.layer_sizes.len()-1 {
+    		let ones = Matrix::ones(a.rows(), 1);
+    		a = ones.hcat(&a);
+    		z = a * self.get_net_weights(l);
+    		a = z.clone().apply(&sigmoid);
+    	}
+
+    	a
+    }
 }
 
 impl<'a> Optimizable for NeuralNet<'a> {
@@ -201,7 +218,7 @@ impl<'a> Optimizable for NeuralNet<'a> {
 
 impl<'a> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a> {
     fn predict(&self, data: Matrix<f64>) -> Matrix<f64> {
-        unimplemented!()
+        self.forward_prop(&data)
     }
 
     fn train(&mut self, data: Matrix<f64>, values: Matrix<f64>) {
