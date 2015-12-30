@@ -9,7 +9,7 @@ use rand::{Rng, thread_rng};
 /// Requires the number of neurons in each layer to be specified.
 pub struct NeuralNet<'a> {
     layer_sizes: &'a [usize],
-    weights: Vec<f64>,
+    pub weights: Vec<f64>,
     gd: GradientDesc,
 }
 
@@ -126,20 +126,27 @@ impl<'a> NeuralNet<'a> {
     	let mut forward_weights = Vec::with_capacity(self.layer_sizes.len()-1);
     	let mut activations = Vec::with_capacity(self.layer_sizes.len());
 
-    	activations.push(data.clone());
+    	let net_data = Matrix::ones(data.rows(), 1).hcat(data);
+
+
+    	activations.push(net_data.clone());
 
     	// Forward propagation
     	{
-	    	let mut a = self.get_layer_weights(weights, 0) * data;
-	    	activations.push(self.get_layer_weights(weights, 0) * data);
+    		let mut z = net_data * self.get_layer_weights(weights, 0);
+    		forward_weights.push(z.clone());
 
 	    	for l in 1..self.layer_sizes.len()-1 {
-	    		let z = self.get_layer_weights(weights, l) * a.clone();
-	    		forward_weights.push(z.clone());
-	    		a = z.apply(&sigmoid);
+	    		let mut a = z.clone().apply(&sigmoid);
+	    		let ones = Matrix::ones(a.rows(), 1);
+
+	    		a = ones.hcat(&a);
 	    		activations.push(a.clone());
+	    		z = a * self.get_layer_weights(weights, l);
+	    		forward_weights.push(z.clone());
 	    	}
 
+	    	activations.push(z.apply(&sigmoid));
 	    }
 
 	    let mut deltas = Vec::with_capacity(self.layer_sizes.len()-1);
@@ -148,20 +155,25 @@ impl<'a> NeuralNet<'a> {
 	    	let mut delta = &activations[self.layer_sizes.len()-1] - outputs;
 	    	deltas.push(delta.clone());
 
-	    	for l in (0..self.layer_sizes.len()-1).rev() {
-	    		let g = forward_weights[l].clone().apply(&sigmoid_grad);
-	    		delta = (self.get_layer_weights(weights, l).transpose() * delta.clone()).elemul(&g);
+	    	for l in (1..self.layer_sizes.len()-1).rev() {
+	    		let mut z = forward_weights[l-1].clone();
+	    		let ones = Matrix::ones(z.rows(), 1);
+	    		z = ones.hcat(&z);
+
+	    		let g = z.apply(&sigmoid_grad);
+	    		delta = (delta * self.get_layer_weights(weights, l).transpose()).elemul(&g);
+
+	    		let non_one_rows = &(1..delta.cols()).collect::<Vec<usize>>()[..];
+	    		delta = delta.select_cols(non_one_rows);
 	    		deltas.push(delta.clone());
 	    	}
 	    }
-
 
 	    let mut grad = Vec::with_capacity(self.layer_sizes.len()-1);
 	   	let mut capacity = 0;
 
 	   	for l in 0..self.layer_sizes.len()-1 {
-	   		// Probably need to remove the first column on the deltas.
-	   		let g = deltas[l].clone() * activations[l].clone().transpose();
+	   		let g = deltas[self.layer_sizes.len()-2-l].transpose() * activations[l].clone();
 	   		capacity += g.cols() * g.rows();
 	   		grad.push(g / (data.rows() as f64));
 	   	}

@@ -67,6 +67,7 @@ impl<T: Clone> Clone for Matrix<T> {
 }
 
 impl<T: Copy> Matrix<T> {
+
     /// Select rows from matrix
     ///
     /// # Examples
