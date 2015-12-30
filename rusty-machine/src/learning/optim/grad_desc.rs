@@ -1,3 +1,13 @@
+//! Gradient Descent
+//! 
+//! Implementation of gradient descent algorithm. Module contains
+//! the struct GradientDesc which is instantiated within models
+//! implementing the Optimizable trait.
+//!
+//! Currently standard batch gradient descent is the only implemented
+//! optimization algorithm but there is flexibility to introduce new
+//! algorithms and git them into the same scheme easily.
+
 use learning::optim::{Optimizable, OptimAlgorithm};
 use linalg::vector::Vector;
 
@@ -7,6 +17,11 @@ pub struct GradientDesc {
 }
 
 impl GradientDesc {
+
+	/// Constructs a new gradient descent algorithm.
+	///
+	/// Currently defaults to 1000 iterations and step size
+	/// of 0.3. More control coming soon!
 	pub fn new() -> GradientDesc {
 		GradientDesc{ alpha: 0.3, iters: 1000 }
 	}

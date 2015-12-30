@@ -43,14 +43,21 @@ pub mod learning {
     /// Module for optimization in machine learning setting.
     pub mod optim {
 
+        /// Trait for models which can be gradient-optimized.
         pub trait Optimizable {
             type Data;
             type Target;
 
+            /// Compute the gradient for the model.
             fn compute_grad(&self, params: &[f64], data: &Self::Data, target: &Self::Target) -> Vec<f64>;
         }
 
+        /// Trait for optimization algorithms.
         pub trait OptimAlgorithm<M : Optimizable> {
+
+            /// Return the optimized parameter using gradient optimization.
+            ///
+            /// Takes in a set of starting parameters and related model data.
             fn optimize(&self, model: &M, start: &[f64], data: &M::Data, outputs: &M::Target) -> Vec<f64>;
         }
 

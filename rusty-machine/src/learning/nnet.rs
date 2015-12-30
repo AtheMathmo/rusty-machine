@@ -120,6 +120,7 @@ impl<'a> NeuralNet<'a> {
     	self.get_layer_weights(&self.weights[..], idx)
     }
 
+    /// Compute the gradient using the back propagation algorithm.
     fn compute_grad(&self, weights: &[f64], data: &Matrix<f64>, outputs: &Matrix<f64>) -> Vec<f64> {
     	assert_eq!(data.cols(), self.layer_sizes[0]);
 
@@ -187,6 +188,7 @@ impl<'a> NeuralNet<'a> {
 	   	gradients
     }
 
+    /// Forward propagation of the model weights to get the outputs.
     fn forward_prop(&self, data: &Matrix<f64>) -> Matrix<f64> {
     	assert_eq!(data.cols(), self.layer_sizes[0]);
 
@@ -210,6 +212,7 @@ impl<'a> Optimizable for NeuralNet<'a> {
 	type Data = Matrix<f64>;
 	type Target = Matrix<f64>;
 
+	/// Compute the gradient of the neural network.
 	fn compute_grad(&self, params: &[f64], data: &Matrix<f64>, target: &Matrix<f64>) -> Vec<f64> {
 		self.compute_grad(params, data, target)
 	}
@@ -217,10 +220,13 @@ impl<'a> Optimizable for NeuralNet<'a> {
 }
 
 impl<'a> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a> {
+
+	/// Predict neural network output using forward propagation.
     fn predict(&self, data: &Matrix<f64>) -> Matrix<f64> {
         self.forward_prop(data)
     }
 
+    /// Train the model using gradient optimization and back propagation.
     fn train(&mut self, data: &Matrix<f64>, values: &Matrix<f64>) {
     	let start = self.weights.clone();
         let optimal_w = self.gd.optimize(self, &start[..], data, values);
