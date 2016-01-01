@@ -287,3 +287,12 @@ fn matrix_solve() {
     assert_eq!(x[0], 1.);
     assert_eq!(x[1], 2.);
 }
+
+#[test]
+fn cholesky() {
+    let a = Matrix::new(3,3, vec![25.,15.,-5.,15.,18.,0.,-5.,0.,11.]);
+
+    let l = a.cholesky();
+
+    assert_eq!(l.data, vec![5.,0.,0.,3.,3.,0.,-1.,1.,3.]);
+}
