@@ -29,7 +29,26 @@ This project is implemented using [Rust](https://www.rust-lang.org/).
 
 ## Motivation
 
-This key motivation behind this project was for me to learn some systems programming and a new language! I wanted to try implementing a linear algebra library within a systems programming language and then extend this to explore some machine learning algorithms
+This key motivation behind this project was for me to learn some systems programming and a new language! I wanted to try implementing a linear algebra library within a systems programming language and then extend this to explore some machine learning algorithms.
+
+---
+
+## Current Progress
+
+There is now a first pass at the linear algebra library and some basic machine learning algorithms in place.
+
+### Matrices
+
+- Generic data matrices
+- Concatenation
+- Data manipulation (row and column selection/repetition etc.)
+- Arithmetic
+
+### Machine Learning
+
+- Linear Regression
+- K-Means Clustering
+- Neural Networks
 
 ---
 
