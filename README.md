@@ -35,7 +35,7 @@ This key motivation behind this project was for me to learn some systems program
 
 ## Usage
 
-The usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state (0.0.7 as of writing) and intended usage.
+The usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state (0.0.9 as of writing) and intended usage.
 
 The library consists of two core components. The linear algebra module and the learning module.
 
@@ -59,7 +59,7 @@ More detailed coverage can be found in the [API documentation](https://AtheMathm
 
 #### Learning
 
-The learning module contains machine learning models. Currently this only includes a simple Linear Regression model. 
+The learning module contains machine learning models. Currently this only includes a simple Linear Regression model, k-means clustering and feed forward neural networks.
 
 ---
 
