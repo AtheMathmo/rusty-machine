@@ -910,6 +910,11 @@ impl<T: Copy + Zero + Float> Matrix<T> {
     ///
     /// let l = m.cholesky();
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// - Matrix is not square.
+    /// - Matrix is not positive definite. (This should probably be a Failure not a Panic).
     pub fn cholesky(&self) -> Matrix<T> {
         assert!(self.rows() == self.cols(), "Matrix is not square.");
 
@@ -934,6 +939,8 @@ impl<T: Copy + Zero + Float> Matrix<T> {
                 }
                 else {
                     let p = new_data[j * self.cols + j];
+
+                    assert!(p != T::zero(), "Matrix is not positive definite.");
                     new_data.push((self[[i, j]] - sum) / p);
                 }
             }
