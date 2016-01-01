@@ -57,7 +57,7 @@ impl<'a> NeuralNet<'a> {
         NeuralNet {
             layer_sizes: layer_sizes,
             weights: NeuralNet::create_weights(layer_sizes),
-            gd: GradientDesc::new(),
+            gd: GradientDesc::default(),
         }
     }
 
@@ -84,7 +84,7 @@ impl<'a> NeuralNet<'a> {
     /// Initializes the weights for a single layer in the network.
     fn initialize_weights(rows: usize, cols: usize) -> Vec<f64> {
         let mut weights = Vec::with_capacity(rows * cols);
-        let eps_init = (6f64).sqrt() / ((rows + cols) as f64).sqrt();
+        let eps_init = (6f64 / (rows + cols) as f64).sqrt();
 
         let mut rng = thread_rng();
 
