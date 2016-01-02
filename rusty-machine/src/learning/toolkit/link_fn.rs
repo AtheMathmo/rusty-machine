@@ -1,3 +1,13 @@
+//! Link Functions.
+//!
+//! This module contains a number of structs implementing the LinkFunc trait.
+//!
+//! These structs are used within Neural Networks and
+//! Generalized Linear Regression (not yet implemented). 
+//! 
+//! You can also create your own custom Link Functions for use in your models.
+//! Just create a unit struct implementing the LinkFunc trait.
+
 /// Trait for link functions in models.
 pub trait LinkFunc {
     fn func(x: f64) -> f64;
