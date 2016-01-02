@@ -37,7 +37,7 @@ use rand::{Rng, thread_rng};
 /// Neural Network struct
 pub struct NeuralNet<'a, L: LinkFunc> {
     layer_sizes: &'a [usize],
-    pub weights: Vec<f64>,
+    weights: Vec<f64>,
     gd: GradientDesc,
     _link: PhantomData<L>,
 }
