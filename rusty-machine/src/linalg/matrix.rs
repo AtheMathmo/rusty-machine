@@ -36,7 +36,7 @@ impl<T> Matrix<T> {
     /// ```
     pub fn new(rows: usize, cols: usize, data: Vec<T>) -> Matrix<T> {
 
-        assert_eq!(cols * rows, data.len());
+        assert!(cols * rows == data.len(), "Data does not match given dimensions.");
         Matrix {
             cols: cols,
             rows: rows,
@@ -67,7 +67,6 @@ impl<T: Clone> Clone for Matrix<T> {
 }
 
 impl<T: Copy> Matrix<T> {
-
     /// Select rows from matrix
     ///
     /// # Examples
@@ -161,7 +160,7 @@ impl<T: Copy> Matrix<T> {
     /// assert_eq!(c[[1, 2]], 5.0);
     /// ```
     pub fn hcat(&self, m: &Matrix<T>) -> Matrix<T> {
-        assert_eq!(self.rows, m.rows);
+        assert!(self.rows == m.rows, "Matrix row counts are not equal.");
 
         let mut new_data = Vec::with_capacity((self.cols + m.cols) * self.rows);
 
@@ -199,7 +198,7 @@ impl<T: Copy> Matrix<T> {
     /// assert_eq!(c[[2, 2]], 6.0);
     /// ```
     pub fn vcat(&self, m: &Matrix<T>) -> Matrix<T> {
-        assert_eq!(self.cols, m.cols);
+        assert!(self.cols==m.cols, "Matrix column counts are not equal.");
 
         let mut new_data = Vec::with_capacity((self.rows + m.rows) * self.cols);
 
@@ -250,7 +249,7 @@ impl<T: Copy> Matrix<T> {
         let mut diagonal = Vec::with_capacity(mat_min);
         unsafe {
             for i in 0..mat_min {
-                diagonal.push(*self.data.get_unchecked(i*self.cols + i));
+                diagonal.push(*self.data.get_unchecked(i * self.cols + i));
             }
         }
         Vector::new(diagonal)
@@ -505,8 +504,8 @@ impl<T: Copy + Zero + Mul<T, Output = T>> Matrix<T> {
     /// assert_eq!(c.data, vec![1.0, 4.0, 9.0, 16.0]);
     /// ```
     pub fn elemul(&self, m: &Matrix<T>) -> Matrix<T> {
-        assert_eq!(self.rows, m.rows);
-        assert_eq!(self.cols, m.cols);
+        assert!(self.rows==m.rows, "Matrix row counts not equal.");
+        assert!(self.cols==m.cols, "Matrix column counts not equal.");
 
         Matrix::new(self.rows, self.cols, utils::ele_mul(&self.data, &m.data))
     }
@@ -527,8 +526,8 @@ impl<T: Copy + Zero + Div<T, Output = T>> Matrix<T> {
     /// assert_eq!(c.data, vec![1.0; 4]);
     /// ```
     pub fn elediv(&self, m: &Matrix<T>) -> Matrix<T> {
-        assert_eq!(self.rows, m.rows);
-        assert_eq!(self.cols, m.cols);
+        assert!(self.rows==m.rows, "Matrix row counts not equal.");
+        assert!(self.cols==m.cols, "Matrix column counts not equal.");
 
         Matrix::new(self.rows, self.cols, utils::ele_div(&self.data, &m.data))
     }
@@ -639,7 +638,7 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
 
     /// Solves an upper triangular linear system.
     fn solve_u_triangular(&self, y: Vector<T>) -> Vector<T> {
-        assert!(self.cols == y.size());
+        assert!(self.cols == y.size(), "Matrix and Vector dimensions do not agree.");
 
         let mut x = vec![T::zero(); y.size()];
 
@@ -658,7 +657,7 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
 
     /// Solves a lower triangular linear system.
     fn solve_l_triangular(&self, y: Vector<T>) -> Vector<T> {
-        assert!(self.cols == y.size());
+        assert!(self.cols == y.size(), "Matrix and Vector dimensions do not agree.");
 
         let mut x = vec![T::zero(); y.size()];
 
@@ -714,7 +713,7 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
     /// assert_eq!(I.data, vec![1.0,0.0,0.0,1.0]);
     /// ```
     pub fn inverse(&self) -> Matrix<T> {
-        assert_eq!(self.rows, self.cols);
+        assert!(self.rows==self.cols, "Matrix is not square.");
 
         let mut new_t_data = Vec::<T>::new();
         let (l,u,p) = self.lup_decomp();
@@ -759,7 +758,7 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
     ///
     /// ```
     pub fn det(&self) -> T {
-        assert_eq!(self.rows, self.cols);
+        assert!(self.rows==self.cols, "Matrix is not square.");
 
         let n = self.cols;
 
@@ -842,7 +841,7 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
     ///
     /// ```
     pub fn lup_decomp(&self) -> (Matrix<T>, Matrix<T>, Matrix<T>) {
-        assert!(self.rows == self.cols);
+        assert!(self.rows == self.cols, "Matrix is not square.");
 
         let n = self.cols;
 
@@ -892,6 +891,66 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
         }
 
         (l,u,p)
+    }
+
+}
+
+impl<T: Copy + Zero + Float> Matrix<T> {
+
+    /// Cholesky decomposition
+    ///
+    /// Returns the cholesky decomposition of a positive definite matrix.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let m = Matrix::new(3,3, vec![1.0,0.5,0.5,0.5,1.0,0.5,0.5,0.5,1.0]);
+    ///
+    /// let l = m.cholesky();
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// - Matrix is not square.
+    /// - Matrix is not positive definite. (This should probably be a Failure not a Panic).
+    pub fn cholesky(&self) -> Matrix<T> {
+        assert!(self.rows() == self.cols(), "Matrix is not square.");
+
+        let mut new_data = Vec::<T>::with_capacity(self.rows() * self.cols());
+
+        for i in 0..self.rows() {
+
+            for j in 0..self.cols() {
+
+                if j > i {
+                    new_data.push(T::zero());
+                    continue;
+                }
+                
+                let mut sum = T::zero();
+                for k in 0..j {
+                    sum = sum + (new_data[i * self.cols() + k] * new_data[j * self.cols() + k]);
+                }
+
+                if j == i {
+                    new_data.push((self[[i, i]] - sum).sqrt());
+                }
+                else {
+                    let p = new_data[j * self.cols + j];
+
+                    assert!(p != T::zero(), "Matrix is not positive definite.");
+                    new_data.push((self[[i, j]] - sum) / p);
+                }
+            }
+        }
+
+        Matrix {
+            rows: self.rows(),
+            cols: self.cols(),
+            data: new_data,
+        }
     }
 }
 
@@ -969,7 +1028,7 @@ impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
     type Output = Matrix<T>;
 
     fn mul(self, m: &Matrix<T>) -> Matrix<T> {
-        assert!(self.cols == m.rows);
+        assert!(self.cols == m.rows, "Matrix dimensions do not agree.");
 
         let mut new_data = Vec::with_capacity(self.rows * m.cols);
 
@@ -1028,7 +1087,7 @@ impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
     type Output = Vector<T>;
 
     fn mul(self, v: &Vector<T>) -> Vector<T> {
-        assert!(v.size() == self.cols);
+        assert!(v.size() == self.cols, "Matrix and Vector dimensions do not agree.");
 
         let mut new_data = vec![T::zero(); self.rows];
 
@@ -1114,8 +1173,8 @@ impl<'a, 'b, T: Copy + One + Zero + Add<T, Output = T>> Add<&'b Matrix<T>> for &
     type Output = Matrix<T>;
 
     fn add(self, m: &Matrix<T>) -> Matrix<T> {
-        assert!(self.cols == m.cols);
-        assert!(self.rows == m.rows);
+        assert!(self.cols == m.cols, "Column dimensions do not agree.");
+        assert!(self.rows == m.rows, "Row dimensions do not agree.");
 
         let new_data = utils::vec_sum(&self.data, &m.data);
 
@@ -1201,8 +1260,8 @@ impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'b Matrix<T>> for &
     type Output = Matrix<T>;
 
     fn sub(self, m: &Matrix<T>) -> Matrix<T> {
-        assert!(self.cols == m.cols);
-        assert!(self.rows == m.rows);
+        assert!(self.cols == m.cols, "Column dimensions do not agree.");
+        assert!(self.rows == m.rows, "Row dimensions do not agree.");
 
         let new_data = utils::vec_sub(&self.data, &m.data);
 
@@ -1265,8 +1324,8 @@ impl<T> Index<[usize; 2]> for Matrix<T> {
     type Output = T;
 
     fn index(&self, idx: [usize; 2]) -> &T {
-        assert!(idx[0] < self.rows);
-        assert!(idx[1] < self.cols);
+        assert!(idx[0] < self.rows, "Row index is greater than row dimension.");
+        assert!(idx[1] < self.cols, "Column index is greater than column dimension.");
         unsafe { &self.data.get_unchecked(idx[0] * self.cols + idx[1]) }
     }
 }

@@ -1,6 +1,6 @@
 # rusty-machine
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.0.8](https://crates.io/crates/rusty-machine/0.0.8).
+Here is the API documentation for the rust crate. Currently up to date for [version 0.0.9](https://crates.io/crates/rusty-machine/0.0.9).
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
@@ -29,13 +29,32 @@ This project is implemented using [Rust](https://www.rust-lang.org/).
 
 ## Motivation
 
-This key motivation behind this project was for me to learn some systems programming and a new language! I wanted to try implementing a linear algebra library within a systems programming language and then extend this to explore some machine learning algorithms
+This key motivation behind this project was for me to learn some systems programming and a new language! I wanted to try implementing a linear algebra library within a systems programming language and then extend this to explore some machine learning algorithms.
+
+---
+
+## Current Progress
+
+There is now a first pass at the linear algebra library and some basic machine learning algorithms in place.
+
+### Matrices
+
+- Generic data matrices
+- Concatenation
+- Data manipulation (row and column selection/repetition etc.)
+- Arithmetic
+
+### Machine Learning
+
+- Linear Regression
+- K-Means Clustering
+- Neural Networks
 
 ---
 
 ## Usage
 
-The usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state (0.0.7 as of writing) and intended usage.
+The usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state (0.0.9 as of writing) and intended usage.
 
 The library consists of two core components. The linear algebra module and the learning module.
 
@@ -59,7 +78,7 @@ More detailed coverage can be found in the [API documentation](https://AtheMathm
 
 #### Learning
 
-The learning module contains machine learning models. Currently this only includes a simple Linear Regression model. 
+The learning module contains machine learning models. Currently this only includes a simple Linear Regression model, k-means clustering and feed forward neural networks.
 
 ---
 
