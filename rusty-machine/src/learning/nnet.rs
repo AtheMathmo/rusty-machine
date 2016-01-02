@@ -15,7 +15,7 @@
 //! 									0.,0.,1.,0.,0.,1.]);
 //!
 //! let layers = &[3,5,11,7,3];
-//! let mut model = NeuralNet::new(layers);
+//! let mut model = NeuralNet::default(layers);
 //!
 //! model.train(&data, &outputs);
 //!
@@ -26,23 +26,27 @@
 
 use linalg::matrix::Matrix;
 use learning::SupModel;
+use learning::toolkit::link_fn;
+use learning::toolkit::link_fn::LinkFunc;
 use learning::optim::{Optimizable, OptimAlgorithm};
 use learning::optim::grad_desc::GradientDesc;
+
+use std::marker::PhantomData;
 use rand::{Rng, thread_rng};
 
 /// Neural Network struct
-pub struct NeuralNet<'a> {
+pub struct NeuralNet<'a, L: LinkFunc> {
     layer_sizes: &'a [usize],
     pub weights: Vec<f64>,
     gd: GradientDesc,
+    _link: PhantomData<L>,
 }
 
-impl<'a> NeuralNet<'a> {
-    /// Create a new neural network with the specified layer sizes.
+impl<'a> NeuralNet<'a, link_fn::Sigmoid> {
+
+    /// Creates a neural network with the specified layer sizes.
     ///
-    /// The layer sizes slice should include the input, hidden layers, and output layer sizes.
-    ///
-    /// Currently defaults to simple batch Gradient Descent for optimization.
+    /// Uses the default settings (gradient descent and sigmoid link function).
     ///
     /// # Examples
     ///
@@ -51,13 +55,41 @@ impl<'a> NeuralNet<'a> {
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.
     /// let layers = &[3; 4];
-    /// let mut a = NeuralNet::new(layers);
+    /// let mut a = NeuralNet::default(layers);
     /// ```
-    pub fn new(layer_sizes: &[usize]) -> NeuralNet {
+    pub fn default(layer_sizes: &[usize]) -> NeuralNet<link_fn::Sigmoid> {
         NeuralNet {
             layer_sizes: layer_sizes,
-            weights: NeuralNet::create_weights(layer_sizes),
+            weights: NeuralNet::<link_fn::Sigmoid>::create_weights(layer_sizes),
             gd: GradientDesc::default(),
+            _link: PhantomData,
+        }
+    }
+}
+impl<'a, L: LinkFunc> NeuralNet<'a, L> {
+    /// Create a new neural network with the specified layer sizes.
+    ///
+    /// The layer sizes slice should include the input, hidden layers, and output layer sizes.
+    /// The type of link function must be specified.
+    ///
+    /// Currently defaults to simple batch Gradient Descent for optimization.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::nnet::NeuralNet;
+    /// use rusty_machine::learning::toolkit::link_fn::Linear;
+    ///
+    /// // Create a neural net with 4 layers, 3 neurons in each.
+    /// let layers = &[3; 4];
+    /// let mut a = NeuralNet::<Linear>::new(layers);
+    /// ```
+    pub fn new(layer_sizes: &[usize]) -> NeuralNet<L> {
+        NeuralNet {
+            layer_sizes: layer_sizes,
+            weights: NeuralNet::<L>::create_weights(layer_sizes),
+            gd: GradientDesc::default(),
+            _link: PhantomData,
         }
     }
 
@@ -74,7 +106,7 @@ impl<'a> NeuralNet<'a> {
         let mut layers = Vec::with_capacity(capacity);
 
         for l in 0..total_layers - 1 {
-            layers.append(&mut NeuralNet::initialize_weights(layer_sizes[l] + 1,
+            layers.append(&mut NeuralNet::<L>::initialize_weights(layer_sizes[l] + 1,
                                                              layer_sizes[l + 1]));
         }
 
@@ -139,7 +171,7 @@ impl<'a> NeuralNet<'a> {
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.
     /// let layers = &[3; 4];
-    /// let mut a = NeuralNet::new(layers);
+    /// let mut a = NeuralNet::default(layers);
     ///
     /// let w = &a.get_net_weights(2);
     /// assert_eq!(w.rows(), 4);
@@ -167,7 +199,7 @@ impl<'a> NeuralNet<'a> {
             forward_weights.push(z.clone());
 
             for l in 1..self.layer_sizes.len() - 1 {
-                let mut a = z.clone().apply(&sigmoid);
+                let mut a = z.clone().apply(&L::func);
                 let ones = Matrix::ones(a.rows(), 1);
 
                 a = ones.hcat(&a);
@@ -176,7 +208,7 @@ impl<'a> NeuralNet<'a> {
                 forward_weights.push(z.clone());
             }
 
-            activations.push(z.apply(&sigmoid));
+            activations.push(z.apply(&L::func));
         }
 
         let mut deltas = Vec::with_capacity(self.layer_sizes.len() - 1);
@@ -190,7 +222,7 @@ impl<'a> NeuralNet<'a> {
                 let ones = Matrix::ones(z.rows(), 1);
                 z = ones.hcat(&z);
 
-                let g = z.apply(&sigmoid_grad);
+                let g = z.apply(&L::func_grad);
                 delta = (delta * self.get_layer_weights(weights, l).transpose()).elemul(&g);
 
                 let non_one_rows = &(1..delta.cols()).collect::<Vec<usize>>()[..];
@@ -224,20 +256,20 @@ impl<'a> NeuralNet<'a> {
         let net_data = Matrix::ones(data.rows(), 1).hcat(data);
 
         let mut z = net_data * self.get_net_weights(0);
-        let mut a = z.clone().apply(&sigmoid);
+        let mut a = z.clone().apply(&L::func);
 
         for l in 1..self.layer_sizes.len() - 1 {
             let ones = Matrix::ones(a.rows(), 1);
             a = ones.hcat(&a);
             z = a * self.get_net_weights(l);
-            a = z.clone().apply(&sigmoid);
+            a = z.clone().apply(&L::func);
         }
 
         a
     }
 }
 
-impl<'a> Optimizable for NeuralNet<'a> {
+impl<'a, L: LinkFunc> Optimizable for NeuralNet<'a, L> {
     type Data = Matrix<f64>;
 	type Target = Matrix<f64>;
 
@@ -247,7 +279,7 @@ impl<'a> Optimizable for NeuralNet<'a> {
     }
 }
 
-impl<'a> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a> {
+impl<'a, L: LinkFunc> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, L> {
     /// Predict neural network output using forward propagation.
     fn predict(&self, data: &Matrix<f64>) -> Matrix<f64> {
         self.forward_prop(data)
@@ -259,20 +291,4 @@ impl<'a> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a> {
         let optimal_w = self.gd.optimize(self, &start[..], data, values);
         self.weights = optimal_w;
     }
-}
-
-
-
-/// Sigmoid function.
-///
-/// Returns 1 / ( 1 + e^-t).
-fn sigmoid(t: f64) -> f64 {
-    1.0 / (1.0 + (-t).exp())
-}
-
-/// Gradient of sigmoid function.
-///
-/// Evaluates to (1 - e^-t) / (1 + e^-t)^2
-fn sigmoid_grad(t: f64) -> f64 {
-    sigmoid(t) * (1f64 - sigmoid(t))
 }

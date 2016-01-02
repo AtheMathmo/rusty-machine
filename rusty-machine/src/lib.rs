@@ -63,4 +63,8 @@ pub mod learning {
 
         pub mod grad_desc;
     }
+
+    pub mod toolkit {
+        pub mod link_fn;
+    }
 }
