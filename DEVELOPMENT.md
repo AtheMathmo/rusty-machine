@@ -6,8 +6,20 @@ This document will keep track of my development goals for this project.
 
 ## Current Progress
 
-I have completed a first pass at the linear algebra library. It is now 
-functional enough that I can start adding some ML! I've implemented a basic linear regression module.
+There is now a first pass at the linear algebra library and some basic machine learning algorithms in place.
+
+### Matrices
+
+- Generic data matrices
+- Concatenation
+- Data manipulation (row and column selection/repetition etc.)
+- Arithmetic
+
+### Machine Learning
+
+- Linear Regression
+- K-Means Clustering
+- Neural Networks
 
 I will need to update and optimize the linear algebra library but should be able to do this in tandem.
 
