@@ -59,3 +59,4 @@ I have chosen to push out a number of different algorithms before focused optimi
 - Start work on statistics components - R.V. sampling etc.
 - Data Handling.
 - Convolutional and Recurrent neural nets.
+- Regularization in existing models.
