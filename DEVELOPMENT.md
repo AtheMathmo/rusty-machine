@@ -58,3 +58,4 @@ I have chosen to push out a number of different algorithms before focused optimi
 - Tidy up indexing.
 - Start work on statistics components - R.V. sampling etc.
 - Data Handling.
+- Convolutional and Recurrent neural nets.
