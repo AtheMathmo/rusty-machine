@@ -40,7 +40,7 @@ This marks my intended release goals. I won't estimate the actual dates of relea
         <td>0.1.0</td><td><ul><li>Optimization (with basic data handling - unreleased).</li></ul></td><td></td>
     </tr>
     <tr>
-        <td>0.1.1.</td><td><ul><li>Cholesky Decomp</li></ul></td><td><ul><li>None</li></ul></td>
+        <td>0.1.1.</td><td><ul><li>Cholesky Decomp</li><li>Cost AND grad for optimization.</li></ul></td><td><ul><li>None</li></ul></td>
     </tr>
     <tr>
         <td>0.1.2</td><td><ul><li>Gaussian Processes</li></ul></td><td><ul><li>Cholesky Decomp</li><li>Kernels</li></ul></td>
