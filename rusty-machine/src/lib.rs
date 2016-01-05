@@ -19,7 +19,8 @@ pub mod learning {
     pub mod lin_reg;
     pub mod k_means;
     pub mod nnet;
-
+    pub mod gp;
+    
     /// Trait for supervised model.
     pub trait SupModel<T,U> {
 
@@ -67,5 +68,6 @@ pub mod learning {
     /// Module for learning tools.
     pub mod toolkit {
         pub mod link_fn;
+        pub mod kernel;
     }
 }
