@@ -121,7 +121,6 @@ impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Matrix<f64>> for GaussianProc
         }
 
         panic!("The model has not been trained.");
-
     }
 
     /// Train the model using data and outputs.
@@ -136,4 +135,30 @@ impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Matrix<f64>> for GaussianProc
         self.train_data = Some(data.clone());
         self.train_output = Some(value.clone());
     }
+}
+
+impl<T: Kernel, U: MeanFunc> GaussianProcess<T,U> {
+
+	/// Compute the posterior distribution
+	///
+	/// Requires the model to be trained first. 
+	/// _Note that this is a messy compromise as GPs do not
+	/// fit the SupModel trait as is currently implemented._
+	pub fn get_posterior(&self, data: &Matrix<f64>) -> (Matrix<f64>, Matrix<f64>) {
+		let mean = self.mean.func(data.clone());
+
+        // Messy referencing for succint syntax
+        if let (&Some(ref t_data), &Some(ref t_mat), &Some(ref t_out)) = (&self.train_data,
+                                                                          &self.train_mat,
+                                                                          &self.train_output) {
+            let test_mat = self.ker_mat(data, t_data) * t_mat;            
+            let post_mean = mean + &test_mat * (t_out - self.mean.func(t_data.clone()));
+
+            let post_cov = self.ker_mat(data, data) - test_mat * self.ker_mat(t_data, data);
+
+            return (post_mean, post_cov);
+        }
+
+        panic!("The model has not been trained.");
+	}
 }
