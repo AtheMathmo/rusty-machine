@@ -2,11 +2,12 @@ use learning::toolkit::kernel::{Kernel, SquaredExp};
 use learning::SupModel;
 use linalg::matrix::Matrix;
 
-trait MeanFunc {
+pub trait MeanFunc {
     fn func(&self, x: Matrix<f64>) -> Matrix<f64>;
 }
 
-struct ConstMean {
+/// Constant mean function
+pub struct ConstMean {
     a: f64,
 }
 
@@ -22,8 +23,16 @@ impl MeanFunc for ConstMean {
     }
 }
 
-
-struct GaussianProcess<T: Kernel, U: MeanFunc> {
+/// Gaussian Process struct
+///
+/// Gaussian process with generic kernel and deterministic mean function.
+/// Can be used for gaussian process regression with noise.
+/// Currently does not support classification.
+///
+/// # Note
+///
+/// The 
+pub struct GaussianProcess<T: Kernel, U: MeanFunc> {
     ker: T,
     mean: U,
     noise: f64,
@@ -33,6 +42,15 @@ struct GaussianProcess<T: Kernel, U: MeanFunc> {
 }
 
 impl Default for GaussianProcess<SquaredExp, ConstMean> {
+    /// Construct a default Gaussian Process
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::gp;
+    /// 
+    /// let gp = gp::GaussianProcess::default();
+    /// ```
     fn default() -> GaussianProcess<SquaredExp, ConstMean> {
         GaussianProcess {
             ker: SquaredExp::default(),
@@ -46,6 +64,30 @@ impl Default for GaussianProcess<SquaredExp, ConstMean> {
 }
 
 impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
+    /// Construct a new Gaussian Process.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::gp;
+    /// use rusty_machine::learning::toolkit::kernel;
+    ///
+    /// let ker = kernel::SquaredExp::default();
+    /// let mean = gp::ConstMean::default();
+    /// let gaussp = gp::GaussianProcess::new(ker, mean, 1e-3f64);
+    /// ```
+    pub fn new(ker: T, mean: U, noise: f64) -> GaussianProcess<T, U> {
+        GaussianProcess {
+            ker: ker,
+            mean: mean,
+            noise: noise,
+            train_data: None,
+            train_output: None,
+            train_mat: None,
+        }
+    }
+
+    /// Construct a kernel matrix
     fn ker_mat(&self, m1: &Matrix<f64>, m2: &Matrix<f64>) -> Matrix<f64> {
         assert_eq!(m1.cols(), m2.cols());
         let dim1 = m1.rows();
@@ -70,14 +112,16 @@ impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Matrix<f64>> for GaussianProc
         let mean = self.mean.func(data.clone());
 
         // Messy referencing for succint syntax
-        if let (&Some(ref t_data), &Some(ref t_mat), &Some(ref t_out)) = (&self.train_data, &self.train_mat, &self.train_output) {
-        	let test_mat = self.ker_mat(data, t_data) * t_mat *
-                       (t_out - self.mean.func(t_data.clone()));
-        	return mean + test_mat;
+        if let (&Some(ref t_data), &Some(ref t_mat), &Some(ref t_out)) = (&self.train_data,
+                                                                          &self.train_mat,
+                                                                          &self.train_output) {
+            let test_mat = self.ker_mat(data, t_data) * t_mat *
+                           (t_out - self.mean.func(t_data.clone()));
+            return mean + test_mat;
         }
 
         panic!("The model has not been trained.");
-        
+
     }
 
     /// Train the model using data and outputs.
