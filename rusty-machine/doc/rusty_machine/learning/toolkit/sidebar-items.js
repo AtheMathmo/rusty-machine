@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["link_fn","Link Functions."]]});
+initSidebarItems({"mod":[["kernel","Module for kernels"],["link_fn","Link Functions."]]});

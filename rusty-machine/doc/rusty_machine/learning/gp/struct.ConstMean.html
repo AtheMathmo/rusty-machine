@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="API documentation for the Rust `lin_reg` mod in crate `rusty_machine`.">
-    <meta name="keywords" content="rust, rustlang, rust-lang, lin_reg">
+    <meta name="description" content="API documentation for the Rust `ConstMean` struct in crate `rusty_machine`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, ConstMean">
 
-    <title>rusty_machine::learning::lin_reg - Rust</title>
+    <title>rusty_machine::learning::gp::ConstMean - Rust</title>
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
@@ -27,7 +27,7 @@
 
     <nav class="sidebar">
         
-        <p class='location'><a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>learning</a></p><script>window.sidebarCurrent = {name: 'lin_reg', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+        <p class='location'><a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>learning</a>::<wbr><a href='index.html'>gp</a></p><script>window.sidebarCurrent = {name: 'ConstMean', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
     <nav class="sub">
@@ -41,30 +41,18 @@
         </form>
     </nav>
 
-    <section id='main' class="content mod">
-<h1 class='fqn'><span class='in-band'>Module <a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>learning</a>::<wbr><a class='mod' href=''>lin_reg</a></span><span class='out-of-band'><span id='render-detail'>
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>learning</a>::<wbr><a href='index.html'>gp</a>::<wbr><a class='struct' href=''>ConstMean</a></span><span class='out-of-band'><span id='render-detail'>
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1018' class='srclink' href='../../../src/rusty_machine/learning/lin_reg.rs.html#1-69' title='goto source code'>[src]</a></span></h1>
-<div class='docblock'><p>Linear Regression module</p>
-
-<p>Contains implementation of linear regression models.
-Allows training and prediction of linear regression model
-using least squares optimization.</p>
-
-<p>Currently only OLS solution - gradient descent not yet implemented.</p>
-</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
-<table>
-                    <tr class=' module-item'>
-                        <td><a class='struct' href='struct.LinRegressor.html'
-                               title='rusty_machine::learning::lin_reg::LinRegressor'>LinRegressor</a></td>
-                        <td class='docblock short'>
-                             <p>Linear Regression Model.</p>
-
-                        </td>
-                    </tr>
-                </table></section>
+        </span><a id='src-1318' class='srclink' href='../../../src/rusty_machine/learning/gp.rs.html#38-40' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct ConstMean {
+    // some fields omitted
+}</pre><div class='docblock'><p>Constant mean function</p>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../../../rusty_machine/learning/gp/struct.ConstMean.html' title='rusty_machine::learning::gp::ConstMean'>ConstMean</a></code></h3><div class='impl-items'><h4 id='method.default' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#method.default' class='fnname'>default</a>() -&gt; <a class='struct' href='../../../rusty_machine/learning/gp/struct.ConstMean.html' title='rusty_machine::learning::gp::ConstMean'>ConstMean</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='../../../rusty_machine/learning/gp/trait.MeanFunc.html' title='rusty_machine::learning::gp::MeanFunc'>MeanFunc</a> for <a class='struct' href='../../../rusty_machine/learning/gp/struct.ConstMean.html' title='rusty_machine::learning::gp::ConstMean'>ConstMean</a></code></h3><div class='impl-items'><h4 id='method.func' class='method'><code>fn <a href='../../../rusty_machine/learning/gp/trait.MeanFunc.html#method.func' class='fnname'>func</a>(&amp;self, x: <a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;) -&gt; <a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;</code></h4>
+</div></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

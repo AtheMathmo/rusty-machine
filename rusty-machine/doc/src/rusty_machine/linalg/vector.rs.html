@@ -606,6 +606,34 @@
 <span id="563">563</span>
 <span id="564">564</span>
 <span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The vector module.</span>
 <span class='doccomment'>//!</span>
@@ -659,6 +687,34 @@
     <span class='doccomment'>/// Clones the Vector.</span>
     <span class='kw'>fn</span> <span class='ident'>clone</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='ident'>Vector</span>{ <span class='ident'>size</span>: <span class='self'>self</span>.<span class='ident'>size</span>, <span class='ident'>data</span>: <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>clone</span>() }
+    }
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span><span class='op'>&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+
+    <span class='doccomment'>/// Applies a function to each element in the vector.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::vector::Vector;</span>
+    <span class='doccomment'>/// fn add_two(a: f64) -&gt; f64 {</span>
+    <span class='doccomment'>///     a + 2f64</span>
+    <span class='doccomment'>/// }</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let a = Vector::new(vec![0.;4]);</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let b = a.apply(&amp;add_two);</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// assert_eq!(b.data, vec![2.0; 4]);</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>apply</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='ident'>Fn</span>(<span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>into_iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='ident'>f</span>(<span class='ident'>v</span>)).<span class='ident'>collect</span>();
+
+        <span class='ident'>Vector</span> {
+            <span class='ident'>size</span>: <span class='self'>self</span>.<span class='ident'>size</span>,
+            <span class='ident'>data</span>: <span class='ident'>new_data</span>,
+        }
     }
 
 }

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SquaredExp","Squared exponential kernel"]],"trait":[["Kernel","The Kernel trait"]]});

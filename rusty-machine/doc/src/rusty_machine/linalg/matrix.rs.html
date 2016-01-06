@@ -1397,6 +1397,11 @@
 <span id="1354">1354</span>
 <span id="1355">1355</span>
 <span id="1356">1356</span>
+<span id="1357">1357</span>
+<span id="1358">1358</span>
+<span id="1359">1359</span>
+<span id="1360">1360</span>
+<span id="1361">1361</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The matrix module.</span>
 <span class='doccomment'>//!</span>
@@ -2285,7 +2290,12 @@
                     <span class='ident'>s2</span> <span class='op'>=</span> <span class='ident'>s2</span> <span class='op'>+</span> <span class='ident'>l</span>.<span class='ident'>data</span>[<span class='ident'>j</span><span class='op'>*</span><span class='ident'>n</span> <span class='op'>+</span> <span class='ident'>k</span>] <span class='op'>*</span> <span class='ident'>u</span>.<span class='ident'>data</span>[<span class='ident'>k</span><span class='op'>*</span><span class='ident'>n</span> <span class='op'>+</span> <span class='ident'>i</span>];
                 }
 
-                <span class='ident'>l</span>.<span class='ident'>data</span>[<span class='ident'>j</span><span class='op'>*</span><span class='ident'>n</span> <span class='op'>+</span> <span class='ident'>i</span>] <span class='op'>=</span> (<span class='ident'>a_2</span>[[<span class='ident'>j</span>,<span class='ident'>i</span>]] <span class='op'>-</span> <span class='ident'>s2</span>) <span class='op'>/</span> <span class='ident'>u</span>[[<span class='ident'>i</span>,<span class='ident'>i</span>]];
+                <span class='kw'>let</span> <span class='ident'>denom</span> <span class='op'>=</span> <span class='ident'>u</span>[[<span class='ident'>i</span>,<span class='ident'>i</span>]];
+
+                <span class='kw'>if</span> <span class='ident'>denom</span> <span class='op'>==</span> <span class='ident'>T</span>::<span class='ident'>zero</span>() {
+                    <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Arithmetic error. Matrix could not be decomposed.&quot;</span>)
+                }
+                <span class='ident'>l</span>.<span class='ident'>data</span>[<span class='ident'>j</span><span class='op'>*</span><span class='ident'>n</span> <span class='op'>+</span> <span class='ident'>i</span>] <span class='op'>=</span> (<span class='ident'>a_2</span>[[<span class='ident'>j</span>,<span class='ident'>i</span>]] <span class='op'>-</span> <span class='ident'>s2</span>) <span class='op'>/</span> <span class='ident'>denom</span>;
             }
 
         }

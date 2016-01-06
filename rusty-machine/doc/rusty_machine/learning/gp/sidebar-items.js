@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ConstMean","Constant mean function"],["GaussianProcess","Gaussian Process struct"]],"trait":[["MeanFunc","Trait for GP mean functions."]]});
