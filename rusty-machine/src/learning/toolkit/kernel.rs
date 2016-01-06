@@ -8,6 +8,9 @@ use linalg::vector::Vector;
 ///
 /// Requires a function mapping two vectors to a scalar.
 pub trait Kernel {
+    /// The kernel function.
+    ///
+    /// Takes two equal length slices and returns a scalar.
     fn kernel(&self, x1: &[f64], x2: &[f64]) -> f64;
 }
 

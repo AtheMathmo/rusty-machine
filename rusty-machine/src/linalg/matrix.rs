@@ -16,6 +16,8 @@ use linalg::utils;
 pub struct Matrix<T> {
     rows: usize,
     cols: usize,
+    /// The underlying matrix data.
+    /// NOTE: This should not be changed after instantiation.
     pub data: Vec<T>,
 }
 

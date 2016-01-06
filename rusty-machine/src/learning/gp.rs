@@ -31,6 +31,7 @@ use linalg::matrix::Matrix;
 
 /// Trait for GP mean functions.
 pub trait MeanFunc {
+    /// Compute the mean function applied elementwise to a matrix.
     fn func(&self, x: Matrix<f64>) -> Matrix<f64>;
 }
 
@@ -68,6 +69,7 @@ impl MeanFunc for ConstMean {
 pub struct GaussianProcess<T: Kernel, U: MeanFunc> {
     ker: T,
     mean: U,
+    /// The observation noise of the GP.
     pub noise: f64,
     train_data: Option<Matrix<f64>>,
     train_output: Option<Matrix<f64>>,

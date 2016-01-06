@@ -49,8 +49,11 @@ use rand::{Rng, thread_rng};
 
 /// Initialization Algorithm enum.
 pub enum InitAlgorithm {
+    /// The Forgy initialization scheme.
     Forgy,
+    /// The Random Partition initialization scheme.
     RandomPartition,
+    /// The K-means ++ initialization scheme.
     KPlusPlus,
 }
 
@@ -59,9 +62,13 @@ pub enum InitAlgorithm {
 /// Contains option for centroids.
 /// Specifies iterations and number of classes.
 pub struct KMeansClassifier {
+    /// Max iterations of algorithm to run.
     pub iters: usize,
+    /// The number of classes.
     pub k: usize,
+    /// The fitted centroids .
     pub centroids: Option<Matrix<f64>>,
+    /// The initial algorithm to use.
     pub init_algorithm: InitAlgorithm,
 }
 

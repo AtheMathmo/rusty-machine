@@ -18,7 +18,12 @@ This project was originally intended to be an implementation of Online Collabora
 
 So this project is now going to be a machine learning crate for Rust. I began this project as a fun way to learn Rust and so there will be lots of things that need improving (I'm still not very familiar with LLVM). I hope that this crate will provide a number of standard out-the-box machine learning algorithms.
 
+#### Contributing
+
+I don't have a dedicated page for contributions right now as the project is still very small. Please feel free to fork, file issues, PRs and all that jazz.
+
 #### Help!
+
 I've probably introduced some bad practices as I've been learning Rust. If you have any suggestions for structure or optimization please let me know.
 
 ---
@@ -49,12 +54,13 @@ There is now a first pass at the linear algebra library and some basic machine l
 - Linear Regression
 - K-Means Clustering
 - Neural Networks
+- Gaussian Process Regression
 
 ---
 
 ## Usage
 
-The library usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state (0.0.9 as of writing) and intended usage.
+The library usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state (0.1.1 as of writing) and intended usage.
 
 ### Installation
 
@@ -70,8 +76,6 @@ And then import the library using:
 ```
 extern crate rusty_machine as rm;
 ```
-
-The library usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state (0.1.1 as of writing) and intended usage.
 
 The library consists of two core components. The linear algebra module and the learning module.
 
