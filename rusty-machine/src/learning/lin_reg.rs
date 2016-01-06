@@ -14,6 +14,7 @@ use linalg::vector::Vector;
 ///
 /// Contains option for optimized parameter.
 pub struct LinRegressor {
+    /// The mle for the beta parameters.
     pub b: Option<Vector<f64>>,
 }
 

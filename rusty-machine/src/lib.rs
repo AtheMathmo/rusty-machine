@@ -1,10 +1,19 @@
+//! The rusty-machine crate.
+//!
+//! Crate built for machine learning with some linear algebra thrown in.
+
 extern crate num as libnum;
 extern crate rand;
 
 /// Module for linear algebra.
 pub mod linalg {
 
+    /// Trait for linear algebra metrics.
+    ///
+    /// Currently only implements basic euclidean norm.
     pub trait Metric<T> {
+
+        /// Computes the euclidean norm.
         fn norm(&self) -> T;
 	}
 
@@ -46,7 +55,9 @@ pub mod learning {
 
         /// Trait for models which can be gradient-optimized.
         pub trait Optimizable {
+            /// The input data type to the model.
             type Data;
+            /// The target data type to the model.
             type Target;
 
             /// Compute the gradient for the model.

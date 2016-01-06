@@ -10,10 +10,13 @@
 
 /// Trait for link functions in models.
 pub trait LinkFunc {
+    /// The link function.
     fn func(x: f64) -> f64;
 
+    /// The gradient of the link function.
     fn func_grad(x: f64) -> f64;
 
+    /// The inverse of the link function.
     fn func_inv(x: f64) -> f64;
 }
 

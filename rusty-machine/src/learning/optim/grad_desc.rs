@@ -11,8 +11,11 @@
 use learning::optim::{Optimizable, OptimAlgorithm};
 use linalg::vector::Vector;
 
+/// Batch Gradient Descent algorithm
 pub struct GradientDesc {
+	/// The step-size for the gradient descent steps.
 	pub alpha: f64,
+	/// The number of iterations to run.
 	pub iters: usize
 }
 

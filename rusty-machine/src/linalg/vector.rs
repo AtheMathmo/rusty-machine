@@ -14,6 +14,8 @@ use linalg::utils;
 /// Can be instantiated with any type.
 pub struct Vector<T> {
     size: usize,
+    /// The underlying vector data.
+    /// NOTE: This should not be changed after instantiation.
     pub data: Vec<T>,
 }
 
