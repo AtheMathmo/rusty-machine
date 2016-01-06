@@ -28,7 +28,7 @@ impl SquaredExp {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::learning::toolkit::SquaredExp;
+    /// use rusty_machine::learning::toolkit::kernel::SquaredExp;
     ///
     /// let ker = SquaredExp::new(2f64, 1f64);
     /// ```
@@ -51,7 +51,7 @@ impl Default for SquaredExp {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::learning::toolkit::SquaredExp;
+    /// use rusty_machine::learning::toolkit::kernel::SquaredExp;
     ///
     /// let ker = SquaredExp::default();
     /// ```

@@ -1,7 +1,35 @@
+//! Gaussian Processes
+//!
+//! Provides implementation of gaussian process regression.
+//!
+//! # Usage
+//! 
+//! ```
+//! use rusty_machine::learning::gp;
+//! use rusty_machine::learning::SupModel;
+//! use rusty_machine::linalg::matrix::Matrix;
+//!
+//! let mut gaussp = gp::GaussianProcess::default();
+//! gaussp.noise = 10f64;
+//!
+//! let train_data = Matrix::new(10,1,vec![0.,1.,2.,3.,4.,5.,6.,7.,8.,9.]);
+//! let target = Matrix::new(10,1,vec![0.,1.,2.,3.,4.,4.,3.,2.,1.,0.]);
+//!
+//! gaussp.train(&train_data, &target);
+//!
+//! let test_data = Matrix::new(5,1,vec![2.3,4.4,5.1,6.2,7.1]);
+//!
+//! let output = gaussp.predict(&test_data);
+//! ```
+//! Alternatively one could use gaussp.get_posterior() which would return both
+//! the predictive mean and covariance. However, this is likely to change in
+//! a future release. 
+
 use learning::toolkit::kernel::{Kernel, SquaredExp};
 use learning::SupModel;
 use linalg::matrix::Matrix;
 
+/// Trait for GP mean functions.
 pub trait MeanFunc {
     fn func(&self, x: Matrix<f64>) -> Matrix<f64>;
 }
@@ -12,6 +40,15 @@ pub struct ConstMean {
 }
 
 impl Default for ConstMean {
+
+    /// Constructs the zero function.
+    ///
+    /// # Examples
+    /// ```
+    /// use rusty_machine::learning::gp::ConstMean;
+    ///
+    /// let zero_m = ConstMean::default();
+    /// ```
     fn default() -> ConstMean {
         ConstMean { a: 0f64 }
     }
@@ -134,7 +171,7 @@ impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Matrix<f64>> for GaussianProc
 }
 
 impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
-    /// Compute the posterior distribution
+    /// Compute the posterior distribution [UNSTABLE]
     ///
     /// Requires the model to be trained first. 
     /// _Note that this is a messy compromise as GPs do not
