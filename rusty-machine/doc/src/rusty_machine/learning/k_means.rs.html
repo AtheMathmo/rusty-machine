@@ -333,6 +333,13 @@
 <span id="290">290</span>
 <span id="291">291</span>
 <span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! K-means Classification</span>
 <span class='doccomment'>//!</span>
@@ -385,8 +392,11 @@
 
 <span class='doccomment'>/// Initialization Algorithm enum.</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>InitAlgorithm</span> {
+    <span class='doccomment'>/// The Forgy initialization scheme.</span>
     <span class='ident'>Forgy</span>,
+    <span class='doccomment'>/// The Random Partition initialization scheme.</span>
     <span class='ident'>RandomPartition</span>,
+    <span class='doccomment'>/// The K-means ++ initialization scheme.</span>
     <span class='ident'>KPlusPlus</span>,
 }
 
@@ -395,9 +405,13 @@
 <span class='doccomment'>/// Contains option for centroids.</span>
 <span class='doccomment'>/// Specifies iterations and number of classes.</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>KMeansClassifier</span> {
+    <span class='doccomment'>/// Max iterations of algorithm to run.</span>
     <span class='kw'>pub</span> <span class='ident'>iters</span>: <span class='ident'>usize</span>,
+    <span class='doccomment'>/// The number of classes.</span>
     <span class='kw'>pub</span> <span class='ident'>k</span>: <span class='ident'>usize</span>,
+    <span class='doccomment'>/// The fitted centroids .</span>
     <span class='kw'>pub</span> <span class='ident'>centroids</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span>,
+    <span class='doccomment'>/// The initial algorithm to use.</span>
     <span class='kw'>pub</span> <span class='ident'>init_algorithm</span>: <span class='ident'>InitAlgorithm</span>,
 }
 

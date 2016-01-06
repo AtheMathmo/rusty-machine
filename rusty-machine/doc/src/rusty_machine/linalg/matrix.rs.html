@@ -1402,6 +1402,8 @@
 <span id="1359">1359</span>
 <span id="1360">1360</span>
 <span id="1361">1361</span>
+<span id="1362">1362</span>
+<span id="1363">1363</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The matrix module.</span>
 <span class='doccomment'>//!</span>
@@ -1421,6 +1423,8 @@
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='ident'>rows</span>: <span class='ident'>usize</span>,
     <span class='ident'>cols</span>: <span class='ident'>usize</span>,
+    <span class='doccomment'>/// The underlying matrix data.</span>
+    <span class='doccomment'>/// NOTE: This should not be changed after instantiation.</span>
     <span class='kw'>pub</span> <span class='ident'>data</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>,
 }
 

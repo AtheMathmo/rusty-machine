@@ -114,14 +114,34 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
 </pre><pre class='rust '>
+<span class='doccomment'>//! The rusty-machine crate.</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! Crate built for machine learning with some linear algebra thrown in.</span>
+
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>num</span> <span class='kw'>as</span> <span class='ident'>libnum</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rand</span>;
 
 <span class='doccomment'>/// Module for linear algebra.</span>
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>linalg</span> {
 
+    <span class='doccomment'>/// Trait for linear algebra metrics.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Currently only implements basic euclidean norm.</span>
     <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Metric</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+
+        <span class='doccomment'>/// Computes the euclidean norm.</span>
         <span class='kw'>fn</span> <span class='ident'>norm</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span>;
 	}
 
@@ -163,7 +183,9 @@
 
         <span class='doccomment'>/// Trait for models which can be gradient-optimized.</span>
         <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Optimizable</span> {
+            <span class='doccomment'>/// The input data type to the model.</span>
             <span class='kw'>type</span> <span class='ident'>Data</span>;
+            <span class='doccomment'>/// The target data type to the model.</span>
             <span class='kw'>type</span> <span class='ident'>Target</span>;
 
             <span class='doccomment'>/// Compute the gradient for the model.</span>

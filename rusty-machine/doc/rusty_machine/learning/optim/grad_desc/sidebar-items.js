@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["GradientDesc",""]]});
+initSidebarItems({"struct":[["GradientDesc","Batch Gradient Descent algorithm"]]});

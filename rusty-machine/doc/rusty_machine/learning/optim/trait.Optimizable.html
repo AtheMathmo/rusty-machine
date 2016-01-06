@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1417' class='srclink' href='../../../src/rusty_machine/lib.rs.html#48-54' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-1417' class='srclink' href='../../../src/rusty_machine/lib.rs.html#57-65' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Optimizable {
     type Data;
     type Target;
@@ -55,7 +55,9 @@
 </div>
             <h2 id='associated-types'>Associated Types</h2>
             <div class='methods'>
-        <h3 id='associatedtype.Data' class='method stab '><code>type Data</code></h3><h3 id='associatedtype.Target' class='method stab '><code>type Target</code></h3></div>
+        <h3 id='associatedtype.Data' class='method stab '><code>type Data</code></h3><div class='docblock'><p>The input data type to the model.</p>
+</div><h3 id='associatedtype.Target' class='method stab '><code>type Target</code></h3><div class='docblock'><p>The target data type to the model.</p>
+</div></div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
         <h3 id='tymethod.compute_grad' class='method stab '><code>fn <a href='#tymethod.compute_grad' class='fnname'>compute_grad</a>(&amp;self, params: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>, data: &amp;Self::<a class='trait' href='../../../rusty_machine/learning/optim/trait.Optimizable.html' title='rusty_machine::learning::optim::Optimizable'>Data</a>, target: &amp;Self::<a class='trait' href='../../../rusty_machine/learning/optim/trait.Optimizable.html' title='rusty_machine::learning::optim::Optimizable'>Target</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;</code></h3><div class='docblock'><p>Compute the gradient for the model.</p>

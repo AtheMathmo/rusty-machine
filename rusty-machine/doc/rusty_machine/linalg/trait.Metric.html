@@ -46,13 +46,17 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-8' class='srclink' href='../../src/rusty_machine/lib.rs.html#7-9' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-8' class='srclink' href='../../src/rusty_machine/lib.rs.html#14-18' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Metric&lt;T&gt; {
     fn <a href='#tymethod.norm' class='fnname'>norm</a>(&amp;self) -&gt; T;
-}</pre>
+}</pre><div class='docblock'><p>Trait for linear algebra metrics.</p>
+
+<p>Currently only implements basic euclidean norm.</p>
+</div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.norm' class='method stab '><code>fn <a href='#tymethod.norm' class='fnname'>norm</a>(&amp;self) -&gt; T</code></h3></div>
+        <h3 id='tymethod.norm' class='method stab '><code>fn <a href='#tymethod.norm' class='fnname'>norm</a>(&amp;self) -&gt; T</code></h3><div class='docblock'><p>Computes the euclidean norm.</p>
+</div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
     <li><code>impl&lt;T: <a class='trait' href='../../num/traits/trait.Float.html' title='num::traits::Float'>Float</a>&gt; <a class='trait' href='../../rusty_machine/linalg/trait.Metric.html' title='rusty_machine::linalg::Metric'>Metric</a>&lt;T&gt; for <a class='struct' href='../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;T&gt;</code></li>

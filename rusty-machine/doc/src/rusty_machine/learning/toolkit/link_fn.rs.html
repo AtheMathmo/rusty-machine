@@ -116,6 +116,9 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Link Functions.</span>
 <span class='doccomment'>//!</span>
@@ -129,10 +132,13 @@
 
 <span class='doccomment'>/// Trait for link functions in models.</span>
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>LinkFunc</span> {
+    <span class='doccomment'>/// The link function.</span>
     <span class='kw'>fn</span> <span class='ident'>func</span>(<span class='ident'>x</span>: <span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span>;
 
+    <span class='doccomment'>/// The gradient of the link function.</span>
     <span class='kw'>fn</span> <span class='ident'>func_grad</span>(<span class='ident'>x</span>: <span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span>;
 
+    <span class='doccomment'>/// The inverse of the link function.</span>
     <span class='kw'>fn</span> <span class='ident'>func_inv</span>(<span class='ident'>x</span>: <span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span>;
 }
 

@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1462' class='srclink' href='../../../../src/rusty_machine/learning/toolkit/link_fn.rs.html#12-18' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-1462' class='srclink' href='../../../../src/rusty_machine/learning/toolkit/link_fn.rs.html#12-21' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait LinkFunc {
     fn <a href='#tymethod.func' class='fnname'>func</a>(x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>;
     fn <a href='#tymethod.func_grad' class='fnname'>func_grad</a>(x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>;
@@ -55,7 +55,10 @@
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.func' class='method stab '><code>fn <a href='#tymethod.func' class='fnname'>func</a>(x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h3><h3 id='tymethod.func_grad' class='method stab '><code>fn <a href='#tymethod.func_grad' class='fnname'>func_grad</a>(x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h3><h3 id='tymethod.func_inv' class='method stab '><code>fn <a href='#tymethod.func_inv' class='fnname'>func_inv</a>(x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h3></div>
+        <h3 id='tymethod.func' class='method stab '><code>fn <a href='#tymethod.func' class='fnname'>func</a>(x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h3><div class='docblock'><p>The link function.</p>
+</div><h3 id='tymethod.func_grad' class='method stab '><code>fn <a href='#tymethod.func_grad' class='fnname'>func_grad</a>(x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h3><div class='docblock'><p>The gradient of the link function.</p>
+</div><h3 id='tymethod.func_inv' class='method stab '><code>fn <a href='#tymethod.func_inv' class='fnname'>func_inv</a>(x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h3><div class='docblock'><p>The inverse of the link function.</p>
+</div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
     <li><code>impl <a class='trait' href='../../../../rusty_machine/learning/toolkit/link_fn/trait.LinkFunc.html' title='rusty_machine::learning::toolkit::link_fn::LinkFunc'>LinkFunc</a> for <a class='struct' href='../../../../rusty_machine/learning/toolkit/link_fn/struct.Sigmoid.html' title='rusty_machine::learning::toolkit::link_fn::Sigmoid'>Sigmoid</a></code></li>

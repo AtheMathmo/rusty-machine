@@ -634,6 +634,8 @@
 <span id="591">591</span>
 <span id="592">592</span>
 <span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The vector module.</span>
 <span class='doccomment'>//!</span>
@@ -651,6 +653,8 @@
 <span class='doccomment'>/// Can be instantiated with any type.</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='ident'>size</span>: <span class='ident'>usize</span>,
+    <span class='doccomment'>/// The underlying vector data.</span>
+    <span class='doccomment'>/// NOTE: This should not be changed after instantiation.</span>
     <span class='kw'>pub</span> <span class='ident'>data</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>,
 }
 

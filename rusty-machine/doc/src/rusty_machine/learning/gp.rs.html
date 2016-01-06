@@ -237,6 +237,8 @@
 <span id="194">194</span>
 <span id="195">195</span>
 <span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Gaussian Processes</span>
 <span class='doccomment'>//!</span>
@@ -271,6 +273,7 @@
 
 <span class='doccomment'>/// Trait for GP mean functions.</span>
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>MeanFunc</span> {
+    <span class='doccomment'>/// Compute the mean function applied elementwise to a matrix.</span>
     <span class='kw'>fn</span> <span class='ident'>func</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>x</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>;
 }
 
@@ -308,6 +311,7 @@
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>GaussianProcess</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Kernel</span>, <span class='ident'>U</span>: <span class='ident'>MeanFunc</span><span class='op'>&gt;</span> {
     <span class='ident'>ker</span>: <span class='ident'>T</span>,
     <span class='ident'>mean</span>: <span class='ident'>U</span>,
+    <span class='doccomment'>/// The observation noise of the GP.</span>
     <span class='kw'>pub</span> <span class='ident'>noise</span>: <span class='ident'>f64</span>,
     <span class='ident'>train_data</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span>,
     <span class='ident'>train_output</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span>,

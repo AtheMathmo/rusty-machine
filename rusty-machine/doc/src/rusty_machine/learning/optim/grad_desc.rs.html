@@ -103,6 +103,9 @@
 <span id="60">60</span>
 <span id="61">61</span>
 <span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Gradient Descent</span>
 <span class='doccomment'>//! </span>
@@ -117,8 +120,11 @@
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>optim</span>::{<span class='ident'>Optimizable</span>, <span class='ident'>OptimAlgorithm</span>};
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>vector</span>::<span class='ident'>Vector</span>;
 
+<span class='doccomment'>/// Batch Gradient Descent algorithm</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>GradientDesc</span> {
+	<span class='doccomment'>/// The step-size for the gradient descent steps.</span>
 	<span class='kw'>pub</span> <span class='ident'>alpha</span>: <span class='ident'>f64</span>,
+	<span class='doccomment'>/// The number of iterations to run.</span>
 	<span class='kw'>pub</span> <span class='ident'>iters</span>: <span class='ident'>usize</span>
 }
 

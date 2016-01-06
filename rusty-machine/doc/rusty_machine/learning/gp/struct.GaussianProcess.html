@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1326' class='srclink' href='../../../src/rusty_machine/learning/gp.rs.html#68-75' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-1326' class='srclink' href='../../../src/rusty_machine/learning/gp.rs.html#69-77' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct GaussianProcess&lt;T: <a class='trait' href='../../../rusty_machine/learning/toolkit/kernel/trait.Kernel.html' title='rusty_machine::learning::toolkit::kernel::Kernel'>Kernel</a>, U: <a class='trait' href='../../../rusty_machine/learning/gp/trait.MeanFunc.html' title='rusty_machine::learning::gp::MeanFunc'>MeanFunc</a>&gt; {
     pub noise: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>,
     // some fields omitted
@@ -57,7 +57,8 @@ Can be used for gaussian process regression with noise.
 Currently does not support classification.</p>
 </div><h2 class='fields'>Fields</h2>
 <table><tr class='stab '>
-                                  <td id='structfield.noise'><code>noise</code></td><td></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;T: <a class='trait' href='../../../rusty_machine/learning/toolkit/kernel/trait.Kernel.html' title='rusty_machine::learning::toolkit::kernel::Kernel'>Kernel</a>, U: <a class='trait' href='../../../rusty_machine/learning/gp/trait.MeanFunc.html' title='rusty_machine::learning::gp::MeanFunc'>MeanFunc</a>&gt; <a class='struct' href='../../../rusty_machine/learning/gp/struct.GaussianProcess.html' title='rusty_machine::learning::gp::GaussianProcess'>GaussianProcess</a>&lt;T, U&gt;</code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(ker: T, mean: U, noise: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='struct' href='../../../rusty_machine/learning/gp/struct.GaussianProcess.html' title='rusty_machine::learning::gp::GaussianProcess'>GaussianProcess</a>&lt;T, U&gt;</code></h4>
+                                  <td id='structfield.noise'><code>noise</code></td><td><div class='docblock'><p>The observation noise of the GP.</p>
+</div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;T: <a class='trait' href='../../../rusty_machine/learning/toolkit/kernel/trait.Kernel.html' title='rusty_machine::learning::toolkit::kernel::Kernel'>Kernel</a>, U: <a class='trait' href='../../../rusty_machine/learning/gp/trait.MeanFunc.html' title='rusty_machine::learning::gp::MeanFunc'>MeanFunc</a>&gt; <a class='struct' href='../../../rusty_machine/learning/gp/struct.GaussianProcess.html' title='rusty_machine::learning::gp::GaussianProcess'>GaussianProcess</a>&lt;T, U&gt;</code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(ker: T, mean: U, noise: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='struct' href='../../../rusty_machine/learning/gp/struct.GaussianProcess.html' title='rusty_machine::learning::gp::GaussianProcess'>GaussianProcess</a>&lt;T, U&gt;</code></h4>
 <div class='docblock'><p>Construct a new Gaussian Process.</p>
 
 <h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1><pre class='rust rust-example-rendered'>
