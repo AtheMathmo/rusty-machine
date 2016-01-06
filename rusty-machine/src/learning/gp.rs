@@ -19,7 +19,7 @@ impl Default for ConstMean {
 
 impl MeanFunc for ConstMean {
     fn func(&self, x: Matrix<f64>) -> Matrix<f64> {
-        Matrix::ones(x.rows(), x.cols()) * self.a
+        Matrix::zeros(x.rows(), x.cols()) + self.a
     }
 }
 
@@ -31,7 +31,7 @@ impl MeanFunc for ConstMean {
 pub struct GaussianProcess<T: Kernel, U: MeanFunc> {
     ker: T,
     mean: U,
-    noise: f64,
+    pub noise: f64,
     train_data: Option<Matrix<f64>>,
     train_output: Option<Matrix<f64>>,
     train_mat: Option<Matrix<f64>>,
