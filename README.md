@@ -54,12 +54,13 @@ There is now a first pass at the linear algebra library and some basic machine l
 - Linear Regression
 - K-Means Clustering
 - Neural Networks
+- Gaussian Process Regression
 
 ---
 
 ## Usage
 
-The library usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state (0.0.9 as of writing) and intended usage.
+The library usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state (0.1.1 as of writing) and intended usage.
 
 ### Installation
 
@@ -75,8 +76,6 @@ And then import the library using:
 ```
 extern crate rusty_machine as rm;
 ```
-
-The library usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state (0.1.1 as of writing) and intended usage.
 
 The library consists of two core components. The linear algebra module and the learning module.
 
