@@ -885,7 +885,12 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
                     s2 = s2 + l.data[j*n + k] * u.data[k*n + i];
                 }
 
-                l.data[j*n + i] = (a_2[[j,i]] - s2) / u[[i,i]];
+                let denom = u[[i,i]];
+
+                if denom == T::zero() {
+                    panic!("Arithmetic error. Matrix could not be decomposed.")
+                }
+                l.data[j*n + i] = (a_2[[j,i]] - s2) / denom;
             }
 
         }

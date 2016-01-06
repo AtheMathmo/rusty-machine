@@ -81,10 +81,10 @@ pub fn vec_sum<T: Copy + Zero + Add<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> 
     let xs = &u[..len];
     let ys = &v[..len];
 
-    let mut sum_data = vec![T::zero(); len];
+    let mut sum_data = Vec::with_capacity(len);
 
     for i in 0..len {
-        sum_data[i] = xs[i] + ys[i];
+        sum_data.push(xs[i] + ys[i]);
     }
     sum_data
 }
@@ -107,10 +107,10 @@ pub fn vec_sub<T: Copy + Zero + Sub<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> 
     let xs = &u[..len];
     let ys = &v[..len];
 
-    let mut sum_data = vec![T::zero(); len];
+    let mut sum_data = Vec::with_capacity(len);
 
     for i in 0..len {
-        sum_data[i] = xs[i] - ys[i];
+        sum_data.push(xs[i] - ys[i]);
     }
     sum_data
 }
@@ -133,10 +133,10 @@ pub fn ele_mul<T: Copy + Zero + Mul<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> 
     let xs = &u[..len];
     let ys = &v[..len];
 
-    let mut sum_data = vec![T::zero(); len];
+    let mut sum_data = Vec::with_capacity(len);
 
     for i in 0..len {
-        sum_data[i] = xs[i] * ys[i];
+        sum_data.push(xs[i] * ys[i]);
     }
     sum_data
 }
@@ -159,10 +159,10 @@ pub fn ele_div<T: Copy + Zero + Div<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> 
     let xs = &u[..len];
     let ys = &v[..len];
 
-    let mut sum_data = vec![T::zero(); len];
+    let mut sum_data = Vec::with_capacity(len);
 
     for i in 0..len {
-        sum_data[i] = xs[i] / ys[i];
+        sum_data.push(xs[i] / ys[i]);
     }
     sum_data
 }

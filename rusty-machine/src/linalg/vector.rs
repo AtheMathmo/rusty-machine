@@ -51,6 +51,34 @@ impl<T: Clone> Clone for Vector<T> {
     fn clone(&self) -> Vector<T> {
         Vector{ size: self.size, data: self.data.clone() }
     }
+}
+
+impl<T: Copy> Vector<T> {
+
+    /// Applies a function to each element in the vector.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::vector::Vector;
+    /// fn add_two(a: f64) -> f64 {
+    ///     a + 2f64
+    /// }
+    ///
+    /// let a = Vector::new(vec![0.;4]);
+    ///
+    /// let b = a.apply(&add_two);
+    ///
+    /// assert_eq!(b.data, vec![2.0; 4]);
+    /// ```
+    pub fn apply(self, f: &Fn(T) -> T) -> Vector<T> {
+        let new_data = self.data.into_iter().map(|v| f(v)).collect();
+
+        Vector {
+            size: self.size,
+            data: new_data,
+        }
+    }
 
 }
 
