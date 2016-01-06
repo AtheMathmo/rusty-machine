@@ -1,3 +1,7 @@
+//! Module for kernels
+//!
+//! Currently used within Gaussian Processes.
+
 use linalg::vector::Vector;
 
 /// The Kernel trait
