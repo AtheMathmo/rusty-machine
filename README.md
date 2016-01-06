@@ -1,6 +1,6 @@
 # rusty-machine
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.1.0](https://crates.io/crates/rusty-machine/0.1.0).
+Here is the API documentation for the rust crate. Currently up to date for [version 0.1.1](https://crates.io/crates/rusty-machine/0.1.1).
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
@@ -54,7 +54,24 @@ There is now a first pass at the linear algebra library and some basic machine l
 
 ## Usage
 
-The usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state (0.0.9 as of writing) and intended usage.
+The library usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state (0.0.9 as of writing) and intended usage.
+
+### Installation
+
+The library is most easily used with [cargo](http://doc.crates.io/guide.html). Simply include the following in your Cargo.toml file:
+
+```
+[dependencies.rusty-machine]
+version="*"
+```
+
+And then import the library using:
+
+```
+extern crate rusty_machine as rm;
+```
+
+The library usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state (0.1.1 as of writing) and intended usage.
 
 The library consists of two core components. The linear algebra module and the learning module.
 
@@ -81,7 +98,3 @@ More detailed coverage can be found in the [API documentation](https://AtheMathm
 The learning module contains machine learning models. Currently this only includes a simple Linear Regression model, k-means clustering and feed forward neural networks.
 
 ---
-
-## References
-
-[Online Collaborative Filtering](http://canini.me/research_files/OnlineCollaborativeFiltering.pdf)

@@ -21,7 +21,7 @@ There is now a first pass at the linear algebra library and some basic machine l
 - K-Means Clustering
 - Neural Networks
 
-I will need to update and optimize the linear algebra library but should be able to do this in tandem.
+I've decided for now to halt optimization efforts. It seems the best course of action is to decide as a community a single linear algebra library to utilize. This should also probably utilize BLAS and LAPACK bindings.
 
 ---
 
@@ -34,16 +34,10 @@ This marks my intended release goals. I won't estimate the actual dates of relea
         <th>Version</th><th>Features</th><th>Dependencies</th>
     </tr>
     <tr>
-        <td>0.0.9</td><td><ul><li>Gradient descent.</li><li>Neural Nets</li></ul></td><td><ul><li>None</li></ul></td>
+        <td>0.1.1.</td><td><ul><li>Cholesky Decomp</li><li>Gaussian Processes</li></ul></td><td><ul><li>None</li></ul></td>
     </tr>
     <tr>
-        <td>0.1.0</td><td><ul><li>Optimization (with basic data handling - unreleased).</li></ul></td><td></td>
-    </tr>
-    <tr>
-        <td>0.1.1.</td><td><ul><li>Cholesky Decomp</li><li>Cost AND grad for optimization.</li></ul></td><td><ul><li>None</li></ul></td>
-    </tr>
-    <tr>
-        <td>0.1.2</td><td><ul><li>Gaussian Processes</li></ul></td><td><ul><li>Cholesky Decomp</li><li>Kernels</li></ul></td>
+        <td>0.1.2</td><td><ul><li>Cost AND grad for optimization.</li></ul></td><td><ul><li>Cholesky Decomp</li><li>Kernels</li></ul></td>
     </tr>
     <tr>
         <td>0.2.0</td><td><ul><li>Generalized linear regression</li><li>SVM</li><li>Linalg optimization</li></ul></td><td><ul><li>Lots</li></ul></td>
