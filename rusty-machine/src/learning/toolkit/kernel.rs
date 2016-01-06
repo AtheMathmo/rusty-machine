@@ -1,15 +1,37 @@
 use linalg::vector::Vector;
 
+/// The Kernel trait
+///
+/// Requires a function mapping two vectors to a scalar.
 pub trait Kernel {
     fn kernel(&self, x1: &[f64], x2: &[f64]) -> f64;
 }
 
+/// Squared exponential kernel
+///
+/// Equivalently a gaussian function.
+///
+/// The kernel function is given by:
+///
+/// f(x1,x2) = A _exp_(-||x1-x2||^2 / 2(l^2))
+///
+/// Where A is the amplitude and l the length scale.
 pub struct SquaredExp {
     ls: f64,
     ampl: f64,
 }
 
 impl SquaredExp {
+
+    /// Construct a new squared exponential kernel.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::toolkit::SquaredExp;
+    ///
+    /// let ker = SquaredExp::new(2f64, 1f64);
+    /// ```
     pub fn new(ls: f64, ampl: f64) -> SquaredExp {
         SquaredExp {
             ls: ls,
@@ -19,6 +41,20 @@ impl SquaredExp {
 }
 
 impl Default for SquaredExp {
+
+    /// Constructs the default Squared Exp kernel.
+    ///
+    /// The default settings are:
+    /// - length scale = 1
+    /// - amplitude = 1
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::toolkit::SquaredExp;
+    ///
+    /// let ker = SquaredExp::default();
+    /// ```
     fn default() -> SquaredExp {
         SquaredExp {
             ls: 1f64,
@@ -28,6 +64,7 @@ impl Default for SquaredExp {
 }
 
 impl Kernel for SquaredExp {
+    /// The squared exponential kernel function.
     fn kernel(&self, x1: &[f64], x2: &[f64]) -> f64 {
         assert_eq!(x1.len(), x2.len());
 
