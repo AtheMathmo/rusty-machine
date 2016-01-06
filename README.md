@@ -18,7 +18,12 @@ This project was originally intended to be an implementation of Online Collabora
 
 So this project is now going to be a machine learning crate for Rust. I began this project as a fun way to learn Rust and so there will be lots of things that need improving (I'm still not very familiar with LLVM). I hope that this crate will provide a number of standard out-the-box machine learning algorithms.
 
+#### Contributing
+
+I don't have a dedicated page for contributions right now as the project is still very small. Please feel free to fork, file issues, PRs and all that jazz.
+
 #### Help!
+
 I've probably introduced some bad practices as I've been learning Rust. If you have any suggestions for structure or optimization please let me know.
 
 ---
