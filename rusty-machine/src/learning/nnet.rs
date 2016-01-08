@@ -26,8 +26,8 @@
 
 use linalg::matrix::Matrix;
 use learning::SupModel;
-use learning::toolkit::link_fn;
-use learning::toolkit::link_fn::LinkFunc;
+use learning::toolkit::activ_fn;
+use learning::toolkit::activ_fn::ActivationFunc;
 use learning::optim::{Optimizable, OptimAlgorithm};
 use learning::optim::grad_desc::GradientDesc;
 
@@ -35,18 +35,18 @@ use std::marker::PhantomData;
 use rand::{Rng, thread_rng};
 
 /// Neural Network struct
-pub struct NeuralNet<'a, L: LinkFunc> {
+pub struct NeuralNet<'a, L: ActivationFunc> {
     layer_sizes: &'a [usize],
     weights: Vec<f64>,
     gd: GradientDesc,
-    _link: PhantomData<L>,
+    _act_fn: PhantomData<L>,
 }
 
-impl<'a> NeuralNet<'a, link_fn::Sigmoid> {
+impl<'a> NeuralNet<'a, activ_fn::Sigmoid> {
 
     /// Creates a neural network with the specified layer sizes.
     ///
-    /// Uses the default settings (gradient descent and sigmoid link function).
+    /// Uses the default settings (gradient descent and sigmoid activation function).
     ///
     /// # Examples
     ///
@@ -57,20 +57,20 @@ impl<'a> NeuralNet<'a, link_fn::Sigmoid> {
     /// let layers = &[3; 4];
     /// let mut a = NeuralNet::default(layers);
     /// ```
-    pub fn default(layer_sizes: &[usize]) -> NeuralNet<link_fn::Sigmoid> {
+    pub fn default(layer_sizes: &[usize]) -> NeuralNet<activ_fn::Sigmoid> {
         NeuralNet {
             layer_sizes: layer_sizes,
-            weights: NeuralNet::<link_fn::Sigmoid>::create_weights(layer_sizes),
+            weights: NeuralNet::<activ_fn::Sigmoid>::create_weights(layer_sizes),
             gd: GradientDesc::default(),
-            _link: PhantomData,
+            _act_fn: PhantomData,
         }
     }
 }
-impl<'a, L: LinkFunc> NeuralNet<'a, L> {
+impl<'a, L: ActivationFunc> NeuralNet<'a, L> {
     /// Create a new neural network with the specified layer sizes.
     ///
     /// The layer sizes slice should include the input, hidden layers, and output layer sizes.
-    /// The type of link function must be specified.
+    /// The type of activation function must be specified.
     ///
     /// Currently defaults to simple batch Gradient Descent for optimization.
     ///
@@ -78,7 +78,7 @@ impl<'a, L: LinkFunc> NeuralNet<'a, L> {
     ///
     /// ```
     /// use rusty_machine::learning::nnet::NeuralNet;
-    /// use rusty_machine::learning::toolkit::link_fn::Linear;
+    /// use rusty_machine::learning::toolkit::activ_fn::Linear;
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.
     /// let layers = &[3; 4];
@@ -89,7 +89,7 @@ impl<'a, L: LinkFunc> NeuralNet<'a, L> {
             layer_sizes: layer_sizes,
             weights: NeuralNet::<L>::create_weights(layer_sizes),
             gd: GradientDesc::default(),
-            _link: PhantomData,
+            _act_fn: PhantomData,
         }
     }
 
@@ -211,9 +211,12 @@ impl<'a, L: LinkFunc> NeuralNet<'a, L> {
             activations.push(z.apply(&L::func));
         }
 
+        // Compute cost using the last activation.
+
         let mut deltas = Vec::with_capacity(self.layer_sizes.len() - 1);
         // Backward propagation
         {
+            // Take GRAD_cost to compute this delta.
             let mut delta = &activations[self.layer_sizes.len() - 1] - outputs;
             deltas.push(delta.clone());
 
@@ -269,7 +272,7 @@ impl<'a, L: LinkFunc> NeuralNet<'a, L> {
     }
 }
 
-impl<'a, L: LinkFunc> Optimizable for NeuralNet<'a, L> {
+impl<'a, L: ActivationFunc> Optimizable for NeuralNet<'a, L> {
     type Data = Matrix<f64>;
 	type Target = Matrix<f64>;
 
@@ -279,7 +282,7 @@ impl<'a, L: LinkFunc> Optimizable for NeuralNet<'a, L> {
     }
 }
 
-impl<'a, L: LinkFunc> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, L> {
+impl<'a, L: ActivationFunc> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, L> {
     /// Predict neural network output using forward propagation.
     fn predict(&self, data: &Matrix<f64>) -> Matrix<f64> {
         self.forward_prop(data)

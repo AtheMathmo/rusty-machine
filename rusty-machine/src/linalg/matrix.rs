@@ -489,6 +489,31 @@ impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
         }
         Vector::new(col_sum)
     }
+
+    /// The sum of all elements in the matrix
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = a.sum();
+    /// assert_eq!(c, 10.0);
+    /// ```
+    pub fn sum(&self) -> T {
+        let mut sum = T::zero();
+
+        unsafe {
+            for i in 0..self.rows {
+                for j in 0..self.cols {
+                    sum = sum + *self.data.get_unchecked(i * self.cols + j);
+                }
+            }
+        }
+        sum
+    }
 }
 
 impl<T: Copy + Zero + Mul<T, Output = T>> Matrix<T> {

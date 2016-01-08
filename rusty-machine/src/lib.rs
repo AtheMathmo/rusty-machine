@@ -153,7 +153,7 @@ pub mod learning {
 
     /// Module for learning tools.
     pub mod toolkit {
-        pub mod link_fn;
+        pub mod activ_fn;
         pub mod kernel;
     }
 }
