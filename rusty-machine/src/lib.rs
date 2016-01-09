@@ -136,7 +136,7 @@ pub mod learning {
             type Target;
 
             /// Compute the gradient for the model.
-            fn compute_grad(&self, params: &[f64], data: &Self::Data, target: &Self::Target) -> Vec<f64>;
+            fn compute_grad(&self, params: &[f64], data: &Self::Data, target: &Self::Target) -> (f64, Vec<f64>);
         }
 
         /// Trait for optimization algorithms.

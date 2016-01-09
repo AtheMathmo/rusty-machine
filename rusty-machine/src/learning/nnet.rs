@@ -183,7 +183,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
     }
 
     /// Compute the gradient using the back propagation algorithm.
-    fn compute_grad(&self, weights: &[f64], data: &Matrix<f64>, outputs: &Matrix<f64>) -> Vec<f64> {
+    fn compute_grad(&self, weights: &[f64], data: &Matrix<f64>, outputs: &Matrix<f64>) -> (f64, Vec<f64>) {
         assert_eq!(data.cols(), self.layer_sizes[0]);
 
         let mut forward_weights = Vec::with_capacity(self.layer_sizes.len() - 1);
@@ -213,6 +213,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         }
 
         // Compute cost using the last activation.
+
 
         let mut deltas = Vec::with_capacity(self.layer_sizes.len() - 1);
         // Backward propagation
@@ -251,7 +252,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
             gradients.append(&mut g.data.clone());
         }
 
-        gradients
+        (self.criterion.cost(&activations[activations.len() - 1], outputs), gradients)
     }
 
     /// Forward propagation of the model weights to get the outputs.
@@ -279,7 +280,7 @@ impl<'a, T: Criterion> Optimizable for NeuralNet<'a, T> {
 	type Target = Matrix<f64>;
 
     /// Compute the gradient of the neural network.
-    fn compute_grad(&self, params: &[f64], data: &Matrix<f64>, target: &Matrix<f64>) -> Vec<f64> {
+    fn compute_grad(&self, params: &[f64], data: &Matrix<f64>, target: &Matrix<f64>) -> (f64, Vec<f64>) {
         self.compute_grad(params, data, target)
     }
 }
