@@ -155,5 +155,6 @@ pub mod learning {
     pub mod toolkit {
         pub mod activ_fn;
         pub mod kernel;
+        pub mod cost_fn;
     }
 }

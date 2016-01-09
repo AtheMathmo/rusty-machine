@@ -1349,6 +1349,36 @@ impl<'a, 'b, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<&'b T> f
     }
 }
 
+/// Gets negative of matrix.
+impl<T: Neg<Output=T> + Copy> Neg for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn neg(self) -> Matrix<T> {
+        let new_data = self.data.iter().map(|v| -*v).collect();
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data,
+        }
+    }
+}
+
+/// Gets negative of matrix.
+impl<'a, T: Neg<Output=T> + Copy> Neg for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn neg(self) -> Matrix<T> {
+        let new_data = self.data.iter().map(|v| -*v).collect();
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data,
+        }
+    }
+}
+
 /// Indexes matrix.
 ///
 /// Takes row index first then column.
