@@ -149,6 +149,7 @@ pub mod learning {
         }
 
         pub mod grad_desc;
+        pub mod fmincg;
     }
 
     /// Module for learning tools.
