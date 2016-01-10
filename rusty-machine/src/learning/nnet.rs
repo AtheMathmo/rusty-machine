@@ -31,7 +31,7 @@ use learning::toolkit::activ_fn::ActivationFunc;
 use learning::toolkit::cost_fn;
 use learning::toolkit::cost_fn::CostFunc;
 use learning::optim::{Optimizable, OptimAlgorithm};
-use learning::optim::grad_desc::GradientDesc;
+use learning::optim::fmincg::ConjugateGD;
 
 use rand::{Rng, thread_rng};
 
@@ -39,7 +39,7 @@ use rand::{Rng, thread_rng};
 pub struct NeuralNet<'a, T: Criterion> {
     layer_sizes: &'a [usize],
     weights: Vec<f64>,
-    gd: GradientDesc,
+    gd: ConjugateGD,
     criterion: T,
 }
 
@@ -62,7 +62,7 @@ impl<'a> NeuralNet<'a, BCECriterion> {
         NeuralNet {
             layer_sizes: layer_sizes,
             weights: NeuralNet::<BCECriterion>::create_weights(layer_sizes),
-            gd: GradientDesc::default(),
+            gd: ConjugateGD::default(),
             criterion: BCECriterion,
         }
     }
@@ -89,7 +89,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         NeuralNet {
             layer_sizes: layer_sizes,
             weights: NeuralNet::<T>::create_weights(layer_sizes),
-            gd: GradientDesc::default(),
+            gd: ConjugateGD::default(),
             criterion: criterion,
         }
     }
@@ -218,8 +218,11 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         let mut deltas = Vec::with_capacity(self.layer_sizes.len() - 1);
         // Backward propagation
         {
+            let z = forward_weights[self.layer_sizes.len() - 2].clone();
+            let g = self.criterion.grad_activ(z);
+
             // Take GRAD_cost to compute this delta.
-            let mut delta = self.criterion.cost_grad(&activations[self.layer_sizes.len() - 1], outputs);
+            let mut delta = self.criterion.cost_grad(&activations[self.layer_sizes.len() - 1], outputs).elemul(&g);
 
             deltas.push(delta.clone());
 
