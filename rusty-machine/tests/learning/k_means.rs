@@ -13,7 +13,7 @@ fn test_model_default() {
 
     let a = model.predict(&pred_data);
 
-    assert_eq!(a.data.len(), 3);
+    assert_eq!(a.size(), 3);
 }
 
 #[test]
@@ -27,7 +27,7 @@ fn test_model_iter() {
 
     let a = model.predict(&pred_data);
 
-    assert_eq!(a.data.len(), 3);
+    assert_eq!(a.size(), 3);
 }
 
 #[test]
@@ -41,7 +41,7 @@ fn test_model_forgy() {
 
     let a = model.predict(&pred_data);
 
-    assert_eq!(a.data.len(), 3);
+    assert_eq!(a.size(), 3);
 }
 
 #[test]
@@ -55,7 +55,7 @@ fn test_model_ran_partition() {
 
     let a = model.predict(&pred_data);
 
-    assert_eq!(a.data.len(), 3);
+    assert_eq!(a.size(), 3);
 }
 
 #[test]
@@ -69,5 +69,5 @@ fn test_model_kplusplus() {
 
     let a = model.predict(&pred_data);
 
-    assert_eq!(a.data.len(), 3);
+    assert_eq!(a.size(), 3);
 }

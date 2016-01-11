@@ -16,7 +16,7 @@ pub struct Vector<T> {
     size: usize,
     /// The underlying vector data.
     /// NOTE: This should not be changed after instantiation.
-    pub data: Vec<T>,
+    data: Vec<T>,
 }
 
 impl<T> Vector<T> {
@@ -45,6 +45,14 @@ impl<T> Vector<T> {
     pub fn size(&self) -> usize {
         self.size
     }
+
+    pub fn data(&self) -> &Vec<T> {
+        &self.data
+    }
+
+    pub fn into_vec(self) -> Vec<T> {
+        self.data
+    }
 }
 
 impl<T: Clone> Clone for Vector<T> {
@@ -71,7 +79,7 @@ impl<T: Copy> Vector<T> {
     ///
     /// let b = a.apply(&add_two);
     ///
-    /// assert_eq!(b.data, vec![2.0; 4]);
+    /// assert_eq!(b.into_vec(), vec![2.0; 4]);
     /// ```
     pub fn apply(self, f: &Fn(T) -> T) -> Vector<T> {
         let new_data = self.data.into_iter().map(|v| f(v)).collect();
@@ -212,7 +220,7 @@ impl<T: Copy + Zero + Mul<T, Output = T>> Vector<T> {
     /// let b = Vector::new(vec![1.0,2.0,3.0,4.0]);
     ///
     /// let c = &a.elemul(&b);
-    /// assert_eq!(c.data, vec![1.0, 4.0, 9.0, 16.0]);
+    /// assert_eq!(*c.data(), vec![1.0, 4.0, 9.0, 16.0]);
     /// ```
     pub fn elemul(&self, v: &Vector<T>) -> Vector<T> {
         assert_eq!(self.size, v.size);
@@ -232,7 +240,7 @@ impl<T: Copy + Zero + Div<T, Output = T>> Vector<T> {
     /// let b = Vector::new(vec![1.0,2.0,3.0,4.0]);
     ///
     /// let c = &a.elediv(&b);
-    /// assert_eq!(c.data, vec![1.0; 4]);
+    /// assert_eq!(*c.data(), vec![1.0; 4]);
     /// ```
     pub fn elediv(&self, v: &Vector<T>) -> Vector<T> {
         assert_eq!(self.size, v.size);
@@ -257,7 +265,7 @@ impl<T: Copy + Zero + Float + FromPrimitive> Vector<T> {
     /// ```
     pub fn mean(&self) -> T {
         let sum = self.sum();
-        sum / FromPrimitive::from_usize(self.data.len()).unwrap()
+        sum / FromPrimitive::from_usize(self.size()).unwrap()
     }
 
     /// The variance of the vector.
@@ -282,7 +290,7 @@ impl<T: Copy + Zero + Float + FromPrimitive> Vector<T> {
             var = var + (*u - m) * (*u - m);
         }
 
-        var / FromPrimitive::from_usize(self.data.len() - 1).unwrap()
+        var / FromPrimitive::from_usize(self.size() - 1).unwrap()
     }
 }
 

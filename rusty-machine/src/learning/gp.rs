@@ -132,8 +132,8 @@ impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
 
         for i in 0..dim1 {
             for j in 0..dim2 {
-                ker_data.push(self.ker.kernel(&m1.data[i * m1.cols()..(i + 1) * m1.cols()],
-                                              &m2.data[j * m2.cols()..(j + 1) * m2.cols()]));
+                ker_data.push(self.ker.kernel(&m1.data()[i * m1.cols()..(i + 1) * m1.cols()],
+                                              &m2.data()[j * m2.cols()..(j + 1) * m2.cols()]));
             }
         }
 
