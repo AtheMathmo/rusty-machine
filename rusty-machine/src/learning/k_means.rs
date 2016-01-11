@@ -151,14 +151,14 @@ impl KMeansClassifier {
         for i in 0..self.k {
             let mut vec_i = Vec::new();
 
-            for j in classes.data.iter() {
+            for j in classes.data().iter() {
                 if *j == i {
                     vec_i.push(*j);
                 }
             }
 
             let mat_i = data.select_rows(&vec_i);
-            new_centroids.extend(mat_i.mean(0).data);
+            new_centroids.extend(mat_i.mean(0).data());
         }
 
         self.centroids = Some(Matrix::new(self.k, data.cols(), new_centroids));
@@ -178,8 +178,8 @@ impl KMeansClassifier {
     /// Used internally within model.
     /// Returns the index of the closest centroid and the distance to it.
     fn find_closest_centroids(centroids: &Matrix<f64>, data: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
-        let mut idx = Vector::zeros(data.rows());
-        let mut distances = Vector::zeros(data.rows());
+        let mut idx = Vec::with_capacity(data.rows());
+        let mut distances = Vec::with_capacity(data.rows());
 
         for i in 0..data.rows() {
             // This works like repmat pulling out row i repeatedly.
@@ -188,12 +188,12 @@ impl KMeansClassifier {
 
             // Now take argmin and this is the centroid.
             let (min_idx, min_dist) = dist.argmin();
-            idx.data[i]= min_idx;
-            distances.data[i] = min_dist;
+            idx.push(min_idx);
+            distances.push(min_dist);
 
         }
 
-        (idx, distances)
+        (Vector::new(idx), Vector::new(distances))
     }
 
     /// Compute initial centroids using Forgy scheme.
@@ -245,7 +245,7 @@ impl KMeansClassifier {
             }
 
             let mat_i = data.select_rows(&vec_i);
-            init_centroids.extend(mat_i.mean(0).data);
+            init_centroids.extend(mat_i.mean(0).data());
         }
 
         Matrix::new(k, data.cols(), init_centroids)
@@ -263,13 +263,13 @@ impl KMeansClassifier {
         let mut init_centroids = Vec::with_capacity(k * data.cols());
         let first_cen = rng.gen_range(0usize, data.rows());
         
-        init_centroids.append(&mut data.select_rows(&vec![first_cen]).data);
+        init_centroids.append(&mut data.select_rows(&vec![first_cen]).into_vec());
 
         for i in 1..k {
             let temp_centroids = Matrix::new(i, data.cols(), init_centroids.clone());
             let (_, dist) = KMeansClassifier::find_closest_centroids(&temp_centroids, &data);
             let next_cen = sample_discretely(dist);
-            init_centroids.append(&mut data.select_rows(&vec![next_cen]).data)
+            init_centroids.append(&mut data.select_rows(&vec![next_cen]).into_vec())
         }
         
         Matrix::new(k, data.cols(), init_centroids)
@@ -287,7 +287,7 @@ fn sample_discretely(unnorm_dist: Vector<f64>) -> usize {
     let rand = thread_rng().gen_range(0.0f64, sum);
 
     let mut tempsum = 0.0;
-    for (i,p) in unnorm_dist.data.iter().enumerate() {
+    for (i,p) in unnorm_dist.data().iter().enumerate() {
         tempsum += *p;
 
         if rand < tempsum {

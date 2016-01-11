@@ -58,8 +58,8 @@ impl<M: Optimizable> OptimAlgorithm<M> for GradientDesc {
 		let mut optimizing_val = Vector::new(start.to_vec());
 
 		for _i in 0..self.iters {
-			optimizing_val = optimizing_val.clone() - Vector::new(model.compute_grad(&optimizing_val.data[..], data, outputs).1) * self.alpha;
+			optimizing_val = &optimizing_val - Vector::new(model.compute_grad(&optimizing_val.data()[..], data, outputs).1) * self.alpha;
 		}
-		optimizing_val.data
+		optimizing_val.into_vec()
 	}
 } 
