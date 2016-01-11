@@ -115,13 +115,13 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
     }
 
     /// Initializes the weights for a single layer in the network.
-    fn initialize_weights(rows: usize, cols: usize) -> Vec<f64> {
-        let mut weights = Vec::with_capacity(rows * cols);
-        let eps_init = (6f64 / (rows + cols) as f64).sqrt();
+    fn initialize_weights(l_in: usize, l_out: usize) -> Vec<f64> {
+        let mut weights = Vec::with_capacity(l_in * l_out);
+        let eps_init = (6f64 / (l_in + l_out) as f64).sqrt();
 
         let mut rng = thread_rng();
 
-        for _i in 0..rows * cols {
+        for _i in 0..l_in * l_out {
             let w = (rng.gen_range(0f64, 1f64) * 2f64 * eps_init) - eps_init;
             weights.push(w);
         }
@@ -211,9 +211,6 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
 
             activations.push(self.criterion.activate(z));
         }
-
-        // Compute cost using the last activation.
-
 
         let mut deltas = Vec::with_capacity(self.layer_sizes.len() - 1);
         // Backward propagation
