@@ -1,29 +1,29 @@
-//! Link Functions.
+//! Activation Functions.
 //!
-//! This module contains a number of structs implementing the LinkFunc trait.
+//! This module contains a number of structs implementing the ActivationFunc trait.
 //!
 //! These structs are used within Neural Networks and
 //! Generalized Linear Regression (not yet implemented). 
 //! 
-//! You can also create your own custom Link Functions for use in your models.
-//! Just create a unit struct implementing the LinkFunc trait.
+//! You can also create your own custom activation Functions for use in your models.
+//! Just create a unit struct implementing the ActivationFunc trait.
 
-/// Trait for link functions in models.
-pub trait LinkFunc {
-    /// The link function.
+/// Trait for activation functions in models.
+pub trait ActivationFunc {
+    /// The activation function.
     fn func(x: f64) -> f64;
 
-    /// The gradient of the link function.
+    /// The gradient of the activation function.
     fn func_grad(x: f64) -> f64;
 
-    /// The inverse of the link function.
+    /// The inverse of the activation function.
     fn func_inv(x: f64) -> f64;
 }
 
-/// Sigmoid link function.
+/// Sigmoid activation function.
 pub struct Sigmoid;
 
-impl LinkFunc for Sigmoid {
+impl ActivationFunc for Sigmoid {
     /// Sigmoid function.
     ///
     /// Returns 1 / ( 1 + e^-t).
@@ -43,10 +43,10 @@ impl LinkFunc for Sigmoid {
     }
 }
 
-/// Linear link function.
+/// Linear activation function.
 pub struct Linear;
 
-impl LinkFunc for Linear {
+impl ActivationFunc for Linear {
     fn func(x: f64) -> f64 {
         x
     }
@@ -60,10 +60,10 @@ impl LinkFunc for Linear {
     }
 }
 
-/// Exponential link function.
+/// Exponential activation function.
 pub struct Exp;
 
-impl LinkFunc for Exp {
+impl ActivationFunc for Exp {
     fn func(x: f64) -> f64 {
         x.exp()
     }

@@ -23,30 +23,37 @@
 //!
 //! model.predict(&test_data);
 //! ```
+//!
+//! The neural networks are specified via a criterion - similar to [Torch](https://github.com/torch/nn/blob/master/doc/criterion.md).
+//! The criterions combine an activation function and a cost function.
+//!
+//! You can define your own criterion by implementing the `Criterion`
+//! trait with a concrete ActivationFunc and CostFunc.
 
 use linalg::matrix::Matrix;
 use learning::SupModel;
-use learning::toolkit::link_fn;
-use learning::toolkit::link_fn::LinkFunc;
+use learning::toolkit::activ_fn;
+use learning::toolkit::activ_fn::ActivationFunc;
+use learning::toolkit::cost_fn;
+use learning::toolkit::cost_fn::CostFunc;
 use learning::optim::{Optimizable, OptimAlgorithm};
-use learning::optim::grad_desc::GradientDesc;
+use learning::optim::fmincg::ConjugateGD;
 
-use std::marker::PhantomData;
 use rand::{Rng, thread_rng};
 
 /// Neural Network struct
-pub struct NeuralNet<'a, L: LinkFunc> {
+pub struct NeuralNet<'a, T: Criterion> {
     layer_sizes: &'a [usize],
     weights: Vec<f64>,
-    gd: GradientDesc,
-    _link: PhantomData<L>,
+    gd: ConjugateGD,
+    criterion: T,
 }
 
-impl<'a> NeuralNet<'a, link_fn::Sigmoid> {
+impl<'a> NeuralNet<'a, BCECriterion> {
 
     /// Creates a neural network with the specified layer sizes.
     ///
-    /// Uses the default settings (gradient descent and sigmoid link function).
+    /// Uses the default settings (gradient descent and sigmoid activation function).
     ///
     /// # Examples
     ///
@@ -57,39 +64,39 @@ impl<'a> NeuralNet<'a, link_fn::Sigmoid> {
     /// let layers = &[3; 4];
     /// let mut a = NeuralNet::default(layers);
     /// ```
-    pub fn default(layer_sizes: &[usize]) -> NeuralNet<link_fn::Sigmoid> {
+    pub fn default(layer_sizes: &[usize]) -> NeuralNet<BCECriterion> {
         NeuralNet {
             layer_sizes: layer_sizes,
-            weights: NeuralNet::<link_fn::Sigmoid>::create_weights(layer_sizes),
-            gd: GradientDesc::default(),
-            _link: PhantomData,
+            weights: NeuralNet::<BCECriterion>::create_weights(layer_sizes),
+            gd: ConjugateGD::default(),
+            criterion: BCECriterion,
         }
     }
 }
-impl<'a, L: LinkFunc> NeuralNet<'a, L> {
+impl<'a, T: Criterion> NeuralNet<'a, T> {
     /// Create a new neural network with the specified layer sizes.
     ///
     /// The layer sizes slice should include the input, hidden layers, and output layer sizes.
-    /// The type of link function must be specified.
+    /// The type of activation function must be specified.
     ///
     /// Currently defaults to simple batch Gradient Descent for optimization.
     ///
     /// # Examples
     ///
     /// ```
+    /// use rusty_machine::learning::nnet::BCECriterion;
     /// use rusty_machine::learning::nnet::NeuralNet;
-    /// use rusty_machine::learning::toolkit::link_fn::Linear;
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.
     /// let layers = &[3; 4];
-    /// let mut a = NeuralNet::<Linear>::new(layers);
+    /// let mut a = NeuralNet::new(layers, BCECriterion);
     /// ```
-    pub fn new(layer_sizes: &[usize]) -> NeuralNet<L> {
+    pub fn new(layer_sizes: &[usize], criterion: T) -> NeuralNet<T> {
         NeuralNet {
             layer_sizes: layer_sizes,
-            weights: NeuralNet::<L>::create_weights(layer_sizes),
-            gd: GradientDesc::default(),
-            _link: PhantomData,
+            weights: NeuralNet::<T>::create_weights(layer_sizes),
+            gd: ConjugateGD::default(),
+            criterion: criterion,
         }
     }
 
@@ -106,7 +113,7 @@ impl<'a, L: LinkFunc> NeuralNet<'a, L> {
         let mut layers = Vec::with_capacity(capacity);
 
         for l in 0..total_layers - 1 {
-            layers.append(&mut NeuralNet::<L>::initialize_weights(layer_sizes[l] + 1,
+            layers.append(&mut NeuralNet::<T>::initialize_weights(layer_sizes[l] + 1,
                                                              layer_sizes[l + 1]));
         }
 
@@ -114,13 +121,13 @@ impl<'a, L: LinkFunc> NeuralNet<'a, L> {
     }
 
     /// Initializes the weights for a single layer in the network.
-    fn initialize_weights(rows: usize, cols: usize) -> Vec<f64> {
-        let mut weights = Vec::with_capacity(rows * cols);
-        let eps_init = (6f64 / (rows + cols) as f64).sqrt();
+    fn initialize_weights(l_in: usize, l_out: usize) -> Vec<f64> {
+        let mut weights = Vec::with_capacity(l_in * l_out);
+        let eps_init = (6f64 / (l_in + l_out) as f64).sqrt();
 
         let mut rng = thread_rng();
 
-        for _i in 0..rows * cols {
+        for _i in 0..l_in * l_out {
             let w = (rng.gen_range(0f64, 1f64) * 2f64 * eps_init) - eps_init;
             weights.push(w);
         }
@@ -182,7 +189,7 @@ impl<'a, L: LinkFunc> NeuralNet<'a, L> {
     }
 
     /// Compute the gradient using the back propagation algorithm.
-    fn compute_grad(&self, weights: &[f64], data: &Matrix<f64>, outputs: &Matrix<f64>) -> Vec<f64> {
+    fn compute_grad(&self, weights: &[f64], data: &Matrix<f64>, outputs: &Matrix<f64>) -> (f64, Vec<f64>) {
         assert_eq!(data.cols(), self.layer_sizes[0]);
 
         let mut forward_weights = Vec::with_capacity(self.layer_sizes.len() - 1);
@@ -199,7 +206,7 @@ impl<'a, L: LinkFunc> NeuralNet<'a, L> {
             forward_weights.push(z.clone());
 
             for l in 1..self.layer_sizes.len() - 1 {
-                let mut a = z.clone().apply(&L::func);
+                let mut a = self.criterion.activate(z.clone());
                 let ones = Matrix::ones(a.rows(), 1);
 
                 a = ones.hcat(&a);
@@ -208,13 +215,18 @@ impl<'a, L: LinkFunc> NeuralNet<'a, L> {
                 forward_weights.push(z.clone());
             }
 
-            activations.push(z.apply(&L::func));
+            activations.push(self.criterion.activate(z));
         }
 
         let mut deltas = Vec::with_capacity(self.layer_sizes.len() - 1);
         // Backward propagation
         {
-            let mut delta = &activations[self.layer_sizes.len() - 1] - outputs;
+            let z = forward_weights[self.layer_sizes.len() - 2].clone();
+            let g = self.criterion.grad_activ(z);
+
+            // Take GRAD_cost to compute this delta.
+            let mut delta = self.criterion.cost_grad(&activations[self.layer_sizes.len() - 1], outputs).elemul(&g);
+
             deltas.push(delta.clone());
 
             for l in (1..self.layer_sizes.len() - 1).rev() {
@@ -222,7 +234,7 @@ impl<'a, L: LinkFunc> NeuralNet<'a, L> {
                 let ones = Matrix::ones(z.rows(), 1);
                 z = ones.hcat(&z);
 
-                let g = z.apply(&L::func_grad);
+                let g = self.criterion.grad_activ(z);
                 delta = (delta * self.get_layer_weights(weights, l).transpose()).elemul(&g);
 
                 let non_one_rows = &(1..delta.cols()).collect::<Vec<usize>>()[..];
@@ -243,10 +255,10 @@ impl<'a, L: LinkFunc> NeuralNet<'a, L> {
         let mut gradients = Vec::with_capacity(capacity);
 
         for g in grad {
-            gradients.append(&mut g.data.clone());
+            gradients.append(&mut g.data().clone());
         }
 
-        gradients
+        (self.criterion.cost(&activations[activations.len() - 1], outputs), gradients)
     }
 
     /// Forward propagation of the model weights to get the outputs.
@@ -256,30 +268,30 @@ impl<'a, L: LinkFunc> NeuralNet<'a, L> {
         let net_data = Matrix::ones(data.rows(), 1).hcat(data);
 
         let mut z = net_data * self.get_net_weights(0);
-        let mut a = z.clone().apply(&L::func);
+        let mut a = self.criterion.activate(z.clone());
 
         for l in 1..self.layer_sizes.len() - 1 {
             let ones = Matrix::ones(a.rows(), 1);
             a = ones.hcat(&a);
             z = a * self.get_net_weights(l);
-            a = z.clone().apply(&L::func);
+            a = self.criterion.activate(z.clone());
         }
 
         a
     }
 }
 
-impl<'a, L: LinkFunc> Optimizable for NeuralNet<'a, L> {
+impl<'a, T: Criterion> Optimizable for NeuralNet<'a, T> {
     type Data = Matrix<f64>;
 	type Target = Matrix<f64>;
 
     /// Compute the gradient of the neural network.
-    fn compute_grad(&self, params: &[f64], data: &Matrix<f64>, target: &Matrix<f64>) -> Vec<f64> {
+    fn compute_grad(&self, params: &[f64], data: &Matrix<f64>, target: &Matrix<f64>) -> (f64, Vec<f64>) {
         self.compute_grad(params, data, target)
     }
 }
 
-impl<'a, L: LinkFunc> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, L> {
+impl<'a, T: Criterion> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, T> {
     /// Predict neural network output using forward propagation.
     fn predict(&self, data: &Matrix<f64>) -> Matrix<f64> {
         self.forward_prop(data)
@@ -291,4 +303,60 @@ impl<'a, L: LinkFunc> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, L> {
         let optimal_w = self.gd.optimize(self, &start[..], data, values);
         self.weights = optimal_w;
     }
+}
+
+/// Criterion for Neural Networks
+///
+/// Specifies an activation function and a cost function.
+pub trait Criterion {
+    /// The activation function for the criterion.
+    type ActFunc: ActivationFunc;
+    /// The cost function for the criterion.
+    type Cost: CostFunc<Matrix<f64>>;
+
+    /// The activation function applied to a matrix.
+    fn activate(&self, mat: Matrix<f64>) -> Matrix<f64> {
+        mat.apply(&Self::ActFunc::func)
+    }
+
+    /// The gradient of the activation function applied to a matrix.
+    fn grad_activ(&self, mat: Matrix<f64>) -> Matrix<f64> {
+        mat.apply(&Self::ActFunc::func_grad)
+    }
+
+    /// The cost function.
+    ///
+    /// Returns a scalar cost.
+    fn cost(&self, output: &Matrix<f64>, target: &Matrix<f64>) -> f64 {
+        Self::Cost::cost(output, target)
+    }
+
+    /// The gradient of the cost function.
+    ///
+    /// Returns a matrix of cost gradients.
+    fn cost_grad(&self, output: &Matrix<f64>, target: &Matrix<f64>) -> Matrix<f64> {
+        Self::Cost::grad_cost(output, target)
+    }
+}
+
+/// The binary cross entropy criterion.
+///
+/// Uses the Sigmoid activation function and the
+/// cross entropy error.
+pub struct BCECriterion;
+
+impl Criterion for BCECriterion {
+    type ActFunc = activ_fn::Sigmoid;
+    type Cost = cost_fn::CrossEntropyError;
+}
+
+/// The mean squared error criterion.
+///
+/// Uses the Linear activation function and the
+/// mean squared error.
+pub struct MSECriterion;
+
+impl Criterion for MSECriterion {
+    type ActFunc = activ_fn::Linear;
+    type Cost = cost_fn::MeanSqError;
 }

@@ -16,9 +16,7 @@ use linalg::utils;
 pub struct Matrix<T> {
     rows: usize,
     cols: usize,
-    /// The underlying matrix data.
-    /// NOTE: This should not be changed after instantiation.
-    pub data: Vec<T>,
+    data: Vec<T>,
 }
 
 impl<T> Matrix<T> {
@@ -54,6 +52,16 @@ impl<T> Matrix<T> {
     /// Returns the number of columns in the Matrix.
     pub fn cols(&self) -> usize {
         self.cols
+    }
+
+    /// Returns a non-mutable reference to the underlying data.
+    pub fn data(&self) -> &Vec<T> {
+        &self.data
+    }
+
+    /// Consumes the Matrix and returns the Vec of data.
+    pub fn into_vec(self) -> Vec<T> {
+        self.data
     }
 }
 
@@ -241,9 +249,9 @@ impl<T: Copy> Matrix<T> {
     /// let e = &b.diag(); // 1,4
     /// let f = &c.diag(); // 1,5
     ///
-    /// assert_eq!(d.data, vec![1,5,9]);
-    /// assert_eq!(e.data, vec![1,4]);
-    /// assert_eq!(f.data, vec![1,5]);
+    /// assert_eq!(*d.data(), vec![1,5,9]);
+    /// assert_eq!(*e.data(), vec![1,4]);
+    /// assert_eq!(*f.data(), vec![1,5]);
     /// ```
     pub fn diag(&self) -> Vector<T> {
         let mat_min = min(self.rows, self.cols);
@@ -271,7 +279,7 @@ impl<T: Copy> Matrix<T> {
     ///
     /// let b = a.apply(&add_two);
     ///
-    /// assert_eq!(b.data, vec![2.0; 4]);
+    /// assert_eq!(*b.data(), vec![2.0; 4]);
     /// ```
     pub fn apply(self, f: &Fn(T) -> T) -> Matrix<T> {
         let new_data = self.data.into_iter().map(|v| f(v)).collect();
@@ -448,7 +456,7 @@ impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
     /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
     ///
     /// let c = a.sum_rows();
-    /// assert_eq!(c.data, vec![4.0, 6.0]);
+    /// assert_eq!(*c.data(), vec![4.0, 6.0]);
     /// ```
     pub fn sum_rows(&self) -> Vector<T> {
         let mut row_sum = vec![T::zero(); self.cols];
@@ -475,7 +483,7 @@ impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
     /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
     ///
     /// let c = a.sum_cols();
-    /// assert_eq!(c.data, vec![3.0, 7.0]);
+    /// assert_eq!(*c.data(), vec![3.0, 7.0]);
     /// ```
     pub fn sum_cols(&self) -> Vector<T> {
         let mut col_sum = vec![T::zero(); self.rows];
@@ -488,6 +496,31 @@ impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
             }
         }
         Vector::new(col_sum)
+    }
+
+    /// The sum of all elements in the matrix
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
+    ///
+    /// let c = a.sum();
+    /// assert_eq!(c, 10.0);
+    /// ```
+    pub fn sum(&self) -> T {
+        let mut sum = T::zero();
+
+        unsafe {
+            for i in 0..self.rows {
+                for j in 0..self.cols {
+                    sum = sum + *self.data.get_unchecked(i * self.cols + j);
+                }
+            }
+        }
+        sum
     }
 }
 
@@ -503,7 +536,7 @@ impl<T: Copy + Zero + Mul<T, Output = T>> Matrix<T> {
     /// let b = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
     ///
     /// let c = &a.elemul(&b);
-    /// assert_eq!(c.data, vec![1.0, 4.0, 9.0, 16.0]);
+    /// assert_eq!(*c.data(), vec![1.0, 4.0, 9.0, 16.0]);
     /// ```
     pub fn elemul(&self, m: &Matrix<T>) -> Matrix<T> {
         assert!(self.rows==m.rows, "Matrix row counts not equal.");
@@ -525,7 +558,7 @@ impl<T: Copy + Zero + Div<T, Output = T>> Matrix<T> {
     /// let b = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
     ///
     /// let c = &a.elediv(&b);
-    /// assert_eq!(c.data, vec![1.0; 4]);
+    /// assert_eq!(*c.data(), vec![1.0; 4]);
     /// ```
     pub fn elediv(&self, m: &Matrix<T>) -> Matrix<T> {
         assert!(self.rows==m.rows, "Matrix row counts not equal.");
@@ -549,10 +582,10 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
     /// let a = Matrix::<f64>::new(2,2, vec![1.0,2.0,3.0,4.0]);
     ///
     /// let c = a.mean(0);
-    /// assert_eq!(c.data, vec![2.0, 3.0]);
+    /// assert_eq!(*c.data(), vec![2.0, 3.0]);
     ///
     /// let d = a.mean(1);
-    /// assert_eq!(d.data, vec![1.5, 3.5]);
+    /// assert_eq!(*d.data(), vec![1.5, 3.5]);
     /// ```
     pub fn mean(&self, axis: usize) -> Vector<T> {
         let m: Vector<T>;
@@ -584,10 +617,10 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
     /// let a = Matrix::<f32>::new(2,2,vec![1.0,2.0,3.0,4.0]);
     ///
     /// let c = a.variance(0);
-    /// assert_eq!(c.data, vec![2.0, 2.0]);
+    /// assert_eq!(*c.data(), vec![2.0, 2.0]);
     ///
     /// let d = a.variance(1);
-    /// assert_eq!(d.data, vec![0.5, 0.5]);
+    /// assert_eq!(*d.data(), vec![0.5, 0.5]);
     /// ```
     pub fn variance(&self, axis: usize) -> Vector<T> {
         let mean = self.mean(axis);
@@ -691,7 +724,7 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
     ///
     /// let x = a.solve(y);
     ///
-    /// assert_eq!(x.data, vec![2.0, 3.0]);
+    /// assert_eq!(*x.data(), vec![2.0, 3.0]);
     /// ```
     pub fn solve(&self, y: Vector<T>) -> Vector<T> {
         let (l,u,p) = self.lup_decomp();
@@ -712,7 +745,7 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
     ///
     /// let I = a * inv;
     ///
-    /// assert_eq!(I.data, vec![1.0,0.0,0.0,1.0]);
+    /// assert_eq!(*I.data(), vec![1.0,0.0,0.0,1.0]);
     /// ```
     pub fn inverse(&self) -> Matrix<T> {
         assert!(self.rows==self.cols, "Matrix is not square.");
@@ -738,7 +771,7 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
             id_col[i] = T::one();
 
             let b = l.solve_l_triangular(&p * Vector::new(id_col));
-            new_t_data.append(&mut u.solve_u_triangular(b).data);
+            new_t_data.append(&mut u.solve_u_triangular(b).into_vec());
 
         }
 
@@ -1100,7 +1133,7 @@ impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
 
         for i in 0..self.rows
         {
-            new_data[i] = utils::dot(&self.data[i*self.cols..(i+1)*self.cols], &v.data);
+            new_data[i] = utils::dot(&self.data[i*self.cols..(i+1)*self.cols], v.data());
         }
 
         return Vector::new(new_data)
@@ -1315,6 +1348,36 @@ impl<'a, 'b, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<&'b T> f
         assert!(*f != T::zero());
 
         let new_data = self.data.iter().map(|v| *v / *f).collect();
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data,
+        }
+    }
+}
+
+/// Gets negative of matrix.
+impl<T: Neg<Output=T> + Copy> Neg for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn neg(self) -> Matrix<T> {
+        let new_data = self.data.iter().map(|v| -*v).collect();
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data,
+        }
+    }
+}
+
+/// Gets negative of matrix.
+impl<'a, T: Neg<Output=T> + Copy> Neg for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn neg(self) -> Matrix<T> {
+        let new_data = self.data.iter().map(|v| -*v).collect();
 
         Matrix {
             cols: self.cols,

@@ -218,9 +218,9 @@ fn matrix_lup_decomp() {
     let u_true = vec![2., 4., 7., 0., 1., 1.5, 0., 0., -2.];
     let p_true = vec![0., 1., 0., 1., 0., 0., 0., 0., 1.];
 
-    assert_eq!(p.data, p_true);
-    assert_eq!(l.data, l_true);
-    assert_eq!(u.data, u_true);
+    assert_eq!(*p.data(), p_true);
+    assert_eq!(*l.data(), l_true);
+    assert_eq!(*u.data(), u_true);
 
     let e = Matrix::<f64>::new(5,
                                5,
@@ -231,8 +231,8 @@ fn matrix_lup_decomp() {
     let k = p.transpose() * l * u;
 
     for i in 0..25 {
-        println!("{0},{1}", e.data[i], k.data[i]);
-        assert_eq!(e.data[i], k.data[i]);
+        println!("{0},{1}", e.data()[i], k.data()[i]);
+        assert_eq!(e.data()[i], k.data()[i]);
     }
 }
 
@@ -294,5 +294,5 @@ fn cholesky() {
 
     let l = a.cholesky();
 
-    assert_eq!(l.data, vec![5.,0.,0.,3.,3.,0.,-1.,1.,3.]);
+    assert_eq!(*l.data(), vec![5.,0.,0.,3.,3.,0.,-1.,1.,3.]);
 }
