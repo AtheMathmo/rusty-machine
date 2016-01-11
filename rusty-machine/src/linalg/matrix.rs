@@ -54,10 +54,12 @@ impl<T> Matrix<T> {
         self.cols
     }
 
+    /// Returns a non-mutable reference to the underlying data.
     pub fn data(&self) -> &Vec<T> {
         &self.data
     }
 
+    /// Consumes the Matrix and returns the Vec of data.
     pub fn into_vec(self) -> Vec<T> {
         self.data
     }

@@ -14,8 +14,6 @@ use linalg::utils;
 /// Can be instantiated with any type.
 pub struct Vector<T> {
     size: usize,
-    /// The underlying vector data.
-    /// NOTE: This should not be changed after instantiation.
     data: Vec<T>,
 }
 
@@ -46,10 +44,12 @@ impl<T> Vector<T> {
         self.size
     }
 
+    /// Returns a non-mutable reference to the underlying data.
     pub fn data(&self) -> &Vec<T> {
         &self.data
     }
 
+    /// Consumes the Vector and returns the Vec of data.
     pub fn into_vec(self) -> Vec<T> {
         self.data
     }
