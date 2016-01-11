@@ -22,6 +22,8 @@ So this project is now going to be a machine learning crate for Rust. I began th
 
 I don't have a dedicated page for contributions right now as the project is still very small. Please feel free to fork, file issues, PRs and all that jazz.
 
+Additionally I'll start labelling simple issues as `easy`. These may be a good starting point if you want to jump aboard!
+
 #### Help!
 
 I've probably introduced some bad practices as I've been learning Rust. If you have any suggestions for structure or optimization please let me know.
