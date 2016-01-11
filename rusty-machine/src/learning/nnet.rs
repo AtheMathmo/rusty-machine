@@ -23,6 +23,12 @@
 //!
 //! model.predict(&test_data);
 //! ```
+//!
+//! The neural networks are specified via a criterion - similar to [Torch](https://github.com/torch/nn/blob/master/doc/criterion.md).
+//! The criterions combine an activation function and a cost function.
+//!
+//! You can define your own criterion by implementing the `Criterion`
+//! trait with a concrete ActivationFunc and CostFunc.
 
 use linalg::matrix::Matrix;
 use learning::SupModel;
@@ -299,27 +305,44 @@ impl<'a, T: Criterion> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, T> {
     }
 }
 
+/// Criterion for Neural Networks
+///
+/// Specifies an activation function and a cost function.
 pub trait Criterion {
+    /// The activation function for the criterion.
     type ActFunc: ActivationFunc;
+    /// The cost function for the criterion.
     type Cost: CostFunc<Matrix<f64>>;
 
+    /// The activation function applied to a matrix.
     fn activate(&self, mat: Matrix<f64>) -> Matrix<f64> {
         mat.apply(&Self::ActFunc::func)
     }
 
+    /// The gradient of the activation function applied to a matrix.
     fn grad_activ(&self, mat: Matrix<f64>) -> Matrix<f64> {
         mat.apply(&Self::ActFunc::func_grad)
     }
 
+    /// The cost function.
+    ///
+    /// Returns a scalar cost.
     fn cost(&self, output: &Matrix<f64>, target: &Matrix<f64>) -> f64 {
         Self::Cost::cost(output, target)
     }
 
+    /// The gradient of the cost function.
+    ///
+    /// Returns a matrix of cost gradients.
     fn cost_grad(&self, output: &Matrix<f64>, target: &Matrix<f64>) -> Matrix<f64> {
         Self::Cost::grad_cost(output, target)
     }
 }
 
+/// The binary cross entropy criterion.
+///
+/// Uses the Sigmoid activation function and the
+/// cross entropy error.
 pub struct BCECriterion;
 
 impl Criterion for BCECriterion {
@@ -327,6 +350,10 @@ impl Criterion for BCECriterion {
     type Cost = cost_fn::CrossEntropyError;
 }
 
+/// The mean squared error criterion.
+///
+/// Uses the Linear activation function and the
+/// mean squared error.
 pub struct MSECriterion;
 
 impl Criterion for MSECriterion {

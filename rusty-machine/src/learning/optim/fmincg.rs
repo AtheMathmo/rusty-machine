@@ -1,3 +1,33 @@
+//! Module for the fmincg optimization algorithm.
+//!
+//! This algorithm was taken from Andrew Ng's coursera machine
+//! learning course. The function was translated from MATLAB into rust.
+//! Original source code can be found [here](http://www.mathworks.com/matlabcentral/fileexchange/42770-logistic-regression-with-regularization-used-to-classify-hand-written-digits/content/Logistic%20Regression%20with%20regularisation/fmincg.m).
+//!
+//! The attached license permits use and modification for research
+//! and education only.
+//!
+//! Copyright (C) 2001 and 2002 by Carl Edward Rasmussen. Date 2002-02-13
+//!
+//!
+//! (C) Copyright 1999, 2000 & 2001, Carl Edward Rasmussen
+//! 
+//! Permission is granted for anyone to copy, use, or modify these
+//! programs and accompanying documents for purposes of research or
+//! education, provided this copyright notice is retained, and note is
+//! made of any changes that have been made.
+//! 
+//! These programs and documents are distributed without any warranty,
+//! express or implied.  As the programs were written for research
+//! purposes only, they have not been tested to the degree that would be
+//! advisable in any important application.  All use of these programs is
+//! entirely at the user's own risk.
+//!
+//! [rusty-machine] Changes made:
+//!
+//! - Conversion to Rust.
+//! - Length hard defaults to the max iterations.
+
 use learning::optim::{Optimizable, OptimAlgorithm};
 use linalg::vector::Vector;
 
@@ -7,14 +37,21 @@ use std::f64;
 
 /// Conjugate Gradient Descent algorithm
 pub struct ConjugateGD {
-    pub rho: f64, // 0.01
-    pub sig: f64, // 0.5
-    pub int: f64, // 0.1
-    pub ext: f64, // 3.0
-    pub max: usize, // 20
-    pub ratio: f64, // 100
+    /// Constant in the Wolfe-Powell conditions.
+    pub rho: f64,
+    /// Constant in the Wolfe-Powell conditions.
+    pub sig: f64,
+    /// Don't reevaluate within `int` of the limit of the current bracket.
+    pub int: f64,
+    /// Extrapolate max of `ext` times the current bracket.
+    pub ext: f64,
+    /// Max of `max` function evaluations per line search
+    pub max: usize,
+    /// The maximum allowed slope ratio
+    pub ratio: f64,
 
-    pub iters: usize, // 100
+    /// The default number of max iterations.
+    pub iters: usize,
 }
 
 impl Default for ConjugateGD {
@@ -41,6 +78,7 @@ impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
 
         // The reduction in the function. Can also be specified as part of length
         let red = 1f64;
+
         let length = self.iters as i32;
 
         let mut s = -df1.clone();

@@ -1,3 +1,4 @@
+#![deny(missing_docs)]
 //! # The rusty-machine crate.
 //!
 //! Crate built for machine learning with some linear algebra thrown in.
