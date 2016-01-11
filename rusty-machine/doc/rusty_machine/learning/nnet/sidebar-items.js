@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["NeuralNet","Neural Network struct"]]});
+initSidebarItems({"struct":[["BCECriterion","The binary cross entropy criterion."],["MSECriterion","The mean squared error criterion."],["NeuralNet","Neural Network struct"]],"trait":[["Criterion","Criterion for Neural Networks"]]});

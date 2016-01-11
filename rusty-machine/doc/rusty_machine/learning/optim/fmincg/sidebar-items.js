@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ConjugateGD","Conjugate Gradient Descent algorithm"]]});

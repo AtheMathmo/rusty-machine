@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Exp","Exponential activation function."],["Linear","Linear activation function."],["Sigmoid","Sigmoid activation function."]],"trait":[["ActivationFunc","Trait for activation functions in models."]]});

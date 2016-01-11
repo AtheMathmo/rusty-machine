@@ -46,18 +46,13 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-619' class='srclink' href='../../../src/rusty_machine/linalg/vector.rs.html#15-20' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-649' class='srclink' href='../../../src/rusty_machine/linalg/vector.rs.html#15-18' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Vector&lt;T&gt; {
-    pub data: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;,
     // some fields omitted
 }</pre><div class='docblock'><p>The Vector struct.</p>
 
 <p>Can be instantiated with any type.</p>
-</div><h2 class='fields'>Fields</h2>
-<table><tr class='stab '>
-                                  <td id='structfield.data'><code>data</code></td><td><div class='docblock'><p>The underlying vector data.
-NOTE: This should not be changed after instantiation.</p>
-</div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;T&gt; <a class='struct' href='../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(data: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;) -&gt; <a class='struct' href='../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;T&gt;</code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;T&gt; <a class='struct' href='../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(data: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;) -&gt; <a class='struct' href='../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;T&gt;</code></h4>
 <div class='docblock'><p>Constructor for Vector struct.</p>
 
 <p>Requires the vector data.</p>
@@ -68,6 +63,10 @@ NOTE: This should not be changed after instantiation.</p>
 <span class='kw'>let</span> <span class='ident'>vec</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>,<span class='number'>2.0</span>,<span class='number'>3.0</span>,<span class='number'>4.0</span>]);</pre>
 </div><h4 id='method.size' class='method'><code>fn <a href='#method.size' class='fnname'>size</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
 <div class='docblock'><p>Returns the size of the Vector.</p>
+</div><h4 id='method.data' class='method'><code>fn <a href='#method.data' class='fnname'>data</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;</code></h4>
+<div class='docblock'><p>Returns a non-mutable reference to the underlying data.</p>
+</div><h4 id='method.into_vec' class='method'><code>fn <a href='#method.into_vec' class='fnname'>into_vec</a>(self) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;</code></h4>
+<div class='docblock'><p>Consumes the Vector and returns the Vec of data.</p>
 </div></div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a>&gt; <a class='struct' href='../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.apply' class='method'><code>fn <a href='#method.apply' class='fnname'>apply</a>(self, f: &amp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Fn.html' title='core::ops::Fn'>Fn</a>(T) -&gt; T) -&gt; <a class='struct' href='../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;T&gt;</code></h4>
 <div class='docblock'><p>Applies a function to each element in the vector.</p>
 
@@ -81,7 +80,7 @@ NOTE: This should not be changed after instantiation.</p>
 
 <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='ident'>add_two</span>);
 
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>data</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>2.0</span>; <span class='number'>4</span>]);</pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>into_vec</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>2.0</span>; <span class='number'>4</span>]);</pre>
 </div></div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html' title='core::cmp::PartialOrd'>PartialOrd</a>&gt; <a class='struct' href='../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.argmax' class='method'><code>fn <a href='#method.argmax' class='fnname'>argmax</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, T)</a></code></h4>
 <div class='docblock'><p>Find the argmax of the Vector.</p>
 
@@ -157,7 +156,7 @@ NOTE: This should not be changed after instantiation.</p>
 <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>,<span class='number'>2.0</span>,<span class='number'>3.0</span>,<span class='number'>4.0</span>]);
 
 <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>a</span>.<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>b</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>data</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>, <span class='number'>4.0</span>, <span class='number'>9.0</span>, <span class='number'>16.0</span>]);</pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='op'>*</span><span class='ident'>c</span>.<span class='ident'>data</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>, <span class='number'>4.0</span>, <span class='number'>9.0</span>, <span class='number'>16.0</span>]);</pre>
 </div></div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../../num/traits/trait.Zero.html' title='num::traits::Zero'>Zero</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Div.html' title='core::ops::Div'>Div</a>&lt;T, Output=T&gt;&gt; <a class='struct' href='../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.elediv' class='method'><code>fn <a href='#method.elediv' class='fnname'>elediv</a>(&amp;self, v: &amp;<a class='struct' href='../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;T&gt;) -&gt; <a class='struct' href='../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;T&gt;</code></h4>
 <div class='docblock'><p>The elementwise division of two vectors.</p>
 
@@ -168,7 +167,7 @@ NOTE: This should not be changed after instantiation.</p>
 <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>,<span class='number'>2.0</span>,<span class='number'>3.0</span>,<span class='number'>4.0</span>]);
 
 <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>a</span>.<span class='ident'>elediv</span>(<span class='kw-2'>&amp;</span><span class='ident'>b</span>);
-<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>data</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>; <span class='number'>4</span>]);</pre>
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='op'>*</span><span class='ident'>c</span>.<span class='ident'>data</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>; <span class='number'>4</span>]);</pre>
 </div></div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../../num/traits/trait.Zero.html' title='num::traits::Zero'>Zero</a> + <a class='trait' href='../../../num/traits/trait.Float.html' title='num::traits::Float'>Float</a> + <a class='trait' href='../../../num/traits/trait.FromPrimitive.html' title='num::traits::FromPrimitive'>FromPrimitive</a>&gt; <a class='struct' href='../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.mean' class='method'><code>fn <a href='#method.mean' class='fnname'>mean</a>(&amp;self) -&gt; T</code></h4>
 <div class='docblock'><p>The mean of the vector.</p>
 
