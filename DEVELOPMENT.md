@@ -29,15 +29,11 @@ I've decided for now to halt optimization efforts. It seems the best course of a
 
 This marks my intended release goals. I won't estimate the actual dates of release but rather the content I want to include in each version. I am actively developing and so expect to move through these at a good pace!
 
+*NOTE*: Need to plan out the path 0.2.0 in more detail. More updates soon. Feedback welcome!
+
 <table>
     <tr>
         <th>Version</th><th>Features</th><th>Dependencies</th>
-    </tr>
-    <tr>
-        <td>0.1.1.</td><td><ul><li>Cholesky Decomp</li><li>Gaussian Processes</li></ul></td><td><ul><li>Cholesky Decomp</li><li>Kernels</li></ul></td>
-    </tr>
-    <tr>
-        <td>0.1.2</td><td><ul><li>Cost AND grad for optimization.</li></ul></td><td><ul><li>None</li></ul></td>
     </tr>
     <tr>
         <td>0.2.0</td><td><ul><li>Generalized linear regression</li><li>SVM</li><li>Linalg optimization</li></ul></td><td><ul><li>Lots</li></ul></td>
