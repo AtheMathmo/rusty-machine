@@ -1,5 +1,5 @@
 //! Gradient Descent
-//! 
+//!
 //! Implementation of gradient descent algorithm. Module contains
 //! the struct GradientDesc which is instantiated within models
 //! implementing the Optimizable trait.
@@ -10,56 +10,129 @@
 
 use learning::optim::{Optimizable, OptimAlgorithm};
 use linalg::vector::Vector;
+use linalg::matrix::Matrix;
 
 /// Batch Gradient Descent algorithm
 pub struct GradientDesc {
-	/// The step-size for the gradient descent steps.
-	pub alpha: f64,
-	/// The number of iterations to run.
-	pub iters: usize
+    /// The step-size for the gradient descent steps.
+    pub alpha: f64,
+    /// The number of iterations to run.
+    pub iters: usize,
 }
 
 impl Default for GradientDesc {
-
-	/// Constructs a gradient descent algorithm
-	/// with default settings.
-	///
-	/// Uses 10000 iterations and step size of 0.3.
-	fn default() -> GradientDesc {
-		GradientDesc{ alpha: 0.3, iters: 10000 }
-	}
+    /// Constructs a gradient descent algorithm
+    /// with default settings.
+    ///
+    /// Uses 10000 iterations and step size of 0.3.
+    fn default() -> GradientDesc {
+        GradientDesc {
+            alpha: 0.3,
+            iters: 10000,
+        }
+    }
 }
 
 impl GradientDesc {
-
-	/// Construct a gradient descent algorithm.
-	///
-	/// Requires the step size and iteration count
-	/// to be specified.
-	///
-	/// # Examples
-	///
-	/// ```
-	/// use rusty_machine::learning::optim::grad_desc::GradientDesc;
-	///
-	/// let gd = GradientDesc::new(0.3, 10000);
-	/// ```
-	pub fn new(alpha: f64, iters: usize) -> GradientDesc {
-		GradientDesc{ alpha: alpha, iters: iters }
-	}
+    /// Construct a gradient descent algorithm.
+    ///
+    /// Requires the step size and iteration count
+    /// to be specified.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::optim::grad_desc::GradientDesc;
+    ///
+    /// let gd = GradientDesc::new(0.3, 10000);
+    /// ```
+    pub fn new(alpha: f64, iters: usize) -> GradientDesc {
+        GradientDesc {
+            alpha: alpha,
+            iters: iters,
+        }
+    }
 }
 
-// This could take in the model to be optimized, which has an optimizable trait.
-// This trait specifies a function which we can call within this trait.
 impl<M: Optimizable> OptimAlgorithm<M> for GradientDesc {
-
     fn optimize(&self, model: &M, start: &[f64], data: &M::Data, outputs: &M::Target) -> Vec<f64> {
 
-		let mut optimizing_val = Vector::new(start.to_vec());
+        let mut optimizing_val = Vector::new(start.to_vec());
 
-		for _i in 0..self.iters {
-			optimizing_val = &optimizing_val - Vector::new(model.compute_grad(&optimizing_val.data()[..], data, outputs).1) * self.alpha;
-		}
-		optimizing_val.into_vec()
-	}
-} 
+        for _ in 0..self.iters {
+            optimizing_val = &optimizing_val -
+                             Vector::new(model.compute_grad(&optimizing_val.data()[..],
+                                                            data,
+                                                            outputs)
+                                              .1) * self.alpha;
+        }
+        optimizing_val.into_vec()
+    }
+}
+
+pub struct StochasticGD {
+    pub alpha: f64,
+    pub mu: f64,
+    pub iters: usize,
+}
+
+impl Default for StochasticGD {
+    /// Constructs a stochastic gradient descent algorithm
+    /// with default settings.
+    ///
+    /// Uses 5 iterations and step size of 0.1.
+    fn default() -> StochasticGD {
+        StochasticGD {
+            alpha: 0.1,
+            mu: 0.3,
+            iters: 5,
+        }
+    }
+}
+
+impl StochasticGD {
+    /// Construct a gradient descent algorithm.
+    ///
+    /// Requires the step size and iteration count
+    /// to be specified.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::optim::grad_desc::StochasticGD;
+    ///
+    /// let gd = StochasticGD::new(0.1, 5);
+    /// ```
+    pub fn new(alpha: f64, iters: usize) -> StochasticGD {
+        StochasticGD {
+            alpha: alpha,
+            mu: 0.3,
+            iters: iters,
+        }
+    }
+}
+
+impl<M: Optimizable<Data = Matrix<f64>, Target = Matrix<f64>>> OptimAlgorithm<M> for StochasticGD {
+    fn optimize(&self, model: &M, start: &[f64], data: &M::Data, outputs: &M::Target) -> Vec<f64> {
+
+        let (_, vec_data) = model.compute_grad(start,
+                                               &data.select_rows(&[0]),
+                                               &outputs.select_rows(&[0]));
+        let grad = Vector::new(vec_data);
+        let mut delta_w = grad * self.alpha;
+        let mut optimizing_val = Vector::new(start.to_vec()) - &delta_w * self.mu;
+
+        for _ in 0..self.iters {
+            for i in 1..data.rows() {
+                let (_, vec_data) = model.compute_grad(&optimizing_val.data()[..],
+                                                           &data.select_rows(&[i]),
+                                                           &outputs.select_rows(&[i]));
+
+                delta_w = Vector::new(vec_data) * self.mu + &delta_w * self.alpha;
+
+                optimizing_val = &optimizing_val - &delta_w * self.mu;
+            }
+        }
+        optimizing_val.into_vec()
+    }
+}

@@ -230,7 +230,7 @@ impl KMeansClassifier {
         }
 
         let mut rng = thread_rng();
-        for _i in k..data.rows() {
+        for _ in k..data.rows() {
             random_assignments.push(rng.gen_range(0, k));
         }
 
