@@ -9,7 +9,6 @@
 
     <title>nnet.rs.html -- source</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -443,7 +442,7 @@
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>cost_fn</span>;
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>cost_fn</span>::<span class='ident'>CostFunc</span>;
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>optim</span>::{<span class='ident'>Optimizable</span>, <span class='ident'>OptimAlgorithm</span>};
-<span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>optim</span>::<span class='ident'>fmincg</span>::<span class='ident'>ConjugateGD</span>;
+<span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>optim</span>::<span class='ident'>grad_desc</span>::<span class='ident'>StochasticGD</span>;
 
 <span class='kw'>use</span> <span class='ident'>rand</span>::{<span class='ident'>Rng</span>, <span class='ident'>thread_rng</span>};
 
@@ -451,7 +450,7 @@
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Criterion</span><span class='op'>&gt;</span> {
     <span class='ident'>layer_sizes</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> [<span class='ident'>usize</span>],
     <span class='ident'>weights</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>,
-    <span class='ident'>gd</span>: <span class='ident'>ConjugateGD</span>,
+    <span class='ident'>gd</span>: <span class='ident'>StochasticGD</span>,
     <span class='ident'>criterion</span>: <span class='ident'>T</span>,
 }
 
@@ -474,7 +473,7 @@
         <span class='ident'>NeuralNet</span> {
             <span class='ident'>layer_sizes</span>: <span class='ident'>layer_sizes</span>,
             <span class='ident'>weights</span>: <span class='ident'>NeuralNet</span>::<span class='op'>&lt;</span><span class='ident'>BCECriterion</span><span class='op'>&gt;</span>::<span class='ident'>create_weights</span>(<span class='ident'>layer_sizes</span>),
-            <span class='ident'>gd</span>: <span class='ident'>ConjugateGD</span>::<span class='ident'>default</span>(),
+            <span class='ident'>gd</span>: <span class='ident'>StochasticGD</span>::<span class='ident'>default</span>(),
             <span class='ident'>criterion</span>: <span class='ident'>BCECriterion</span>,
         }
     }
@@ -501,7 +500,7 @@
         <span class='ident'>NeuralNet</span> {
             <span class='ident'>layer_sizes</span>: <span class='ident'>layer_sizes</span>,
             <span class='ident'>weights</span>: <span class='ident'>NeuralNet</span>::<span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>::<span class='ident'>create_weights</span>(<span class='ident'>layer_sizes</span>),
-            <span class='ident'>gd</span>: <span class='ident'>ConjugateGD</span>::<span class='ident'>default</span>(),
+            <span class='ident'>gd</span>: <span class='ident'>StochasticGD</span>::<span class='ident'>default</span>(),
             <span class='ident'>criterion</span>: <span class='ident'>criterion</span>,
         }
     }
@@ -825,6 +824,6 @@
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script defer src="../../../search-index.js"></script>
+    <script async src="../../../search-index.js"></script>
 </body>
 </html>

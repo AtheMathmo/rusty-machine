@@ -9,7 +9,6 @@
 
     <title>rusty_machine::learning::toolkit::kernel::SquaredExp - Rust</title>
 
-    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
 
     
@@ -46,7 +45,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1623' class='srclink' href='../../../../src/rusty_machine/learning/toolkit/kernel.rs.html#26-29' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-1651' class='srclink' href='../../../../src/rusty_machine/learning/toolkit/kernel.rs.html#26-29' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct SquaredExp {
     // some fields omitted
 }</pre><div class='docblock'><p>Squared exponential kernel</p>
@@ -58,7 +57,7 @@
 <p>f(x1,x2) = A <em>exp</em>(-||x1-x2||<sup>2</sup> / 2(l<sup>2))</sup></p>
 
 <p>Where A is the amplitude and l the length scale.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(ls: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>, ampl: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h4>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(ls: <a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>, ampl: <a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h4>
 <div class='docblock'><p>Construct a new squared exponential kernel.</p>
 
 <h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1><pre class='rust rust-example-rendered'>
@@ -66,7 +65,7 @@
 
 <span class='kw'>let</span> <span class='ident'>ker</span> <span class='op'>=</span> <span class='ident'>SquaredExp</span>::<span class='ident'>new</span>(<span class='number'>2f64</span>, <span class='number'>1f64</span>);</pre>
 </div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h3><div class='impl-items'><h4 id='method.default' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#method.default' class='fnname'>default</a>() -&gt; <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h4>
-</div><h3 class='impl'><code>impl <a class='trait' href='../../../../rusty_machine/learning/toolkit/kernel/trait.Kernel.html' title='rusty_machine::learning::toolkit::kernel::Kernel'>Kernel</a> for <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h3><div class='impl-items'><h4 id='method.kernel' class='method'><code>fn <a href='../../../../rusty_machine/learning/toolkit/kernel/trait.Kernel.html#method.kernel' class='fnname'>kernel</a>(&amp;self, x1: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>, x2: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='../../../../rusty_machine/learning/toolkit/kernel/trait.Kernel.html' title='rusty_machine::learning::toolkit::kernel::Kernel'>Kernel</a> for <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h3><div class='impl-items'><h4 id='method.kernel' class='method'><code>fn <a href='../../../../rusty_machine/learning/toolkit/kernel/trait.Kernel.html#method.kernel' class='fnname'>kernel</a>(&amp;self, x1: <a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a><a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>, x2: <a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a><a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -126,6 +125,6 @@
     <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
     
-    <script defer src="../../../../search-index.js"></script>
+    <script async src="../../../../search-index.js"></script>
 </body>
 </html>
