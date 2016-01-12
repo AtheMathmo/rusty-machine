@@ -20,6 +20,7 @@ There is now a first pass at the linear algebra library and some basic machine l
 - Linear Regression
 - K-Means Clustering
 - Neural Networks
+- Gaussian Processes
 
 I've decided for now to halt optimization efforts. It seems the best course of action is to decide as a community a single linear algebra library to utilize. This should also probably utilize BLAS and LAPACK bindings.
 
@@ -29,18 +30,29 @@ I've decided for now to halt optimization efforts. It seems the best course of a
 
 This marks my intended release goals. I won't estimate the actual dates of release but rather the content I want to include in each version. I am actively developing and so expect to move through these at a good pace!
 
-*NOTE*: Need to plan out the path 0.2.0 in more detail. More updates soon. Feedback welcome!
-
 <table>
     <tr>
         <th>Version</th><th>Features</th><th>Dependencies</th>
     </tr>
     <tr>
-        <td>0.2.0</td><td><ul><li>Generalized linear regression</li><li>SVM</li><li>Linalg optimization</li></ul></td><td><ul><li>Lots</li></ul></td>
+        <td>0.1.3</td><td><ul><li>(Basic) Stochastic Gradient Descent</li><ul></td><td><ul><li>None</li><ul></td>
+    </tr>
+    <tr>
+        <td>0.1.4</td><td><ul><li>Regularization on cost functions.</li><ul></td><td><ul><li>May require some refactoring.</li><ul></td>
+    </tr>
+    <tr>
+        <td>0.1.5</td><td><ul><li>Logistic Regression.</li><ul></td><td><ul><li>Looking to Generalized lin reg.</li><ul></td>
+    </tr>
+    <tr>
+        <td>0.1.6</td><td><ul><li>SVMs</li><ul></td><td><ul><li>None.</li><ul></td>
+    </tr>
+    <tr>
+        <td>0.1.7</td><td><ul><li>Generalized linear regression.</li><ul></td><td><ul><li>None.</li><ul></td>
+    </tr>
+    <tr>
+        <td>0.2.0</td><td><ul><li>More advanced GD algorithms.</li><li>Optimization</li><li>Bug fixes</li></ul></td><td></td>
     </tr>
 </table>
-
-I have chosen to push out a number of different algorithms before focused optimizing. This is partly so I can have use-cases for profiling but mostly for fun!  I will also be working through optimization throughout this process.
 
 ### Unplanned:
 
@@ -49,4 +61,3 @@ I have chosen to push out a number of different algorithms before focused optimi
 - Start work on statistics components - R.V. sampling etc.
 - Data Handling.
 - Convolutional and Recurrent neural nets.
-- Regularization in existing models.
