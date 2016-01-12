@@ -37,7 +37,7 @@ use learning::toolkit::activ_fn::ActivationFunc;
 use learning::toolkit::cost_fn;
 use learning::toolkit::cost_fn::CostFunc;
 use learning::optim::{Optimizable, OptimAlgorithm};
-use learning::optim::fmincg::ConjugateGD;
+use learning::optim::grad_desc::StochasticGD;
 
 use rand::{Rng, thread_rng};
 
@@ -45,7 +45,7 @@ use rand::{Rng, thread_rng};
 pub struct NeuralNet<'a, T: Criterion> {
     layer_sizes: &'a [usize],
     weights: Vec<f64>,
-    gd: ConjugateGD,
+    gd: StochasticGD,
     criterion: T,
 }
 
@@ -68,7 +68,7 @@ impl<'a> NeuralNet<'a, BCECriterion> {
         NeuralNet {
             layer_sizes: layer_sizes,
             weights: NeuralNet::<BCECriterion>::create_weights(layer_sizes),
-            gd: ConjugateGD::default(),
+            gd: StochasticGD::default(),
             criterion: BCECriterion,
         }
     }
@@ -95,7 +95,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         NeuralNet {
             layer_sizes: layer_sizes,
             weights: NeuralNet::<T>::create_weights(layer_sizes),
-            gd: ConjugateGD::default(),
+            gd: StochasticGD::default(),
             criterion: criterion,
         }
     }

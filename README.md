@@ -1,6 +1,6 @@
 # rusty-machine
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.1.1](https://crates.io/crates/rusty-machine/0.1.1).
+Here is the API documentation for the rust crate. Currently up to date for [version 0.1.2](https://crates.io/crates/rusty-machine/0.1.2).
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
@@ -21,6 +21,8 @@ So this project is now going to be a machine learning crate for Rust. I began th
 #### Contributing
 
 I don't have a dedicated page for contributions right now as the project is still very small. Please feel free to fork, file issues, PRs and all that jazz.
+
+Additionally I'll start labelling simple issues as `easy`. These may be a good starting point if you want to jump aboard!
 
 #### Help!
 
