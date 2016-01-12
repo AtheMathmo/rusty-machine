@@ -70,9 +70,15 @@ impl<M: Optimizable> OptimAlgorithm<M> for GradientDesc {
     }
 }
 
+/// Stochastic Gradient Descent algorithm.
+///
+/// Uses basic momentum to control the learning rate.
 pub struct StochasticGD {
+    /// Controls the momentum of the descent
     pub alpha: f64,
+    /// The square root of the raw learning rate.
     pub mu: f64,
+    /// The number of passes through the data.
     pub iters: usize,
 }
 
@@ -80,7 +86,7 @@ impl Default for StochasticGD {
     /// Constructs a stochastic gradient descent algorithm
     /// with default settings.
     ///
-    /// Uses 5 iterations and step size of 0.1.
+    /// Uses 5 iterations, momentum of 0.1 and rate of 0.3.
     fn default() -> StochasticGD {
         StochasticGD {
             alpha: 0.1,
@@ -91,9 +97,9 @@ impl Default for StochasticGD {
 }
 
 impl StochasticGD {
-    /// Construct a gradient descent algorithm.
+    /// Construct a stochastic gradient descent algorithm.
     ///
-    /// Requires the step size and iteration count
+    /// Requires the learning rate, momentum rate and iteration count
     /// to be specified.
     ///
     /// # Examples
@@ -101,12 +107,12 @@ impl StochasticGD {
     /// ```
     /// use rusty_machine::learning::optim::grad_desc::StochasticGD;
     ///
-    /// let gd = StochasticGD::new(0.1, 5);
+    /// let sgd = StochasticGD::new(0.1, 0.3, 5);
     /// ```
-    pub fn new(alpha: f64, iters: usize) -> StochasticGD {
+    pub fn new(alpha: f64, mu: f64, iters: usize) -> StochasticGD {
         StochasticGD {
             alpha: alpha,
-            mu: 0.3,
+            mu: mu,
             iters: iters,
         }
     }
