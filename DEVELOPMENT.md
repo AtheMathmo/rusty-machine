@@ -38,7 +38,7 @@ This marks my intended release goals. I won't estimate the actual dates of relea
         <td>0.1.3</td><td><ul><li>(Basic) Stochastic Gradient Descent</li><ul></td><td><ul><li>None</li><ul></td>
     </tr>
     <tr>
-        <td>0.1.4</td><td><ul><li>Regularization on cost functions.</li><ul></td><td><ul><li>May require some refactoring.</li><ul></td>
+        <td>0.1.4</td><td><ul><li>Regularization on cost functions.</li><ul></td><td><ul><li>Data Normalization.</li><li>Some refactoring.</li><ul></td>
     </tr>
     <tr>
         <td>0.1.5</td><td><ul><li>Logistic Regression.</li><ul></td><td><ul><li>Looking to Generalized lin reg.</li><ul></td>
