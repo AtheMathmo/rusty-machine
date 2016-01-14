@@ -44,6 +44,7 @@
 //!
 //! ```
 //! use rusty_machine::linalg::matrix::Matrix;
+//! use rusty_machine::linalg::vector::Vector;
 //! use rusty_machine::learning::gp::GaussianProcess;
 //! use rusty_machine::learning::gp::ConstMean;
 //! use rusty_machine::learning::toolkit::kernel;
@@ -51,7 +52,7 @@
 //! 
 //! // Some example training data.
 //! let train_data = Matrix::new(3,3,vec![1.,1.,1.,2.,2.,2.,3.,3.,3.]);
-//! let train_outputs = Matrix::new(3,3, vec![0.,0.,0.,1.,1.,1.,0.,0.,0.]);
+//! let train_outputs = Vector::new(vec![0.,1.,0.]);
 //!
 //! // Some example test data.
 //! let test_data = Matrix::new(2,3, vec![1.5,1.5,1.5,2.5,2.5,2.5]);

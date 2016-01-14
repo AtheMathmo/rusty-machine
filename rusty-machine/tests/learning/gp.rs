@@ -1,4 +1,5 @@
 use rm::linalg::matrix::Matrix;
+use rm::linalg::vector::Vector;
 use rm::learning::SupModel;
 use rm::learning::gp::GaussianProcess;
 
@@ -8,7 +9,7 @@ fn test_default_gp() {
 	gp.noise = 10f64;
 
 	let train_data = Matrix::new(10,1,vec![0.,1.,2.,3.,4.,5.,6.,7.,8.,9.]);
-	let target = Matrix::new(10,1,vec![0.,1.,2.,3.,4.,4.,3.,2.,1.,0.]);
+	let target = Vector::new(vec![0.,1.,2.,3.,4.,4.,3.,2.,1.,0.]);
 
 	gp.train(&train_data, &target);
 

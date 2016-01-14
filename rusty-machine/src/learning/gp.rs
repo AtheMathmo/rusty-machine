@@ -8,12 +8,13 @@
 //! use rusty_machine::learning::gp;
 //! use rusty_machine::learning::SupModel;
 //! use rusty_machine::linalg::matrix::Matrix;
+//! use rusty_machine::linalg::vector::Vector;
 //!
 //! let mut gaussp = gp::GaussianProcess::default();
 //! gaussp.noise = 10f64;
 //!
 //! let train_data = Matrix::new(10,1,vec![0.,1.,2.,3.,4.,5.,6.,7.,8.,9.]);
-//! let target = Matrix::new(10,1,vec![0.,1.,2.,3.,4.,4.,3.,2.,1.,0.]);
+//! let target = Vector::new(vec![0.,1.,2.,3.,4.,4.,3.,2.,1.,0.]);
 //!
 //! gaussp.train(&train_data, &target);
 //!
@@ -168,12 +169,10 @@ impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Vector<f64>> for GaussianProc
 
         let train_mat = (ker_mat + noise_mat).cholesky();
 
-        let x = GaussianProcess::<T, U>::solve_l_triangular(&train_mat,
+        let x = solve_l_triangular(&train_mat,
                                                             &(value -
                                                               self.mean.func(data.clone())));
-        let alpha = GaussianProcess::<T, U>::solve_u_triangular(&train_mat.transpose(), &x);
-
-        println!("x {:?}", x.data());
+        let alpha = solve_u_triangular(&train_mat.transpose(), &x);
 
         self.train_mat = Some(train_mat);
         self.train_data = Some(data.clone());
@@ -187,44 +186,58 @@ impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
     /// Requires the model to be trained first. 
     /// _Note that this is a messy compromise as GPs do not
     /// fit the SupModel trait as is currently implemented._
-    pub fn get_posterior(&self, data: &Matrix<f64>) {}
+    pub fn get_posterior(&self, data: &Matrix<f64>) {
+        if let (&Some(ref t_mat), &Some(ref alpha), &Some(ref t_data)) = (&self.train_mat, &self.alpha, &self.train_data) {
+            let mean = self.mean.func(data.clone());
 
-    /// Solves an upper triangular linear system.
-    fn solve_u_triangular(mat: &Matrix<f64>, y: &Vector<f64>) -> Vector<f64> {
-        assert!(mat.cols() == y.size(),
-                "Matrix and Vector dimensions do not agree.");
+            let post_mean = mean + self.ker_mat(data, t_data) * alpha;
 
-        let mut x = vec![0.; y.size()];
 
-        let mut holding_u_sum = 0.;
-        x[y.size() - 1] = y[y.size() - 1] / mat[[y.size() - 1, y.size() - 1]];
-
-        unsafe {
-            for i in (0..y.size() - 1).rev() {
-                holding_u_sum = holding_u_sum + *mat.data().get_unchecked(i * (mat.cols() + 1) + 1);
-                x[i] = (y[i] - holding_u_sum * x[i + 1]) /
-                       *mat.data().get_unchecked(i * (mat.cols() + 1));
+            for i in 0..data.rows() {
+                let test_point = Vector::new(data.select_rows(&[i]).into_vec());
+                let v = solve_l_triangular(t_mat, &test_point);
             }
         }
 
-        Vector::new(x)
+        panic!("The model has not been trained.");
     }
+}
 
-    /// Solves a lower triangular linear system.
-    fn solve_l_triangular(mat: &Matrix<f64>, y: &Vector<f64>) -> Vector<f64> {
-        assert!(mat.cols() == y.size(),
-                "Matrix and Vector dimensions do not agree.");
+/// Solves an upper triangular linear system.
+fn solve_u_triangular(mat: &Matrix<f64>, y: &Vector<f64>) -> Vector<f64> {
+    assert!(mat.cols() == y.size(),
+            "Matrix and Vector dimensions do not agree.");
 
-        let mut x = vec![0.; y.size()];
+    let mut x = vec![0.; y.size()];
 
-        let mut holding_l_sum = 0.;
-        x[0] = y[0] / mat[[0, 0]];
+    let mut holding_u_sum = 0.;
+    x[y.size() - 1] = y[y.size() - 1] / mat[[y.size() - 1, y.size() - 1]];
 
-        for i in 1..y.size() {
-            holding_l_sum = holding_l_sum + mat.data()[i * (mat.cols() + 1) - 1];
-            x[i] = (y[i] - holding_l_sum * x[i - 1]) / mat.data()[i * (mat.cols() + 1)];
+    unsafe {
+        for i in (0..y.size() - 1).rev() {
+            holding_u_sum = holding_u_sum + *mat.data().get_unchecked(i * (mat.cols() + 1) + 1);
+            x[i] = (y[i] - holding_u_sum * x[i + 1]) /
+                   *mat.data().get_unchecked(i * (mat.cols() + 1));
         }
-
-        Vector::new(x)
     }
+
+    Vector::new(x)
+}
+
+/// Solves a lower triangular linear system.
+fn solve_l_triangular(mat: &Matrix<f64>, y: &Vector<f64>) -> Vector<f64> {
+    assert!(mat.cols() == y.size(),
+            "Matrix and Vector dimensions do not agree.");
+
+    let mut x = vec![0.; y.size()];
+
+    let mut holding_l_sum = 0.;
+    x[0] = y[0] / mat[[0, 0]];
+
+    for i in 1..y.size() {
+        holding_l_sum = holding_l_sum + mat.data()[i * (mat.cols() + 1) - 1];
+        x[i] = (y[i] - holding_l_sum * x[i - 1]) / mat.data()[i * (mat.cols() + 1)];
+    }
+
+    Vector::new(x)
 }
