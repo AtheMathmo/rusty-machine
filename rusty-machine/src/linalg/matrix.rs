@@ -978,10 +978,10 @@ impl<T: Copy + Zero + Float> Matrix<T> {
                     new_data.push((self[[i, i]] - sum).sqrt());
                 }
                 else {
-                    let p = new_data[j * self.cols + j];
+                    let p = (self[[i, j]] - sum) / new_data[j * self.cols + j];
 
-                    assert!(p != T::zero(), "Matrix is not positive definite.");
-                    new_data.push((self[[i, j]] - sum) / p);
+                    assert!(!p.is_nan(), "Matrix is not positive definite.");
+                    new_data.push(p);
                 }
             }
         }
