@@ -188,6 +188,28 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         self.get_layer_weights(&self.weights[..], idx)
     }
 
+    /*
+    /// Get the matrix of weights without the bias terms.
+    fn get_regular_weights(&self, weights: &[f64]) -> Vec<f64> {
+        let mut reg_weights = Vec::new();
+
+        // Check that the weights are the right size.
+        let mut start = 0usize;
+        for l in 0..self.layer_sizes.len() - 1 {
+            
+            for i in 0..self.layer_sizes[l] {
+                for j in 0..self.layer_sizes[l + 1] {
+                    reg_weights.push(weights[start + j*(1+self.layer_sizes[l]) + 1 + i] )
+                }
+            }
+
+            start += (self.layer_sizes[l]+1) * self.layer_sizes[l + 1];
+        }
+
+        reg_weights
+    }
+    */
+
     /// Compute the gradient using the back propagation algorithm.
     fn compute_grad(&self, weights: &[f64], data: &Matrix<f64>, outputs: &Matrix<f64>) -> (f64, Vec<f64>) {
         assert_eq!(data.cols(), self.layer_sizes[0]);
@@ -196,7 +218,6 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         let mut activations = Vec::with_capacity(self.layer_sizes.len());
 
         let net_data = Matrix::ones(data.rows(), 1).hcat(data);
-
 
         activations.push(net_data.clone());
 
@@ -210,6 +231,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
                 let ones = Matrix::ones(a.rows(), 1);
 
                 a = ones.hcat(&a);
+                
                 activations.push(a.clone());
                 z = a * self.get_layer_weights(weights, l);
                 forward_weights.push(z.clone());
@@ -257,7 +279,6 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         for g in grad {
             gradients.append(&mut g.data().clone());
         }
-
         (self.criterion.cost(&activations[activations.len() - 1], outputs), gradients)
     }
 
