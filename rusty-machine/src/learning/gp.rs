@@ -169,9 +169,7 @@ impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Vector<f64>> for GaussianProc
 
         let train_mat = (ker_mat + noise_mat).cholesky();
 
-        let x = solve_l_triangular(&train_mat,
-                                                            &(value -
-                                                              self.mean.func(data.clone())));
+        let x = solve_l_triangular(&train_mat, &(value - self.mean.func(data.clone())));
         let alpha = solve_u_triangular(&train_mat.transpose(), &x);
 
         self.train_mat = Some(train_mat);
@@ -183,20 +181,29 @@ impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Vector<f64>> for GaussianProc
 impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
     /// Compute the posterior distribution [UNSTABLE]
     ///
-    /// Requires the model to be trained first. 
-    /// _Note that this is a messy compromise as GPs do not
-    /// fit the SupModel trait as is currently implemented._
-    pub fn get_posterior(&self, data: &Matrix<f64>) {
-        if let (&Some(ref t_mat), &Some(ref alpha), &Some(ref t_data)) = (&self.train_mat, &self.alpha, &self.train_data) {
+    /// Requires the model to be trained first.
+    ///
+    /// Outputs the posterior mean and covariance matrix.
+    pub fn get_posterior(&self, data: &Matrix<f64>) -> (Vector<f64>, Matrix<f64>) {
+        if let (&Some(ref t_mat), &Some(ref alpha), &Some(ref t_data)) = (&self.train_mat,
+                                                                          &self.alpha,
+                                                                          &self.train_data) {
             let mean = self.mean.func(data.clone());
 
             let post_mean = mean + self.ker_mat(data, t_data) * alpha;
 
-
-            for i in 0..data.rows() {
-                let test_point = Vector::new(data.select_rows(&[i]).into_vec());
-                let v = solve_l_triangular(t_mat, &test_point);
+            let test_mat = self.ker_mat(data, t_data);
+            let mut v_data = Vec::with_capacity(data.rows() * data.cols());
+            for i in 0..test_mat.rows() {
+                let test_point = Vector::new(test_mat.select_rows(&[i]).into_vec());
+                v_data.append(&mut solve_l_triangular(t_mat, &test_point).into_vec());
             }
+
+            let v_mat = Matrix::new(test_mat.rows(), test_mat.cols(), v_data);
+
+            let post_var = self.ker_mat(data, data) - &v_mat * v_mat.transpose();
+
+            return (post_mean, post_var);
         }
 
         panic!("The model has not been trained.");
@@ -210,17 +217,16 @@ fn solve_u_triangular(mat: &Matrix<f64>, y: &Vector<f64>) -> Vector<f64> {
 
     let mut x = vec![0.; y.size()];
 
-    
+
     x[y.size() - 1] = y[y.size() - 1] / mat[[y.size() - 1, y.size() - 1]];
 
     for i in (0..y.size() - 1).rev() {
         let mut holding_u_sum = 0.;
-        for j in (i+1..y.size()).rev() {
+        for j in (i + 1..y.size()).rev() {
             holding_u_sum += mat.data()[i * mat.cols() + j] * x[j];
         }
-            
-        x[i] = (y[i] - holding_u_sum) /
-            mat.data()[i * (mat.cols() + 1)];
+
+        x[i] = (y[i] - holding_u_sum) / mat.data()[i * (mat.cols() + 1)];
     }
 
     Vector::new(x)
@@ -233,7 +239,7 @@ fn solve_l_triangular(mat: &Matrix<f64>, y: &Vector<f64>) -> Vector<f64> {
 
     let mut x = vec![0.; y.size()];
 
-    
+
     x[0] = y[0] / mat[[0, 0]];
 
     for i in 1..y.size() {
@@ -241,7 +247,7 @@ fn solve_l_triangular(mat: &Matrix<f64>, y: &Vector<f64>) -> Vector<f64> {
         for j in 0..i {
             holding_l_sum += mat.data()[i * mat.cols() + j] * x[j];
         }
-        
+
         x[i] = (y[i] - holding_l_sum) / mat.data()[i * (mat.cols() + 1)];
     }
 
