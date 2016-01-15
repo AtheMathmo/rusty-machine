@@ -28,7 +28,7 @@ impl Default for GradientDesc {
     fn default() -> GradientDesc {
         GradientDesc {
             alpha: 0.3,
-            iters: 10000,
+            iters: 100,
         }
     }
 }
@@ -90,8 +90,8 @@ impl Default for StochasticGD {
     fn default() -> StochasticGD {
         StochasticGD {
             alpha: 0.1,
-            mu: 0.3,
-            iters: 5,
+            mu: 0.1,
+            iters: 20,
         }
     }
 }
@@ -131,11 +131,10 @@ impl<M: Optimizable<Data = Matrix<f64>, Target = Matrix<f64>>> OptimAlgorithm<M>
         for _ in 0..self.iters {
             for i in 1..data.rows() {
                 let (_, vec_data) = model.compute_grad(&optimizing_val.data()[..],
-                                                           &data.select_rows(&[i]),
-                                                           &outputs.select_rows(&[i]));
+                                                       &data.select_rows(&[i]),
+                                                       &outputs.select_rows(&[i]));
 
                 delta_w = Vector::new(vec_data) * self.mu + &delta_w * self.alpha;
-
                 optimizing_val = &optimizing_val - &delta_w * self.mu;
             }
         }

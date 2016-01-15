@@ -677,13 +677,15 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
 
         let mut x = vec![T::zero(); y.size()];
 
-        let mut holding_u_sum = T::zero();
         x[y.size()-1] = y[y.size()-1] / self[[y.size()-1,y.size()-1]];
 
         unsafe {
             for i in (0..y.size()-1).rev() {
-                holding_u_sum = holding_u_sum + *self.data.get_unchecked(i*(self.cols+1) + 1);
-                x[i] = (y[i] - holding_u_sum*x[i+1]) / *self.data.get_unchecked(i*(self.cols+1));
+                let mut holding_u_sum = T::zero();
+                for j in (i+1..y.size()).rev() {
+                    holding_u_sum = holding_u_sum + *self.data.get_unchecked(i * self.cols + j) * x[j];
+                }
+                x[i] = (y[i] - holding_u_sum) / *self.data.get_unchecked(i*(self.cols+1));
             }
         }
 
@@ -694,15 +696,17 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
     fn solve_l_triangular(&self, y: Vector<T>) -> Vector<T> {
         assert!(self.cols == y.size(), "Matrix and Vector dimensions do not agree.");
 
-        let mut x = vec![T::zero(); y.size()];
+        let mut x = Vec::with_capacity(y.size());
 
-        let mut holding_l_sum = T::zero();
-        x[0] = y[0] / self[[0,0]];
+        x.push(y[0] / self[[0,0]]);
 
         unsafe {
             for i in 1..y.size() {
-                holding_l_sum = holding_l_sum + *self.data.get_unchecked(i*(self.cols + 1) - 1);
-                x[i] = (y[i] - holding_l_sum*x[i-1]) / *self.data.get_unchecked(i*(self.cols+1));
+                let mut holding_l_sum = T::zero();
+                for j in 0..i {
+                    holding_l_sum = holding_l_sum + *self.data.get_unchecked(i * self.cols + j) * x[j];
+                }
+                x.push((y[i] - holding_l_sum) / *self.data.get_unchecked(i*(self.cols+1)));
             }
         }
 
@@ -978,10 +982,10 @@ impl<T: Copy + Zero + Float> Matrix<T> {
                     new_data.push((self[[i, i]] - sum).sqrt());
                 }
                 else {
-                    let p = new_data[j * self.cols + j];
+                    let p = (self[[i, j]] - sum) / new_data[j * self.cols + j];
 
-                    assert!(p != T::zero(), "Matrix is not positive definite.");
-                    new_data.push((self[[i, j]] - sum) / p);
+                    assert!(!p.is_nan(), "Matrix is not positive definite.");
+                    new_data.push(p);
                 }
             }
         }

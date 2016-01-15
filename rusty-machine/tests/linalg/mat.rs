@@ -231,7 +231,6 @@ fn matrix_lup_decomp() {
     let k = p.transpose() * l * u;
 
     for i in 0..25 {
-        println!("{0},{1}", e.data()[i], k.data()[i]);
         assert_eq!(e.data()[i], k.data()[i]);
     }
 }

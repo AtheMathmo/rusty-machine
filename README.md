@@ -1,6 +1,6 @@
 # rusty-machine
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.1.2](https://crates.io/crates/rusty-machine/0.1.2).
+Here is the API documentation for the rust crate. Currently up to date for [version 0.1.4](https://crates.io/crates/rusty-machine/0.1.4).
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
