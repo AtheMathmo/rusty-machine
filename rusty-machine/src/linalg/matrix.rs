@@ -696,9 +696,9 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
     fn solve_l_triangular(&self, y: Vector<T>) -> Vector<T> {
         assert!(self.cols == y.size(), "Matrix and Vector dimensions do not agree.");
 
-        let mut x = vec![T::zero(); y.size()];
+        let mut x = Vec::with_capacity(y.size());
 
-        x[0] = y[0] / self[[0,0]];
+        x.push(y[0] / self[[0,0]]);
 
         unsafe {
             for i in 1..y.size() {
@@ -706,7 +706,7 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
                 for j in 0..i {
                     holding_l_sum = holding_l_sum + *self.data.get_unchecked(i * self.cols + j) * x[j];
                 }
-                x[i] = (y[i] - holding_l_sum) / *self.data.get_unchecked(i*(self.cols+1));
+                x.push((y[i] - holding_l_sum) / *self.data.get_unchecked(i*(self.cols+1)));
             }
         }
 
