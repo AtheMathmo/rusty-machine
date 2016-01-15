@@ -45,7 +45,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-0' class='srclink' href='../src/rusty_machine/lib.rs.html#1-161' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-0' class='srclink' href='../src/rusty_machine/lib.rs.html#1-162' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'>
 <h1 id='the-rusty-machine-crate' class='section-header'><a href='#the-rusty-machine-crate'>The rusty-machine crate.</a></h1>
 <p>Crate built for machine learning with some linear algebra thrown in.</p>
@@ -89,6 +89,7 @@ other things are left explicitly to the user.</p>
 <p>Here is an example usage for Gaussian Process Regression:</p>
 <pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>linalg</span>::<span class='ident'>matrix</span>::<span class='ident'>Matrix</span>;
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>linalg</span>::<span class='ident'>vector</span>::<span class='ident'>Vector</span>;
 <span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>learning</span>::<span class='ident'>gp</span>::<span class='ident'>GaussianProcess</span>;
 <span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>learning</span>::<span class='ident'>gp</span>::<span class='ident'>ConstMean</span>;
 <span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>kernel</span>;
@@ -96,7 +97,7 @@ other things are left explicitly to the user.</p>
  
 <span class='comment'>// Some example training data.</span>
 <span class='kw'>let</span> <span class='ident'>train_data</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>,<span class='number'>3</span>,<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.</span>,<span class='number'>1.</span>,<span class='number'>1.</span>,<span class='number'>2.</span>,<span class='number'>2.</span>,<span class='number'>2.</span>,<span class='number'>3.</span>,<span class='number'>3.</span>,<span class='number'>3.</span>]);
-<span class='kw'>let</span> <span class='ident'>train_outputs</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>,<span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0.</span>,<span class='number'>0.</span>,<span class='number'>0.</span>,<span class='number'>1.</span>,<span class='number'>1.</span>,<span class='number'>1.</span>,<span class='number'>0.</span>,<span class='number'>0.</span>,<span class='number'>0.</span>]);
+<span class='kw'>let</span> <span class='ident'>train_outputs</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0.</span>,<span class='number'>1.</span>,<span class='number'>0.</span>]);
 
 <span class='comment'>// Some example test data.</span>
 <span class='kw'>let</span> <span class='ident'>test_data</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>,<span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.5</span>,<span class='number'>1.5</span>,<span class='number'>1.5</span>,<span class='number'>2.5</span>,<span class='number'>2.5</span>,<span class='number'>2.5</span>]);

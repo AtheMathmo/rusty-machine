@@ -201,6 +201,7 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
+<span id="162">162</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! # The rusty-machine crate.</span>
 <span class='doccomment'>//!</span>
@@ -248,6 +249,7 @@
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ```</span>
 <span class='doccomment'>//! use rusty_machine::linalg::matrix::Matrix;</span>
+<span class='doccomment'>//! use rusty_machine::linalg::vector::Vector;</span>
 <span class='doccomment'>//! use rusty_machine::learning::gp::GaussianProcess;</span>
 <span class='doccomment'>//! use rusty_machine::learning::gp::ConstMean;</span>
 <span class='doccomment'>//! use rusty_machine::learning::toolkit::kernel;</span>
@@ -255,7 +257,7 @@
 <span class='doccomment'>//! </span>
 <span class='doccomment'>//! // Some example training data.</span>
 <span class='doccomment'>//! let train_data = Matrix::new(3,3,vec![1.,1.,1.,2.,2.,2.,3.,3.,3.]);</span>
-<span class='doccomment'>//! let train_outputs = Matrix::new(3,3, vec![0.,0.,0.,1.,1.,1.,0.,0.,0.]);</span>
+<span class='doccomment'>//! let train_outputs = Vector::new(vec![0.,1.,0.]);</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Some example test data.</span>
 <span class='doccomment'>//! let test_data = Matrix::new(2,3, vec![1.5,1.5,1.5,2.5,2.5,2.5]);</span>

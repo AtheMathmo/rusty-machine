@@ -1466,6 +1466,10 @@
 <span id="1424">1424</span>
 <span id="1425">1425</span>
 <span id="1426">1426</span>
+<span id="1427">1427</span>
+<span id="1428">1428</span>
+<span id="1429">1429</span>
+<span id="1430">1430</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The matrix module.</span>
 <span class='doccomment'>//!</span>
@@ -2146,13 +2150,15 @@
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>x</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>zero</span>(); <span class='ident'>y</span>.<span class='ident'>size</span>()];
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>holding_u_sum</span> <span class='op'>=</span> <span class='ident'>T</span>::<span class='ident'>zero</span>();
         <span class='ident'>x</span>[<span class='ident'>y</span>.<span class='ident'>size</span>()<span class='op'>-</span><span class='number'>1</span>] <span class='op'>=</span> <span class='ident'>y</span>[<span class='ident'>y</span>.<span class='ident'>size</span>()<span class='op'>-</span><span class='number'>1</span>] <span class='op'>/</span> <span class='self'>self</span>[[<span class='ident'>y</span>.<span class='ident'>size</span>()<span class='op'>-</span><span class='number'>1</span>,<span class='ident'>y</span>.<span class='ident'>size</span>()<span class='op'>-</span><span class='number'>1</span>]];
 
         <span class='kw'>unsafe</span> {
             <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> (<span class='number'>0</span>..<span class='ident'>y</span>.<span class='ident'>size</span>()<span class='op'>-</span><span class='number'>1</span>).<span class='ident'>rev</span>() {
-                <span class='ident'>holding_u_sum</span> <span class='op'>=</span> <span class='ident'>holding_u_sum</span> <span class='op'>+</span> <span class='op'>*</span><span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>get_unchecked</span>(<span class='ident'>i</span><span class='op'>*</span>(<span class='self'>self</span>.<span class='ident'>cols</span><span class='op'>+</span><span class='number'>1</span>) <span class='op'>+</span> <span class='number'>1</span>);
-                <span class='ident'>x</span>[<span class='ident'>i</span>] <span class='op'>=</span> (<span class='ident'>y</span>[<span class='ident'>i</span>] <span class='op'>-</span> <span class='ident'>holding_u_sum</span><span class='op'>*</span><span class='ident'>x</span>[<span class='ident'>i</span><span class='op'>+</span><span class='number'>1</span>]) <span class='op'>/</span> <span class='op'>*</span><span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>get_unchecked</span>(<span class='ident'>i</span><span class='op'>*</span>(<span class='self'>self</span>.<span class='ident'>cols</span><span class='op'>+</span><span class='number'>1</span>));
+                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>holding_u_sum</span> <span class='op'>=</span> <span class='ident'>T</span>::<span class='ident'>zero</span>();
+                <span class='kw'>for</span> <span class='ident'>j</span> <span class='kw'>in</span> (<span class='ident'>i</span><span class='op'>+</span><span class='number'>1</span>..<span class='ident'>y</span>.<span class='ident'>size</span>()).<span class='ident'>rev</span>() {
+                    <span class='ident'>holding_u_sum</span> <span class='op'>=</span> <span class='ident'>holding_u_sum</span> <span class='op'>+</span> <span class='op'>*</span><span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>get_unchecked</span>(<span class='ident'>i</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span> <span class='op'>+</span> <span class='ident'>j</span>) <span class='op'>*</span> <span class='ident'>x</span>[<span class='ident'>j</span>];
+                }
+                <span class='ident'>x</span>[<span class='ident'>i</span>] <span class='op'>=</span> (<span class='ident'>y</span>[<span class='ident'>i</span>] <span class='op'>-</span> <span class='ident'>holding_u_sum</span>) <span class='op'>/</span> <span class='op'>*</span><span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>get_unchecked</span>(<span class='ident'>i</span><span class='op'>*</span>(<span class='self'>self</span>.<span class='ident'>cols</span><span class='op'>+</span><span class='number'>1</span>));
             }
         }
 
@@ -2163,15 +2169,17 @@
     <span class='kw'>fn</span> <span class='ident'>solve_l_triangular</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>y</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>cols</span> <span class='op'>==</span> <span class='ident'>y</span>.<span class='ident'>size</span>(), <span class='string'>&quot;Matrix and Vector dimensions do not agree.&quot;</span>);
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>x</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>zero</span>(); <span class='ident'>y</span>.<span class='ident'>size</span>()];
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>x</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>y</span>.<span class='ident'>size</span>());
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>holding_l_sum</span> <span class='op'>=</span> <span class='ident'>T</span>::<span class='ident'>zero</span>();
-        <span class='ident'>x</span>[<span class='number'>0</span>] <span class='op'>=</span> <span class='ident'>y</span>[<span class='number'>0</span>] <span class='op'>/</span> <span class='self'>self</span>[[<span class='number'>0</span>,<span class='number'>0</span>]];
+        <span class='ident'>x</span>.<span class='ident'>push</span>(<span class='ident'>y</span>[<span class='number'>0</span>] <span class='op'>/</span> <span class='self'>self</span>[[<span class='number'>0</span>,<span class='number'>0</span>]]);
 
         <span class='kw'>unsafe</span> {
             <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>1</span>..<span class='ident'>y</span>.<span class='ident'>size</span>() {
-                <span class='ident'>holding_l_sum</span> <span class='op'>=</span> <span class='ident'>holding_l_sum</span> <span class='op'>+</span> <span class='op'>*</span><span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>get_unchecked</span>(<span class='ident'>i</span><span class='op'>*</span>(<span class='self'>self</span>.<span class='ident'>cols</span> <span class='op'>+</span> <span class='number'>1</span>) <span class='op'>-</span> <span class='number'>1</span>);
-                <span class='ident'>x</span>[<span class='ident'>i</span>] <span class='op'>=</span> (<span class='ident'>y</span>[<span class='ident'>i</span>] <span class='op'>-</span> <span class='ident'>holding_l_sum</span><span class='op'>*</span><span class='ident'>x</span>[<span class='ident'>i</span><span class='op'>-</span><span class='number'>1</span>]) <span class='op'>/</span> <span class='op'>*</span><span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>get_unchecked</span>(<span class='ident'>i</span><span class='op'>*</span>(<span class='self'>self</span>.<span class='ident'>cols</span><span class='op'>+</span><span class='number'>1</span>));
+                <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>holding_l_sum</span> <span class='op'>=</span> <span class='ident'>T</span>::<span class='ident'>zero</span>();
+                <span class='kw'>for</span> <span class='ident'>j</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>i</span> {
+                    <span class='ident'>holding_l_sum</span> <span class='op'>=</span> <span class='ident'>holding_l_sum</span> <span class='op'>+</span> <span class='op'>*</span><span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>get_unchecked</span>(<span class='ident'>i</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span> <span class='op'>+</span> <span class='ident'>j</span>) <span class='op'>*</span> <span class='ident'>x</span>[<span class='ident'>j</span>];
+                }
+                <span class='ident'>x</span>.<span class='ident'>push</span>((<span class='ident'>y</span>[<span class='ident'>i</span>] <span class='op'>-</span> <span class='ident'>holding_l_sum</span>) <span class='op'>/</span> <span class='op'>*</span><span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>get_unchecked</span>(<span class='ident'>i</span><span class='op'>*</span>(<span class='self'>self</span>.<span class='ident'>cols</span><span class='op'>+</span><span class='number'>1</span>)));
             }
         }
 
@@ -2447,10 +2455,10 @@
                     <span class='ident'>new_data</span>.<span class='ident'>push</span>((<span class='self'>self</span>[[<span class='ident'>i</span>, <span class='ident'>i</span>]] <span class='op'>-</span> <span class='ident'>sum</span>).<span class='ident'>sqrt</span>());
                 }
                 <span class='kw'>else</span> {
-                    <span class='kw'>let</span> <span class='ident'>p</span> <span class='op'>=</span> <span class='ident'>new_data</span>[<span class='ident'>j</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span> <span class='op'>+</span> <span class='ident'>j</span>];
+                    <span class='kw'>let</span> <span class='ident'>p</span> <span class='op'>=</span> (<span class='self'>self</span>[[<span class='ident'>i</span>, <span class='ident'>j</span>]] <span class='op'>-</span> <span class='ident'>sum</span>) <span class='op'>/</span> <span class='ident'>new_data</span>[<span class='ident'>j</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span> <span class='op'>+</span> <span class='ident'>j</span>];
 
-                    <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>p</span> <span class='op'>!=</span> <span class='ident'>T</span>::<span class='ident'>zero</span>(), <span class='string'>&quot;Matrix is not positive definite.&quot;</span>);
-                    <span class='ident'>new_data</span>.<span class='ident'>push</span>((<span class='self'>self</span>[[<span class='ident'>i</span>, <span class='ident'>j</span>]] <span class='op'>-</span> <span class='ident'>sum</span>) <span class='op'>/</span> <span class='ident'>p</span>);
+                    <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>p</span>.<span class='ident'>is_nan</span>(), <span class='string'>&quot;Matrix is not positive definite.&quot;</span>);
+                    <span class='ident'>new_data</span>.<span class='ident'>push</span>(<span class='ident'>p</span>);
                 }
             }
         }
