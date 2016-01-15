@@ -9,9 +9,9 @@
 //! use rusty_machine::linalg::matrix::Matrix;
 //! use rusty_machine::learning::SupModel;
 //!
-//! let data = Matrix::new(5,3, vec![1.,1.,1.,2.,2.,2.,3.,3.,3.,
+//! let inputs = Matrix::new(5,3, vec![1.,1.,1.,2.,2.,2.,3.,3.,3.,
 //! 								4.,4.,4.,5.,5.,5.,]);
-//! let outputs = Matrix::new(5,3, vec![1.,0.,0.,0.,1.,0.,0.,0.,1.,
+//! let targets = Matrix::new(5,3, vec![1.,0.,0.,0.,1.,0.,0.,0.,1.,
 //! 									0.,0.,1.,0.,0.,1.]);
 //!
 //! let layers = &[3,5,11,7,3];
@@ -211,7 +211,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
     */
 
     /// Compute the gradient using the back propagation algorithm.
-    fn compute_grad(&self, weights: &[f64], inputs: &Matrix<f64>, outputs: &Matrix<f64>) -> (f64, Vec<f64>) {
+    fn compute_grad(&self, weights: &[f64], inputs: &Matrix<f64>, targets: &Matrix<f64>) -> (f64, Vec<f64>) {
         assert_eq!(inputs.cols(), self.layer_sizes[0]);
 
         let mut forward_weights = Vec::with_capacity(self.layer_sizes.len() - 1);
@@ -247,7 +247,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
             let g = self.criterion.grad_activ(z);
 
             // Take GRAD_cost to compute this delta.
-            let mut delta = self.criterion.cost_grad(&activations[self.layer_sizes.len() - 1], outputs).elemul(&g);
+            let mut delta = self.criterion.cost_grad(&activations[self.layer_sizes.len() - 1], targets).elemul(&g);
 
             deltas.push(delta.clone());
 
@@ -279,7 +279,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         for g in grad {
             gradients.append(&mut g.data().clone());
         }
-        (self.criterion.cost(&activations[activations.len() - 1], outputs), gradients)
+        (self.criterion.cost(&activations[activations.len() - 1], targets), gradients)
     }
 
     /// Forward propagation of the model weights to get the outputs.

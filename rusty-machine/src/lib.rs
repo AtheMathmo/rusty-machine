@@ -113,7 +113,7 @@ pub mod learning {
         fn predict(&self, inputs: &T) -> U;
 
         /// Train the model using inputs and targets.
-        fn train(&mut self, inputs: &T, outputs: &U);
+        fn train(&mut self, inputs: &T, targets: &U);
 	}
 
     /// Trait for unsupervised model.
@@ -146,7 +146,7 @@ pub mod learning {
             /// Return the optimized parameter using gradient optimization.
             ///
             /// Takes in a set of starting parameters and related model Inputs.
-            fn optimize(&self, model: &M, start: &[f64], inputs: &M::Inputs, outputs: &M::Targets) -> Vec<f64>;
+            fn optimize(&self, model: &M, start: &[f64], inputs: &M::Inputs, targets: &M::Targets) -> Vec<f64>;
         }
 
         pub mod grad_desc;

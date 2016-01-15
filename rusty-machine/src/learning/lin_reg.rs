@@ -32,8 +32,8 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
     /// use rusty_machine::learning::SupModel;
     ///
     /// let mut lin_mod = LinRegressor::new();
-    /// let data = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
-    /// let values = Vector::new(vec![5.0, 6.0, 7.0]);
+    /// let inputs = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
+    /// let targets = Vector::new(vec![5.0, 6.0, 7.0]);
     ///
     /// lin_mod.train(&inputs, &targets);
     /// ```

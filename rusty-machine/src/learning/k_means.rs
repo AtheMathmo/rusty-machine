@@ -9,8 +9,8 @@
 //! use rusty_machine::learning::k_means::KMeansClassifier;
 //! use rusty_machine::learning::UnSupModel;
 //!
-//! let train_data = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
-//! let pred_data = Matrix::new(1,2, vec![0.0, 0.0]);
+//! let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
+//! let targets = Matrix::new(1,2, vec![0.0, 0.0]);
 //!
 //! // Create model with k(=2) classes.
 //! let mut model = KMeansClassifier::new(2);
@@ -76,9 +76,9 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
     /// Predict classes from data.
     ///
     /// Model must be trained.
-    fn predict(&self, data: &Matrix<f64>) -> Vector<usize> {
+    fn predict(&self, inputs: &Matrix<f64>) -> Vector<usize> {
         if let Some(ref centroids) = self.centroids {
-            return KMeansClassifier::find_closest_centroids(centroids, data).0;
+            return KMeansClassifier::find_closest_centroids(centroids, inputs).0;
         }
         else {
             panic!("Model has not been trained.");
@@ -86,13 +86,13 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
     }
 
     /// Train the classifier using input data.
-    fn train(&mut self, data: &Matrix<f64>) {
-        self.init_centroids(data);
+    fn train(&mut self, inputs: &Matrix<f64>) {
+        self.init_centroids(inputs);
         let mut cost = 0.0;
 
         for _i in 0..self.iters {
-                let (idx, distances) = self.get_closest_centroids(data);
-                self.update_centroids(data, idx);
+                let (idx, distances) = self.get_closest_centroids(inputs);
+                self.update_centroids(inputs, idx);
 
                 let cost_i = distances.sum();
                 if cost == cost_i {
@@ -129,16 +129,16 @@ impl KMeansClassifier {
     /// Initialize the centroids.
     ///
     /// Used internally within model.
-    fn init_centroids(&mut self, data: &Matrix<f64>) {
+    fn init_centroids(&mut self, inputs: &Matrix<f64>) {
         match self.init_algorithm {
             InitAlgorithm::Forgy => {
-                self.centroids = Some(KMeansClassifier::forgy_init(self.k, data))
+                self.centroids = Some(KMeansClassifier::forgy_init(self.k, inputs))
             }
             InitAlgorithm::RandomPartition => {
-                self.centroids = Some(KMeansClassifier::ran_partition_init(self.k, data))
+                self.centroids = Some(KMeansClassifier::ran_partition_init(self.k, inputs))
             }
             InitAlgorithm::KPlusPlus => {
-                self.centroids = Some(KMeansClassifier::plusplus_init(self.k, data))
+                self.centroids = Some(KMeansClassifier::plusplus_init(self.k, inputs))
             }
         }
     }
@@ -146,8 +146,8 @@ impl KMeansClassifier {
     /// Updated the centroids by computing means of assigned classes.
     ///
     /// Used internally within model.
-    fn update_centroids(&mut self, data: &Matrix<f64>, classes: Vector<usize>) {
-        let mut new_centroids = Vec::with_capacity(self.k * data.cols());
+    fn update_centroids(&mut self, inputs: &Matrix<f64>, classes: Vector<usize>) {
+        let mut new_centroids = Vec::with_capacity(self.k * inputs.cols());
         for i in 0..self.k {
             let mut vec_i = Vec::new();
 
@@ -157,16 +157,16 @@ impl KMeansClassifier {
                 }
             }
 
-            let mat_i = data.select_rows(&vec_i);
+            let mat_i = inputs.select_rows(&vec_i);
             new_centroids.extend(mat_i.mean(0).data());
         }
 
-        self.centroids = Some(Matrix::new(self.k, data.cols(), new_centroids));
+        self.centroids = Some(Matrix::new(self.k, inputs.cols(), new_centroids));
     }
 
-    fn get_closest_centroids(&self, data: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
+    fn get_closest_centroids(&self, inputs: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
         if let Some(ref c) = self.centroids {
-            return KMeansClassifier::find_closest_centroids(&c, data);
+            return KMeansClassifier::find_closest_centroids(&c, inputs);
         }
         else {
             panic!("Centroids not correctly initialized.");
@@ -177,13 +177,13 @@ impl KMeansClassifier {
     ///
     /// Used internally within model.
     /// Returns the index of the closest centroid and the distance to it.
-    fn find_closest_centroids(centroids: &Matrix<f64>, data: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
-        let mut idx = Vec::with_capacity(data.rows());
-        let mut distances = Vec::with_capacity(data.rows());
+    fn find_closest_centroids(centroids: &Matrix<f64>, inputs: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
+        let mut idx = Vec::with_capacity(inputs.rows());
+        let mut distances = Vec::with_capacity(inputs.rows());
 
-        for i in 0..data.rows() {
+        for i in 0..inputs.rows() {
             // This works like repmat pulling out row i repeatedly.
-            let centroid_diff = centroids - data.select_rows(&vec![i; centroids.rows()]);
+            let centroid_diff = centroids - inputs.select_rows(&vec![i; centroids.rows()]);
             let dist = &centroid_diff.elemul(&centroid_diff).sum_cols();
 
             // Now take argmin and this is the centroid.
@@ -199,30 +199,30 @@ impl KMeansClassifier {
     /// Compute initial centroids using Forgy scheme.
     ///
     /// Selects k random points in data for centroids.
-    fn forgy_init(k: usize, data: &Matrix<f64>) -> Matrix<f64> {
-        assert!(k <= data.rows());
+    fn forgy_init(k: usize, inputs: &Matrix<f64>) -> Matrix<f64> {
+        assert!(k <= inputs.rows());
 
         let mut random_choices = Vec::with_capacity(k);
         let mut rng = thread_rng();
         while random_choices.len() < k {
-            let r = rng.gen_range(0, data.rows());
+            let r = rng.gen_range(0, inputs.rows());
 
             if !random_choices.contains(&r) {
                 random_choices.push(r);
             }
         }
 
-        data.select_rows(&random_choices)
+        inputs.select_rows(&random_choices)
     }
 
     /// Compute initial centroids using random partition.
     ///
     /// Selects centroids by assigning each point randomly to a class
     /// and computing the mean of each class.
-    fn ran_partition_init(k: usize, data: &Matrix<f64>) -> Matrix<f64> {
-        assert!(k <= data.rows());
+    fn ran_partition_init(k: usize, inputs: &Matrix<f64>) -> Matrix<f64> {
+        assert!(k <= inputs.rows());
 
-        let mut random_assignments = Vec::with_capacity(data.rows());
+        let mut random_assignments = Vec::with_capacity(inputs.rows());
 
         // Populate so we have something in each class.
         for i in 0..k {
@@ -230,11 +230,11 @@ impl KMeansClassifier {
         }
 
         let mut rng = thread_rng();
-        for _ in k..data.rows() {
+        for _ in k..inputs.rows() {
             random_assignments.push(rng.gen_range(0, k));
         }
 
-        let mut init_centroids = Vec::with_capacity(k * data.cols());
+        let mut init_centroids = Vec::with_capacity(k * inputs.cols());
         for i in 0..k {
             let mut vec_i = Vec::new();
 
@@ -244,35 +244,35 @@ impl KMeansClassifier {
                 }
             }
 
-            let mat_i = data.select_rows(&vec_i);
+            let mat_i = inputs.select_rows(&vec_i);
             init_centroids.extend(mat_i.mean(0).data());
         }
 
-        Matrix::new(k, data.cols(), init_centroids)
+        Matrix::new(k, inputs.cols(), init_centroids)
     }
 
     /// Compute initial centroids using k-means++.
     ///
     /// Selects centroids using weighted probability from
     /// distances.
-    fn plusplus_init(k: usize, data: &Matrix<f64>) -> Matrix<f64> {
-        assert!(k <= data.rows());
+    fn plusplus_init(k: usize, inputs: &Matrix<f64>) -> Matrix<f64> {
+        assert!(k <= inputs.rows());
 
         let mut rng = thread_rng();
 
-        let mut init_centroids = Vec::with_capacity(k * data.cols());
-        let first_cen = rng.gen_range(0usize, data.rows());
+        let mut init_centroids = Vec::with_capacity(k * inputs.cols());
+        let first_cen = rng.gen_range(0usize, inputs.rows());
 
-        init_centroids.append(&mut data.select_rows(&vec![first_cen]).into_vec());
+        init_centroids.append(&mut inputs.select_rows(&vec![first_cen]).into_vec());
 
         for i in 1..k {
-            let temp_centroids = Matrix::new(i, data.cols(), init_centroids.clone());
-            let (_, dist) = KMeansClassifier::find_closest_centroids(&temp_centroids, &data);
+            let temp_centroids = Matrix::new(i, inputs.cols(), init_centroids.clone());
+            let (_, dist) = KMeansClassifier::find_closest_centroids(&temp_centroids, &inputs);
             let next_cen = sample_discretely(dist);
-            init_centroids.append(&mut data.select_rows(&vec![next_cen]).into_vec())
+            init_centroids.append(&mut inputs.select_rows(&vec![next_cen]).into_vec())
         }
 
-        Matrix::new(k, data.cols(), init_centroids)
+        Matrix::new(k, inputs.cols(), init_centroids)
     }
 }
 
