@@ -49,7 +49,7 @@
 //! use rusty_machine::learning::gp::ConstMean;
 //! use rusty_machine::learning::toolkit::kernel;
 //! use rusty_machine::learning::SupModel;
-//! 
+//!
 //! // Some example training data.
 //! let train_data = Matrix::new(3,3,vec![1.,1.,1.,2.,2.,2.,3.,3.,3.]);
 //! let train_outputs = Vector::new(vec![0.,1.,0.]);
@@ -64,7 +64,7 @@
 //! let zero_mean = ConstMean::default();
 //!
 //! // Construct a GP with the specified kernel, mean, and a noise of 0.5.
-//! let mut gp = GaussianProcess::new(ker, zero_mean, 0.5); 
+//! let mut gp = GaussianProcess::new(ker, zero_mean, 0.5);
 //!
 //! // Train the model!
 //! gp.train(&train_data, &train_outputs);
@@ -105,25 +105,25 @@ pub mod learning {
     pub mod k_means;
     pub mod nnet;
     pub mod gp;
-    
+
     /// Trait for supervised model.
     pub trait SupModel<T,U> {
 
-        /// Predict output from data.
-        fn predict(&self, data: &T) -> U;
+        /// Predict output from inputs.
+        fn predict(&self, inputs: &T) -> U;
 
-        /// Train the model using data and outputs.
-        fn train(&mut self, data: &T, value: &U);
+        /// Train the model using inputs and targets.
+        fn train(&mut self, inputs: &T, outputs: &U);
 	}
 
     /// Trait for unsupervised model.
 	pub trait UnSupModel<T, U> {
 
         /// Predict output from data.
-        fn predict(&self, data: &T) -> U;
+        fn predict(&self, inputs: &T) -> U;
 
         /// Train the model using data.
-        fn train(&mut self, data: &T);
+        fn train(&mut self, inputs: &T);
 	}
 
     /// Module for optimization in machine learning setting.
@@ -132,12 +132,12 @@ pub mod learning {
         /// Trait for models which can be gradient-optimized.
         pub trait Optimizable {
             /// The input data type to the model.
-            type Data;
+            type Inputs;
             /// The target data type to the model.
-            type Target;
+            type Targets;
 
             /// Compute the gradient for the model.
-            fn compute_grad(&self, params: &[f64], data: &Self::Data, target: &Self::Target) -> (f64, Vec<f64>);
+            fn compute_grad(&self, params: &[f64], inputs: &Self::Inputs, targets: &Self::Targets) -> (f64, Vec<f64>);
         }
 
         /// Trait for optimization algorithms.
@@ -145,8 +145,8 @@ pub mod learning {
 
             /// Return the optimized parameter using gradient optimization.
             ///
-            /// Takes in a set of starting parameters and related model data.
-            fn optimize(&self, model: &M, start: &[f64], data: &M::Data, outputs: &M::Target) -> Vec<f64>;
+            /// Takes in a set of starting parameters and related model Inputs.
+            fn optimize(&self, model: &M, start: &[f64], inputs: &M::Inputs, outputs: &M::Targets) -> Vec<f64>;
         }
 
         pub mod grad_desc;

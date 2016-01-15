@@ -11,12 +11,12 @@
 //!
 //! let train_data = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
 //! let pred_data = Matrix::new(1,2, vec![0.0, 0.0]);
-//! 
+//!
 //! // Create model with k(=2) classes.
 //! let mut model = KMeansClassifier::new(2);
 //!
 //! // Where train_data is a Matrix with features in columns.
-//! model.train(&train_data); 
+//! model.train(&train_data);
 //!
 //! // Where pred_data is a Matrix with features in columns.
 //! let a = model.predict(&pred_data);
@@ -262,7 +262,7 @@ impl KMeansClassifier {
 
         let mut init_centroids = Vec::with_capacity(k * data.cols());
         let first_cen = rng.gen_range(0usize, data.rows());
-        
+
         init_centroids.append(&mut data.select_rows(&vec![first_cen]).into_vec());
 
         for i in 1..k {
@@ -271,14 +271,14 @@ impl KMeansClassifier {
             let next_cen = sample_discretely(dist);
             init_centroids.append(&mut data.select_rows(&vec![next_cen]).into_vec())
         }
-        
+
         Matrix::new(k, data.cols(), init_centroids)
     }
 }
 
 /// Sample from an unnormalized distribution.
 ///
-/// 
+///
 fn sample_discretely(unnorm_dist: Vector<f64>) -> usize {
     assert!(unnorm_dist.size() > 0);
 
