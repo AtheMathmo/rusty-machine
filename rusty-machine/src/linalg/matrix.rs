@@ -677,13 +677,15 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
 
         let mut x = vec![T::zero(); y.size()];
 
-        let mut holding_u_sum = T::zero();
         x[y.size()-1] = y[y.size()-1] / self[[y.size()-1,y.size()-1]];
 
         unsafe {
             for i in (0..y.size()-1).rev() {
-                holding_u_sum = holding_u_sum + *self.data.get_unchecked(i*(self.cols+1) + 1);
-                x[i] = (y[i] - holding_u_sum*x[i+1]) / *self.data.get_unchecked(i*(self.cols+1));
+                let mut holding_u_sum = T::zero();
+                for j in (i+1..y.size()).rev() {
+                    holding_u_sum = holding_u_sum + *self.data.get_unchecked(i * self.cols + j) * x[j];
+                }
+                x[i] = (y[i] - holding_u_sum) / *self.data.get_unchecked(i*(self.cols+1));
             }
         }
 
@@ -696,13 +698,15 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
 
         let mut x = vec![T::zero(); y.size()];
 
-        let mut holding_l_sum = T::zero();
         x[0] = y[0] / self[[0,0]];
 
         unsafe {
             for i in 1..y.size() {
-                holding_l_sum = holding_l_sum + *self.data.get_unchecked(i*(self.cols + 1) - 1);
-                x[i] = (y[i] - holding_l_sum*x[i-1]) / *self.data.get_unchecked(i*(self.cols+1));
+                let mut holding_l_sum = T::zero();
+                for j in 0..i {
+                    holding_l_sum = holding_l_sum + *self.data.get_unchecked(i * self.cols + j) * x[j];
+                }
+                x[i] = (y[i] - holding_l_sum) / *self.data.get_unchecked(i*(self.cols+1));
             }
         }
 

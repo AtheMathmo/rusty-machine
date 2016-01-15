@@ -210,15 +210,17 @@ fn solve_u_triangular(mat: &Matrix<f64>, y: &Vector<f64>) -> Vector<f64> {
 
     let mut x = vec![0.; y.size()];
 
-    let mut holding_u_sum = 0.;
+    
     x[y.size() - 1] = y[y.size() - 1] / mat[[y.size() - 1, y.size() - 1]];
 
-    unsafe {
-        for i in (0..y.size() - 1).rev() {
-            holding_u_sum = holding_u_sum + *mat.data().get_unchecked(i * (mat.cols() + 1) + 1);
-            x[i] = (y[i] - holding_u_sum * x[i + 1]) /
-                   *mat.data().get_unchecked(i * (mat.cols() + 1));
+    for i in (0..y.size() - 1).rev() {
+        let mut holding_u_sum = 0.;
+        for j in (i+1..y.size()).rev() {
+            holding_u_sum += mat.data()[i * mat.cols() + j] * x[j];
         }
+            
+        x[i] = (y[i] - holding_u_sum) /
+            mat.data()[i * (mat.cols() + 1)];
     }
 
     Vector::new(x)
@@ -231,12 +233,16 @@ fn solve_l_triangular(mat: &Matrix<f64>, y: &Vector<f64>) -> Vector<f64> {
 
     let mut x = vec![0.; y.size()];
 
-    let mut holding_l_sum = 0.;
+    
     x[0] = y[0] / mat[[0, 0]];
 
     for i in 1..y.size() {
-        holding_l_sum = holding_l_sum + mat.data()[i * (mat.cols() + 1) - 1];
-        x[i] = (y[i] - holding_l_sum * x[i - 1]) / mat.data()[i * (mat.cols() + 1)];
+        let mut holding_l_sum = 0.;
+        for j in 0..i {
+            holding_l_sum += mat.data()[i * mat.cols() + j] * x[j];
+        }
+        
+        x[i] = (y[i] - holding_l_sum) / mat.data()[i * (mat.cols() + 1)];
     }
 
     Vector::new(x)
