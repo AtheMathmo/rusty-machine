@@ -11,9 +11,9 @@ fn test_model_default() {
 
     model.train(&inputs);
 
-    let a = model.predict(&targets);
+    let outputs = model.predict(&targets);
 
-    assert_eq!(a.size(), 3);
+    assert_eq!(outputs.size(), 3);
 }
 
 #[test]
@@ -25,9 +25,9 @@ fn test_model_iter() {
     model.iters = 1000;
     model.train(&inputs);
 
-    let a = model.predict(&targets);
+    let outputs = model.predict(&targets);
 
-    assert_eq!(a.size(), 3);
+    assert_eq!(outputs.size(), 3);
 }
 
 #[test]
@@ -39,9 +39,9 @@ fn test_model_forgy() {
     model.init_algorithm = InitAlgorithm::Forgy;
     model.train(&inputs);
 
-    let a = model.predict(&targets);
+    let outputs = model.predict(&targets);
 
-    assert_eq!(a.size(), 3);
+    assert_eq!(outputs.size(), 3);
 }
 
 #[test]
@@ -53,9 +53,9 @@ fn test_model_ran_partition() {
     model.init_algorithm = InitAlgorithm::RandomPartition;
     model.train(&inputs);
 
-    let a = model.predict(&targets);
+    let outputs = model.predict(&targets);
 
-    assert_eq!(a.size(), 3);
+    assert_eq!(outputs.size(), 3);
 }
 
 #[test]
@@ -67,7 +67,7 @@ fn test_model_kplusplus() {
     model.init_algorithm = InitAlgorithm::KPlusPlus;
     model.train(&inputs);
 
-    let a = model.predict(&targets);
+    let outputs = model.predict(&targets);
 
-    assert_eq!(a.size(), 3);
+    assert_eq!(outputs.size(), 3);
 }

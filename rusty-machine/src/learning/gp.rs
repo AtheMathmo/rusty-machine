@@ -193,13 +193,13 @@ impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
             let post_mean = mean + self.ker_mat(inputs, t_data) * alpha;
 
             let test_mat = self.ker_mat(inputs, t_data);
-            let mut v_inputs = Vec::with_capacity(inputs.rows() * inputs.cols());
+            let mut var_data = Vec::with_capacity(inputs.rows() * inputs.cols());
             for i in 0..test_mat.rows() {
                 let test_point = Vector::new(test_mat.select_rows(&[i]).into_vec());
-                v_inputs.append(&mut solve_l_triangular(t_mat, &test_point).into_vec());
+                var_data.append(&mut solve_l_triangular(t_mat, &test_point).into_vec());
             }
 
-            let v_mat = Matrix::new(test_mat.rows(), test_mat.cols(), v_inputs);
+            let v_mat = Matrix::new(test_mat.rows(), test_mat.cols(), var_data);
 
             let post_var = self.ker_mat(inputs, inputs) - &v_mat * v_mat.transpose();
 

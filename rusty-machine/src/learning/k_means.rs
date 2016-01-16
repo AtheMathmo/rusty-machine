@@ -10,16 +10,17 @@
 //! use rusty_machine::learning::UnSupModel;
 //!
 //! let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
-//! let targets = Matrix::new(1,2, vec![0.0, 0.0]);
+//! let targets = Matrix::new(1, 2, vec![0.0, 0.0]);
+//! let test_inputs = Matrix::new(1, 2, vec![1.0, 3.5]);
 //!
 //! // Create model with k(=2) classes.
 //! let mut model = KMeansClassifier::new(2);
 //!
-//! // Where train_data is a Matrix with features in columns.
-//! model.train(&train_data);
+//! // Where inputs is a Matrix with features in columns.
+//! model.train(&inputs);
 //!
 //! // Where pred_data is a Matrix with features in columns.
-//! let a = model.predict(&pred_data);
+//! let a = model.predict(&test_inputs);
 //! ```
 //!
 //! Additionally you can control the initialization

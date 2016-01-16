@@ -51,11 +51,11 @@
 //! use rusty_machine::learning::SupModel;
 //!
 //! // Some example training data.
-//! let train_data = Matrix::new(3,3,vec![1.,1.,1.,2.,2.,2.,3.,3.,3.]);
-//! let train_outputs = Vector::new(vec![0.,1.,0.]);
+//! let inputs = Matrix::new(3,3,vec![1.,1.,1.,2.,2.,2.,3.,3.,3.]);
+//! let targets = Vector::new(vec![0.,1.,0.]);
 //!
 //! // Some example test data.
-//! let test_data = Matrix::new(2,3, vec![1.5,1.5,1.5,2.5,2.5,2.5]);
+//! let test_inputs = Matrix::new(2,3, vec![1.5,1.5,1.5,2.5,2.5,2.5]);
 //!
 //! // A squared exponential kernel with lengthscale 2, and amplitude 1.
 //! let ker = kernel::SquaredExp::new(2., 1.);
@@ -67,10 +67,10 @@
 //! let mut gp = GaussianProcess::new(ker, zero_mean, 0.5);
 //!
 //! // Train the model!
-//! gp.train(&train_data, &train_outputs);
+//! gp.train(&inputs, &targets);
 //!
-//! // Predict output from test data
-//! let outputs = gp.predict(&test_data);
+//! // Predict output from test datae]
+//! let outputs = gp.predict(&test_inputs);
 //! ```
 //!
 //! Of course this code could have been a lot simpler if we had simply adopted
@@ -119,10 +119,10 @@ pub mod learning {
     /// Trait for unsupervised model.
 	pub trait UnSupModel<T, U> {
 
-        /// Predict output from data.
+        /// Predict output from inputs.
         fn predict(&self, inputs: &T) -> U;
 
-        /// Train the model using data.
+        /// Train the model using inputs.
         fn train(&mut self, inputs: &T);
 	}
 
@@ -145,7 +145,7 @@ pub mod learning {
 
             /// Return the optimized parameter using gradient optimization.
             ///
-            /// Takes in a set of starting parameters and related model Inputs.
+            /// Takes in a set of starting parameters and related model data.
             fn optimize(&self, model: &M, start: &[f64], inputs: &M::Inputs, targets: &M::Targets) -> Vec<f64>;
         }
 

@@ -17,11 +17,11 @@
 //! let layers = &[3,5,11,7,3];
 //! let mut model = NeuralNet::default(layers);
 //!
-//! model.train(&data, &outputs);
+//! model.train(&inputs, &targets);
 //!
-//! let test_data = Matrix::new(2,3, vec![1.5,1.5,1.5,5.1,5.1,5.1]);
+//! let test_inputs = Matrix::new(2,3, vec![1.5,1.5,1.5,5.1,5.1,5.1]);
 //!
-//! model.predict(&test_data);
+//! model.predict(&test_inputs);
 //! ```
 //!
 //! The neural networks are specified via a criterion - similar to [Torch](https://github.com/torch/nn/blob/master/doc/criterion.md).
@@ -62,7 +62,7 @@ impl<'a> NeuralNet<'a, BCECriterion> {
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.
     /// let layers = &[3; 4];
-    /// let mut a = NeuralNet::default(layers);
+    /// let mut net = NeuralNet::default(layers);
     /// ```
     pub fn default(layer_sizes: &[usize]) -> NeuralNet<BCECriterion> {
         NeuralNet {
@@ -89,7 +89,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.
     /// let layers = &[3; 4];
-    /// let mut a = NeuralNet::new(layers, BCECriterion);
+    /// let mut net = NeuralNet::new(layers, BCECriterion);
     /// ```
     pub fn new(layer_sizes: &[usize], criterion: T) -> NeuralNet<T> {
         NeuralNet {
@@ -178,9 +178,11 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.
     /// let layers = &[3; 4];
-    /// let mut a = NeuralNet::default(layers);
+    /// let mut net = NeuralNet::default(layers);
     ///
-    /// let w = &a.get_net_weights(2);
+    /// let w = &net.get_net_weights(2);
+    ///
+    /// // We add a bias term to the weight matrix
     /// assert_eq!(w.rows(), 4);
     /// assert_eq!(w.cols(), 3);
     /// ```
