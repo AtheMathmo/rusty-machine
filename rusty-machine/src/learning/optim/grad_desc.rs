@@ -55,15 +55,15 @@ impl GradientDesc {
 }
 
 impl<M: Optimizable> OptimAlgorithm<M> for GradientDesc {
-    fn optimize(&self, model: &M, start: &[f64], data: &M::Data, outputs: &M::Target) -> Vec<f64> {
+    fn optimize(&self, model: &M, start: &[f64], inputs: &M::Inputs, targets: &M::Targets) -> Vec<f64> {
 
         let mut optimizing_val = Vector::new(start.to_vec());
 
         for _ in 0..self.iters {
             optimizing_val = &optimizing_val -
                              Vector::new(model.compute_grad(&optimizing_val.data()[..],
-                                                            data,
-                                                            outputs)
+                                                            inputs,
+                                                            targets)
                                               .1) * self.alpha;
         }
         optimizing_val.into_vec()
@@ -118,21 +118,21 @@ impl StochasticGD {
     }
 }
 
-impl<M: Optimizable<Data = Matrix<f64>, Target = Matrix<f64>>> OptimAlgorithm<M> for StochasticGD {
-    fn optimize(&self, model: &M, start: &[f64], data: &M::Data, outputs: &M::Target) -> Vec<f64> {
+impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm<M> for StochasticGD {
+    fn optimize(&self, model: &M, start: &[f64], inputs: &M::Inputs,targets: &M::Targets) -> Vec<f64> {
 
         let (_, vec_data) = model.compute_grad(start,
-                                               &data.select_rows(&[0]),
-                                               &outputs.select_rows(&[0]));
+                                               &inputs.select_rows(&[0]),
+                                               &targets.select_rows(&[0]));
         let grad = Vector::new(vec_data);
         let mut delta_w = grad * self.alpha;
         let mut optimizing_val = Vector::new(start.to_vec()) - &delta_w * self.mu;
 
         for _ in 0..self.iters {
-            for i in 1..data.rows() {
+            for i in 1..inputs.rows() {
                 let (_, vec_data) = model.compute_grad(&optimizing_val.data()[..],
-                                                       &data.select_rows(&[i]),
-                                                       &outputs.select_rows(&[i]));
+                                                       &inputs.select_rows(&[i]),
+                                                       &targets.select_rows(&[i]));
 
                 delta_w = Vector::new(vec_data) * self.mu + &delta_w * self.alpha;
                 optimizing_val = &optimizing_val - &delta_w * self.mu;

@@ -9,9 +9,9 @@
 //! use rusty_machine::linalg::matrix::Matrix;
 //! use rusty_machine::learning::SupModel;
 //!
-//! let data = Matrix::new(5,3, vec![1.,1.,1.,2.,2.,2.,3.,3.,3.,
+//! let inputs = Matrix::new(5,3, vec![1.,1.,1.,2.,2.,2.,3.,3.,3.,
 //! 								4.,4.,4.,5.,5.,5.,]);
-//! let outputs = Matrix::new(5,3, vec![1.,0.,0.,0.,1.,0.,0.,0.,1.,
+//! let targets = Matrix::new(5,3, vec![1.,0.,0.,0.,1.,0.,0.,0.,1.,
 //! 									0.,0.,1.,0.,0.,1.]);
 //!
 //! let layers = &[3,5,11,7,3];
@@ -196,7 +196,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         // Check that the weights are the right size.
         let mut start = 0usize;
         for l in 0..self.layer_sizes.len() - 1 {
-            
+
             for i in 0..self.layer_sizes[l] {
                 for j in 0..self.layer_sizes[l + 1] {
                     reg_weights.push(weights[start + j*(1+self.layer_sizes[l]) + 1 + i] )
@@ -211,13 +211,13 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
     */
 
     /// Compute the gradient using the back propagation algorithm.
-    fn compute_grad(&self, weights: &[f64], data: &Matrix<f64>, outputs: &Matrix<f64>) -> (f64, Vec<f64>) {
-        assert_eq!(data.cols(), self.layer_sizes[0]);
+    fn compute_grad(&self, weights: &[f64], inputs: &Matrix<f64>, targets: &Matrix<f64>) -> (f64, Vec<f64>) {
+        assert_eq!(inputs.cols(), self.layer_sizes[0]);
 
         let mut forward_weights = Vec::with_capacity(self.layer_sizes.len() - 1);
         let mut activations = Vec::with_capacity(self.layer_sizes.len());
 
-        let net_data = Matrix::ones(data.rows(), 1).hcat(data);
+        let net_data = Matrix::ones(inputs.rows(), 1).hcat(inputs);
 
         activations.push(net_data.clone());
 
@@ -231,7 +231,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
                 let ones = Matrix::ones(a.rows(), 1);
 
                 a = ones.hcat(&a);
-                
+
                 activations.push(a.clone());
                 z = a * self.get_layer_weights(weights, l);
                 forward_weights.push(z.clone());
@@ -247,7 +247,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
             let g = self.criterion.grad_activ(z);
 
             // Take GRAD_cost to compute this delta.
-            let mut delta = self.criterion.cost_grad(&activations[self.layer_sizes.len() - 1], outputs).elemul(&g);
+            let mut delta = self.criterion.cost_grad(&activations[self.layer_sizes.len() - 1], targets).elemul(&g);
 
             deltas.push(delta.clone());
 
@@ -271,7 +271,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         for l in 0..self.layer_sizes.len() - 1 {
             let g = deltas[self.layer_sizes.len() - 2 - l].transpose() * activations[l].clone();
             capacity += g.cols() * g.rows();
-            grad.push(g / (data.rows() as f64));
+            grad.push(g / (inputs.rows() as f64));
         }
 
         let mut gradients = Vec::with_capacity(capacity);
@@ -279,14 +279,14 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         for g in grad {
             gradients.append(&mut g.data().clone());
         }
-        (self.criterion.cost(&activations[activations.len() - 1], outputs), gradients)
+        (self.criterion.cost(&activations[activations.len() - 1], targets), gradients)
     }
 
     /// Forward propagation of the model weights to get the outputs.
-    fn forward_prop(&self, data: &Matrix<f64>) -> Matrix<f64> {
-        assert_eq!(data.cols(), self.layer_sizes[0]);
+    fn forward_prop(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
+        assert_eq!(inputs.cols(), self.layer_sizes[0]);
 
-        let net_data = Matrix::ones(data.rows(), 1).hcat(data);
+        let net_data = Matrix::ones(inputs.rows(), 1).hcat(inputs);
 
         let mut z = net_data * self.get_net_weights(0);
         let mut a = self.criterion.activate(z.clone());
@@ -303,25 +303,25 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
 }
 
 impl<'a, T: Criterion> Optimizable for NeuralNet<'a, T> {
-    type Data = Matrix<f64>;
-	type Target = Matrix<f64>;
+    type Inputs = Matrix<f64>;
+	type Targets = Matrix<f64>;
 
     /// Compute the gradient of the neural network.
-    fn compute_grad(&self, params: &[f64], data: &Matrix<f64>, target: &Matrix<f64>) -> (f64, Vec<f64>) {
-        self.compute_grad(params, data, target)
+    fn compute_grad(&self, params: &[f64], inputs: &Matrix<f64>, targets: &Matrix<f64>) -> (f64, Vec<f64>) {
+        self.compute_grad(params, inputs, targets)
     }
 }
 
 impl<'a, T: Criterion> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, T> {
     /// Predict neural network output using forward propagation.
-    fn predict(&self, data: &Matrix<f64>) -> Matrix<f64> {
-        self.forward_prop(data)
+    fn predict(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
+        self.forward_prop(inputs)
     }
 
     /// Train the model using gradient optimization and back propagation.
-    fn train(&mut self, data: &Matrix<f64>, values: &Matrix<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) {
         let start = self.weights.clone();
-        let optimal_w = self.gd.optimize(self, &start[..], data, values);
+        let optimal_w = self.gd.optimize(self, &start[..], inputs, targets);
         self.weights = optimal_w;
     }
 }
@@ -348,15 +348,15 @@ pub trait Criterion {
     /// The cost function.
     ///
     /// Returns a scalar cost.
-    fn cost(&self, output: &Matrix<f64>, target: &Matrix<f64>) -> f64 {
-        Self::Cost::cost(output, target)
+    fn cost(&self, outputs: &Matrix<f64>, targets: &Matrix<f64>) -> f64 {
+        Self::Cost::cost(outputs, targets)
     }
 
     /// The gradient of the cost function.
     ///
     /// Returns a matrix of cost gradients.
-    fn cost_grad(&self, output: &Matrix<f64>, target: &Matrix<f64>) -> Matrix<f64> {
-        Self::Cost::grad_cost(output, target)
+    fn cost_grad(&self, outputs: &Matrix<f64>, targets: &Matrix<f64>) -> Matrix<f64> {
+        Self::Cost::grad_cost(outputs, targets)
     }
 }
 

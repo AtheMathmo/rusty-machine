@@ -388,7 +388,7 @@ impl<T: Zero + One + Copy> Matrix<T> {
     ///
     /// ```
     /// use rusty_machine::linalg::matrix::Matrix;
-    /// 
+    ///
     /// let mat = Matrix::new(2,3, vec![1.0,2.0,3.0,4.0,5.0,6.0]);
     ///
     /// let mt = mat.transpose();
@@ -628,7 +628,7 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
         let n: usize;
         let m: usize;
 
-        match axis { 
+        match axis {
             0 => {
                 n = self.rows;
                 m = self.cols;
@@ -972,7 +972,7 @@ impl<T: Copy + Zero + Float> Matrix<T> {
                     new_data.push(T::zero());
                     continue;
                 }
-                
+
                 let mut sum = T::zero();
                 for k in 0..j {
                     sum = sum + (new_data[i * self.cols() + k] * new_data[j * self.cols() + k]);
