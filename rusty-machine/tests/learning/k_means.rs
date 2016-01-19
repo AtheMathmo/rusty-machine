@@ -71,3 +71,13 @@ fn test_model_kplusplus() {
 
     assert_eq!(outputs.size(), 3);
 }
+
+#[test]
+#[should_panic]
+fn test_no_train_predict() {
+    let model = KMeansClassifier::new(3);
+    let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
+
+    model.predict(&inputs);
+
+}

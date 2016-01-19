@@ -12,11 +12,28 @@ fn test_regression() {
 
     lin_mod.train(&inputs, &targets);
 
-    let b_val = lin_mod.b.unwrap();
+    let parameters = lin_mod.parameters().unwrap();
 
-    let err_1 = abs(b_val[0] - 3.0);
-    let err_2 = abs(b_val[1] - 1.0);
+    let err_1 = abs(parameters[0] - 3.0);
+    let err_2 = abs(parameters[1] - 1.0);
 
     assert!(err_1 < 1e-8);
     assert!(err_2 < 1e-8);
+}
+
+#[test]
+#[should_panic]
+fn test_no_train_params() {
+    let lin_mod = LinRegressor::new();
+
+    let _ = lin_mod.parameters().unwrap();
+}
+
+#[test]
+#[should_panic]
+fn test_no_train_predict() {
+    let lin_mod = LinRegressor::new();
+    let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
+
+    let _ = lin_mod.predict(&inputs);
 }
