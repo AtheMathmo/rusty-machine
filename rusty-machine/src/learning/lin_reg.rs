@@ -14,8 +14,8 @@ use linalg::vector::Vector;
 ///
 /// Contains option for optimized parameter.
 pub struct LinRegressor {
-    /// The mle for the beta parameters.
-    pub b: Option<Vector<f64>>,
+    /// The parameters for the regression model.
+    parameters: Option<Vector<f64>>,
 }
 
 impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
@@ -40,14 +40,14 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
     fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) {
         let xt = inputs.transpose();
 
-        self.b = Some(((&xt * inputs).inverse() * &xt) * targets);
+        self.parameters = Some(((&xt * inputs).inverse() * &xt) * targets);
     }
 
     /// Predict output value from input data.
     ///
     /// Model must be trained before prediction can be made.
     fn predict(&self, inputs: &Matrix<f64>) -> Vector<f64> {
-        match self.b {
+        match self.parameters {
             Some(ref v) => inputs * v,
             None => panic!("Model has not been trained."),
         }
@@ -65,6 +65,16 @@ impl LinRegressor {
     /// let mut lin_mod = LinRegressor::new();
     /// ```
     pub fn new() -> LinRegressor {
-        LinRegressor { b: None }
+        LinRegressor { parameters: None }
+    }
+
+    /// Get the parameters from the model.
+    ///
+    /// Returns an option that is None if the model has not been trained.
+    pub fn parameters(&self) -> Option<Vector<f64>> {
+        match self.parameters {
+            None => None,
+            Some(ref x) => Some(x.clone()),
+        }
     }
 }
