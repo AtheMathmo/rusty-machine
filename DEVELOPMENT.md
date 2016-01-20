@@ -35,21 +35,23 @@ This marks my intended release goals. I won't estimate the actual dates of relea
         <th>Version</th><th>Features</th><th>Dependencies</th>
     </tr>
     <tr>
-        <td>0.1.5</td><td><ul><li>Regularization on cost functions.</li><ul></td><td><ul><li>Data Normalization.</li><li>Some refactoring.</li><ul></td>
+        <td>0.1.*</td><td><ul><li>Logistic Regression.</li><ul></td><td><ul><li>Looking to Generalized lin reg.</li><ul></td>
     </tr>
     <tr>
-        <td>0.1.6</td><td><ul><li>Logistic Regression.</li><ul></td><td><ul><li>Looking to Generalized lin reg.</li><ul></td>
+        <td>0.1.*</td><td><ul><li>SVMs</li><ul></td><td><ul><li>None.</li><ul></td>
     </tr>
     <tr>
-        <td>0.1.7</td><td><ul><li>SVMs</li><ul></td><td><ul><li>None.</li><ul></td>
+        <td>0.1.*</td><td><ul><li>Generalized linear regression.</li><ul></td><td><ul><li>None.</li><ul></td>
     </tr>
     <tr>
-        <td>0.1.8</td><td><ul><li>Generalized linear regression.</li><ul></td><td><ul><li>None.</li><ul></td>
+        <td>0.1.*</td><td><ul><li>Regularization on cost functions.</li><ul></td><td><ul><li>Data Normalization.</li><li>Some refactoring.</li><ul></td>
     </tr>
     <tr>
         <td>0.2.0</td><td><ul><li>More advanced GD algorithms.</li><li>Optimization</li><li>Bug fixes</li></ul></td><td></td>
     </tr>
 </table>
+
+*Note*: Regularization has been pushed back as it will require careful planning. I plan to implement the other features first and then try to round off the 0.2.0 release with regularization.
 
 ### Unplanned:
 

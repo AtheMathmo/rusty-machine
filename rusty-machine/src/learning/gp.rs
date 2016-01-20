@@ -20,7 +20,7 @@
 //!
 //! let test_data = Matrix::new(5,1,vec![2.3,4.4,5.1,6.2,7.1]);
 //!
-//! let output = gaussp.predict(&test_data);
+//! let outputs = gaussp.predict(&test_data);
 //! ```
 //! Alternatively one could use gaussp.get_posterior() which would return both
 //! the predictive mean and covariance. However, this is likely to change in
@@ -84,7 +84,7 @@ impl Default for GaussianProcess<SquaredExp, ConstMean> {
     ///
     /// ```
     /// use rusty_machine::learning::gp;
-    /// 
+    ///
     /// let gp = gp::GaussianProcess::default();
     /// ```
     fn default() -> GaussianProcess<SquaredExp, ConstMean> {
@@ -145,14 +145,14 @@ impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
 }
 
 impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Vector<f64>> for GaussianProcess<T, U> {
-    /// Predict output from data.
-    fn predict(&self, data: &Matrix<f64>) -> Vector<f64> {
+    /// Predict output from inputs.
+    fn predict(&self, inputs: &Matrix<f64>) -> Vector<f64> {
 
         // Messy referencing for succint syntax
         if let (&Some(ref alpha), &Some(ref t_data)) = (&self.alpha, &self.train_data) {
-            let mean = self.mean.func(data.clone());
+            let mean = self.mean.func(inputs.clone());
 
-            let post_mean = self.ker_mat(data, t_data) * alpha;
+            let post_mean = self.ker_mat(inputs, t_data) * alpha;
 
             return mean + post_mean;
 
@@ -162,18 +162,18 @@ impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Vector<f64>> for GaussianProc
     }
 
     /// Train the model using data and outputs.
-    fn train(&mut self, data: &Matrix<f64>, value: &Vector<f64>) {
-        let noise_mat = Matrix::identity(data.rows()) * self.noise;
+    fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) {
+        let noise_mat = Matrix::identity(inputs.rows()) * self.noise;
 
-        let ker_mat = self.ker_mat(data, data);
+        let ker_mat = self.ker_mat(inputs, inputs);
 
         let train_mat = (ker_mat + noise_mat).cholesky();
 
-        let x = solve_l_triangular(&train_mat, &(value - self.mean.func(data.clone())));
+        let x = solve_l_triangular(&train_mat, &(targets - self.mean.func(inputs.clone())));
         let alpha = solve_u_triangular(&train_mat.transpose(), &x);
 
         self.train_mat = Some(train_mat);
-        self.train_data = Some(data.clone());
+        self.train_data = Some(inputs.clone());
         self.alpha = Some(alpha);
     }
 }
@@ -184,24 +184,24 @@ impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
     /// Requires the model to be trained first.
     ///
     /// Outputs the posterior mean and covariance matrix.
-    pub fn get_posterior(&self, data: &Matrix<f64>) -> (Vector<f64>, Matrix<f64>) {
+    pub fn get_posterior(&self, inputs: &Matrix<f64>) -> (Vector<f64>, Matrix<f64>) {
         if let (&Some(ref t_mat), &Some(ref alpha), &Some(ref t_data)) = (&self.train_mat,
                                                                           &self.alpha,
                                                                           &self.train_data) {
-            let mean = self.mean.func(data.clone());
+            let mean = self.mean.func(inputs.clone());
 
-            let post_mean = mean + self.ker_mat(data, t_data) * alpha;
+            let post_mean = mean + self.ker_mat(inputs, t_data) * alpha;
 
-            let test_mat = self.ker_mat(data, t_data);
-            let mut v_data = Vec::with_capacity(data.rows() * data.cols());
+            let test_mat = self.ker_mat(inputs, t_data);
+            let mut var_data = Vec::with_capacity(inputs.rows() * inputs.cols());
             for i in 0..test_mat.rows() {
                 let test_point = Vector::new(test_mat.select_rows(&[i]).into_vec());
-                v_data.append(&mut solve_l_triangular(t_mat, &test_point).into_vec());
+                var_data.append(&mut solve_l_triangular(t_mat, &test_point).into_vec());
             }
 
-            let v_mat = Matrix::new(test_mat.rows(), test_mat.cols(), v_data);
+            let v_mat = Matrix::new(test_mat.rows(), test_mat.cols(), var_data);
 
-            let post_var = self.ker_mat(data, data) - &v_mat * v_mat.transpose();
+            let post_var = self.ker_mat(inputs, inputs) - &v_mat * v_mat.transpose();
 
             return (post_mean, post_var);
         }
