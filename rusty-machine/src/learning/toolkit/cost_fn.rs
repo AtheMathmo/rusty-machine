@@ -9,6 +9,7 @@
 //! Just create a struct implementing the CostFunc trait.
 
 use linalg::matrix::Matrix;
+use linalg::vector::Vector;
 
 /// Trait for cost functions in models.
 pub trait CostFunc<T> {
@@ -56,6 +57,24 @@ impl CostFunc<Matrix<f64>> for CrossEntropyError {
 	}
 
 	fn grad_cost(outputs: &Matrix<f64>, targets: &Matrix<f64>) -> Matrix<f64> {
+		(outputs - targets).elediv(&(outputs.elemul(&(-outputs+1f64))))
+	}
+}
+
+impl CostFunc<Vector<f64>> for CrossEntropyError {
+	fn cost(outputs: &Vector<f64>, targets: &Vector<f64>) -> f64 {
+		// The cost for a single
+		let log_inv_output = (-outputs + 1f64).apply(&ln);
+		let log_output = outputs.clone().apply(&ln);
+
+		let mat_cost = targets.elemul(&log_output) + (-targets+1f64).elemul(&log_inv_output);
+
+		let n = outputs.size();
+
+		- (mat_cost.sum()) / (n as f64)
+	}
+
+	fn grad_cost(outputs: &Vector<f64>, targets: &Vector<f64>) -> Vector<f64> {
 		(outputs - targets).elediv(&(outputs.elemul(&(-outputs+1f64))))
 	}
 }
