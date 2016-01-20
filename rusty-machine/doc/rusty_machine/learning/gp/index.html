@@ -45,7 +45,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1379' class='srclink' href='../../../src/rusty_machine/learning/gp.rs.html#1-255' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-1435' class='srclink' href='../../../src/rusty_machine/learning/gp.rs.html#1-255' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Gaussian Processes</p>
 
 <p>Provides implementation of gaussian process regression.</p>
@@ -66,7 +66,7 @@
 
 <span class='kw'>let</span> <span class='ident'>test_data</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>5</span>,<span class='number'>1</span>,<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>2.3</span>,<span class='number'>4.4</span>,<span class='number'>5.1</span>,<span class='number'>6.2</span>,<span class='number'>7.1</span>]);
 
-<span class='kw'>let</span> <span class='ident'>output</span> <span class='op'>=</span> <span class='ident'>gaussp</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>test_data</span>);</pre>
+<span class='kw'>let</span> <span class='ident'>outputs</span> <span class='op'>=</span> <span class='ident'>gaussp</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>test_data</span>);</pre>
 
 <p>Alternatively one could use gaussp.get_posterior() which would return both
 the predictive mean and covariance. However, this is likely to change in

@@ -45,16 +45,16 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1509' class='srclink' href='../../src/rusty_machine/lib.rs.html#120-127' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-1565' class='srclink' href='../../src/rusty_machine/lib.rs.html#121-128' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait UnSupModel&lt;T, U&gt; {
-    fn <a href='#tymethod.predict' class='fnname'>predict</a>(&amp;self, data: &amp;T) -&gt; U;
-    fn <a href='#tymethod.train' class='fnname'>train</a>(&amp;mut self, data: &amp;T);
+    fn <a href='#tymethod.predict' class='fnname'>predict</a>(&amp;self, inputs: &amp;T) -&gt; U;
+    fn <a href='#tymethod.train' class='fnname'>train</a>(&amp;mut self, inputs: &amp;T);
 }</pre><div class='docblock'><p>Trait for unsupervised model.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.predict' class='method stab '><code>fn <a href='#tymethod.predict' class='fnname'>predict</a>(&amp;self, data: &amp;T) -&gt; U</code></h3><div class='docblock'><p>Predict output from data.</p>
-</div><h3 id='tymethod.train' class='method stab '><code>fn <a href='#tymethod.train' class='fnname'>train</a>(&amp;mut self, data: &amp;T)</code></h3><div class='docblock'><p>Train the model using data.</p>
+        <h3 id='tymethod.predict' class='method stab '><code>fn <a href='#tymethod.predict' class='fnname'>predict</a>(&amp;self, inputs: &amp;T) -&gt; U</code></h3><div class='docblock'><p>Predict output from inputs.</p>
+</div><h3 id='tymethod.train' class='method stab '><code>fn <a href='#tymethod.train' class='fnname'>train</a>(&amp;mut self, inputs: &amp;T)</code></h3><div class='docblock'><p>Train the model using inputs.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>

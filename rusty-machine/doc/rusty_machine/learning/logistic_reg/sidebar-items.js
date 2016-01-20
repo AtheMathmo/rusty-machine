@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["LogisticRegressor","Logistic Regression Model."]]});

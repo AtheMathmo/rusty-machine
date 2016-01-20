@@ -45,21 +45,22 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1716' class='srclink' href='../../../../src/rusty_machine/learning/toolkit/cost_fn.rs.html#14-20' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-1773' class='srclink' href='../../../../src/rusty_machine/learning/toolkit/cost_fn.rs.html#15-21' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait CostFunc&lt;T&gt; {
-    fn <a href='#tymethod.cost' class='fnname'>cost</a>(output: &amp;T, target: &amp;T) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>;
-    fn <a href='#tymethod.grad_cost' class='fnname'>grad_cost</a>(output: &amp;T, target: &amp;T) -&gt; T;
+    fn <a href='#tymethod.cost' class='fnname'>cost</a>(outputs: &amp;T, targets: &amp;T) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>;
+    fn <a href='#tymethod.grad_cost' class='fnname'>grad_cost</a>(outputs: &amp;T, targets: &amp;T) -&gt; T;
 }</pre><div class='docblock'><p>Trait for cost functions in models.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
-        <h3 id='tymethod.cost' class='method stab '><code>fn <a href='#tymethod.cost' class='fnname'>cost</a>(output: &amp;T, target: &amp;T) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h3><div class='docblock'><p>The cost function.</p>
-</div><h3 id='tymethod.grad_cost' class='method stab '><code>fn <a href='#tymethod.grad_cost' class='fnname'>grad_cost</a>(output: &amp;T, target: &amp;T) -&gt; T</code></h3><div class='docblock'><p>The gradient of the cost function.</p>
+        <h3 id='tymethod.cost' class='method stab '><code>fn <a href='#tymethod.cost' class='fnname'>cost</a>(outputs: &amp;T, targets: &amp;T) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h3><div class='docblock'><p>The cost function.</p>
+</div><h3 id='tymethod.grad_cost' class='method stab '><code>fn <a href='#tymethod.grad_cost' class='fnname'>grad_cost</a>(outputs: &amp;T, targets: &amp;T) -&gt; T</code></h3><div class='docblock'><p>The gradient of the cost function.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
     <li><code>impl <a class='trait' href='../../../../rusty_machine/learning/toolkit/cost_fn/trait.CostFunc.html' title='rusty_machine::learning::toolkit::cost_fn::CostFunc'>CostFunc</a>&lt;<a class='struct' href='../../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;&gt; for <a class='struct' href='../../../../rusty_machine/learning/toolkit/cost_fn/struct.MeanSqError.html' title='rusty_machine::learning::toolkit::cost_fn::MeanSqError'>MeanSqError</a></code></li>
 <li><code>impl <a class='trait' href='../../../../rusty_machine/learning/toolkit/cost_fn/trait.CostFunc.html' title='rusty_machine::learning::toolkit::cost_fn::CostFunc'>CostFunc</a>&lt;<a class='struct' href='../../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;&gt; for <a class='struct' href='../../../../rusty_machine/learning/toolkit/cost_fn/struct.CrossEntropyError.html' title='rusty_machine::learning::toolkit::cost_fn::CrossEntropyError'>CrossEntropyError</a></code></li>
+<li><code>impl <a class='trait' href='../../../../rusty_machine/learning/toolkit/cost_fn/trait.CostFunc.html' title='rusty_machine::learning::toolkit::cost_fn::CostFunc'>CostFunc</a>&lt;<a class='struct' href='../../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;&gt; for <a class='struct' href='../../../../rusty_machine/learning/toolkit/cost_fn/struct.CrossEntropyError.html' title='rusty_machine::learning::toolkit::cost_fn::CrossEntropyError'>CrossEntropyError</a></code></li>
 </ul><script type="text/javascript" async
                               src="../../../../implementors/rusty_machine/learning/toolkit/cost_fn/trait.CostFunc.js">
                       </script></section>

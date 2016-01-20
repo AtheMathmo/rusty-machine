@@ -106,26 +106,46 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Cost Functions.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! This module contains a number of structs implementing the CostFunc trait.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! These structs are used within Neural Networks and</span>
-<span class='doccomment'>//! Generalized Linear Regression (not yet implemented). </span>
-<span class='doccomment'>//! </span>
+<span class='doccomment'>//! Generalized Linear Regression (not yet implemented).</span>
+<span class='doccomment'>//!</span>
 <span class='doccomment'>//! You can also create your own custom cost functions for use in your models.</span>
 <span class='doccomment'>//! Just create a struct implementing the CostFunc trait.</span>
 
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>matrix</span>::<span class='ident'>Matrix</span>;
+<span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>vector</span>::<span class='ident'>Vector</span>;
 
 <span class='doccomment'>/// Trait for cost functions in models.</span>
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>CostFunc</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
 	<span class='doccomment'>/// The cost function.</span>
-	<span class='kw'>fn</span> <span class='ident'>cost</span>(<span class='ident'>output</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>, <span class='ident'>target</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span>;
+	<span class='kw'>fn</span> <span class='ident'>cost</span>(<span class='ident'>outputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span>;
 
 	<span class='doccomment'>/// The gradient of the cost function.</span>
-	<span class='kw'>fn</span> <span class='ident'>grad_cost</span>(<span class='ident'>output</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>, <span class='ident'>target</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span>;
+	<span class='kw'>fn</span> <span class='ident'>grad_cost</span>(<span class='ident'>outputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span>;
 }
 
 <span class='doccomment'>/// The mean squared error cost function.</span>
@@ -134,8 +154,8 @@
 <span class='comment'>// For generics we need a trait for &quot;Hadamard product&quot; here</span>
 <span class='comment'>// Which is &quot;Elementwise multiplication&quot;.</span>
 <span class='kw'>impl</span> <span class='ident'>CostFunc</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>MeanSqError</span> {
-	<span class='kw'>fn</span> <span class='ident'>cost</span>(<span class='ident'>output</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>target</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span> {
-		<span class='kw'>let</span> <span class='ident'>diff</span> <span class='op'>=</span> <span class='ident'>output</span> <span class='op'>-</span> <span class='ident'>target</span>;
+	<span class='kw'>fn</span> <span class='ident'>cost</span>(<span class='ident'>outputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span> {
+		<span class='kw'>let</span> <span class='ident'>diff</span> <span class='op'>=</span> <span class='ident'>outputs</span> <span class='op'>-</span> <span class='ident'>targets</span>;
 		<span class='kw'>let</span> <span class='ident'>sq_diff</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>diff</span>.<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>diff</span>);
 
 		<span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='ident'>diff</span>.<span class='ident'>rows</span>();
@@ -143,8 +163,8 @@
 		<span class='ident'>sq_diff</span>.<span class='ident'>sum</span>() <span class='op'>/</span> (<span class='number'>2f64</span> <span class='op'>*</span> (<span class='ident'>n</span> <span class='kw'>as</span> <span class='ident'>f64</span>))
 	}
 
-	<span class='kw'>fn</span> <span class='ident'>grad_cost</span>(<span class='ident'>output</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>target</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-		<span class='ident'>output</span> <span class='op'>-</span> <span class='ident'>target</span>
+	<span class='kw'>fn</span> <span class='ident'>grad_cost</span>(<span class='ident'>outputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+		<span class='ident'>outputs</span> <span class='op'>-</span> <span class='ident'>targets</span>
 	}
 }
 
@@ -152,27 +172,46 @@
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>CrossEntropyError</span>;
 
 <span class='kw'>impl</span> <span class='ident'>CostFunc</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>CrossEntropyError</span> {
-	<span class='kw'>fn</span> <span class='ident'>cost</span>(<span class='ident'>output</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>target</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span> {
+	<span class='kw'>fn</span> <span class='ident'>cost</span>(<span class='ident'>outputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span> {
 		<span class='comment'>// The cost for a single</span>
-		<span class='kw'>let</span> <span class='ident'>log_inv_output</span> <span class='op'>=</span> (<span class='op'>-</span><span class='ident'>output</span> <span class='op'>+</span> <span class='number'>1f64</span>).<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='ident'>ln</span>);
-		<span class='kw'>let</span> <span class='ident'>log_output</span> <span class='op'>=</span> <span class='ident'>output</span>.<span class='ident'>clone</span>().<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='ident'>ln</span>);
+		<span class='kw'>let</span> <span class='ident'>log_inv_output</span> <span class='op'>=</span> (<span class='op'>-</span><span class='ident'>outputs</span> <span class='op'>+</span> <span class='number'>1f64</span>).<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='ident'>ln</span>);
+		<span class='kw'>let</span> <span class='ident'>log_output</span> <span class='op'>=</span> <span class='ident'>outputs</span>.<span class='ident'>clone</span>().<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='ident'>ln</span>);
 
-		<span class='kw'>let</span> <span class='ident'>mat_cost</span> <span class='op'>=</span> <span class='ident'>target</span>.<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>log_output</span>) <span class='op'>+</span> (<span class='op'>-</span><span class='ident'>target</span><span class='op'>+</span><span class='number'>1f64</span>).<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>log_inv_output</span>);
+		<span class='kw'>let</span> <span class='ident'>mat_cost</span> <span class='op'>=</span> <span class='ident'>targets</span>.<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>log_output</span>) <span class='op'>+</span> (<span class='op'>-</span><span class='ident'>targets</span><span class='op'>+</span><span class='number'>1f64</span>).<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>log_inv_output</span>);
 
-		<span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='ident'>output</span>.<span class='ident'>rows</span>();
+		<span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='ident'>outputs</span>.<span class='ident'>rows</span>();
 
 		<span class='op'>-</span> (<span class='ident'>mat_cost</span>.<span class='ident'>sum</span>()) <span class='op'>/</span> (<span class='ident'>n</span> <span class='kw'>as</span> <span class='ident'>f64</span>)
 	}
 
-	<span class='kw'>fn</span> <span class='ident'>grad_cost</span>(<span class='ident'>output</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>target</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-		(<span class='ident'>output</span> <span class='op'>-</span> <span class='ident'>target</span>).<span class='ident'>elediv</span>(<span class='kw-2'>&amp;</span>(<span class='ident'>output</span>.<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span>(<span class='op'>-</span><span class='ident'>output</span><span class='op'>+</span><span class='number'>1f64</span>))))
+	<span class='kw'>fn</span> <span class='ident'>grad_cost</span>(<span class='ident'>outputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+		(<span class='ident'>outputs</span> <span class='op'>-</span> <span class='ident'>targets</span>).<span class='ident'>elediv</span>(<span class='kw-2'>&amp;</span>(<span class='ident'>outputs</span>.<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span>(<span class='op'>-</span><span class='ident'>outputs</span><span class='op'>+</span><span class='number'>1f64</span>))))
+	}
+}
+
+<span class='kw'>impl</span> <span class='ident'>CostFunc</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>CrossEntropyError</span> {
+	<span class='kw'>fn</span> <span class='ident'>cost</span>(<span class='ident'>outputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span> {
+		<span class='comment'>// The cost for a single</span>
+		<span class='kw'>let</span> <span class='ident'>log_inv_output</span> <span class='op'>=</span> (<span class='op'>-</span><span class='ident'>outputs</span> <span class='op'>+</span> <span class='number'>1f64</span>).<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='ident'>ln</span>);
+		<span class='kw'>let</span> <span class='ident'>log_output</span> <span class='op'>=</span> <span class='ident'>outputs</span>.<span class='ident'>clone</span>().<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='ident'>ln</span>);
+
+		<span class='kw'>let</span> <span class='ident'>mat_cost</span> <span class='op'>=</span> <span class='ident'>targets</span>.<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>log_output</span>) <span class='op'>+</span> (<span class='op'>-</span><span class='ident'>targets</span><span class='op'>+</span><span class='number'>1f64</span>).<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>log_inv_output</span>);
+
+		<span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='ident'>outputs</span>.<span class='ident'>size</span>();
+
+		<span class='op'>-</span> (<span class='ident'>mat_cost</span>.<span class='ident'>sum</span>()) <span class='op'>/</span> (<span class='ident'>n</span> <span class='kw'>as</span> <span class='ident'>f64</span>)
+	}
+
+	<span class='kw'>fn</span> <span class='ident'>grad_cost</span>(<span class='ident'>outputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+		(<span class='ident'>outputs</span> <span class='op'>-</span> <span class='ident'>targets</span>).<span class='ident'>elediv</span>(<span class='kw-2'>&amp;</span>(<span class='ident'>outputs</span>.<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span>(<span class='op'>-</span><span class='ident'>outputs</span><span class='op'>+</span><span class='number'>1f64</span>))))
 	}
 }
 
 <span class='doccomment'>/// Logarithm for applying within cost function.</span>
 <span class='kw'>fn</span> <span class='ident'>ln</span>(<span class='ident'>x</span>: <span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span> {
 	<span class='ident'>x</span>.<span class='ident'>ln</span>()
-}</pre>
+}
+</pre>
 </section>
     <section id='search' class="content hidden"></section>
 

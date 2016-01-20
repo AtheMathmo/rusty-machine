@@ -339,6 +339,7 @@
 <span id="297">297</span>
 <span id="298">298</span>
 <span id="299">299</span>
+<span id="300">300</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! K-means Classification</span>
 <span class='doccomment'>//!</span>
@@ -351,17 +352,18 @@
 <span class='doccomment'>//! use rusty_machine::learning::k_means::KMeansClassifier;</span>
 <span class='doccomment'>//! use rusty_machine::learning::UnSupModel;</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! let train_data = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);</span>
-<span class='doccomment'>//! let pred_data = Matrix::new(1,2, vec![0.0, 0.0]);</span>
-<span class='doccomment'>//! </span>
+<span class='doccomment'>//! let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);</span>
+<span class='doccomment'>//! let targets = Matrix::new(1, 2, vec![0.0, 0.0]);</span>
+<span class='doccomment'>//! let test_inputs = Matrix::new(1, 2, vec![1.0, 3.5]);</span>
+<span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Create model with k(=2) classes.</span>
 <span class='doccomment'>//! let mut model = KMeansClassifier::new(2);</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! // Where train_data is a Matrix with features in columns.</span>
-<span class='doccomment'>//! model.train(&amp;train_data); </span>
+<span class='doccomment'>//! // Where inputs is a Matrix with features in columns.</span>
+<span class='doccomment'>//! model.train(&amp;inputs);</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Where pred_data is a Matrix with features in columns.</span>
-<span class='doccomment'>//! let a = model.predict(&amp;pred_data);</span>
+<span class='doccomment'>//! let a = model.predict(&amp;test_inputs);</span>
 <span class='doccomment'>//! ```</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! Additionally you can control the initialization</span>
@@ -418,9 +420,9 @@
     <span class='doccomment'>/// Predict classes from data.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Model must be trained.</span>
-    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>centroids</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>centroids</span> {
-            <span class='kw'>return</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='ident'>centroids</span>, <span class='ident'>data</span>).<span class='number'>0</span>;
+            <span class='kw'>return</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='ident'>centroids</span>, <span class='ident'>inputs</span>).<span class='number'>0</span>;
         }
         <span class='kw'>else</span> {
             <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Model has not been trained.&quot;</span>);
@@ -428,13 +430,13 @@
     }
 
     <span class='doccomment'>/// Train the classifier using input data.</span>
-    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
-        <span class='self'>self</span>.<span class='ident'>init_centroids</span>(<span class='ident'>data</span>);
+    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
+        <span class='self'>self</span>.<span class='ident'>init_centroids</span>(<span class='ident'>inputs</span>);
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cost</span> <span class='op'>=</span> <span class='number'>0.0</span>;
 
         <span class='kw'>for</span> <span class='ident'>_i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>iters</span> {
-                <span class='kw'>let</span> (<span class='ident'>idx</span>, <span class='ident'>distances</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>get_closest_centroids</span>(<span class='ident'>data</span>);
-                <span class='self'>self</span>.<span class='ident'>update_centroids</span>(<span class='ident'>data</span>, <span class='ident'>idx</span>);
+                <span class='kw'>let</span> (<span class='ident'>idx</span>, <span class='ident'>distances</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>get_closest_centroids</span>(<span class='ident'>inputs</span>);
+                <span class='self'>self</span>.<span class='ident'>update_centroids</span>(<span class='ident'>inputs</span>, <span class='ident'>idx</span>);
 
                 <span class='kw'>let</span> <span class='ident'>cost_i</span> <span class='op'>=</span> <span class='ident'>distances</span>.<span class='ident'>sum</span>();
                 <span class='kw'>if</span> <span class='ident'>cost</span> <span class='op'>==</span> <span class='ident'>cost_i</span> {
@@ -471,16 +473,16 @@
     <span class='doccomment'>/// Initialize the centroids.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Used internally within model.</span>
-    <span class='kw'>fn</span> <span class='ident'>init_centroids</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
+    <span class='kw'>fn</span> <span class='ident'>init_centroids</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>init_algorithm</span> {
             <span class='ident'>InitAlgorithm</span>::<span class='ident'>Forgy</span> <span class='op'>=&gt;</span> {
-                <span class='self'>self</span>.<span class='ident'>centroids</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>KMeansClassifier</span>::<span class='ident'>forgy_init</span>(<span class='self'>self</span>.<span class='ident'>k</span>, <span class='ident'>data</span>))
+                <span class='self'>self</span>.<span class='ident'>centroids</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>KMeansClassifier</span>::<span class='ident'>forgy_init</span>(<span class='self'>self</span>.<span class='ident'>k</span>, <span class='ident'>inputs</span>))
             }
             <span class='ident'>InitAlgorithm</span>::<span class='ident'>RandomPartition</span> <span class='op'>=&gt;</span> {
-                <span class='self'>self</span>.<span class='ident'>centroids</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>KMeansClassifier</span>::<span class='ident'>ran_partition_init</span>(<span class='self'>self</span>.<span class='ident'>k</span>, <span class='ident'>data</span>))
+                <span class='self'>self</span>.<span class='ident'>centroids</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>KMeansClassifier</span>::<span class='ident'>ran_partition_init</span>(<span class='self'>self</span>.<span class='ident'>k</span>, <span class='ident'>inputs</span>))
             }
             <span class='ident'>InitAlgorithm</span>::<span class='ident'>KPlusPlus</span> <span class='op'>=&gt;</span> {
-                <span class='self'>self</span>.<span class='ident'>centroids</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>KMeansClassifier</span>::<span class='ident'>plusplus_init</span>(<span class='self'>self</span>.<span class='ident'>k</span>, <span class='ident'>data</span>))
+                <span class='self'>self</span>.<span class='ident'>centroids</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>KMeansClassifier</span>::<span class='ident'>plusplus_init</span>(<span class='self'>self</span>.<span class='ident'>k</span>, <span class='ident'>inputs</span>))
             }
         }
     }
@@ -488,8 +490,8 @@
     <span class='doccomment'>/// Updated the centroids by computing means of assigned classes.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Used internally within model.</span>
-    <span class='kw'>fn</span> <span class='ident'>update_centroids</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>classes</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>) {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>new_centroids</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='self'>self</span>.<span class='ident'>k</span> <span class='op'>*</span> <span class='ident'>data</span>.<span class='ident'>cols</span>());
+    <span class='kw'>fn</span> <span class='ident'>update_centroids</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>classes</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>) {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>new_centroids</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='self'>self</span>.<span class='ident'>k</span> <span class='op'>*</span> <span class='ident'>inputs</span>.<span class='ident'>cols</span>());
         <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>k</span> {
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>vec_i</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
 
@@ -499,16 +501,16 @@
                 }
             }
 
-            <span class='kw'>let</span> <span class='ident'>mat_i</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>vec_i</span>);
+            <span class='kw'>let</span> <span class='ident'>mat_i</span> <span class='op'>=</span> <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>vec_i</span>);
             <span class='ident'>new_centroids</span>.<span class='ident'>extend</span>(<span class='ident'>mat_i</span>.<span class='ident'>mean</span>(<span class='number'>0</span>).<span class='ident'>data</span>());
         }
 
-        <span class='self'>self</span>.<span class='ident'>centroids</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='self'>self</span>.<span class='ident'>k</span>, <span class='ident'>data</span>.<span class='ident'>cols</span>(), <span class='ident'>new_centroids</span>));
+        <span class='self'>self</span>.<span class='ident'>centroids</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='self'>self</span>.<span class='ident'>k</span>, <span class='ident'>inputs</span>.<span class='ident'>cols</span>(), <span class='ident'>new_centroids</span>));
     }
 
-    <span class='kw'>fn</span> <span class='ident'>get_closest_centroids</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> (<span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>, <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
+    <span class='kw'>fn</span> <span class='ident'>get_closest_centroids</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> (<span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>, <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>c</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>centroids</span> {
-            <span class='kw'>return</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='kw-2'>&amp;</span><span class='ident'>c</span>, <span class='ident'>data</span>);
+            <span class='kw'>return</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='kw-2'>&amp;</span><span class='ident'>c</span>, <span class='ident'>inputs</span>);
         }
         <span class='kw'>else</span> {
             <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Centroids not correctly initialized.&quot;</span>);
@@ -519,13 +521,13 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Used internally within model.</span>
     <span class='doccomment'>/// Returns the index of the closest centroid and the distance to it.</span>
-    <span class='kw'>fn</span> <span class='ident'>find_closest_centroids</span>(<span class='ident'>centroids</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> (<span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>, <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>idx</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>data</span>.<span class='ident'>rows</span>());
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>distances</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>data</span>.<span class='ident'>rows</span>());
+    <span class='kw'>fn</span> <span class='ident'>find_closest_centroids</span>(<span class='ident'>centroids</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> (<span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>, <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>idx</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>inputs</span>.<span class='ident'>rows</span>());
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>distances</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>inputs</span>.<span class='ident'>rows</span>());
 
-        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>data</span>.<span class='ident'>rows</span>() {
+        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>inputs</span>.<span class='ident'>rows</span>() {
             <span class='comment'>// This works like repmat pulling out row i repeatedly.</span>
-            <span class='kw'>let</span> <span class='ident'>centroid_diff</span> <span class='op'>=</span> <span class='ident'>centroids</span> <span class='op'>-</span> <span class='ident'>data</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>i</span>; <span class='ident'>centroids</span>.<span class='ident'>rows</span>()]);
+            <span class='kw'>let</span> <span class='ident'>centroid_diff</span> <span class='op'>=</span> <span class='ident'>centroids</span> <span class='op'>-</span> <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>i</span>; <span class='ident'>centroids</span>.<span class='ident'>rows</span>()]);
             <span class='kw'>let</span> <span class='ident'>dist</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>centroid_diff</span>.<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>centroid_diff</span>).<span class='ident'>sum_cols</span>();
 
             <span class='comment'>// Now take argmin and this is the centroid.</span>
@@ -541,30 +543,30 @@
     <span class='doccomment'>/// Compute initial centroids using Forgy scheme.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Selects k random points in data for centroids.</span>
-    <span class='kw'>fn</span> <span class='ident'>forgy_init</span>(<span class='ident'>k</span>: <span class='ident'>usize</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>k</span> <span class='op'>&lt;=</span> <span class='ident'>data</span>.<span class='ident'>rows</span>());
+    <span class='kw'>fn</span> <span class='ident'>forgy_init</span>(<span class='ident'>k</span>: <span class='ident'>usize</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>k</span> <span class='op'>&lt;=</span> <span class='ident'>inputs</span>.<span class='ident'>rows</span>());
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>random_choices</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>k</span>);
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>rng</span> <span class='op'>=</span> <span class='ident'>thread_rng</span>();
         <span class='kw'>while</span> <span class='ident'>random_choices</span>.<span class='ident'>len</span>() <span class='op'>&lt;</span> <span class='ident'>k</span> {
-            <span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span> <span class='ident'>rng</span>.<span class='ident'>gen_range</span>(<span class='number'>0</span>, <span class='ident'>data</span>.<span class='ident'>rows</span>());
+            <span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span> <span class='ident'>rng</span>.<span class='ident'>gen_range</span>(<span class='number'>0</span>, <span class='ident'>inputs</span>.<span class='ident'>rows</span>());
 
             <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>random_choices</span>.<span class='ident'>contains</span>(<span class='kw-2'>&amp;</span><span class='ident'>r</span>) {
                 <span class='ident'>random_choices</span>.<span class='ident'>push</span>(<span class='ident'>r</span>);
             }
         }
 
-        <span class='ident'>data</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>random_choices</span>)
+        <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>random_choices</span>)
     }
 
     <span class='doccomment'>/// Compute initial centroids using random partition.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Selects centroids by assigning each point randomly to a class</span>
     <span class='doccomment'>/// and computing the mean of each class.</span>
-    <span class='kw'>fn</span> <span class='ident'>ran_partition_init</span>(<span class='ident'>k</span>: <span class='ident'>usize</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>k</span> <span class='op'>&lt;=</span> <span class='ident'>data</span>.<span class='ident'>rows</span>());
+    <span class='kw'>fn</span> <span class='ident'>ran_partition_init</span>(<span class='ident'>k</span>: <span class='ident'>usize</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>k</span> <span class='op'>&lt;=</span> <span class='ident'>inputs</span>.<span class='ident'>rows</span>());
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>random_assignments</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>data</span>.<span class='ident'>rows</span>());
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>random_assignments</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>inputs</span>.<span class='ident'>rows</span>());
 
         <span class='comment'>// Populate so we have something in each class.</span>
         <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>k</span> {
@@ -572,11 +574,11 @@
         }
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>rng</span> <span class='op'>=</span> <span class='ident'>thread_rng</span>();
-        <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='ident'>k</span>..<span class='ident'>data</span>.<span class='ident'>rows</span>() {
+        <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='ident'>k</span>..<span class='ident'>inputs</span>.<span class='ident'>rows</span>() {
             <span class='ident'>random_assignments</span>.<span class='ident'>push</span>(<span class='ident'>rng</span>.<span class='ident'>gen_range</span>(<span class='number'>0</span>, <span class='ident'>k</span>));
         }
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>init_centroids</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>k</span> <span class='op'>*</span> <span class='ident'>data</span>.<span class='ident'>cols</span>());
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>init_centroids</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>k</span> <span class='op'>*</span> <span class='ident'>inputs</span>.<span class='ident'>cols</span>());
         <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>k</span> {
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>vec_i</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
 
@@ -586,41 +588,41 @@
                 }
             }
 
-            <span class='kw'>let</span> <span class='ident'>mat_i</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>vec_i</span>);
+            <span class='kw'>let</span> <span class='ident'>mat_i</span> <span class='op'>=</span> <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>vec_i</span>);
             <span class='ident'>init_centroids</span>.<span class='ident'>extend</span>(<span class='ident'>mat_i</span>.<span class='ident'>mean</span>(<span class='number'>0</span>).<span class='ident'>data</span>());
         }
 
-        <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>k</span>, <span class='ident'>data</span>.<span class='ident'>cols</span>(), <span class='ident'>init_centroids</span>)
+        <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>k</span>, <span class='ident'>inputs</span>.<span class='ident'>cols</span>(), <span class='ident'>init_centroids</span>)
     }
 
     <span class='doccomment'>/// Compute initial centroids using k-means++.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Selects centroids using weighted probability from</span>
     <span class='doccomment'>/// distances.</span>
-    <span class='kw'>fn</span> <span class='ident'>plusplus_init</span>(<span class='ident'>k</span>: <span class='ident'>usize</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>k</span> <span class='op'>&lt;=</span> <span class='ident'>data</span>.<span class='ident'>rows</span>());
+    <span class='kw'>fn</span> <span class='ident'>plusplus_init</span>(<span class='ident'>k</span>: <span class='ident'>usize</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>k</span> <span class='op'>&lt;=</span> <span class='ident'>inputs</span>.<span class='ident'>rows</span>());
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>rng</span> <span class='op'>=</span> <span class='ident'>thread_rng</span>();
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>init_centroids</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>k</span> <span class='op'>*</span> <span class='ident'>data</span>.<span class='ident'>cols</span>());
-        <span class='kw'>let</span> <span class='ident'>first_cen</span> <span class='op'>=</span> <span class='ident'>rng</span>.<span class='ident'>gen_range</span>(<span class='number'>0usize</span>, <span class='ident'>data</span>.<span class='ident'>rows</span>());
-        
-        <span class='ident'>init_centroids</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>data</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>first_cen</span>]).<span class='ident'>into_vec</span>());
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>init_centroids</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>k</span> <span class='op'>*</span> <span class='ident'>inputs</span>.<span class='ident'>cols</span>());
+        <span class='kw'>let</span> <span class='ident'>first_cen</span> <span class='op'>=</span> <span class='ident'>rng</span>.<span class='ident'>gen_range</span>(<span class='number'>0usize</span>, <span class='ident'>inputs</span>.<span class='ident'>rows</span>());
+
+        <span class='ident'>init_centroids</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>first_cen</span>]).<span class='ident'>into_vec</span>());
 
         <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>1</span>..<span class='ident'>k</span> {
-            <span class='kw'>let</span> <span class='ident'>temp_centroids</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>i</span>, <span class='ident'>data</span>.<span class='ident'>cols</span>(), <span class='ident'>init_centroids</span>.<span class='ident'>clone</span>());
-            <span class='kw'>let</span> (_, <span class='ident'>dist</span>) <span class='op'>=</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='kw-2'>&amp;</span><span class='ident'>temp_centroids</span>, <span class='kw-2'>&amp;</span><span class='ident'>data</span>);
+            <span class='kw'>let</span> <span class='ident'>temp_centroids</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>i</span>, <span class='ident'>inputs</span>.<span class='ident'>cols</span>(), <span class='ident'>init_centroids</span>.<span class='ident'>clone</span>());
+            <span class='kw'>let</span> (_, <span class='ident'>dist</span>) <span class='op'>=</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='kw-2'>&amp;</span><span class='ident'>temp_centroids</span>, <span class='kw-2'>&amp;</span><span class='ident'>inputs</span>);
             <span class='kw'>let</span> <span class='ident'>next_cen</span> <span class='op'>=</span> <span class='ident'>sample_discretely</span>(<span class='ident'>dist</span>);
-            <span class='ident'>init_centroids</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>data</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>next_cen</span>]).<span class='ident'>into_vec</span>())
+            <span class='ident'>init_centroids</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>next_cen</span>]).<span class='ident'>into_vec</span>())
         }
-        
-        <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>k</span>, <span class='ident'>data</span>.<span class='ident'>cols</span>(), <span class='ident'>init_centroids</span>)
+
+        <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>k</span>, <span class='ident'>inputs</span>.<span class='ident'>cols</span>(), <span class='ident'>init_centroids</span>)
     }
 }
 
 <span class='doccomment'>/// Sample from an unnormalized distribution.</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>/// </span>
+<span class='doccomment'>///</span>
 <span class='kw'>fn</span> <span class='ident'>sample_discretely</span>(<span class='ident'>unnorm_dist</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
     <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>unnorm_dist</span>.<span class='ident'>size</span>() <span class='op'>&gt;</span> <span class='number'>0</span>);
 
@@ -638,7 +640,8 @@
     }
 
     <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;No random value was sampled! There may be more clusters than unique data points.&quot;</span>);
-}</pre>
+}
+</pre>
 </section>
     <section id='search' class="content hidden"></section>
 

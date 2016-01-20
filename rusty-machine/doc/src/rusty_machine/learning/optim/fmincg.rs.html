@@ -312,12 +312,12 @@
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! (C) Copyright 1999, 2000 &amp; 2001, Carl Edward Rasmussen</span>
-<span class='doccomment'>//! </span>
+<span class='doccomment'>//!</span>
 <span class='doccomment'>//! Permission is granted for anyone to copy, use, or modify these</span>
 <span class='doccomment'>//! programs and accompanying documents for purposes of research or</span>
 <span class='doccomment'>//! education, provided this copyright notice is retained, and note is</span>
 <span class='doccomment'>//! made of any changes that have been made.</span>
-<span class='doccomment'>//! </span>
+<span class='doccomment'>//!</span>
 <span class='doccomment'>//! These programs and documents are distributed without any warranty,</span>
 <span class='doccomment'>//! express or implied.  As the programs were written for research</span>
 <span class='doccomment'>//! purposes only, they have not been tested to the degree that would be</span>
@@ -370,11 +370,11 @@
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>M</span>: <span class='ident'>Optimizable</span><span class='op'>&gt;</span> <span class='ident'>OptimAlgorithm</span><span class='op'>&lt;</span><span class='ident'>M</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>ConjugateGD</span> {
-    <span class='kw'>fn</span> <span class='ident'>optimize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>model</span>: <span class='kw-2'>&amp;</span><span class='ident'>M</span>, <span class='ident'>start</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>], <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>M</span>::<span class='ident'>Data</span>, <span class='ident'>outputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>M</span>::<span class='ident'>Target</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>optimize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>model</span>: <span class='kw-2'>&amp;</span><span class='ident'>M</span>, <span class='ident'>start</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>], <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>M</span>::<span class='ident'>Inputs</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>M</span>::<span class='ident'>Targets</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0usize</span>;
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ls_failed</span> <span class='op'>=</span> <span class='boolval'>false</span>;
 
-        <span class='kw'>let</span> (<span class='kw-2'>mut</span> <span class='ident'>f1</span>, <span class='ident'>vec_df1</span>) <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='ident'>start</span>, <span class='ident'>data</span>, <span class='ident'>outputs</span>);
+        <span class='kw'>let</span> (<span class='kw-2'>mut</span> <span class='ident'>f1</span>, <span class='ident'>vec_df1</span>) <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='ident'>start</span>, <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>df1</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>vec_df1</span>);
 
         <span class='comment'>// The reduction in the function. Can also be specified as part of length</span>
@@ -399,7 +399,7 @@
 
             <span class='ident'>x</span> <span class='op'>=</span> <span class='ident'>x</span> <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>s</span> <span class='op'>*</span> <span class='ident'>z1</span>;
 
-            <span class='kw'>let</span> <span class='ident'>cost</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='ident'>x</span>.<span class='ident'>data</span>()[..], <span class='ident'>data</span>, <span class='ident'>outputs</span>);
+            <span class='kw'>let</span> <span class='ident'>cost</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='ident'>x</span>.<span class='ident'>data</span>()[..], <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
             <span class='ident'>f2</span> <span class='op'>=</span> <span class='ident'>cost</span>.<span class='number'>0</span>;
             <span class='ident'>df2</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>cost</span>.<span class='number'>1</span>);
 
@@ -425,7 +425,7 @@
                 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>z2</span>: <span class='ident'>f64</span>;
 
                 <span class='kw'>while</span> ((<span class='ident'>f2</span> <span class='op'>&gt;</span> (<span class='ident'>f1</span> <span class='op'>+</span> <span class='ident'>z1</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>rho</span> <span class='op'>*</span> <span class='ident'>d1</span>)) <span class='op'>||</span> (<span class='ident'>d2</span> <span class='op'>&gt;</span> <span class='op'>-</span><span class='self'>self</span>.<span class='ident'>sig</span> <span class='op'>*</span> <span class='ident'>d1</span>)) <span class='op'>&amp;&amp;</span> (<span class='ident'>m</span> <span class='op'>&gt;</span> <span class='number'>0i32</span>) {
-                    
+
                     <span class='ident'>limit</span> <span class='op'>=</span> <span class='ident'>z1</span>;
 
                     <span class='kw'>if</span> <span class='ident'>f2</span> <span class='op'>&gt;</span> <span class='ident'>f1</span> {
@@ -454,7 +454,7 @@
 
                     <span class='ident'>z1</span> <span class='op'>=</span> <span class='ident'>z1</span> <span class='op'>+</span> <span class='ident'>z2</span>;
                     <span class='ident'>x</span> <span class='op'>=</span> <span class='ident'>x</span> <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>s</span> <span class='op'>*</span> <span class='ident'>z2</span>;
-                    <span class='kw'>let</span> <span class='ident'>cost_grad</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='ident'>x</span>.<span class='ident'>data</span>()[..], <span class='ident'>data</span>, <span class='ident'>outputs</span>);
+                    <span class='kw'>let</span> <span class='ident'>cost_grad</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='ident'>x</span>.<span class='ident'>data</span>()[..], <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
                     <span class='ident'>f2</span> <span class='op'>=</span>  <span class='ident'>cost_grad</span>.<span class='number'>0</span>;
                     <span class='ident'>df2</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>cost_grad</span>.<span class='number'>1</span>);
 
@@ -502,7 +502,7 @@
                 <span class='ident'>z1</span> <span class='op'>=</span> <span class='ident'>z1</span> <span class='op'>+</span> <span class='ident'>z2</span>;
                 <span class='ident'>x</span> <span class='op'>=</span> <span class='ident'>x</span> <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>s</span> <span class='op'>*</span> <span class='ident'>z2</span>;
 
-                <span class='kw'>let</span> <span class='ident'>cost_grad</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='ident'>x</span>.<span class='ident'>data</span>()[..], <span class='ident'>data</span>, <span class='ident'>outputs</span>);
+                <span class='kw'>let</span> <span class='ident'>cost_grad</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='ident'>x</span>.<span class='ident'>data</span>()[..], <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
                 <span class='ident'>f2</span> <span class='op'>=</span>  <span class='ident'>cost_grad</span>.<span class='number'>0</span>;
                 <span class='ident'>df2</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>cost_grad</span>.<span class='number'>1</span>);
 
@@ -517,7 +517,7 @@
             <span class='kw'>if</span> <span class='ident'>success</span> {
                 <span class='ident'>f1</span> <span class='op'>=</span> <span class='ident'>f2</span>;
                 <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>s</span> <span class='op'>*</span> (<span class='kw-2'>&amp;</span><span class='ident'>df2</span> <span class='op'>-</span> <span class='kw-2'>&amp;</span><span class='ident'>df1</span>).<span class='ident'>dot</span>(<span class='kw-2'>&amp;</span><span class='ident'>df2</span>) <span class='op'>/</span> <span class='ident'>df1</span>.<span class='ident'>dot</span>(<span class='kw-2'>&amp;</span><span class='ident'>df1</span>) <span class='op'>-</span> <span class='kw-2'>&amp;</span><span class='ident'>df2</span>;
-                
+
                 <span class='ident'>df1</span> <span class='op'>=</span> <span class='ident'>df2</span>;
 
                 <span class='ident'>d2</span> <span class='op'>=</span> <span class='ident'>df1</span>.<span class='ident'>dot</span>(<span class='kw-2'>&amp;</span><span class='ident'>s</span>);
