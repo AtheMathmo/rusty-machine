@@ -1073,20 +1073,18 @@ impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
 
     fn mul(self, m: &Matrix<T>) -> Matrix<T> {
         assert!(self.cols == m.rows, "Matrix dimensions do not agree.");
-
-        let mut new_data = Vec::with_capacity(self.rows * m.cols);
+        
+        let mut new_data = vec![T::zero(); self.rows * m.cols];
 
         unsafe {
             for i in 0..self.rows
             {
-                for j in 0..m.cols
+                for k in 0..m.rows
                 {
-                    let mut sum = T::zero();
-                    for k in 0..m.rows
+                    for j in 0..m.cols
                     {
-                        sum = sum + *self.data.get_unchecked(i * self.cols + k) * *m.data.get_unchecked(k*m.cols + j);
+                        new_data[i*m.cols() + j] = *new_data.get_unchecked(i*m.cols() + j) + *self.data.get_unchecked(i * self.cols + k) * *m.data.get_unchecked(k*m.cols + j);
                     }
-                    new_data.push(sum);
                 }
             }
         }
