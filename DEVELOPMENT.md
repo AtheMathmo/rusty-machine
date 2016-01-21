@@ -38,7 +38,7 @@ This marks my intended release goals. I won't estimate the actual dates of relea
         <td>0.1.*</td><td><ul><li>Logistic Regression.</li><ul></td><td><ul><li>Looking to Generalized lin reg.</li><ul></td>
     </tr>
     <tr>
-        <td>0.1.*</td><td><ul><li>SVMs</li><ul></td><td><ul><li>None.</li><ul></td>
+        <td>0.1.*</td><td><ul><li>SVMs</li><ul></td><td><ul><li>(Adaptive) Coordinate Descent. <i>See below</i></li><li>Subgradient methods.</li><ul></td>
     </tr>
     <tr>
         <td>0.1.*</td><td><ul><li>Generalized linear regression.</li><ul></td><td><ul><li>None.</li><ul></td>
@@ -50,6 +50,8 @@ This marks my intended release goals. I won't estimate the actual dates of relea
         <td>0.2.0</td><td><ul><li>More advanced GD algorithms.</li><li>Optimization</li><li>Bug fixes</li></ul></td><td></td>
     </tr>
 </table>
+
+For Coordinate descent I will follow the algorithm defined in [this paper](http://www.loshchilov.com/publications/GECCO2011_AdaptiveCoordinateDescent.pdf).
 
 *Note*: Regularization has been pushed back as it will require careful planning. I plan to implement the other features first and then try to round off the 0.2.0 release with regularization.
 
