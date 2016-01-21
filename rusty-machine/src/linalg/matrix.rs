@@ -936,7 +936,6 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
 
         (l,u,p)
     }
-
 }
 
 impl<T: Copy + Zero + Float> Matrix<T> {
@@ -995,6 +994,66 @@ impl<T: Copy + Zero + Float> Matrix<T> {
             cols: self.cols(),
             data: new_data,
         }
+    }
+
+    fn make_householder(mat: Matrix<T>) -> Matrix<T> {
+        assert!(mat.cols()==1usize, "Householder matrix has invalid size.");
+        let size = mat.rows();
+
+        let denom = mat.data()[0] + mat.data()[0].signum() * mat.norm();
+        
+        if denom == T::zero() {
+            panic!("Matrix can not be decomposed.");
+        }
+        let mut v = (mat / denom).into_vec();
+        v[0] = T::one();
+        let v = Vector::new(v);
+        let v_norm_sq = v.dot(&v);
+
+        let v_vert = Matrix::new(size, 1, v.data().clone());
+        let v_hor = Matrix::new(1, size, v.data().clone());
+        Matrix::<T>::identity(size) - (v_vert * v_hor) * ((T::one() + T::one()) / v_norm_sq)
+
+
+    }
+
+    pub fn qr_decomp(self) -> (Matrix<T>, Matrix<T>) {
+        let m = self.rows();
+        let n = self.cols();
+
+        let mut q = Matrix::<T>::identity(m);
+        let mut r = self;
+
+        for i in 0..(n-((m==n) as usize)) {
+            let lower_rows = &(i..m).collect::<Vec<usize>>()[..];
+            let lower_self = (r.select_cols(&[i])).select_rows(lower_rows);
+            let mut holder_data = Matrix::make_householder(lower_self).into_vec();
+
+            // This bit is inefficient
+            // using for now as we'll swap to lapack eventually.
+            let mut h_full_data = Vec::with_capacity(m*m);
+            
+            for j in 0..m {
+                let mut row_data : Vec<T>;
+                if j < i {
+                    row_data = vec![T::zero(); m];
+                    row_data[j] = T::one();
+                    h_full_data.extend(row_data);
+                }
+                else { 
+                    row_data = vec![T::zero();i];
+                    h_full_data.extend(row_data);
+                    h_full_data.extend(holder_data.drain(..m-i)); 
+                }
+            }
+
+            let h = Matrix::new(m ,m, h_full_data);
+
+            q = q * &h;
+            r = h * &r;
+        }
+
+        (q, r)
     }
 }
 
@@ -1073,7 +1132,7 @@ impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
 
     fn mul(self, m: &Matrix<T>) -> Matrix<T> {
         assert!(self.cols == m.rows, "Matrix dimensions do not agree.");
-        
+
         let mut new_data = vec![T::zero(); self.rows * m.cols];
 
         unsafe {
