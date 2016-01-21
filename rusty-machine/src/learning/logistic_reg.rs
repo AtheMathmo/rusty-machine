@@ -70,9 +70,12 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor {
     /// logistic_mod.train(&inputs, &targets);
     /// ```
     fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) {
-        let initial_params = vec![0.5; inputs.cols()];
+        let ones = Matrix::<f64>::ones(inputs.rows(), 1);
+        let full_inputs = ones.hcat(inputs);
 
-        let optimal_w = self.gd.optimize(self, &initial_params[..], inputs, targets);
+        let initial_params = vec![0.5; full_inputs.cols()];
+
+        let optimal_w = self.gd.optimize(self, &initial_params[..], &full_inputs, targets);
         self.parameters = Some(Vector::new(optimal_w));
     }
 
@@ -80,9 +83,13 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor {
     ///
     /// Model must be trained before prediction can be made.
     fn predict(&self, inputs: &Matrix<f64>) -> Vector<f64> {
-        match self.parameters {
-            Some(ref v) => (inputs * v).apply(&Sigmoid::func),
-            None => panic!("Model has not been trained."),
+        if let Some(ref v) = self.parameters {
+            let ones = Matrix::<f64>::ones(inputs.rows(), 1);
+            let full_inputs = ones.hcat(inputs);
+            (full_inputs * v).apply(&Sigmoid::func)
+        }
+        else {
+            panic!("Model has not been trained.");
         }
     }
 }
