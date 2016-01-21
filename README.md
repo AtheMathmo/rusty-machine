@@ -54,6 +54,7 @@ There is now a first pass at the linear algebra library and some basic machine l
 ### Machine Learning
 
 - Linear Regression
+- Logistic Regression
 - K-Means Clustering
 - Neural Networks
 - Gaussian Process Regression
