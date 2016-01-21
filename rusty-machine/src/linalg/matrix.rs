@@ -1017,6 +1017,19 @@ impl<T: Copy + Zero + Float> Matrix<T> {
 
     }
 
+    /// Compute the QR decomposition of the matrix.
+    ///
+    /// Returns the tuple (Q,R).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let m = Matrix::new(3,3, vec![1.0,0.5,0.5,0.5,1.0,0.5,0.5,0.5,1.0]);
+    ///
+    /// let l = m.qr_decomp();
+    /// ```
     pub fn qr_decomp(self) -> (Matrix<T>, Matrix<T>) {
         let m = self.rows();
         let n = self.cols();

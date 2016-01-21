@@ -1,3 +1,39 @@
+//! Logistic Regression module
+//!
+//! Contains implemention of logistic regression using
+//! gradient descent optimization.
+//!
+//! The regressor will automatically add the intercept term
+//! so you do not need to format the input matrices yourself.
+//!
+//! # Usage
+//!
+//! ```
+//! use rusty_machine::learning::logistic_reg::LogisticRegressor;
+//! use rusty_machine::learning::SupModel;
+//! use rusty_machine::linalg::matrix::Matrix;
+//! use rusty_machine::linalg::vector::Vector;
+//!
+//! let inputs = Matrix::new(4,1,vec![1.0,3.0,5.0,7.0]);
+//! let targets = Vector::new(vec![0.,0.,1.,1.]);
+//!
+//! let mut log_mod = LogisticRegressor::default();
+//! 
+//! // Train the model
+//! log_mod.train(&inputs, &targets);
+//!
+//! // Now we'll predict a new point
+//! let new_point = Matrix::new(1,1,vec![10.]);
+//! let output = log_mod.predict(&new_point);
+//!
+//! // Hopefully we classified our new point correctly!
+//! assert!(output[0] > 0.5, "Our classifier isn't very good!");
+//! ```
+//!
+//! We could have been more specific about the learning of the model
+//! by using the `new` constructor instead. This allows us to provide
+//! a `GradientDesc` object with custom parameters.
+
 use learning::SupModel;
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
