@@ -279,7 +279,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         let mut gradients = Vec::with_capacity(capacity);
 
         for g in grad {
-            gradients.append(&mut g.data().clone());
+            gradients.append(&mut g.into_vec());
         }
         (self.criterion.cost(&activations[activations.len() - 1], targets), gradients)
     }

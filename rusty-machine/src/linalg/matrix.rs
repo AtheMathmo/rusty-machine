@@ -1011,7 +1011,7 @@ impl<T: Copy + Zero + Float> Matrix<T> {
         let v_norm_sq = v.dot(&v);
 
         let v_vert = Matrix::new(size, 1, v.data().clone());
-        let v_hor = Matrix::new(1, size, v.data().clone());
+        let v_hor = Matrix::new(1, size, v.into_vec());
         Matrix::<T>::identity(size) - (v_vert * v_hor) * ((T::one() + T::one()) / v_norm_sq)
 
 

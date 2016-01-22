@@ -246,7 +246,7 @@ impl KMeansClassifier {
             }
 
             let mat_i = inputs.select_rows(&vec_i);
-            init_centroids.extend(mat_i.mean(0).data());
+            init_centroids.extend(mat_i.mean(0).into_vec());
         }
 
         Matrix::new(k, inputs.cols(), init_centroids)
