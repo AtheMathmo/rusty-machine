@@ -1,10 +1,10 @@
 //! Linear algebra utils module.
-//!
+//! 
 //! Contains support methods for linear algebra structs.
 
 use std::cmp;
-use libnum::Zero;
-use std::ops::{Add, Mul, Sub, Div};
+use libnum::{Zero};
+use std::ops::{Add, Mul};
 
 /// Compute dot product of two slices.
 ///
@@ -17,27 +17,15 @@ use std::ops::{Add, Mul, Sub, Div};
 ///
 /// let c = utils::dot(&a,&b);
 /// ```
-pub fn dot<T: Copy + Zero + Add<T, Output = T> + Mul<T, Output = T>>(u: &[T], v: &[T]) -> T {
+pub fn dot<T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>>(u: &[T], v: &[T]) -> T {
     let len = cmp::min(u.len(), v.len());
     let mut xs = &u[..len];
     let mut ys = &v[..len];
 
     let mut s = T::zero();
-    let (mut p0,
-         mut p1,
-         mut p2,
-         mut p3,
-         mut p4,
-         mut p5,
-         mut p6,
-         mut p7) = (T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero());
+    let (mut p0, mut p1, mut p2, mut p3, mut p4, mut p5, mut p6, mut p7) =
+        (T::zero(), T::zero(), T::zero(), T::zero(),
+            T::zero(), T::zero(), T::zero(), T::zero());
 
     while xs.len() >= 8 {
         p0 = p0 + xs[0] * ys[0];
@@ -61,9 +49,9 @@ pub fn dot<T: Copy + Zero + Add<T, Output = T> + Mul<T, Output = T>>(u: &[T], v:
         s = s + xs[i] * ys[i];
     }
     s
-}
+ }
 
-/// Compute vector sum of two slices.
+/// Compute sum of two slices.
 ///
 /// # Examples
 ///
@@ -72,97 +60,34 @@ pub fn dot<T: Copy + Zero + Add<T, Output = T> + Mul<T, Output = T>>(u: &[T], v:
 /// let a = vec![1.0,2.0,3.0,4.0];
 /// let b = vec![1.0,2.0,3.0,4.0];
 ///
-/// let c = utils::vec_sum(&a,&b);
-///
-/// assert_eq!(c, vec![2.0,4.0, 6.0, 8.0]);
+/// let c = utils::unrolled_sum(&a,&b);
 /// ```
-pub fn vec_sum<T: Copy + Zero + Add<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
+pub fn unrolled_sum<T: Copy + Zero + Add<T, Output=T>> (u: &[T], v: &[T]) -> Vec<T> {
     let len = cmp::min(u.len(), v.len());
-    let xs = &u[..len];
-    let ys = &v[..len];
+    let mut xs = &u[..len];
+    let mut ys = &v[..len];
+    
+    let mut sum_data = vec![T::zero(); len];
+    let mut holder = 0;
 
-    let mut sum_data = Vec::with_capacity(len);
+    while xs.len() >= 8 {
+        sum_data[0+holder] = xs[0] + ys[0];
+        sum_data[1+holder] = xs[1] + ys[1];
+        sum_data[2+holder] = xs[2] + ys[2];
+        sum_data[3+holder] = xs[3] + ys[3];
+        sum_data[4+holder] = xs[4] + ys[4];
+        sum_data[5+holder] = xs[5] + ys[5];
+        sum_data[6+holder] = xs[6] + ys[6];
+        sum_data[7+holder] = xs[7] + ys[7];
 
-    for i in 0..len {
-        sum_data.push(xs[i] + ys[i]);
+        xs = &xs[8..];
+        ys = &ys[8..];
+        
+        holder += 8;
     }
-    sum_data
-}
 
-/// Compute vector difference two slices.
-///
-/// # Examples
-///
-/// ```
-/// use rusty_machine::linalg::utils;
-/// let a = vec![1.0,2.0,3.0,4.0];
-/// let b = vec![1.0,2.0,3.0,4.0];
-///
-/// let c = utils::vec_sub(&a,&b);
-///
-/// assert_eq!(c, vec![0.0; 4]);
-/// ```
-pub fn vec_sub<T: Copy + Zero + Sub<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
-    let len = cmp::min(u.len(), v.len());
-    let xs = &u[..len];
-    let ys = &v[..len];
-
-    let mut sum_data = Vec::with_capacity(len);
-
-    for i in 0..len {
-        sum_data.push(xs[i] - ys[i]);
-    }
-    sum_data
-}
-
-/// Computes elementwise multiplication.
-///
-/// # Examples
-///
-/// ```
-/// use rusty_machine::linalg::utils;
-/// let a = vec![1.0,2.0,3.0,4.0];
-/// let b = vec![1.0,2.0,3.0,4.0];
-///
-/// let c = utils::ele_mul(&a,&b);
-///
-/// assert_eq!(c, vec![1.0,4.0,9.0,16.0]);
-/// ```
-pub fn ele_mul<T: Copy + Zero + Mul<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
-    let len = cmp::min(u.len(), v.len());
-    let xs = &u[..len];
-    let ys = &v[..len];
-
-    let mut sum_data = Vec::with_capacity(len);
-
-    for i in 0..len {
-        sum_data.push(xs[i] * ys[i]);
-    }
-    sum_data
-}
-
-/// Computes elementwise division.
-///
-/// # Examples
-///
-/// ```
-/// use rusty_machine::linalg::utils;
-/// let a = vec![1.0,2.0,3.0,4.0];
-/// let b = vec![1.0,2.0,3.0,4.0];
-///
-/// let c = utils::ele_div(&a,&b);
-///
-/// assert_eq!(c, vec![1.0; 4]);
-/// ```
-pub fn ele_div<T: Copy + Zero + Div<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
-    let len = cmp::min(u.len(), v.len());
-    let xs = &u[..len];
-    let ys = &v[..len];
-
-    let mut sum_data = Vec::with_capacity(len);
-
-    for i in 0..len {
-        sum_data.push(xs[i] / ys[i]);
+    for i in 0..xs.len() {
+        sum_data[i+holder] = xs[i] + ys[i];
     }
     sum_data
 }
@@ -178,10 +103,9 @@ pub fn ele_div<T: Copy + Zero + Div<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> 
 /// let a = vec![1.0,2.0,3.0,4.0];
 ///
 /// let c = utils::argmax(&a);
-/// assert_eq!(c.0, 3);
-/// assert_eq!(c.1, 4.0);
+/// assert_eq!(c, 3);
 /// ```
-pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> (usize, T) {
+pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> usize {
     assert!(u.len() != 0);
 
     let mut max_index = 0;
@@ -194,37 +118,7 @@ pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> (usize, T) {
         }
     }
 
-    (max_index, max)
-}
-
-/// Find argmin of slice.
-///
-/// Returns index of first occuring minimum.
-///
-/// # Examples
-///
-/// ```
-/// use rusty_machine::linalg::utils;
-/// let a = vec![5.0,2.0,3.0,4.0];
-///
-/// let c = utils::argmin(&a);
-/// assert_eq!(c.0, 1);
-/// assert_eq!(c.1, 2.0);
-/// ```
-pub fn argmin<T: Copy + PartialOrd>(u: &[T]) -> (usize, T) {
-    assert!(u.len() != 0);
-
-    let mut min_index = 0;
-    let mut min = u[min_index];
-
-    for (i, v) in (u.iter()).enumerate() {
-        if min > *v {
-            min_index = i;
-            min = *v;
-        }
-    }
-
-    (min_index, min)
+    max_index
 }
 
 /// Find index of value in slice.
@@ -241,11 +135,11 @@ pub fn argmin<T: Copy + PartialOrd>(u: &[T]) -> (usize, T) {
 /// assert_eq!(c, 2);
 /// ```
 pub fn find<T: PartialEq>(p: &[T], u: T) -> usize {
-    for (i, v) in p.iter().enumerate() {
-        if *v == u {
-            return i;
+        for (i, v) in p.iter().enumerate() {
+            if *v == u {
+                return i;
+            }
         }
-    }
 
-    panic!("Value not found.")
-}
+        panic!("Value not found.")
+    }
