@@ -14,7 +14,7 @@ pub struct Exponential {
 }
 
 impl Exponential {
-    pub fn new(lambda: f64) {
+    pub fn new(lambda: f64) -> Exponential {
         Exponential { lambda: lambda }
     }
 }
