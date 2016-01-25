@@ -80,8 +80,7 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
     fn predict(&self, inputs: &Matrix<f64>) -> Vector<usize> {
         if let Some(ref centroids) = self.centroids {
             return KMeansClassifier::find_closest_centroids(centroids, inputs).0;
-        }
-        else {
+        } else {
             panic!("Model has not been trained.");
         }
     }
@@ -92,15 +91,15 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
         let mut cost = 0.0;
 
         for _i in 0..self.iters {
-                let (idx, distances) = self.get_closest_centroids(inputs);
-                self.update_centroids(inputs, idx);
+            let (idx, distances) = self.get_closest_centroids(inputs);
+            self.update_centroids(inputs, idx);
 
-                let cost_i = distances.sum();
-                if cost == cost_i {
-                    break;
-                }
+            let cost_i = distances.sum();
+            if cost == cost_i {
+                break;
+            }
 
-                cost = cost_i;
+            cost = cost_i;
         }
     }
 }
@@ -168,8 +167,7 @@ impl KMeansClassifier {
     fn get_closest_centroids(&self, inputs: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
         if let Some(ref c) = self.centroids {
             return KMeansClassifier::find_closest_centroids(&c, inputs);
-        }
-        else {
+        } else {
             panic!("Centroids not correctly initialized.");
         }
     }
@@ -178,7 +176,9 @@ impl KMeansClassifier {
     ///
     /// Used internally within model.
     /// Returns the index of the closest centroid and the distance to it.
-    fn find_closest_centroids(centroids: &Matrix<f64>, inputs: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
+    fn find_closest_centroids(centroids: &Matrix<f64>,
+                              inputs: &Matrix<f64>)
+                              -> (Vector<usize>, Vector<f64>) {
         let mut idx = Vec::with_capacity(inputs.rows());
         let mut distances = Vec::with_capacity(inputs.rows());
 
@@ -288,7 +288,7 @@ fn sample_discretely(unnorm_dist: Vector<f64>) -> usize {
     let rand = thread_rng().gen_range(0.0f64, sum);
 
     let mut tempsum = 0.0;
-    for (i,p) in unnorm_dist.data().iter().enumerate() {
+    for (i, p) in unnorm_dist.data().iter().enumerate() {
         tempsum += *p;
 
         if rand < tempsum {

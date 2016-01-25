@@ -56,15 +56,16 @@ impl<T> Vector<T> {
 }
 
 impl<T: Clone> Clone for Vector<T> {
-
     /// Clones the Vector.
     fn clone(&self) -> Vector<T> {
-        Vector{ size: self.size, data: self.data.clone() }
+        Vector {
+            size: self.size,
+            data: self.data.clone(),
+        }
     }
 }
 
 impl<T: Copy> Vector<T> {
-
     /// Applies a function to each element in the vector.
     ///
     /// # Examples
@@ -89,11 +90,9 @@ impl<T: Copy> Vector<T> {
             data: new_data,
         }
     }
-
 }
 
 impl<T: Copy + PartialOrd> Vector<T> {
-
     /// Find the argmax of the Vector.
     ///
     /// Returns the index of the largest value in the vector.
@@ -546,7 +545,7 @@ impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'b Vector<T>> for &
 }
 
 /// Gets negative of vector.
-impl<T: Neg<Output=T> + Copy> Neg for Vector<T> {
+impl<T: Neg<Output = T> + Copy> Neg for Vector<T> {
     type Output = Vector<T>;
 
     fn neg(self) -> Vector<T> {
@@ -557,7 +556,7 @@ impl<T: Neg<Output=T> + Copy> Neg for Vector<T> {
 }
 
 /// Gets negative of vector.
-impl<'a, T: Neg<Output=T> + Copy> Neg for &'a Vector<T> {
+impl<'a, T: Neg<Output = T> + Copy> Neg for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn neg(self) -> Vector<T> {

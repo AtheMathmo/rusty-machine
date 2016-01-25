@@ -3,8 +3,8 @@
 //! This module contains a number of structs implementing the ActivationFunc trait.
 //!
 //! These structs are used within Neural Networks and
-//! Generalized Linear Regression (not yet implemented). 
-//! 
+//! Generalized Linear Regression (not yet implemented).
+//!
 //! You can also create your own custom activation Functions for use in your models.
 //! Just create a unit struct implementing the ActivationFunc trait.
 
@@ -39,7 +39,7 @@ impl ActivationFunc for Sigmoid {
     }
 
     fn func_inv(x: f64) -> f64 {
-        (x / (1f64-x)).ln()
+        (x / (1f64 - x)).ln()
     }
 }
 
@@ -55,7 +55,7 @@ impl ActivationFunc for Linear {
         1f64
     }
 
-    fn func_inv(x:f64) -> f64 {
+    fn func_inv(x: f64) -> f64 {
         x
     }
 }

@@ -138,7 +138,11 @@ pub mod learning {
             type Targets;
 
             /// Compute the gradient for the model.
-            fn compute_grad(&self, params: &[f64], inputs: &Self::Inputs, targets: &Self::Targets) -> (f64, Vec<f64>);
+            fn compute_grad(&self,
+                            params: &[f64],
+                            inputs: &Self::Inputs,
+                            targets: &Self::Targets)
+                            -> (f64, Vec<f64>);
         }
 
         /// Trait for optimization algorithms.
@@ -147,7 +151,12 @@ pub mod learning {
             /// Return the optimized parameter using gradient optimization.
             ///
             /// Takes in a set of starting parameters and related model data.
-            fn optimize(&self, model: &M, start: &[f64], inputs: &M::Inputs, targets: &M::Targets) -> Vec<f64>;
+            fn optimize(&self,
+                        model: &M,
+                        start: &[f64],
+                        inputs: &M::Inputs,
+                        targets: &M::Targets)
+                        -> Vec<f64>;
         }
 
         pub mod grad_desc;
@@ -173,7 +182,7 @@ pub mod stats {
         /// Trait for statistical distributions.
         pub trait Distribution<T> {
             /// The pdf of the distribution.
-            fn pdf(&self, x:T) -> f64;
+            fn pdf(&self, x: T) -> f64;
 
             /// The logpdf of the distribution.
             ///
@@ -184,7 +193,7 @@ pub mod stats {
             }
 
             /// The cdf of the distribution.
-            fn cdf(&self, x: T)-> f64;
+            fn cdf(&self, x: T) -> f64;
         }
 
         pub mod exponential;

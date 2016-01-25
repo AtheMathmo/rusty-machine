@@ -18,7 +18,7 @@
 //! let targets = Vector::new(vec![0.,0.,1.,1.]);
 //!
 //! let mut log_mod = LogisticRegressor::default();
-//! 
+//!
 //! // Train the model
 //! log_mod.train(&inputs, &targets);
 //!
@@ -56,7 +56,10 @@ pub struct LogisticRegressor {
 
 impl Default for LogisticRegressor {
     fn default() -> LogisticRegressor {
-        LogisticRegressor { parameters: None, gd: GradientDesc::default() }
+        LogisticRegressor {
+            parameters: None,
+            gd: GradientDesc::default(),
+        }
     }
 }
 impl LogisticRegressor {
@@ -72,7 +75,10 @@ impl LogisticRegressor {
     /// let mut logistic_mod = LogisticRegressor::new(gd);
     /// ```
     pub fn new(gd: GradientDesc) -> LogisticRegressor {
-        LogisticRegressor { parameters: None, gd: gd }
+        LogisticRegressor {
+            parameters: None,
+            gd: gd,
+        }
     }
 
     /// Get the parameters from the model.
@@ -123,8 +129,7 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor {
             let ones = Matrix::<f64>::ones(inputs.rows(), 1);
             let full_inputs = ones.hcat(inputs);
             (full_inputs * v).apply(&Sigmoid::func)
-        }
-        else {
+        } else {
             panic!("Model has not been trained.");
         }
     }
@@ -134,17 +139,20 @@ impl Optimizable for LogisticRegressor {
     type Inputs = Matrix<f64>;
     type Targets = Vector<f64>;
 
-    fn compute_grad(&self, params: &[f64], inputs: &Matrix<f64>, targets: &Vector<f64>) -> (f64, Vec<f64>) {
-        
+    fn compute_grad(&self,
+                    params: &[f64],
+                    inputs: &Matrix<f64>,
+                    targets: &Vector<f64>)
+                    -> (f64, Vec<f64>) {
+
         let beta_vec = Vector::new(params.to_vec());
         let outputs = (inputs * beta_vec).apply(&Sigmoid::func);
 
         let cost = CrossEntropyError::cost(&outputs, targets);
-        let grad = (inputs.transpose() * (outputs-targets)) / (inputs.rows() as f64);
+        let grad = (inputs.transpose() * (outputs - targets)) / (inputs.rows() as f64);
 
         println!("Cost is {0}", cost);
 
         (cost, grad.into_vec())
     }
-
 }

@@ -29,7 +29,6 @@ pub struct SquaredExp {
 }
 
 impl SquaredExp {
-
     /// Construct a new squared exponential kernel.
     ///
     /// # Examples
@@ -48,7 +47,6 @@ impl SquaredExp {
 }
 
 impl Default for SquaredExp {
-
     /// Constructs the default Squared Exp kernel.
     ///
     /// The default settings are:

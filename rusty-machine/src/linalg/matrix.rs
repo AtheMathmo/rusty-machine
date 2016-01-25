@@ -36,7 +36,8 @@ impl<T> Matrix<T> {
     /// ```
     pub fn new(rows: usize, cols: usize, data: Vec<T>) -> Matrix<T> {
 
-        assert!(cols * rows == data.len(), "Data does not match given dimensions.");
+        assert!(cols * rows == data.len(),
+                "Data does not match given dimensions.");
         Matrix {
             cols: cols,
             rows: rows,
@@ -208,7 +209,7 @@ impl<T: Copy> Matrix<T> {
     /// assert_eq!(c[[2, 2]], 6.0);
     /// ```
     pub fn vcat(&self, m: &Matrix<T>) -> Matrix<T> {
-        assert!(self.cols==m.cols, "Matrix column counts are not equal.");
+        assert!(self.cols == m.cols, "Matrix column counts are not equal.");
 
         let mut new_data = Vec::with_capacity((self.rows + m.rows) * self.cols);
 
@@ -539,8 +540,8 @@ impl<T: Copy + Zero + Mul<T, Output = T>> Matrix<T> {
     /// assert_eq!(*c.data(), vec![1.0, 4.0, 9.0, 16.0]);
     /// ```
     pub fn elemul(&self, m: &Matrix<T>) -> Matrix<T> {
-        assert!(self.rows==m.rows, "Matrix row counts not equal.");
-        assert!(self.cols==m.cols, "Matrix column counts not equal.");
+        assert!(self.rows == m.rows, "Matrix row counts not equal.");
+        assert!(self.cols == m.cols, "Matrix column counts not equal.");
 
         Matrix::new(self.rows, self.cols, utils::ele_mul(&self.data, &m.data))
     }
@@ -561,8 +562,8 @@ impl<T: Copy + Zero + Div<T, Output = T>> Matrix<T> {
     /// assert_eq!(*c.data(), vec![1.0; 4]);
     /// ```
     pub fn elediv(&self, m: &Matrix<T>) -> Matrix<T> {
-        assert!(self.rows==m.rows, "Matrix row counts not equal.");
-        assert!(self.cols==m.cols, "Matrix column counts not equal.");
+        assert!(self.rows == m.rows, "Matrix row counts not equal.");
+        assert!(self.cols == m.cols, "Matrix column counts not equal.");
 
         Matrix::new(self.rows, self.cols, utils::ele_div(&self.data, &m.data))
     }
@@ -794,7 +795,6 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
     ///                               5.0, 1.0, 2.0]);
     ///
     /// let det = a.det();
-    ///
     /// ```
     pub fn det(&self) -> T {
         assert!(self.rows==self.cols, "Matrix is not square.");
@@ -877,7 +877,6 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
     ///                               5.0, 1.0, 2.0]);
     ///
     /// let (l,u,p) = a.lup_decomp();
-    ///
     /// ```
     pub fn lup_decomp(&self) -> (Matrix<T>, Matrix<T>, Matrix<T>) {
         assert!(self.rows == self.cols, "Matrix is not square.");
@@ -939,7 +938,6 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
 }
 
 impl<T: Copy + Zero + Float> Matrix<T> {
-
     /// Cholesky decomposition
     ///
     /// Returns the cholesky decomposition of a positive definite matrix.
@@ -979,8 +977,7 @@ impl<T: Copy + Zero + Float> Matrix<T> {
 
                 if j == i {
                     new_data.push((self[[i, i]] - sum).sqrt());
-                }
-                else {
+                } else {
                     let p = (self[[i, j]] - sum) / new_data[j * self.cols + j];
 
                     assert!(!p.is_nan(), "Matrix is not positive definite.");
@@ -997,11 +994,11 @@ impl<T: Copy + Zero + Float> Matrix<T> {
     }
 
     fn make_householder(mat: Matrix<T>) -> Matrix<T> {
-        assert!(mat.cols()==1usize, "Householder matrix has invalid size.");
+        assert!(mat.cols() == 1usize, "Householder matrix has invalid size.");
         let size = mat.rows();
 
         let denom = mat.data()[0] + mat.data()[0].signum() * mat.norm();
-        
+
         if denom == T::zero() {
             panic!("Matrix can not be decomposed.");
         }
@@ -1037,30 +1034,29 @@ impl<T: Copy + Zero + Float> Matrix<T> {
         let mut q = Matrix::<T>::identity(m);
         let mut r = self;
 
-        for i in 0..(n-((m==n) as usize)) {
+        for i in 0..(n - ((m == n) as usize)) {
             let lower_rows = &(i..m).collect::<Vec<usize>>()[..];
             let lower_self = (r.select_cols(&[i])).select_rows(lower_rows);
             let mut holder_data = Matrix::make_householder(lower_self).into_vec();
 
             // This bit is inefficient
             // using for now as we'll swap to lapack eventually.
-            let mut h_full_data = Vec::with_capacity(m*m);
-            
+            let mut h_full_data = Vec::with_capacity(m * m);
+
             for j in 0..m {
-                let mut row_data : Vec<T>;
+                let mut row_data: Vec<T>;
                 if j < i {
                     row_data = vec![T::zero(); m];
                     row_data[j] = T::one();
                     h_full_data.extend(row_data);
-                }
-                else { 
+                } else {
                     row_data = vec![T::zero();i];
                     h_full_data.extend(row_data);
-                    h_full_data.extend(holder_data.drain(..m-i)); 
+                    h_full_data.extend(holder_data.drain(..m - i));
                 }
             }
 
-            let h = Matrix::new(m ,m, h_full_data);
+            let h = Matrix::new(m, m, h_full_data);
 
             q = q * &h;
             r = h * &r;
@@ -1432,7 +1428,7 @@ impl<'a, 'b, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<&'b T> f
 }
 
 /// Gets negative of matrix.
-impl<T: Neg<Output=T> + Copy> Neg for Matrix<T> {
+impl<T: Neg<Output = T> + Copy> Neg for Matrix<T> {
     type Output = Matrix<T>;
 
     fn neg(self) -> Matrix<T> {
@@ -1447,7 +1443,7 @@ impl<T: Neg<Output=T> + Copy> Neg for Matrix<T> {
 }
 
 /// Gets negative of matrix.
-impl<'a, T: Neg<Output=T> + Copy> Neg for &'a Matrix<T> {
+impl<'a, T: Neg<Output = T> + Copy> Neg for &'a Matrix<T> {
     type Output = Matrix<T>;
 
     fn neg(self) -> Matrix<T> {
@@ -1468,8 +1464,10 @@ impl<T> Index<[usize; 2]> for Matrix<T> {
     type Output = T;
 
     fn index(&self, idx: [usize; 2]) -> &T {
-        assert!(idx[0] < self.rows, "Row index is greater than row dimension.");
-        assert!(idx[1] < self.cols, "Column index is greater than column dimension.");
+        assert!(idx[0] < self.rows,
+                "Row index is greater than row dimension.");
+        assert!(idx[1] < self.cols,
+                "Column index is greater than column dimension.");
         unsafe { &self.data.get_unchecked(idx[0] * self.cols + idx[1]) }
     }
 }
