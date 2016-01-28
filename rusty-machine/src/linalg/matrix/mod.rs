@@ -488,14 +488,10 @@ impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
     /// assert_eq!(*c.data(), vec![3.0, 7.0]);
     /// ```
     pub fn sum_cols(&self) -> Vector<T> {
-        let mut col_sum = vec![T::zero(); self.rows];
+        let mut col_sum = Vec::with_capacity(self.rows);
 
-        unsafe {
-            for i in 0..self.rows {
-                for j in 0..self.cols {
-                    col_sum[i] = col_sum[i] + *self.data.get_unchecked(i * self.cols + j);
-                }
-            }
+        for i in 0..self.rows {
+            col_sum.push(utils::unrolled_sum(&self.data[i * self.cols .. (i+1)*self.cols]));
         }
         Vector::new(col_sum)
     }
@@ -513,16 +509,7 @@ impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
     /// assert_eq!(c, 10.0);
     /// ```
     pub fn sum(&self) -> T {
-        let mut sum = T::zero();
-
-        unsafe {
-            for i in 0..self.rows {
-                for j in 0..self.cols {
-                    sum = sum + *self.data.get_unchecked(i * self.cols + j);
-                }
-            }
-        }
-        sum
+        utils::unrolled_sum(&self.data[..])
     }
 }
 
@@ -1285,11 +1272,7 @@ impl<T: Float> Metric<T> for Matrix<T> {
     /// assert_eq!(c, 5.0);
     /// ```
     fn norm(&self) -> T {
-        let mut s = T::zero();
-
-        for u in &self.data {
-            s = s + (*u) * (*u);
-        }
+        let s = utils::dot(&self.data[..], &self.data[..]);
 
         s.sqrt()
     }
