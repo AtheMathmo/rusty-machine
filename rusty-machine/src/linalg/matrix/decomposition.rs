@@ -1,11 +1,18 @@
+//! Matrix Decompositions
+//!
+//! References:
+//! 1. [On Matrix Balancing and EigenVector computation](http://arxiv.org/pdf/1401.5766v1.pdf), James, Langou and Lowery
+
 use std::ops::{Mul, Add, Div, Sub, Neg};
+use std::fmt;
 
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
 use linalg::Metric;
 use linalg::utils;
 
-use libnum::{One, Zero, Float};
+use libnum::{One, Zero, Float, NumCast};
+use libnum::cast;
 
 impl<T: Copy + Zero + Float> Matrix<T> {
     /// Cholesky decomposition
@@ -136,27 +143,146 @@ impl<T: Copy + Zero + Float> Matrix<T> {
     }
 }
 
-
-impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
-                           Add<T, Output=T> + Mul<T, Output=T> +
-                           Sub<T, Output=T> + Div<T, Output=T> +
-                           PartialOrd {
-
-    /// Computes L, U, and P for LUP decomposition.
-    ///
-    /// Returns L,U, and P respectively.
+impl<T: Copy + Zero + One + Float + NumCast + fmt::Debug> Matrix<T> {
+    /// Returns (U,H), where H is the upper hessenberg form
+    /// and U is the unitary transform matrix.
     ///
     /// # Examples
     ///
     /// ```
     /// use rusty_machine::linalg::matrix::Matrix;
     ///
-    /// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
-    ///                               0.0,3.0,4.0,
-    ///                               5.0, 1.0, 2.0]);
-    ///
-    /// let (l,u,p) = a.lup_decomp();
+    /// let a = Matrix::new(4,4,vec![2.,0.,1.,1.,2.,0.,1.,2.,1.,2.,0.,0.,2.,0.,1.,1.]);
+    /// let h = a.upper_hessenberg();
     /// ```
+    pub fn upper_hessenberg(&self) -> Matrix<T> {
+        let n = self.rows();
+        assert!(n == self.cols(),
+                "Matrix must be square to produce upper hessenberg.");
+
+        let mut dummy = self.clone();
+        dummy.balance_matrix();
+
+        for i in 0..n - 2 {
+            let lower_rows = &(i + 1..n).collect::<Vec<usize>>()[..];
+            let lower_self = (dummy.select_cols(&[i])).select_rows(lower_rows);
+            let mut holder_data = Matrix::make_householder(lower_self).into_vec();
+
+            let mut u_data = Vec::with_capacity(n * n);
+
+            for j in 0..n {
+                let mut row_data: Vec<T>;
+                if j <= i {
+                    row_data = vec![T::zero(); n];
+                    row_data[j] = T::one();
+                    u_data.extend(row_data);
+                } else {
+                    row_data = vec![T::zero();i+1];
+                    u_data.extend(row_data);
+                    u_data.extend(holder_data.drain(..n - i - 1));
+                }
+            }
+
+            let u = Matrix::new(n, n, u_data);
+            dummy = &u * dummy * u.transpose();
+        }
+        dummy
+    }
+
+    fn balance_matrix(&mut self) {
+        let n = self.rows();
+        let radix = cast::<f64, T>(2.0).unwrap();
+
+        assert!(n == self.cols(),
+                "Matrix must be square to produce balance matrix.");
+
+        let mut d = Matrix::<T>::identity(n);
+        let mut converged = false;
+
+        while !converged {
+            converged = true;
+
+            for i in 0..n {
+                let mut c = self.select_cols(&[i]).norm();
+                let mut r = self.select_rows(&[i]).norm();
+
+                let s = c * c + r * r;
+                let mut f = T::one();
+
+                while c < r / radix {
+                    c = c * radix;
+                    r = r / radix;
+                    f = f * radix;
+                }
+
+                while c >= r * radix {
+                    c = c / radix;
+                    r = r * radix;
+                    f = f / radix;
+                }
+
+                if (c * c + r * r) < cast::<f64, T>(0.95).unwrap() * s {
+                    converged = false;
+                    d.data[(i + 1) * self.cols] = f * d.data[(i + 1) * self.cols];
+
+                    for j in 1..n {
+                        self.data[j * self.cols + i] = f * self.data[j * self.cols + i];
+                        self.data[i * self.cols + j] = f * self.data[i * self.cols + j];
+                    }
+                }
+            }
+        }
+    }
+
+    /// Eigendecomposition of a square matrix.
+    ///
+    /// Returns a Vec of eigen values and the eigen vectors.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// 
+    /// let a = Matrix::new(3,3,vec![2.,0.,1.,0.,2.,0.,1.,0.,2.]);
+    ///
+    /// let e = a.eigenvalues();
+    /// println!("{:?}", e);
+    /// ```
+    pub fn eigenvalues(&self) -> Vec<T> {
+        let n = self.rows();
+        assert!(n == self.cols(), "Matrix must be square for eigendecomp.");
+        let mut h = self.upper_hessenberg();
+
+        for _ in 0..200 {
+            let (q, r) = h.qr_decomp();
+            h = r * &q;
+        }
+
+        h.diag().into_vec()
+    }
+}
+
+
+impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
+                           Add<T, Output=T> + Mul<T, Output=T> +
+                           Sub<T, Output=T> + Div<T, Output=T> +
+                           PartialOrd {
+
+/// Computes L, U, and P for LUP decomposition.
+///
+/// Returns L,U, and P respectively.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::linalg::matrix::Matrix;
+///
+/// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
+///                               0.0,3.0,4.0,
+///                               5.0, 1.0, 2.0]);
+///
+/// let (l,u,p) = a.lup_decomp();
+/// ```
     pub fn lup_decomp(&self) -> (Matrix<T>, Matrix<T>, Matrix<T>) {
         assert!(self.rows == self.cols, "Matrix is not square.");
 
@@ -169,7 +295,7 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
 
         let mut p = Matrix::<T>::identity(n);
 
-        // Compute the permutation matrix
+// Compute the permutation matrix
         for i in 0..n {
             let (row,_) = utils::argmax(&mt.data[i*(n+1)..(i+1)*n]);
 
