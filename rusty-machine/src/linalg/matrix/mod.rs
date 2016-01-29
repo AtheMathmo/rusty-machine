@@ -284,7 +284,7 @@ impl<T: Copy> Matrix<T> {
     /// assert_eq!(*b.data(), vec![2.0; 4]);
     /// ```
     pub fn apply(self, f: &Fn(T) -> T) -> Matrix<T> {
-        let new_data = self.data.into_iter().map(|v| f(v)).collect();
+        let new_data = self.data.into_iter().map(f).collect();
 
         Matrix {
             rows: self.rows,
@@ -373,8 +373,8 @@ impl<T: Zero + One + Copy> Matrix<T> {
         let size = diag.len();
         let mut data = vec![T::zero(); size * size];
 
-        for i in 0..size {
-            data[(i * (size + 1)) as usize] = diag[i];
+        for (i, item) in diag.into_iter().enumerate().take(size) {
+            data[i * (size + 1)] = *item;
         }
 
         Matrix {
@@ -440,8 +440,7 @@ impl<T: Copy + Zero + One + PartialEq> Matrix<T> {
                 }
             }
         }
-
-        return true;
+        true
     }
 }
 
@@ -465,8 +464,8 @@ impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
 
         unsafe {
             for i in 0..self.rows {
-                for j in 0..self.cols {
-                    row_sum[j] = row_sum[j] + *self.data.get_unchecked(i * self.cols + j);
+                for (j, item) in row_sum.iter_mut().enumerate().take(self.cols) {
+                    *item = *item + *self.data.get_unchecked(i * self.cols + j);
                 }
             }
         }
@@ -690,12 +689,12 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
         x.push(y[0] / self[[0,0]]);
 
         unsafe {
-            for i in 1..y.size() {
+            for (i,y_item) in y.data().iter().enumerate().take(y.size()).skip(1) {
                 let mut holding_l_sum = T::zero();
-                for j in 0..i {
-                    holding_l_sum = holding_l_sum + *self.data.get_unchecked(i * self.cols + j) * x[j];
+                for (j, x_item) in x.iter().enumerate().take(i) {
+                    holding_l_sum = holding_l_sum + *self.data.get_unchecked(i * self.cols + j) * *x_item;
                 }
-                x.push((y[i] - holding_l_sum) / *self.data.get_unchecked(i*(self.cols+1)));
+                x.push((*y_item - holding_l_sum) / *self.data.get_unchecked(i*(self.cols+1)));
             }
         }
 
@@ -849,7 +848,7 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
 
         let sgn = p.parity();
 
-        return sgn * d;
+        sgn * d
     }
 }
 
@@ -986,14 +985,14 @@ impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b
     fn mul(self, v: &Vector<T>) -> Vector<T> {
         assert!(v.size() == self.cols, "Matrix and Vector dimensions do not agree.");
 
-        let mut new_data = vec![T::zero(); self.rows];
+        let mut new_data = Vec::with_capacity(self.rows);
 
         for i in 0..self.rows
         {
-            new_data[i] = utils::dot(&self.data[i*self.cols..(i+1)*self.cols], v.data());
+            new_data.push(utils::dot(&self.data[i*self.cols..(i+1)*self.cols], v.data()));
         }
 
-        return Vector::new(new_data)
+        Vector::new(new_data)
     }
 }
 

@@ -48,6 +48,8 @@ use linalg::vector::Vector;
 use learning::UnSupModel;
 use rand::{Rng, thread_rng};
 
+use libnum::abs;
+
 /// Initialization Algorithm enum.
 pub enum InitAlgorithm {
     /// The Forgy initialization scheme.
@@ -90,13 +92,14 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
     fn train(&mut self, inputs: &Matrix<f64>) {
         self.init_centroids(inputs);
         let mut cost = 0.0;
+        let eps = 1e-14;
 
         for _i in 0..self.iters {
                 let (idx, distances) = self.get_closest_centroids(inputs);
                 self.update_centroids(inputs, idx);
 
                 let cost_i = distances.sum();
-                if cost == cost_i {
+                if abs(cost - cost_i) < eps {
                     break;
                 }
 
@@ -239,7 +242,7 @@ impl KMeansClassifier {
         for i in 0..k {
             let mut vec_i = Vec::new();
 
-            for j in random_assignments.iter() {
+            for j in &random_assignments {
                 if *j == i {
                     vec_i.push(*j);
                 }

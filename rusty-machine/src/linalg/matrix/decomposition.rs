@@ -234,9 +234,9 @@ impl<T: Copy + Zero + One + Float + NumCast + fmt::Debug> Matrix<T> {
         }
     }
 
-    /// Eigendecomposition of a square matrix.
+    /// Eigen values of a square matrix.
     ///
-    /// Returns a Vec of eigen values and the eigen vectors.
+    /// Returns a Vec of eigen values.
     ///
     /// # Examples
     ///
