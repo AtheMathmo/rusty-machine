@@ -36,6 +36,10 @@ impl<T> Matrix<T> {
     /// assert_eq!(mat.rows(), 2);
     /// assert_eq!(mat.cols(), 2);
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// - The input data does not match the given dimensions.
     pub fn new(rows: usize, cols: usize, data: Vec<T>) -> Matrix<T> {
 
         assert!(cols * rows == data.len(), "Data does not match given dimensions.");
@@ -96,12 +100,16 @@ impl<T: Copy> Matrix<T> {
     /// assert_eq!(c.rows(), 2);
     /// assert_eq!(c.cols(), 3);
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// - Panics if row indices exceed the matrix dimensions.
     pub fn select_rows(&self, rows: &[usize]) -> Matrix<T> {
 
         let mut mat_vec = Vec::with_capacity(rows.len() * self.cols);
 
         for row in rows {
-            assert!(*row < self.rows);
+            assert!(*row < self.rows, "Row index is greater than number of rows.");
         }
 
         unsafe {
@@ -134,17 +142,21 @@ impl<T: Copy> Matrix<T> {
     /// assert_eq!(c.rows(), 3);
     /// assert_eq!(c.cols(), 2);
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// - Panics if column indices exceed the matrix dimensions.
     pub fn select_cols(&self, cols: &[usize]) -> Matrix<T> {
 
         let mut mat_vec = Vec::with_capacity(cols.len() * self.rows);
 
         for col in cols {
-            assert!(*col < self.cols);
+            assert!(*col < self.cols, "Column index is greater than number of columns.");
         }
 
         unsafe {
             for i in 0..self.rows {
-                for col in cols.iter() {
+                for col in cols.into_iter() {
                     mat_vec.push(*self.data.get_unchecked(i * self.cols + col));
                 }
             }
@@ -153,6 +165,54 @@ impl<T: Copy> Matrix<T> {
         Matrix {
             cols: cols.len(),
             rows: self.rows,
+            data: mat_vec,
+        }
+    }
+
+    /// Select block matrix from matrix
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::<f64>::identity(3);
+    /// let b = &a.select(&[0,1], &[1,2]);
+    ///
+    /// // We get the 2x2 block matrix in the upper right corner.
+    /// assert_eq!(b.rows(), 2);
+    /// assert_eq!(b.cols(), 2);
+    ///
+    /// // Prints [0,0,1,0]
+    /// println!("{:?}", b.data());
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// - Panics if row or column indices exceed the matrix dimensions.
+    pub fn select(&self, rows: &[usize], cols: &[usize]) -> Matrix<T> {
+
+        let mut mat_vec = Vec::with_capacity(cols.len() * rows.len());
+
+        for col in cols {
+            assert!(*col < self.cols, "Column index is greater than number of columns.");
+        }
+
+        for row in rows {
+            assert!(*row < self.rows, "Row index is greater than number of columns.");
+        }
+
+        unsafe {
+            for row in rows.into_iter() {
+                for col in cols.into_iter() {
+                    mat_vec.push(*self.data.get_unchecked(row * self.cols + col));
+                }
+            }
+        }
+
+        Matrix {
+            cols: cols.len(),
+            rows: rows.len(),
             data: mat_vec,
         }
     }
@@ -171,6 +231,10 @@ impl<T: Copy> Matrix<T> {
     /// assert_eq!(c.cols(), a.cols() + b.cols());
     /// assert_eq!(c[[1, 2]], 5.0);
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// - Self and m have different row counts.
     pub fn hcat(&self, m: &Matrix<T>) -> Matrix<T> {
         assert!(self.rows == m.rows, "Matrix row counts are not equal.");
 
@@ -209,6 +273,10 @@ impl<T: Copy> Matrix<T> {
     /// assert_eq!(c.rows(), a.rows() + b.rows());
     /// assert_eq!(c[[2, 2]], 6.0);
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// - Self and m have different column counts.
     pub fn vcat(&self, m: &Matrix<T>) -> Matrix<T> {
         assert!(self.cols==m.cols, "Matrix column counts are not equal.");
 
@@ -526,6 +594,11 @@ impl<T: Copy + Zero + Mul<T, Output = T>> Matrix<T> {
     /// let c = &a.elemul(&b);
     /// assert_eq!(*c.data(), vec![1.0, 4.0, 9.0, 16.0]);
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// - The matrices have different row counts.
+    /// - The matrices have different column counts.
     pub fn elemul(&self, m: &Matrix<T>) -> Matrix<T> {
         assert!(self.rows==m.rows, "Matrix row counts not equal.");
         assert!(self.cols==m.cols, "Matrix column counts not equal.");
@@ -548,6 +621,11 @@ impl<T: Copy + Zero + Div<T, Output = T>> Matrix<T> {
     /// let c = &a.elediv(&b);
     /// assert_eq!(*c.data(), vec![1.0; 4]);
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// - The matrices have different row counts.
+    /// - The matrices have different column counts.
     pub fn elediv(&self, m: &Matrix<T>) -> Matrix<T> {
         assert!(self.rows==m.rows, "Matrix row counts not equal.");
         assert!(self.cols==m.cols, "Matrix column counts not equal.");
@@ -575,6 +653,10 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
     /// let d = a.mean(1);
     /// assert_eq!(*d.data(), vec![1.5, 3.5]);
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// - The specified axis is not 0 or 1.
     pub fn mean(&self, axis: usize) -> Vector<T> {
         let m: Vector<T>;
         let n: T;
@@ -610,6 +692,10 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
     /// let d = a.variance(1);
     /// assert_eq!(*d.data(), vec![0.5, 0.5]);
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// - The specified axis is not 0 or 1.
     pub fn variance(&self, axis: usize) -> Vector<T> {
         let mean = self.mean(axis);
 
@@ -742,6 +828,10 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
     ///
     /// assert_eq!(*x.data(), vec![2.0, 3.0]);
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// - The matrix column count and vector size are different.
     pub fn solve(&self, y: Vector<T>) -> Vector<T> {
         let (l,u,p) = self.lup_decomp();
 
@@ -763,6 +853,10 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
     ///
     /// assert_eq!(*I.data(), vec![1.0,0.0,0.0,1.0]);
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// - The matrix is not square.
     pub fn inverse(&self) -> Matrix<T> {
         assert!(self.rows==self.cols, "Matrix is not square.");
 
@@ -808,6 +902,10 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
     /// let det = a.det();
     ///
     /// ```
+    ///
+    /// # Panics
+    ///
+    /// - The matrix is not square.
     pub fn det(&self) -> T {
         assert!(self.rows==self.cols, "Matrix is not square.");
 
