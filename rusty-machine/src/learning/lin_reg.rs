@@ -1,10 +1,34 @@
 //! Linear Regression module
 //!
-//! Contains implementation of linear regression models.
-//! Allows training and prediction of linear regression model
-//! using least squares optimization.
+//! Contains implemention of linear regression using
+//! OLS and gradient descent optimization.
 //!
-//! Currently only OLS solution - gradient descent not yet implemented.
+//! The regressor will automatically add the intercept term
+//! so you do not need to format the input matrices yourself.
+//!
+//! # Usage
+//!
+//! ```
+//! use rusty_machine::learning::lin_reg::LinRegressor;
+//! use rusty_machine::learning::SupModel;
+//! use rusty_machine::linalg::matrix::Matrix;
+//! use rusty_machine::linalg::vector::Vector;
+//!
+//! let inputs = Matrix::new(4,1,vec![1.0,3.0,5.0,7.0]);
+//! let targets = Vector::new(vec![1.,5.,9.,13.]);
+//!
+//! let mut lin_mod = LinRegressor::default();
+//! 
+//! // Train the model
+//! lin_mod.train(&inputs, &targets);
+//!
+//! // Now we'll predict a new point
+//! let new_point = Matrix::new(1,1,vec![10.]);
+//! let output = lin_mod.predict(&new_point);
+//!
+//! // Hopefully we classified our new point correctly!
+//! assert!(output[0] > 17f64, "Our regressor isn't very good!");
+//! ```
 
 use learning::SupModel;
 use linalg::matrix::Matrix;
@@ -23,19 +47,13 @@ pub struct LinRegressor {
     parameters: Option<Vector<f64>>,
 }
 
-impl LinRegressor {
-    /// Constructs untrained linear regression model.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::learning::lin_reg::LinRegressor;
-    ///
-    /// let mut lin_mod = LinRegressor::new();
-    /// ```
-    pub fn new() -> LinRegressor {
+impl Default for LinRegressor {
+    fn default() -> LinRegressor {
         LinRegressor { parameters: None }
     }
+}
+
+impl LinRegressor {
 
     /// Get the parameters from the model.
     ///
@@ -61,7 +79,7 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
     /// use rusty_machine::linalg::vector::Vector;
     /// use rusty_machine::learning::SupModel;
     ///
-    /// let mut lin_mod = LinRegressor::new();
+    /// let mut lin_mod = LinRegressor::default();
     /// let inputs = Matrix::new(3,1, vec![2.0, 3.0, 4.0]);
     /// let targets = Vector::new(vec![5.0, 6.0, 7.0]);
     ///
@@ -108,6 +126,8 @@ impl Optimizable for LinRegressor {
 }
 
 impl LinRegressor {
+
+    /// Train the linear regressor using Gradient Descent.
     pub fn train_with_optimization(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) {
         let ones = Matrix::<f64>::ones(inputs.rows(), 1);
         let full_inputs = ones.hcat(inputs);
