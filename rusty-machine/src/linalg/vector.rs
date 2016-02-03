@@ -129,6 +129,30 @@ impl<T: Copy + PartialOrd> Vector<T> {
     pub fn argmin(&self) -> (usize, T) {
         utils::argmin(&self.data)
     }
+
+    /// Select elements from the Vector and form a new Vector from them.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::vector::Vector;
+    ///
+    /// let a = Vector::new(vec![1.0,2.0,3.0,4.0,5.0]);
+    ///
+    /// let a_lower = a.select(&[2,3,4]);
+    ///
+    /// // Prints [3,4,5]
+    /// println!("{:?}", a_lower.data());
+    /// ```
+    pub fn select(&self, idxs: &[usize]) -> Vector<T> {
+        let mut new_data = Vec::with_capacity(idxs.len());
+
+        for idx in idxs.into_iter() {
+            new_data.push(self[*idx]);
+        }
+
+        Vector::new(new_data)
+    }
 }
 
 impl<T: Zero + One + Copy> Vector<T> {
