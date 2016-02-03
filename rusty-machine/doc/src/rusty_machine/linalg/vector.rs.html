@@ -9,6 +9,7 @@
 
     <title>vector.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -643,6 +644,30 @@
 <span id="601">601</span>
 <span id="602">602</span>
 <span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The vector module.</span>
 <span class='doccomment'>//!</span>
@@ -728,7 +753,7 @@
     <span class='doccomment'>/// assert_eq!(b.into_vec(), vec![2.0; 4]);</span>
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>apply</span>(<span class='self'>self</span>, <span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='ident'>Fn</span>(<span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>into_iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='ident'>f</span>(<span class='ident'>v</span>)).<span class='ident'>collect</span>();
+        <span class='kw'>let</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>into_iter</span>().<span class='ident'>map</span>(<span class='ident'>f</span>).<span class='ident'>collect</span>();
 
         <span class='ident'>Vector</span> {
             <span class='ident'>size</span>: <span class='self'>self</span>.<span class='ident'>size</span>,
@@ -774,6 +799,30 @@
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>argmin</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> (<span class='ident'>usize</span>, <span class='ident'>T</span>) {
         <span class='ident'>utils</span>::<span class='ident'>argmin</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>)
+    }
+
+    <span class='doccomment'>/// Select elements from the Vector and form a new Vector from them.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::vector::Vector;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let a = Vector::new(vec![1.0,2.0,3.0,4.0,5.0]);</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let a_lower = a.select(&amp;[2,3,4]);</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// // Prints [3,4,5]</span>
+    <span class='doccomment'>/// println!(&quot;{:?}&quot;, a_lower.data());</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>select</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>idxs</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>usize</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>idxs</span>.<span class='ident'>len</span>());
+
+        <span class='kw'>for</span> <span class='ident'>idx</span> <span class='kw'>in</span> <span class='ident'>idxs</span>.<span class='ident'>into_iter</span>() {
+            <span class='ident'>new_data</span>.<span class='ident'>push</span>(<span class='self'>self</span>[<span class='op'>*</span><span class='ident'>idx</span>]);
+        }
+
+        <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>new_data</span>)
     }
 }
 
@@ -1307,6 +1356,6 @@
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

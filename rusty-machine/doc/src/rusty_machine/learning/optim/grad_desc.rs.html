@@ -9,6 +9,7 @@
 
     <title>grad_desc.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
 
     
@@ -305,7 +306,7 @@
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>M</span>: <span class='ident'>Optimizable</span><span class='op'>&lt;</span><span class='ident'>Inputs</span> <span class='op'>=</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>Targets</span> <span class='op'>=</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span> <span class='ident'>OptimAlgorithm</span><span class='op'>&lt;</span><span class='ident'>M</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>StochasticGD</span> {
-    <span class='kw'>fn</span> <span class='ident'>optimize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>model</span>: <span class='kw-2'>&amp;</span><span class='ident'>M</span>, <span class='ident'>start</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>], <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>M</span>::<span class='ident'>Inputs</span>,<span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>M</span>::<span class='ident'>Targets</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>optimize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>model</span>: <span class='kw-2'>&amp;</span><span class='ident'>M</span>, <span class='ident'>start</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>], <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>M</span>::<span class='ident'>Inputs</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>M</span>::<span class='ident'>Targets</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
 
         <span class='kw'>let</span> (_, <span class='ident'>vec_data</span>) <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='ident'>start</span>,
                                                <span class='kw-2'>&amp;</span><span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='number'>0</span>]),
@@ -326,8 +327,7 @@
         }
         <span class='ident'>optimizing_val</span>.<span class='ident'>into_vec</span>()
     }
-}
-</pre>
+}</pre>
 </section>
     <section id='search' class="content hidden"></section>
 
@@ -387,6 +387,6 @@
     <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
     
-    <script async src="../../../../search-index.js"></script>
+    <script defer src="../../../../search-index.js"></script>
 </body>
 </html>

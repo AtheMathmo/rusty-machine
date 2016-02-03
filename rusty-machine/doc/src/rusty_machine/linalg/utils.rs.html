@@ -9,6 +9,7 @@
 
     <title>utils.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -291,6 +292,54 @@
 <span id="249">249</span>
 <span id="250">250</span>
 <span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Linear algebra utils module.</span>
 <span class='doccomment'>//!</span>
@@ -355,6 +404,54 @@
         <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>s</span> <span class='op'>+</span> <span class='ident'>xs</span>[<span class='ident'>i</span>] <span class='op'>*</span> <span class='ident'>ys</span>[<span class='ident'>i</span>];
     }
     <span class='ident'>s</span>
+}
+
+<span class='doccomment'>/// Unrolled sum</span>
+<span class='doccomment'>/// </span>
+<span class='doccomment'>/// Computes the sum over the slice consuming it in the process.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// Given graciously by bluss from ndarray!</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>unrolled_sum</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>(<span class='kw-2'>mut</span> <span class='ident'>xs</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>T</span>
+    <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;</span> <span class='op'>+</span> <span class='ident'>Zero</span>
+{
+    <span class='comment'>// eightfold unrolled so that floating point can be vectorized</span>
+    <span class='comment'>// (even with strict floating point accuracy semantics)</span>
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sum</span> <span class='op'>=</span> <span class='ident'>T</span>::<span class='ident'>zero</span>();
+    <span class='kw'>let</span> (<span class='kw-2'>mut</span> <span class='ident'>p0</span>,
+         <span class='kw-2'>mut</span> <span class='ident'>p1</span>,
+         <span class='kw-2'>mut</span> <span class='ident'>p2</span>,
+         <span class='kw-2'>mut</span> <span class='ident'>p3</span>,
+         <span class='kw-2'>mut</span> <span class='ident'>p4</span>,
+         <span class='kw-2'>mut</span> <span class='ident'>p5</span>,
+         <span class='kw-2'>mut</span> <span class='ident'>p6</span>,
+         <span class='kw-2'>mut</span> <span class='ident'>p7</span>) <span class='op'>=</span> (<span class='ident'>T</span>::<span class='ident'>zero</span>(),
+                    <span class='ident'>T</span>::<span class='ident'>zero</span>(),
+                    <span class='ident'>T</span>::<span class='ident'>zero</span>(),
+                    <span class='ident'>T</span>::<span class='ident'>zero</span>(),
+                    <span class='ident'>T</span>::<span class='ident'>zero</span>(),
+                    <span class='ident'>T</span>::<span class='ident'>zero</span>(),
+                    <span class='ident'>T</span>::<span class='ident'>zero</span>(),
+                    <span class='ident'>T</span>::<span class='ident'>zero</span>());
+    <span class='kw'>while</span> <span class='ident'>xs</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='number'>8</span> {
+        <span class='ident'>p0</span> <span class='op'>=</span> <span class='ident'>p0</span> <span class='op'>+</span> <span class='ident'>xs</span>[<span class='number'>0</span>].<span class='ident'>clone</span>();
+        <span class='ident'>p1</span> <span class='op'>=</span> <span class='ident'>p1</span> <span class='op'>+</span> <span class='ident'>xs</span>[<span class='number'>1</span>].<span class='ident'>clone</span>();
+        <span class='ident'>p2</span> <span class='op'>=</span> <span class='ident'>p2</span> <span class='op'>+</span> <span class='ident'>xs</span>[<span class='number'>2</span>].<span class='ident'>clone</span>();
+        <span class='ident'>p3</span> <span class='op'>=</span> <span class='ident'>p3</span> <span class='op'>+</span> <span class='ident'>xs</span>[<span class='number'>3</span>].<span class='ident'>clone</span>();
+        <span class='ident'>p4</span> <span class='op'>=</span> <span class='ident'>p4</span> <span class='op'>+</span> <span class='ident'>xs</span>[<span class='number'>4</span>].<span class='ident'>clone</span>();
+        <span class='ident'>p5</span> <span class='op'>=</span> <span class='ident'>p5</span> <span class='op'>+</span> <span class='ident'>xs</span>[<span class='number'>5</span>].<span class='ident'>clone</span>();
+        <span class='ident'>p6</span> <span class='op'>=</span> <span class='ident'>p6</span> <span class='op'>+</span> <span class='ident'>xs</span>[<span class='number'>6</span>].<span class='ident'>clone</span>();
+        <span class='ident'>p7</span> <span class='op'>=</span> <span class='ident'>p7</span> <span class='op'>+</span> <span class='ident'>xs</span>[<span class='number'>7</span>].<span class='ident'>clone</span>();
+
+        <span class='ident'>xs</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>xs</span>[<span class='number'>8</span>..];
+    }
+    <span class='ident'>sum</span> <span class='op'>=</span> <span class='ident'>sum</span>.<span class='ident'>clone</span>() <span class='op'>+</span> (<span class='ident'>p0</span> <span class='op'>+</span> <span class='ident'>p4</span>);
+    <span class='ident'>sum</span> <span class='op'>=</span> <span class='ident'>sum</span>.<span class='ident'>clone</span>() <span class='op'>+</span> (<span class='ident'>p1</span> <span class='op'>+</span> <span class='ident'>p5</span>);
+    <span class='ident'>sum</span> <span class='op'>=</span> <span class='ident'>sum</span>.<span class='ident'>clone</span>() <span class='op'>+</span> (<span class='ident'>p2</span> <span class='op'>+</span> <span class='ident'>p6</span>);
+    <span class='ident'>sum</span> <span class='op'>=</span> <span class='ident'>sum</span>.<span class='ident'>clone</span>() <span class='op'>+</span> (<span class='ident'>p3</span> <span class='op'>+</span> <span class='ident'>p7</span>);
+    <span class='kw'>for</span> <span class='ident'>elt</span> <span class='kw'>in</span> <span class='ident'>xs</span> {
+        <span class='ident'>sum</span> <span class='op'>=</span> <span class='ident'>sum</span>.<span class='ident'>clone</span>() <span class='op'>+</span> <span class='ident'>elt</span>.<span class='ident'>clone</span>();
+    }
+    <span class='ident'>sum</span>
 }
 
 <span class='doccomment'>/// Compute vector sum of two slices.</span>
@@ -603,6 +700,6 @@
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>

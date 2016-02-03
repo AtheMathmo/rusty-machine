@@ -9,6 +9,7 @@
 
     <title>num - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
 
     <link rel="shortcut icon" href="http://rust-num.github.io/num/favicon.ico">
@@ -45,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-0' class='srclink' href='../src/num/lib.rs.html#11-166' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-0' class='srclink' href='../src/num/lib.rs.html#11-173' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>A collection of numeric types and traits for Rust.</p>
 
 <p>This includes new types for big integers, rationals, and complex numbers,
@@ -57,12 +58,13 @@ and generic range iterators.</p>
 approximate a square root to arbitrary precision:</p>
 <span class='rusttest'>extern crate num;
 #[cfg(all(feature = &quot;bigint&quot;, feature=&quot;rational&quot;))]
-pub mod test {
+mod test {
 
 use num::FromPrimitive;
 use num::bigint::BigInt;
 use num::rational::{Ratio, BigRational};
 
+pub
 fn approx_sqrt(number: u64, iterations: usize) -&gt; BigRational {
     let start: Ratio&lt;BigInt&gt; = Ratio::from_integer(FromPrimitive::from_u64(number).unwrap());
     let mut approx = start.clone();
@@ -76,7 +78,8 @@ fn approx_sqrt(number: u64, iterations: usize) -&gt; BigRational {
 }
 }
 #[cfg(not(all(feature = &quot;bigint&quot;, feature=&quot;rational&quot;)))]
-fn approx_sqrt(n: u64, _: usize) -&gt; u64 { n }
+mod test { pub fn approx_sqrt(n: u64, _: usize) -&gt; u64 { n } }
+use test::approx_sqrt;
 
 fn main() {
     println!(&quot;{}&quot;, approx_sqrt(10, 4)); // prints 4057691201/1283082416
@@ -256,6 +259,6 @@ fn main() {
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     <script src="../playpen.js"></script>
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>

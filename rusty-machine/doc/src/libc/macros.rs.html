@@ -4,11 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/james/.multirust/toolchains/stable/cargo/registry/src/github.com-0a35038f75765ae4/libc-0.2.2/src/macros.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/james/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/libc-0.2.4/src/macros.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>macros.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     <link rel="shortcut icon" href="https://doc.rust-lang.org/favicon.ico">
@@ -147,6 +148,7 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
+<span id="108">108</span>
 </pre><pre class='rust '>
 <span class='doccomment'>/// A macro for defining #[cfg] if-else statements.</span>
 <span class='doccomment'>///</span>
@@ -185,9 +187,10 @@
 }
 
 <span class='macro'>macro_rules</span><span class='macro'>!</span> <span class='ident'>s</span> {
-    ($(<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>i</span>:<span class='ident'>ident</span> { $(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>field</span>:<span class='ident'>tt</span>)<span class='op'>*</span> })<span class='op'>*</span>) <span class='op'>=&gt;</span> ($(
+    ($($(<span class='attribute'>#[<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>attr</span>:<span class='ident'>meta</span>]</span>)<span class='op'>*</span> <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>i</span>:<span class='ident'>ident</span> { $(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>field</span>:<span class='ident'>tt</span>)<span class='op'>*</span> })<span class='op'>*</span>) <span class='op'>=&gt;</span> ($(
         <span class='macro'>__item</span><span class='macro'>!</span> {
             <span class='attribute'>#[<span class='ident'>repr</span>(<span class='ident'>C</span>)]</span>
+            $(<span class='attribute'>#[<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>attr</span>]</span>)<span class='op'>*</span>
             <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>i</span> { $(<span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>field</span>)<span class='op'>*</span> }
         }
         <span class='kw'>impl</span> ::<span class='ident'>dox</span>::<span class='ident'>Copy</span> <span class='kw'>for</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>i</span> {}
@@ -315,6 +318,6 @@
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

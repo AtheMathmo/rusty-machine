@@ -9,6 +9,7 @@
 
     <title>rand::SeedableRng - Rust</title>
 
+    <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
 
     <link rel="shortcut icon" href="https://www.rust-lang.org/favicon.ico">
@@ -66,7 +67,7 @@ the same stream of randomness multiple times.</p>
 <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>rng</span>.<span class='ident'>gen</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>());</pre>
 </div><h3 id='tymethod.from_seed' class='method stab '><code>fn <a href='#tymethod.from_seed' class='fnname'>from_seed</a>(seed: Seed) -&gt; Self</code></h3><div class='docblock'><p>Create a new RNG with the given seed.</p>
 
-<h1 id='example' class='section-header'><a href='#example'>Example</a></h1><pre class='rust rust-example-rendered'>
+<h1 id='example-1' class='section-header'><a href='#example-1'>Example</a></h1><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>rand</span>::{<span class='ident'>Rng</span>, <span class='ident'>SeedableRng</span>, <span class='ident'>StdRng</span>};
 
 <span class='kw'>let</span> <span class='ident'>seed</span>: <span class='kw-2'>&amp;</span>[_] <span class='op'>=</span> <span class='kw-2'>&amp;</span>[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>, <span class='number'>4</span>];
@@ -75,12 +76,12 @@ the same stream of randomness multiple times.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl&lt;'a&gt; <a class='trait' href='../rand/trait.SeedableRng.html' title='rand::SeedableRng'>SeedableRng</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'a [</a><a href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a><a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt; for <a class='struct' href='../rand/isaac/struct.IsaacRng.html' title='rand::isaac::IsaacRng'>IsaacRng</a></code></li>
-<li><code>impl&lt;'a&gt; <a class='trait' href='../rand/trait.SeedableRng.html' title='rand::SeedableRng'>SeedableRng</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'a [</a><a href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a><a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt; for <a class='struct' href='../rand/isaac/struct.Isaac64Rng.html' title='rand::isaac::Isaac64Rng'>Isaac64Rng</a></code></li>
-<li><code>impl&lt;'a&gt; <a class='trait' href='../rand/trait.SeedableRng.html' title='rand::SeedableRng'>SeedableRng</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'a [</a><a href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a><a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt; for <a class='struct' href='../rand/chacha/struct.ChaChaRng.html' title='rand::chacha::ChaChaRng'>ChaChaRng</a></code></li>
-<li><code>impl&lt;S, R: <a class='trait' href='../rand/trait.SeedableRng.html' title='rand::SeedableRng'>SeedableRng</a>&lt;S&gt;, Rsdr: <a class='trait' href='../rand/reseeding/trait.Reseeder.html' title='rand::reseeding::Reseeder'>Reseeder</a>&lt;R&gt; + <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a>&gt; <a class='trait' href='../rand/trait.SeedableRng.html' title='rand::SeedableRng'>SeedableRng</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(Rsdr, S)</a>&gt; for <a class='struct' href='../rand/reseeding/struct.ReseedingRng.html' title='rand::reseeding::ReseedingRng'>ReseedingRng</a>&lt;R, Rsdr&gt;</code></li>
-<li><code>impl <a class='trait' href='../rand/trait.SeedableRng.html' title='rand::SeedableRng'>SeedableRng</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[<a href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>; 4]</a>&gt; for <a class='struct' href='../rand/struct.XorShiftRng.html' title='rand::XorShiftRng'>XorShiftRng</a></code></li>
-<li><code>impl&lt;'a&gt; <a class='trait' href='../rand/trait.SeedableRng.html' title='rand::SeedableRng'>SeedableRng</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'a [</a><a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a><a href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt; for <a class='struct' href='../rand/struct.StdRng.html' title='rand::StdRng'>StdRng</a></code></li>
+    <li><code>impl&lt;'a&gt; <a class='trait' href='../rand/trait.SeedableRng.html' title='rand::SeedableRng'>SeedableRng</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'a [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt; for <a class='struct' href='../rand/isaac/struct.IsaacRng.html' title='rand::isaac::IsaacRng'>IsaacRng</a></code></li>
+<li><code>impl&lt;'a&gt; <a class='trait' href='../rand/trait.SeedableRng.html' title='rand::SeedableRng'>SeedableRng</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'a [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt; for <a class='struct' href='../rand/isaac/struct.Isaac64Rng.html' title='rand::isaac::Isaac64Rng'>Isaac64Rng</a></code></li>
+<li><code>impl&lt;'a&gt; <a class='trait' href='../rand/trait.SeedableRng.html' title='rand::SeedableRng'>SeedableRng</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'a [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt; for <a class='struct' href='../rand/chacha/struct.ChaChaRng.html' title='rand::chacha::ChaChaRng'>ChaChaRng</a></code></li>
+<li><code>impl&lt;S, R: <a class='trait' href='../rand/trait.SeedableRng.html' title='rand::SeedableRng'>SeedableRng</a>&lt;S&gt;, Rsdr: <a class='trait' href='../rand/reseeding/trait.Reseeder.html' title='rand::reseeding::Reseeder'>Reseeder</a>&lt;R&gt; + <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a>&gt; <a class='trait' href='../rand/trait.SeedableRng.html' title='rand::SeedableRng'>SeedableRng</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(Rsdr, S)</a>&gt; for <a class='struct' href='../rand/reseeding/struct.ReseedingRng.html' title='rand::reseeding::ReseedingRng'>ReseedingRng</a>&lt;R, Rsdr&gt;</code></li>
+<li><code>impl <a class='trait' href='../rand/trait.SeedableRng.html' title='rand::SeedableRng'>SeedableRng</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a>; 4]</a>&gt; for <a class='struct' href='../rand/struct.XorShiftRng.html' title='rand::XorShiftRng'>XorShiftRng</a></code></li>
+<li><code>impl&lt;'a&gt; <a class='trait' href='../rand/trait.SeedableRng.html' title='rand::SeedableRng'>SeedableRng</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;'a [</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>&gt; for <a class='struct' href='../rand/struct.StdRng.html' title='rand::StdRng'>StdRng</a></code></li>
 </ul><script type="text/javascript" async
                               src="../implementors/rand/trait.SeedableRng.js">
                       </script></section>
@@ -142,6 +143,6 @@ the same stream of randomness multiple times.</p>
     <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     
-    <script async src="../search-index.js"></script>
+    <script defer src="../search-index.js"></script>
 </body>
 </html>

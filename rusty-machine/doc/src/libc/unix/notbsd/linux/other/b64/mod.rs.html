@@ -4,11 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/james/.multirust/toolchains/stable/cargo/registry/src/github.com-0a35038f75765ae4/libc-0.2.2/src/unix/notbsd/linux/other/b64/mod.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/james/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/libc-0.2.4/src/unix/notbsd/linux/other/b64/mod.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>mod.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../../../../main.css">
 
     <link rel="shortcut icon" href="https://doc.rust-lang.org/favicon.ico">
@@ -68,6 +69,7 @@
 <span id="26">26</span>
 <span id="27">27</span>
 <span id="28">28</span>
+<span id="29">29</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! 64-bit specific definitions for linux-like values</span>
 
@@ -79,6 +81,7 @@
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>ino_t</span> <span class='op'>=</span> <span class='ident'>u64</span>;
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>off_t</span> <span class='op'>=</span> <span class='ident'>i64</span>;
 <span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>blkcnt_t</span> <span class='op'>=</span> <span class='ident'>i64</span>;
+<span class='kw'>pub</span> <span class='kw'>type</span> <span class='ident'>__fsword_t</span> <span class='op'>=</span> ::<span class='ident'>c_long</span>;
 
 <span class='macro'>s</span><span class='macro'>!</span> {
     <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>sigset_t</span> {
@@ -157,6 +160,6 @@
     <script src="../../../../../../../jquery.js"></script>
     <script src="../../../../../../../main.js"></script>
     
-    <script async src="../../../../../../../search-index.js"></script>
+    <script defer src="../../../../../../../search-index.js"></script>
 </body>
 </html>

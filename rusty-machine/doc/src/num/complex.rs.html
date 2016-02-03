@@ -4,11 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/james/.multirust/toolchains/stable/cargo/registry/src/github.com-0a35038f75765ae4/num-0.1.28/src/complex.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/james/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/num-0.1.30/src/complex.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>complex.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
 
     <link rel="shortcut icon" href="http://rust-num.github.io/num/favicon.ico">
@@ -1151,6 +1152,12 @@
 <span id="1109">1109</span>
 <span id="1110">1110</span>
 <span id="1111">1111</span>
+<span id="1112">1112</span>
+<span id="1113">1113</span>
+<span id="1114">1114</span>
+<span id="1115">1115</span>
+<span id="1116">1116</span>
+<span id="1117">1117</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright 2013 The Rust Project Developers. See the COPYRIGHT</span>
 <span class='comment'>// file at the top-level directory of this distribution and at</span>
@@ -1191,6 +1198,12 @@
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>re</span>: <span class='ident'>T</span>, <span class='ident'>im</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>Complex</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='ident'>Complex</span> { <span class='ident'>re</span>: <span class='ident'>re</span>, <span class='ident'>im</span>: <span class='ident'>im</span> }
+    }
+
+    <span class='doccomment'>/// Returns imaginary unit</span>
+    <span class='attribute'>#[<span class='ident'>inline</span>]</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>i</span>() <span class='op'>-&gt;</span> <span class='ident'>Complex</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='ident'>Self</span>::<span class='ident'>new</span>(<span class='ident'>T</span>::<span class='ident'>zero</span>(), <span class='ident'>T</span>::<span class='ident'>one</span>())
     }
 
     <span class='doccomment'>/// Returns the square of the norm (since `T` doesn&#39;t necessarily</span>
@@ -1320,7 +1333,7 @@
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>asin</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Complex</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='comment'>// formula: arcsin(z) = -i ln(sqrt(1-z^2) + iz)</span>
-        <span class='kw'>let</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='ident'>Complex</span>::<span class='ident'>new</span>(<span class='ident'>T</span>::<span class='ident'>zero</span>(), <span class='ident'>T</span>::<span class='ident'>one</span>());
+        <span class='kw'>let</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='ident'>Complex</span>::<span class='ident'>i</span>();
         <span class='op'>-</span><span class='ident'>i</span><span class='op'>*</span>((<span class='ident'>Complex</span>::<span class='ident'>one</span>() <span class='op'>-</span> <span class='self'>self</span><span class='op'>*</span><span class='self'>self</span>).<span class='ident'>sqrt</span>() <span class='op'>+</span> <span class='ident'>i</span><span class='op'>*</span><span class='self'>self</span>).<span class='ident'>ln</span>()
     }
 
@@ -1335,7 +1348,7 @@
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>acos</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Complex</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='comment'>// formula: arccos(z) = -i ln(i sqrt(1-z^2) + z)</span>
-        <span class='kw'>let</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='ident'>Complex</span>::<span class='ident'>new</span>(<span class='ident'>T</span>::<span class='ident'>zero</span>(), <span class='ident'>T</span>::<span class='ident'>one</span>());
+        <span class='kw'>let</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='ident'>Complex</span>::<span class='ident'>i</span>();
         <span class='op'>-</span><span class='ident'>i</span><span class='op'>*</span>(<span class='ident'>i</span><span class='op'>*</span>(<span class='ident'>Complex</span>::<span class='ident'>one</span>() <span class='op'>-</span> <span class='self'>self</span><span class='op'>*</span><span class='self'>self</span>).<span class='ident'>sqrt</span>() <span class='op'>+</span> <span class='self'>self</span>).<span class='ident'>ln</span>()
     }
 
@@ -1350,7 +1363,7 @@
     <span class='attribute'>#[<span class='ident'>inline</span>]</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>atan</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Complex</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='comment'>// formula: arctan(z) = (ln(1+iz) - ln(1-iz))/(2i)</span>
-        <span class='kw'>let</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='ident'>Complex</span>::<span class='ident'>new</span>(<span class='ident'>T</span>::<span class='ident'>zero</span>(), <span class='ident'>T</span>::<span class='ident'>one</span>());
+        <span class='kw'>let</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='ident'>Complex</span>::<span class='ident'>i</span>();
         <span class='kw'>let</span> <span class='ident'>one</span> <span class='op'>=</span> <span class='ident'>Complex</span>::<span class='ident'>one</span>();
         <span class='kw'>let</span> <span class='ident'>two</span> <span class='op'>=</span> <span class='ident'>one</span> <span class='op'>+</span> <span class='ident'>one</span>;
         <span class='kw'>if</span> <span class='op'>*</span><span class='self'>self</span> <span class='op'>==</span> <span class='ident'>i</span> {
@@ -2323,6 +2336,6 @@
     <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script src="../../playpen.js"></script>
-    <script async src="../../search-index.js"></script>
+    <script defer src="../../search-index.js"></script>
 </body>
 </html>

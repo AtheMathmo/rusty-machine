@@ -9,6 +9,7 @@
 
     <title>k_means.rs.html -- source</title>
 
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
 
     
@@ -340,6 +341,9 @@
 <span id="298">298</span>
 <span id="299">299</span>
 <span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! K-means Classification</span>
 <span class='doccomment'>//!</span>
@@ -391,6 +395,8 @@
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>UnSupModel</span>;
 <span class='kw'>use</span> <span class='ident'>rand</span>::{<span class='ident'>Rng</span>, <span class='ident'>thread_rng</span>};
 
+<span class='kw'>use</span> <span class='ident'>libnum</span>::<span class='ident'>abs</span>;
+
 <span class='doccomment'>/// Initialization Algorithm enum.</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>InitAlgorithm</span> {
     <span class='doccomment'>/// The Forgy initialization scheme.</span>
@@ -433,13 +439,14 @@
     <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
         <span class='self'>self</span>.<span class='ident'>init_centroids</span>(<span class='ident'>inputs</span>);
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cost</span> <span class='op'>=</span> <span class='number'>0.0</span>;
+        <span class='kw'>let</span> <span class='ident'>eps</span> <span class='op'>=</span> <span class='number'>1e-14</span>;
 
         <span class='kw'>for</span> <span class='ident'>_i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>iters</span> {
                 <span class='kw'>let</span> (<span class='ident'>idx</span>, <span class='ident'>distances</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>get_closest_centroids</span>(<span class='ident'>inputs</span>);
                 <span class='self'>self</span>.<span class='ident'>update_centroids</span>(<span class='ident'>inputs</span>, <span class='ident'>idx</span>);
 
                 <span class='kw'>let</span> <span class='ident'>cost_i</span> <span class='op'>=</span> <span class='ident'>distances</span>.<span class='ident'>sum</span>();
-                <span class='kw'>if</span> <span class='ident'>cost</span> <span class='op'>==</span> <span class='ident'>cost_i</span> {
+                <span class='kw'>if</span> <span class='ident'>abs</span>(<span class='ident'>cost</span> <span class='op'>-</span> <span class='ident'>cost_i</span>) <span class='op'>&lt;</span> <span class='ident'>eps</span> {
                     <span class='kw'>break</span>;
                 }
 
@@ -582,14 +589,14 @@
         <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>k</span> {
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>vec_i</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
 
-            <span class='kw'>for</span> <span class='ident'>j</span> <span class='kw'>in</span> <span class='ident'>random_assignments</span>.<span class='ident'>iter</span>() {
+            <span class='kw'>for</span> <span class='ident'>j</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>random_assignments</span> {
                 <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>j</span> <span class='op'>==</span> <span class='ident'>i</span> {
                     <span class='ident'>vec_i</span>.<span class='ident'>push</span>(<span class='op'>*</span><span class='ident'>j</span>);
                 }
             }
 
             <span class='kw'>let</span> <span class='ident'>mat_i</span> <span class='op'>=</span> <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>vec_i</span>);
-            <span class='ident'>init_centroids</span>.<span class='ident'>extend</span>(<span class='ident'>mat_i</span>.<span class='ident'>mean</span>(<span class='number'>0</span>).<span class='ident'>data</span>());
+            <span class='ident'>init_centroids</span>.<span class='ident'>extend</span>(<span class='ident'>mat_i</span>.<span class='ident'>mean</span>(<span class='number'>0</span>).<span class='ident'>into_vec</span>());
         }
 
         <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>k</span>, <span class='ident'>inputs</span>.<span class='ident'>cols</span>(), <span class='ident'>init_centroids</span>)
@@ -701,6 +708,6 @@
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
     
-    <script async src="../../../search-index.js"></script>
+    <script defer src="../../../search-index.js"></script>
 </body>
 </html>
