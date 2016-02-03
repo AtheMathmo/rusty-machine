@@ -82,7 +82,7 @@ impl<T: Copy> Vector<T> {
     /// assert_eq!(b.into_vec(), vec![2.0; 4]);
     /// ```
     pub fn apply(self, f: &Fn(T) -> T) -> Vector<T> {
-        let new_data = self.data.into_iter().map(|v| f(v)).collect();
+        let new_data = self.data.into_iter().map(f).collect();
 
         Vector {
             size: self.size,
