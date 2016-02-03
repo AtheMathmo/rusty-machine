@@ -160,8 +160,10 @@ impl<T: Copy + Zero + Float> Matrix<T> {
 }
 
 impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
-    /// Returns (U,H), where H is the upper hessenberg form
-    /// and U is the unitary transform matrix.
+    /// Returns H, where H is the upper hessenberg form.
+    ///
+    /// If the transformation matrix is also required, you should
+    /// use `upper_hess_decomp`.
     ///
     /// # Examples
     ///
@@ -183,7 +185,6 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
                 "Matrix must be square to produce upper hessenberg.");
 
         let mut dummy = self.clone();
-        dummy.balance_matrix();
 
         for i in 0..n - 2 {
             let lower_rows = &(i + 1..n).collect::<Vec<usize>>()[..];
@@ -192,6 +193,7 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
 
             let i_plus_to_n = (i + 1..n).collect::<Vec<usize>>();
 
+            // Apply holder on the left
             let dummy_block = dummy.select(&i_plus_to_n, &(i..n).collect::<Vec<usize>>());
             let reduc_block = &dummy_block -
                               &h_holder_vec * (h_holder_vec.transpose() * &dummy_block) *
@@ -200,10 +202,14 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
             // Reassign block
             for j in i + 1..n {
                 for k in i..n {
-                    dummy.data[j * dummy.cols + k] = reduc_block.data[(j - i - 1) * reduc_block.cols + k - i]
+                    dummy.data[j * dummy.cols + k] = reduc_block.data[(j - i - 1) *
+                                                                      reduc_block.cols +
+                                                                      k -
+                                                                      i]
                 }
             }
 
+            /// Apply holder on the right
             let dummy_block = dummy.select(&(0..n).collect::<Vec<usize>>(), &i_plus_to_n);
             let reduc_block = &dummy_block -
                               (&dummy_block * &h_holder_vec) * h_holder_vec.transpose() *
@@ -212,20 +218,79 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
             // Reassign block
             for j in 0..n {
                 for k in i + 1..n {
-                    dummy.data[j * dummy.cols + k] = reduc_block.data[j * reduc_block.cols + k - i - 1]
+                    dummy.data[j * dummy.cols + k] = reduc_block.data[j * reduc_block.cols + k - i -
+                                                                      1]
                 }
             }
 
         }
 
         // Enforce upper hessenberg
-        for i in 0..self.cols-2 {
+        for i in 0..self.cols - 2 {
             for j in i + 2..self.rows {
                 dummy.data[j * self.cols + i] = T::zero();
             }
         }
 
         dummy
+    }
+
+    /// Returns (U,H), where H is the upper hessenberg form
+    /// and U is the unitary transform matrix.
+    ///
+    /// Note: The current transform matrix seems broken...
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(4,4,vec![2.,0.,1.,1.,2.,0.,1.,2.,1.,2.,0.,0.,2.,0.,1.,1.]);
+    /// 
+    /// // u is the transform, h is the upper hessenberg form.
+    /// let (u,h) = a.upper_hess_decomp();
+    ///
+    /// let new_a = &u * &h * u.transpose();
+    ///
+    /// println!("The hess : {:?}", h.data());
+    /// println!("The transform : {:?}", u.data());
+    /// println!("First : {:?}", new_a.data());
+    /// println!("Manual hess : {:?}", (u.transpose() * &a * u).data());
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// - The matrix is not square.
+    pub fn upper_hess_decomp(&self) -> (Matrix<T>, Matrix<T>) {
+        let n = self.rows;
+        assert!(n == self.cols,
+                "Matrix must be square to produce upper hessenberg.");
+
+        // First we form the transformation.
+        let mut transform = Matrix::identity(n);
+
+        for i in 0..n - 2 {
+            let lower_rows = (i + 1..n).collect::<Vec<usize>>();
+            let lower_self = self.select(&lower_rows, &[i]);
+            let h_holder_vec = Matrix::make_householder_vec(lower_self);
+
+            let trans_block = transform.select(&lower_rows, &lower_rows);
+            let reduc_block = &trans_block -
+                              (&trans_block * &h_holder_vec) * h_holder_vec.transpose() *
+                              (T::one() + T::one());
+
+            // Reassign block
+            for j in i + 1..n {
+                for k in i + 1..n {
+                    transform.data[j * n + k] = reduc_block.data[(j - i - 1) *
+                                                                          reduc_block.cols +
+                                                                          k - i - 1];
+                }
+            }
+        }
+
+        // Now we reduce to upper hessenberg
+        (transform, self.upper_hessenberg())
     }
 
     fn balance_matrix(&mut self) {
@@ -262,7 +327,7 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
 
                 if (c * c + r * r) < cast::<f64, T>(0.95).unwrap() * s {
                     converged = false;
-                    d.data[(i + 1) * self.cols] = f * d.data[(i + 1) * self.cols];
+                    d.data[i * (self.cols + 1)] = f * d.data[i * (self.cols + 1)];
 
                     for j in 0..n {
                         self.data[j * self.cols + i] = f * self.data[j * self.cols + i];
@@ -291,8 +356,6 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
     /// ```
     /// use rusty_machine::linalg::matrix::Matrix;
     /// 
-    /// let a = Matrix::new(3,3,vec![3.,2.,4.,2.,0.,2.,4.,2.,3.]);
-    ///
     /// let a = Matrix::new(4,4, (1..17).map(|v| v as f64).collect::<Vec<f64>>());
     /// let e = a.eigenvalues();
     /// println!("{:?}", e);
@@ -305,6 +368,7 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
         let n = self.rows();
         assert!(n == self.cols(), "Matrix must be square for eigendecomp.");
         let mut h = self.upper_hessenberg();
+        h.balance_matrix();
 
         let eps = cast::<f64, T>(f64::MIN_POSITIVE * 2f64).unwrap();
 
@@ -322,6 +386,7 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
                 let new_shift = h[[m, m]];
                 let (q, r) = (h - &id * new_shift).qr_decomp();
                 h = r * &q + &id * new_shift;
+
             }
 
             eigs.push(h[[m, m]]);
@@ -336,6 +401,7 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
 
         eigs.push(h[[0, 0]]);
         eigs.shrink_to_fit();
+
         eigs
     }
 
@@ -355,6 +421,7 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
     /// let a = Matrix::new(4,4, (1..17).map(|v| v as f64).collect::<Vec<f64>>());
     /// let (e, _) = a.eigendecomp();
     /// println!("{:?}", e);
+    /// assert!(false);
     /// ```
     ///
     /// # Panics
@@ -368,7 +435,7 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
 
         let mut p = n - 1;
 
-        let eps = cast::<f64, T>(1e-15).unwrap();
+        let eps = cast::<f64, T>(1e-20).unwrap();
 
         while p > 1 {
             let q = p - 1;
@@ -384,6 +451,7 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
 
                 let householder = Matrix::make_householder(Matrix::new(3, 1, vec![x, y, z]));
 
+                // Apply householder transformation to block (on the left)
                 let h_block = h.select(&[k, k + 1, k + 2], &(r..n).collect::<Vec<usize>>());
                 let reduc_block = &householder * h_block;
 
@@ -397,6 +465,7 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
 
                 let r = cmp::min(k + 4, p + 1);
 
+                // Apply householder transformation to the block (on the right)
                 let h_block = h.select(&(0..r).collect::<Vec<usize>>(), &[k, k + 1, k + 2]);
                 let reduc_block = h_block * householder.transpose();
 
@@ -418,6 +487,7 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
             let (c, s) = Matrix::givens_rot(x, y);
             let givens_mat = Matrix::new(2, 2, vec![c, -s, s, c]);
 
+            // Apply Givens rotation to the block (on the left)
             let h_block = h.select(&(q..p + 1).collect::<Vec<usize>>(),
                                    &(p - 2..n).collect::<Vec<usize>>());
             let reduc_block = &givens_mat * h_block;
@@ -430,6 +500,7 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
                 }
             }
 
+            // Apply Givens rotation to block (on the right)
             let h_block = h.select(&(0..p).collect::<Vec<usize>>(),
                                    &(p - 1..p + 1).collect::<Vec<usize>>());
             let reduc_block = h_block * givens_mat.transpose();
