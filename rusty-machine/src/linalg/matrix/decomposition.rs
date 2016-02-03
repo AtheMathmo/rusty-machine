@@ -4,7 +4,7 @@
 //! 1. [On Matrix Balancing and EigenVector computation](http://arxiv.org/pdf/1401.5766v1.pdf), James, Langou and Lowery
 
 use std::ops::{Mul, Add, Div, Sub, Neg};
-use std::{f64, cmp};
+use std::cmp;
 
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
@@ -209,7 +209,7 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
                 }
             }
 
-            /// Apply holder on the right
+            // Apply holder on the right
             let dummy_block = dummy.select(&(0..n).collect::<Vec<usize>>(), &i_plus_to_n);
             let reduc_block = &dummy_block -
                               (&dummy_block * &h_holder_vec) * h_holder_vec.transpose() *
@@ -245,16 +245,12 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
     /// ```
     /// use rusty_machine::linalg::matrix::Matrix;
     ///
-    /// let a = Matrix::new(4,4,vec![2.,0.,1.,1.,2.,0.,1.,2.,1.,2.,0.,0.,2.,0.,1.,1.]);
-    /// 
+    /// let a = Matrix::new(3,3,vec![1.,2.,3.,4.,5.,6.,7.,8.,9.]);
+    ///
     /// // u is the transform, h is the upper hessenberg form.
     /// let (u,h) = a.upper_hess_decomp();
     ///
-    /// let new_a = &u * &h * u.transpose();
-    ///
     /// println!("The hess : {:?}", h.data());
-    /// println!("The transform : {:?}", u.data());
-    /// println!("First : {:?}", new_a.data());
     /// println!("Manual hess : {:?}", (u.transpose() * &a * u).data());
     /// ```
     ///
@@ -269,22 +265,23 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
         // First we form the transformation.
         let mut transform = Matrix::identity(n);
 
-        for i in 0..n - 2 {
+        for i in (0..n - 2).rev() {
             let lower_rows = (i + 1..n).collect::<Vec<usize>>();
             let lower_self = self.select(&lower_rows, &[i]);
             let h_holder_vec = Matrix::make_householder_vec(lower_self);
 
             let trans_block = transform.select(&lower_rows, &lower_rows);
             let reduc_block = &trans_block -
-                              (&trans_block * &h_holder_vec) * h_holder_vec.transpose() *
+                              &h_holder_vec * (h_holder_vec.transpose() * &trans_block) *
                               (T::one() + T::one());
 
             // Reassign block
             for j in i + 1..n {
                 for k in i + 1..n {
-                    transform.data[j * n + k] = reduc_block.data[(j - i - 1) *
-                                                                          reduc_block.cols +
-                                                                          k - i - 1];
+                    transform.data[j * n + k] = reduc_block.data[(j - i - 1) * reduc_block.cols +
+                                                                 k -
+                                                                 i -
+                                                                 1];
                 }
             }
         }
@@ -347,9 +344,9 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
         (a / r, -b / r)
     }
 
-    /// Eigen values of a square matrix.
+    /// Eigenvalues of a square matrix.
     ///
-    /// Returns a Vec of eigen values.
+    /// Returns a Vec of eigenvalues.
     ///
     /// # Examples
     ///
@@ -367,71 +364,9 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
     pub fn eigenvalues(&self) -> Vec<T> {
         let n = self.rows();
         assert!(n == self.cols(), "Matrix must be square for eigendecomp.");
+
         let mut h = self.upper_hessenberg();
         h.balance_matrix();
-
-        let eps = cast::<f64, T>(f64::MIN_POSITIVE * 2f64).unwrap();
-
-        let mut id = Matrix::<T>::identity(n);
-        let max_iters = 100;
-        let mut curr_iters = 0;
-
-        let mut eigs = Vec::with_capacity(n);
-
-        for m in (1..n).rev() {
-
-            while abs(h[[m, m - 1]]) > eps && curr_iters < max_iters {
-                curr_iters += 1;
-
-                let new_shift = h[[m, m]];
-                let (q, r) = (h - &id * new_shift).qr_decomp();
-                h = r * &q + &id * new_shift;
-
-            }
-
-            eigs.push(h[[m, m]]);
-
-            let upper_block_indices = &(0..m).collect::<Vec<usize>>()[..];
-            h = h.select(upper_block_indices, upper_block_indices);
-
-            id = Matrix::<T>::identity(m);
-
-            curr_iters = 0;
-        }
-
-        eigs.push(h[[0, 0]]);
-        eigs.shrink_to_fit();
-
-        eigs
-    }
-
-    /// Eigen decomposition of a square matrix.
-    ///
-    /// Returns a Vec of eigen values, and the eigen vectors.
-    ///
-    /// NOTE: This method currently does not return the eigenvector matrix correctly.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// 
-    /// let a = Matrix::new(3,3,vec![3.,2.,4.,2.,0.,2.,4.,2.,3.]);
-    ///
-    /// let a = Matrix::new(4,4, (1..17).map(|v| v as f64).collect::<Vec<f64>>());
-    /// let (e, _) = a.eigendecomp();
-    /// println!("{:?}", e);
-    /// assert!(false);
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// - The matrix is not square.
-    pub fn eigendecomp(&self) -> (Vec<T>, Matrix<T>) {
-        let n = self.rows();
-        assert!(n == self.cols(), "Matrix must be square for eigendecomp.");
-
-        let mut h = self.upper_hessenberg();
 
         let mut p = n - 1;
 
@@ -522,7 +457,149 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
             }
         }
 
-        (h.diag().into_vec(), Matrix::<T>::new(0, 0, Vec::new()))
+        h.diag().into_vec()
+    }
+
+    /// Eigen decomposition of a square matrix.
+    ///
+    /// Returns a Vec of eigenvalues, and a matrix with eigenvectors as the columns.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// 
+    /// let a = Matrix::new(3,3,vec![3.,2.,4.,2.,0.,2.,4.,2.,3.]);
+    ///
+    /// //let a = Matrix::new(4,4, (1..17).map(|v| v as f64).collect::<Vec<f64>>());
+    /// let (e, m) = a.eigendecomp();
+    /// println!("{:?}", e);
+    /// println!("{:?}", m.data());
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// - The matrix is not square.
+    pub fn eigendecomp(&self) -> (Vec<T>, Matrix<T>) {
+        let n = self.rows();
+        assert!(n == self.cols(), "Matrix must be square for eigendecomp.");
+
+        let (u, mut h) = self.upper_hess_decomp();
+        h.balance_matrix();
+        let mut transformation = Matrix::identity(n);
+
+        let mut p = n - 1;
+
+        let eps = cast::<f64, T>(1e-20).unwrap();
+
+        while p > 1 {
+            let q = p - 1;
+            let s = h[[q, q]] + h[[p, p]];
+            let t = h[[q, q]] * h[[p, p]] - h[[q, p]] * h[[p, q]];
+
+            let mut x = h[[0, 0]] * h[[0, 0]] + h[[0, 1]] * h[[1, 0]] - h[[0, 0]] * s + t;
+            let mut y = h[[1, 0]] * (h[[0, 0]] + h[[1, 1]] - s);
+            let mut z = h[[1, 0]] * h[[2, 1]];
+
+            for k in 0..p - 1 {
+                let r = cmp::max(1, k) - 1;
+
+                let householder = Matrix::make_householder(Matrix::new(3, 1, vec![x, y, z]));
+
+                // Apply householder transformation to block (on the left)
+                let h_block = h.select(&[k, k + 1, k + 2], &(r..n).collect::<Vec<usize>>());
+                let reduc_block = &householder * h_block;
+
+                // Reassign the block
+                for i in k..k + 3 {
+                    for j in r..n {
+                        h.data[i * h.cols + j] = reduc_block.data[(i - k) * reduc_block.cols() + j -
+                                                                  r];
+                    }
+                }
+
+                let r = cmp::min(k + 4, p + 1);
+
+                // Apply householder transformation to the block (on the right)
+                let h_block = h.select(&(0..r).collect::<Vec<usize>>(), &[k, k + 1, k + 2]);
+                let reduc_block = h_block * householder.transpose();
+
+                // Reassign the block
+                for i in 0..r {
+                    for j in k..k + 3 {
+                        h.data[i * h.cols + j] = reduc_block.data[i * reduc_block.cols + j - k];
+                    }
+                }
+
+                // Update the transformation matrix
+                let trans_block = transformation.select(&(0..n).collect::<Vec<usize>>(), &[k, k+1, k+2]);
+                let reduc_block = trans_block * householder.transpose();
+
+                // Reassign the trans block
+                for i in 0..n {
+                    for j in k..k+3 {
+                        transformation.data[i*transformation.cols + j] = reduc_block.data[i*reduc_block.cols + j - k];
+                    }
+                }
+
+                x = h[[k + 1, k]];
+                y = h[[k + 2, k]];
+
+                if k < p - 2 {
+                    z = h[[k + 3, k]];
+                }
+            }
+
+            let (c, s) = Matrix::givens_rot(x, y);
+            let givens_mat = Matrix::new(2, 2, vec![c, -s, s, c]);
+
+            // Apply Givens rotation to the block (on the left)
+            let h_block = h.select(&(q..p + 1).collect::<Vec<usize>>(),
+                                   &(p - 2..n).collect::<Vec<usize>>());
+            let reduc_block = &givens_mat * h_block;
+
+            // Reassign the block
+            for i in q..p + 1 {
+                for j in p - 2..n {
+                    h.data[i * h.cols + j] = reduc_block.data[(i - q) * reduc_block.cols + j -
+                                                              (p - 2)];
+                }
+            }
+
+            // Apply Givens rotation to block (on the right)
+            let h_block = h.select(&(0..p).collect::<Vec<usize>>(),
+                                   &(p - 1..p + 1).collect::<Vec<usize>>());
+            let reduc_block = h_block * givens_mat.transpose();
+
+            // Reassign the block
+            for i in 1..p {
+                for j in p - 1..p + 1 {
+                    h.data[i * h.cols + j] = reduc_block.data[i * reduc_block.cols + j - (p - 1)];
+                }
+            }
+
+            // Update the transformation matrix
+            let trans_block = transformation.select(&(0..n).collect::<Vec<usize>>(), &[p-1, p]);
+            let reduc_block = trans_block * givens_mat.transpose();
+
+            // Reassign the trans block
+            for i in 0..n {
+                for j in p-1..p+1 {
+                    transformation.data[i*transformation.cols + j] = reduc_block.data[i*reduc_block.cols + j - (p-1)];
+                }
+            }
+
+            // Check for convergence
+            if abs(h[[p, q]]) < eps * (abs(h[[q, q]]) + abs(h[[p, p]])) {
+                h.data[p * h.cols + q] = T::zero();
+                p = p - 1;
+            } else if abs(h[[p - 1, q - 1]]) < eps * (abs(h[[q - 1, q - 1]]) + abs(h[[q, q]])) {
+                h.data[(p - 1) * h.cols + q - 1] = T::zero();
+                p = p - 2;
+            }
+        }
+
+        (h.diag().into_vec(), u * transformation)
     }
 }
 
