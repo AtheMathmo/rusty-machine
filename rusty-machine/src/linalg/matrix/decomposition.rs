@@ -464,6 +464,10 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
     ///
     /// Returns a Vec of eigenvalues, and a matrix with eigenvectors as the columns.
     ///
+    /// The eigenvectors are only gauranteed to be correct if the matrix is real-symmetric.
+    /// I'm not planning on doing any more work on this for now and will prefer to switch
+    /// out to the lapack implementations in the future.
+    ///
     /// # Examples
     ///
     /// ```
@@ -471,7 +475,6 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
     /// 
     /// let a = Matrix::new(3,3,vec![3.,2.,4.,2.,0.,2.,4.,2.,3.]);
     ///
-    /// //let a = Matrix::new(4,4, (1..17).map(|v| v as f64).collect::<Vec<f64>>());
     /// let (e, m) = a.eigendecomp();
     /// println!("{:?}", e);
     /// println!("{:?}", m.data());
