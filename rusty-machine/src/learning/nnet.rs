@@ -104,18 +104,13 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
     fn create_weights(layer_sizes: &[usize]) -> Vec<f64> {
         let total_layers = layer_sizes.len();
 
-        let mut capacity = 0usize;
+        let mut layers = Vec::new();
 
-        for l in 0..total_layers - 1 {
-            capacity += (layer_sizes[l] + 1) * layer_sizes[l + 1]
-        }
-
-        let mut layers = Vec::with_capacity(capacity);
-
-        for l in 0..total_layers - 1 {
-            layers.append(&mut NeuralNet::<T>::initialize_weights(layer_sizes[l] + 1,
+        for (l, item) in layer_sizes.iter().enumerate().take(total_layers - 1) {
+            layers.append(&mut NeuralNet::<T>::initialize_weights(item + 1,
                                                              layer_sizes[l + 1]));
         }
+        layers.shrink_to_fit();
 
         layers
     }
@@ -270,8 +265,8 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         let mut grad = Vec::with_capacity(self.layer_sizes.len() - 1);
         let mut capacity = 0;
 
-        for l in 0..self.layer_sizes.len() - 1 {
-            let g = deltas[self.layer_sizes.len() - 2 - l].transpose() * activations[l].clone();
+        for (l, activ_item) in activations.iter().enumerate().take(self.layer_sizes.len() - 1) {
+            let g = deltas[self.layer_sizes.len() - 2 - l].transpose() * activ_item;
             capacity += g.cols() * g.rows();
             grad.push(g / (inputs.rows() as f64));
         }
@@ -279,7 +274,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         let mut gradients = Vec::with_capacity(capacity);
 
         for g in grad {
-            gradients.append(&mut g.data().clone());
+            gradients.append(&mut g.into_vec());
         }
         (self.criterion.cost(&activations[activations.len() - 1], targets), gradients)
     }

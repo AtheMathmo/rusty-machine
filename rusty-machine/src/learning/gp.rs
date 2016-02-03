@@ -244,8 +244,8 @@ fn solve_l_triangular(mat: &Matrix<f64>, y: &Vector<f64>) -> Vector<f64> {
 
     for i in 1..y.size() {
         let mut holding_l_sum = 0.;
-        for j in 0..i {
-            holding_l_sum += mat.data()[i * mat.cols() + j] * x[j];
+        for (j, x_item) in x.iter().enumerate().take(i) {
+            holding_l_sum += mat.data()[i * mat.cols() + j] * x_item;
         }
 
         x[i] = (y[i] - holding_l_sum) / mat.data()[i * (mat.cols() + 1)];

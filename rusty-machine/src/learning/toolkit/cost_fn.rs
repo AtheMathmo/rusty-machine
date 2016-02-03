@@ -40,6 +40,21 @@ impl CostFunc<Matrix<f64>> for MeanSqError {
 	}
 }
 
+impl CostFunc<Vector<f64>> for MeanSqError {
+	fn cost(outputs: &Vector<f64>, targets: &Vector<f64>) -> f64 {
+		let diff = outputs - targets;
+		let sq_diff = &diff.elemul(&diff);
+
+		let n = diff.size();
+
+		sq_diff.sum() / (2f64 * (n as f64))
+	}
+
+	fn grad_cost(outputs: &Vector<f64>, targets: &Vector<f64>) -> Vector<f64> {
+		outputs - targets
+	}
+}
+
 /// The cross entropy error cost function.
 pub struct CrossEntropyError;
 
