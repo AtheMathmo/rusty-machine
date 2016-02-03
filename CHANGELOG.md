@@ -4,7 +4,7 @@ This document will be used to keep track of changes made between release version
 
 ---
 
-## 0.1.6 (Unreleased)
+## 0.1.6
 
 ### Breaking Changes
 
@@ -14,6 +14,7 @@ This document will be used to keep track of changes made between release version
 
 - Added a `select` method for cloning a block from a matrix.
 - Implemented QR decomposition, and eigenvalue decomposition.
+- Implemented eigendecomp (though only works definitely for real-symmetric matrices).
 
 ### Minor Changes
 

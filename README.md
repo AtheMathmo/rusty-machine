@@ -1,6 +1,6 @@
 # rusty-machine
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.1.5](https://crates.io/crates/rusty-machine/0.1.5).
+Here is the API documentation for the rust crate. Currently up to date for [version 0.1.6](https://crates.io/crates/rusty-machine/0.1.6).
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
@@ -63,7 +63,7 @@ There is now a first pass at the linear algebra library and some basic machine l
 
 ## Usage
 
-The library usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state (0.1.1 as of writing) and intended usage.
+The library usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state and intended usage.
 
 ### Installation
 
@@ -84,7 +84,7 @@ The library consists of two core components. The linear algebra module and the l
 
 #### Linalg
 
-The linear algebra module contains the Matrix and Vector data structures and related methods - such as LUP decomposition. Usage looks like this:
+The linear algebra module contains the Matrix and Vector data structures and related methods - such as matrix decomposition. Usage looks like this:
 
 ```
 extern crate rusty_machine as rm;
@@ -102,6 +102,14 @@ More detailed coverage can be found in the [API documentation](https://AtheMathm
 
 #### Learning
 
-The learning module contains machine learning models. Currently this only includes a simple Linear Regression model, k-means clustering and feed forward neural networks.
+The learning module contains machine learning models. The machine learning implementations are designed with customizability in mind. This means you can control the optimization algorithms but still retain the ease of using default values. This is an area I am actively trying to improve on!
+
+The current algorithms included are:
+
+- Linear Regression
+- K-Means Clustering
+- Logistic Regression
+- Feed forward neural networks
+- Gaussian Proces regression
 
 ---
