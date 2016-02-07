@@ -7,8 +7,8 @@ Contributing can take place in many forms, including but not limited to:
 - [Bug Reports](#bug-reports)
 - [Feature Requests](#feature-requests)
 - [Pull Requests](#pull-requests)
-	- [Interested (but confused)?](#interested-but-confused?)
-	- [How can I test this?](#how-can-i-test-out-this-project?)
+	- [Interested (but confused)?](#interested-but-confused)
+	- [How can I test this?](#how-can-i-test-out-this-project)
 
 Bug Reports and Feature Requests are easy and the project is happily accepting them now. Please fire away!
 
