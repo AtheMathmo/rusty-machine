@@ -20,9 +20,9 @@ So this project is now going to be a machine learning crate for Rust. I began th
 
 #### Contributing
 
-I don't have a dedicated page for contributions right now as the project is still very small. Please feel free to fork, file issues, PRs and all that jazz.
+This project is currently looking for contributors of all capacities!
 
-Additionally I'll start labelling simple issues as `easy`. These may be a good starting point if you want to jump aboard!
+I have now created a dedicated page for [contributing](CONTRIBUTING.md). If you're interested please take a look.
 
 #### Help!
 
