@@ -172,6 +172,7 @@ pub mod learning {
 }
 
 #[cfg(feature = "stats")]
+/// Module for computational statistics
 pub mod stats {
 
     /// Module for statistical distributions.

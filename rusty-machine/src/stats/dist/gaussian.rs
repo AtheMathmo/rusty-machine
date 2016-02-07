@@ -18,8 +18,13 @@ pub struct Gaussian {
 }
 
 impl Default for Gaussian {
+    /// Constructs a Standard Normal random variable.
     fn default() -> Gaussian {
-        Gaussian{mean: 0f64, variance: 1f64, _std_dev: 1f64}
+        Gaussian {
+            mean: 0f64,
+            variance: 1f64,
+            _std_dev: 1f64,
+        }
     }
 }
 
@@ -46,18 +51,82 @@ impl Gaussian {
 }
 
 impl Distribution<f64> for Gaussian {
+
+    /// The pdf of the normal distribution
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::stats::dist::Gaussian;
+    /// use rusty_machine::stats::dist::Distribution;
+    /// use rusty_machine::stats::dist::consts;
+    ///
+    /// let gauss = Gaussian::default();
+    ///
+    /// let lpdf_zero = gauss.pdf(0f64);
+    ///
+    /// // The value should be very close to 1/sqrt(2 * pi)
+    /// assert!((lpdf_zero - (1f64/consts::SQRT_2_PI).abs()) < 1e-20); 
+    /// ```
     fn pdf(&self, x: f64) -> f64 {
         (-(x - self.mean) * (x - self.mean) / (2.0 * self.variance)).exp() /
         (stat_consts::SQRT_2_PI * self._std_dev)
     }
 
+    /// The log pdf of the normal distribution.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::stats::dist::Gaussian;
+    /// use rusty_machine::stats::dist::Distribution;
+    /// use rusty_machine::stats::dist::consts;
+    ///
+    /// let gauss = Gaussian::default();
+    ///
+    /// let lpdf_zero = gauss.logpdf(0f64);
+    ///
+    /// // The value should be very close to -0.5*Ln(2 * pi)
+    /// assert!((lpdf_zero + 0.5*consts::LN_2_PI).abs() < 1e-20); 
+    /// ```
     fn logpdf(&self, x: f64) -> f64 {
         -self._std_dev.ln() - (stat_consts::LN_2_PI / 2.0) -
         ((x - self.mean) * (x - self.mean) / (2.0 * self.variance))
     }
 
+    /// Rough estimate for the cdf of the gaussian distribution.
+    /// Accurate to 0.003.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::stats::dist::Gaussian;
+    /// use rusty_machine::stats::dist::Distribution;
+    ///
+    /// let gauss = Gaussian::new(10f64, 5f64);
+    /// let cdf_mid = gauss.cdf(10f64);
+    ///
+    /// assert!((0.5 - cdf_mid).abs() < 0.004);
+    /// ```
+    ///
+    /// A slightly more involved test:
+    ///
+    /// ```
+    /// use rusty_machine::stats::dist::Gaussian;
+    /// use rusty_machine::stats::dist::Distribution;
+    ///
+    /// let gauss = Gaussian::new(10f64, 4f64);
+    /// let cdf = gauss.cdf(9f64);
+    ///
+    /// assert!((0.5*(1f64 - 0.382924922548) - cdf).abs() < 0.004);
+    /// ```
     fn cdf(&self, x: f64) -> f64 {
-        0.5 * (1f64 + x.signum()*(1f64 - (-float_consts::FRAC_2_PI*x*x).exp()).sqrt())
+        0.5 *
+        (1f64 +
+         (x - self.mean).signum() *
+         (1f64 -
+          (-float_consts::FRAC_2_PI * (x - self.mean) * (x - self.mean) / self.variance).exp())
+             .sqrt())
     }
 }
 

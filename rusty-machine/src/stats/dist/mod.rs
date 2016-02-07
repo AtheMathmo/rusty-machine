@@ -1,6 +1,9 @@
 pub mod exponential;
 pub mod gaussian;
 
+pub use self::gaussian::Gaussian;
+pub use self::exponential::Exponential;
+
 pub mod consts {
     pub const SQRT_2_PI: f64 = 2.50662827463100050241576528481104525_f64;
     pub const LN_2_PI: f64 = 1.83787706640934548356065947281123527_f64;
@@ -21,6 +24,4 @@ pub trait Distribution<T> {
 
     /// The cdf of the distribution.
     fn cdf(&self, x: T) -> f64;
-        }
-
-        
+}
