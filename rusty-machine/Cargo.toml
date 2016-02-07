@@ -10,6 +10,8 @@ keywords = ["machine","learning","stats","statistics","algebra"]
 readme = "../README.md"
 license = "MIT"
 
+[features]
+stats = []
 
 [dependencies]
 num = {version = "0.1.*", default-features = false }

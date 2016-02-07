@@ -50,7 +50,6 @@ pub struct NeuralNet<'a, T: Criterion> {
 }
 
 impl<'a> NeuralNet<'a, BCECriterion> {
-
     /// Creates a neural network with the specified layer sizes.
     ///
     /// Uses the default settings (gradient descent and sigmoid activation function).
@@ -185,30 +184,33 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         self.get_layer_weights(&self.weights[..], idx)
     }
 
-    /*
-    /// Get the matrix of weights without the bias terms.
-    fn get_regular_weights(&self, weights: &[f64]) -> Vec<f64> {
-        let mut reg_weights = Vec::new();
-
-        // Check that the weights are the right size.
-        let mut start = 0usize;
-        for l in 0..self.layer_sizes.len() - 1 {
-
-            for i in 0..self.layer_sizes[l] {
-                for j in 0..self.layer_sizes[l + 1] {
-                    reg_weights.push(weights[start + j*(1+self.layer_sizes[l]) + 1 + i] )
-                }
-            }
-
-            start += (self.layer_sizes[l]+1) * self.layer_sizes[l + 1];
-        }
-
-        reg_weights
-    }
-    */
+    // Get the matrix of weights without the bias terms.
+    // fn get_regular_weights(&self, weights: &[f64]) -> Vec<f64> {
+    // let mut reg_weights = Vec::new();
+    //
+    // Check that the weights are the right size.
+    // let mut start = 0usize;
+    // for l in 0..self.layer_sizes.len() - 1 {
+    //
+    // for i in 0..self.layer_sizes[l] {
+    // for j in 0..self.layer_sizes[l + 1] {
+    // reg_weights.push(weights[start + j*(1+self.layer_sizes[l]) + 1 + i] )
+    // }
+    // }
+    //
+    // start += (self.layer_sizes[l]+1) * self.layer_sizes[l + 1];
+    // }
+    //
+    // reg_weights
+    // }
+    //
 
     /// Compute the gradient using the back propagation algorithm.
-    fn compute_grad(&self, weights: &[f64], inputs: &Matrix<f64>, targets: &Matrix<f64>) -> (f64, Vec<f64>) {
+    fn compute_grad(&self,
+                    weights: &[f64],
+                    inputs: &Matrix<f64>,
+                    targets: &Matrix<f64>)
+                    -> (f64, Vec<f64>) {
         assert_eq!(inputs.cols(), self.layer_sizes[0]);
 
         let mut forward_weights = Vec::with_capacity(self.layer_sizes.len() - 1);
@@ -244,7 +246,9 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
             let g = self.criterion.grad_activ(z);
 
             // Take GRAD_cost to compute this delta.
-            let mut delta = self.criterion.cost_grad(&activations[self.layer_sizes.len() - 1], targets).elemul(&g);
+            let mut delta = self.criterion
+                                .cost_grad(&activations[self.layer_sizes.len() - 1], targets)
+                                .elemul(&g);
 
             deltas.push(delta.clone());
 
@@ -276,7 +280,8 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         for g in grad {
             gradients.append(&mut g.into_vec());
         }
-        (self.criterion.cost(&activations[activations.len() - 1], targets), gradients)
+        (self.criterion.cost(&activations[activations.len() - 1], targets),
+         gradients)
     }
 
     /// Forward propagation of the model weights to get the outputs.
@@ -304,7 +309,11 @@ impl<'a, T: Criterion> Optimizable for NeuralNet<'a, T> {
 	type Targets = Matrix<f64>;
 
     /// Compute the gradient of the neural network.
-    fn compute_grad(&self, params: &[f64], inputs: &Matrix<f64>, targets: &Matrix<f64>) -> (f64, Vec<f64>) {
+    fn compute_grad(&self,
+                    params: &[f64],
+                    inputs: &Matrix<f64>,
+                    targets: &Matrix<f64>)
+                    -> (f64, Vec<f64>) {
         self.compute_grad(params, inputs, targets)
     }
 }

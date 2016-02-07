@@ -55,7 +55,12 @@ impl GradientDesc {
 }
 
 impl<M: Optimizable> OptimAlgorithm<M> for GradientDesc {
-    fn optimize(&self, model: &M, start: &[f64], inputs: &M::Inputs, targets: &M::Targets) -> Vec<f64> {
+    fn optimize(&self,
+                model: &M,
+                start: &[f64],
+                inputs: &M::Inputs,
+                targets: &M::Targets)
+                -> Vec<f64> {
 
         let mut optimizing_val = Vector::new(start.to_vec());
 
@@ -119,6 +124,7 @@ impl StochasticGD {
 }
 
 impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm<M> for StochasticGD {
+
     fn optimize(&self, model: &M, start: &[f64], inputs: &M::Inputs, targets: &M::Targets) -> Vec<f64> {
 
         let (_, vec_data) = model.compute_grad(start,
