@@ -11,6 +11,13 @@ use rand::distributions::normal::StandardNormal;
 use super::consts as stat_consts;
 use std::f64::consts as float_consts;
 
+/// A Gaussian random variable.
+///
+/// This struct stores both the variance and the standard deviation.
+/// This is to minimize the computation required for computing
+/// the distribution functions and sampling.
+///
+/// It is most efficient to construct the struct using the `from_std_dev` constructor.
 pub struct Gaussian {
     mean: f64,
     variance: f64,

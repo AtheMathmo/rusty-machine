@@ -9,11 +9,21 @@ use rand::Rng;
 use rand::distributions::{Sample, IndependentSample};
 use rand::distributions::exponential::Exp1;
 
+/// An Exponential random variable.
 pub struct Exponential {
     lambda: f64,
 }
 
+impl Default for Exponential {
+    /// Construct a new Exponential random variable
+    /// with a rate of 1.
+    fn default() -> Exponential {
+        Exponential { lambda: 1f64 }
+    }
+}
 impl Exponential {
+    /// Constructs a new Exponential random variable with given
+    /// lambda parameter.
     pub fn new(lambda: f64) -> Exponential {
         Exponential { lambda: lambda }
     }
