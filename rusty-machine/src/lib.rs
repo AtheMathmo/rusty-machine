@@ -173,30 +173,7 @@ pub mod learning {
 
 #[cfg(feature = "stats")]
 pub mod stats {
-    pub use rand::Rand;
-    pub use rand::distributions::Sample;
 
     /// Module for statistical distributions.
-    pub mod dist {
-
-        /// Trait for statistical distributions.
-        pub trait Distribution<T> {
-            /// The pdf of the distribution.
-            fn pdf(&self, x: T) -> f64;
-
-            /// The logpdf of the distribution.
-            ///
-            /// By default this takes the logarithm of the pdf.
-            /// More efficient functions should be implemented.
-            fn logpdf(&self, x: T) -> f64 {
-                self.pdf(x).ln()
-            }
-
-            /// The cdf of the distribution.
-            fn cdf(&self, x: T) -> f64;
-        }
-
-        pub mod exponential;
-        pub mod gaussian;
-    }
+    pub mod dist;
 }

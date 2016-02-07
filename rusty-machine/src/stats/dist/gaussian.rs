@@ -8,7 +8,8 @@ use stats::dist::Distribution;
 use rand::Rng;
 use rand::distributions::{Sample, IndependentSample};
 use rand::distributions::normal::StandardNormal;
-use super::consts;
+use super::consts as stat_consts;
+use std::f64::consts as float_consts;
 
 pub struct Gaussian {
     mean: f64,
@@ -18,7 +19,7 @@ pub struct Gaussian {
 
 impl Default for Gaussian {
     fn default() -> Gaussian {
-        Gaussian(0f64, 1f64, 1f64)
+        Gaussian{mean: 0f64, variance: 1f64, _std_dev: 1f64}
     }
 }
 
@@ -47,16 +48,16 @@ impl Gaussian {
 impl Distribution<f64> for Gaussian {
     fn pdf(&self, x: f64) -> f64 {
         (-(x - self.mean) * (x - self.mean) / (2.0 * self.variance)).exp() /
-        (consts::SQRT_2_PI * self._std_dev)
+        (stat_consts::SQRT_2_PI * self._std_dev)
     }
 
     fn logpdf(&self, x: f64) -> f64 {
-        -self._std_dev.log() - (consts::LN_2_PI/2.0) -
+        -self._std_dev.ln() - (stat_consts::LN_2_PI / 2.0) -
         ((x - self.mean) * (x - self.mean) / (2.0 * self.variance))
     }
 
     fn cdf(&self, x: f64) -> f64 {
-        unimplemented!();
+        0.5 * (1f64 + x.signum()*(1f64 - (-float_consts::FRAC_2_PI*x*x).exp()).sqrt())
     }
 }
 
