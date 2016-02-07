@@ -151,8 +151,6 @@ impl Optimizable for LogisticRegressor {
         let cost = CrossEntropyError::cost(&outputs, targets);
         let grad = (inputs.transpose() * (outputs - targets)) / (inputs.rows() as f64);
 
-        println!("Cost is {0}", cost);
-
         (cost, grad.into_vec())
     }
 }
