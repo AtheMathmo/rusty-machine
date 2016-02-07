@@ -125,8 +125,8 @@
 <span class='doccomment'>//! This module contains a number of structs implementing the ActivationFunc trait.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! These structs are used within Neural Networks and</span>
-<span class='doccomment'>//! Generalized Linear Regression (not yet implemented). </span>
-<span class='doccomment'>//! </span>
+<span class='doccomment'>//! Generalized Linear Regression (not yet implemented).</span>
+<span class='doccomment'>//!</span>
 <span class='doccomment'>//! You can also create your own custom activation Functions for use in your models.</span>
 <span class='doccomment'>//! Just create a unit struct implementing the ActivationFunc trait.</span>
 
@@ -161,7 +161,7 @@
     }
 
     <span class='kw'>fn</span> <span class='ident'>func_inv</span>(<span class='ident'>x</span>: <span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span> {
-        (<span class='ident'>x</span> <span class='op'>/</span> (<span class='number'>1f64</span><span class='op'>-</span><span class='ident'>x</span>)).<span class='ident'>ln</span>()
+        (<span class='ident'>x</span> <span class='op'>/</span> (<span class='number'>1f64</span> <span class='op'>-</span> <span class='ident'>x</span>)).<span class='ident'>ln</span>()
     }
 }
 
@@ -177,7 +177,7 @@
         <span class='number'>1f64</span>
     }
 
-    <span class='kw'>fn</span> <span class='ident'>func_inv</span>(<span class='ident'>x</span>:<span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span> {
+    <span class='kw'>fn</span> <span class='ident'>func_inv</span>(<span class='ident'>x</span>: <span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span> {
         <span class='ident'>x</span>
     }
 }
@@ -197,7 +197,8 @@
     <span class='kw'>fn</span> <span class='ident'>func_inv</span>(<span class='ident'>x</span>: <span class='ident'>f64</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span> {
         <span class='ident'>x</span>.<span class='ident'>ln</span>()
     }
-}</pre>
+}
+</pre>
 </section>
     <section id='search' class="content hidden"></section>
 

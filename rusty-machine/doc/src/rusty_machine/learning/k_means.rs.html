@@ -429,8 +429,7 @@
     <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>centroids</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>centroids</span> {
             <span class='kw'>return</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='ident'>centroids</span>, <span class='ident'>inputs</span>).<span class='number'>0</span>;
-        }
-        <span class='kw'>else</span> {
+        } <span class='kw'>else</span> {
             <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Model has not been trained.&quot;</span>);
         }
     }
@@ -442,15 +441,15 @@
         <span class='kw'>let</span> <span class='ident'>eps</span> <span class='op'>=</span> <span class='number'>1e-14</span>;
 
         <span class='kw'>for</span> <span class='ident'>_i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>iters</span> {
-                <span class='kw'>let</span> (<span class='ident'>idx</span>, <span class='ident'>distances</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>get_closest_centroids</span>(<span class='ident'>inputs</span>);
-                <span class='self'>self</span>.<span class='ident'>update_centroids</span>(<span class='ident'>inputs</span>, <span class='ident'>idx</span>);
+            <span class='kw'>let</span> (<span class='ident'>idx</span>, <span class='ident'>distances</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>get_closest_centroids</span>(<span class='ident'>inputs</span>);
+            <span class='self'>self</span>.<span class='ident'>update_centroids</span>(<span class='ident'>inputs</span>, <span class='ident'>idx</span>);
 
                 <span class='kw'>let</span> <span class='ident'>cost_i</span> <span class='op'>=</span> <span class='ident'>distances</span>.<span class='ident'>sum</span>();
                 <span class='kw'>if</span> <span class='ident'>abs</span>(<span class='ident'>cost</span> <span class='op'>-</span> <span class='ident'>cost_i</span>) <span class='op'>&lt;</span> <span class='ident'>eps</span> {
                     <span class='kw'>break</span>;
                 }
 
-                <span class='ident'>cost</span> <span class='op'>=</span> <span class='ident'>cost_i</span>;
+            <span class='ident'>cost</span> <span class='op'>=</span> <span class='ident'>cost_i</span>;
         }
     }
 }
@@ -518,8 +517,7 @@
     <span class='kw'>fn</span> <span class='ident'>get_closest_centroids</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> (<span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>, <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>c</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>centroids</span> {
             <span class='kw'>return</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='kw-2'>&amp;</span><span class='ident'>c</span>, <span class='ident'>inputs</span>);
-        }
-        <span class='kw'>else</span> {
+        } <span class='kw'>else</span> {
             <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Centroids not correctly initialized.&quot;</span>);
         }
     }
@@ -528,7 +526,9 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Used internally within model.</span>
     <span class='doccomment'>/// Returns the index of the closest centroid and the distance to it.</span>
-    <span class='kw'>fn</span> <span class='ident'>find_closest_centroids</span>(<span class='ident'>centroids</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> (<span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>, <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
+    <span class='kw'>fn</span> <span class='ident'>find_closest_centroids</span>(<span class='ident'>centroids</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>,
+                              <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>)
+                              <span class='op'>-&gt;</span> (<span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>, <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>idx</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>inputs</span>.<span class='ident'>rows</span>());
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>distances</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>inputs</span>.<span class='ident'>rows</span>());
 
@@ -638,7 +638,7 @@
     <span class='kw'>let</span> <span class='ident'>rand</span> <span class='op'>=</span> <span class='ident'>thread_rng</span>().<span class='ident'>gen_range</span>(<span class='number'>0.0f64</span>, <span class='ident'>sum</span>);
 
     <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>tempsum</span> <span class='op'>=</span> <span class='number'>0.0</span>;
-    <span class='kw'>for</span> (<span class='ident'>i</span>,<span class='ident'>p</span>) <span class='kw'>in</span> <span class='ident'>unnorm_dist</span>.<span class='ident'>data</span>().<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
+    <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>p</span>) <span class='kw'>in</span> <span class='ident'>unnorm_dist</span>.<span class='ident'>data</span>().<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
         <span class='ident'>tempsum</span> <span class='op'>+=</span> <span class='op'>*</span><span class='ident'>p</span>;
 
         <span class='kw'>if</span> <span class='ident'>rand</span> <span class='op'>&lt;</span> <span class='ident'>tempsum</span> {
