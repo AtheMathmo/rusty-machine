@@ -1,14 +1,43 @@
 //! Linear Regression module
 //!
-//! Contains implementation of linear regression models.
-//! Allows training and prediction of linear regression model
-//! using least squares optimization.
+//! Contains implemention of linear regression using
+//! OLS and gradient descent optimization.
 //!
-//! Currently only OLS solution - gradient descent not yet implemented.
+//! The regressor will automatically add the intercept term
+//! so you do not need to format the input matrices yourself.
+//!
+//! # Usage
+//!
+//! ```
+//! use rusty_machine::learning::lin_reg::LinRegressor;
+//! use rusty_machine::learning::SupModel;
+//! use rusty_machine::linalg::matrix::Matrix;
+//! use rusty_machine::linalg::vector::Vector;
+//!
+//! let inputs = Matrix::new(4,1,vec![1.0,3.0,5.0,7.0]);
+//! let targets = Vector::new(vec![1.,5.,9.,13.]);
+//!
+//! let mut lin_mod = LinRegressor::default();
+//! 
+//! // Train the model
+//! lin_mod.train(&inputs, &targets);
+//!
+//! // Now we'll predict a new point
+//! let new_point = Matrix::new(1,1,vec![10.]);
+//! let output = lin_mod.predict(&new_point);
+//!
+//! // Hopefully we classified our new point correctly!
+//! assert!(output[0] > 17f64, "Our regressor isn't very good!");
+//! ```
 
 use learning::SupModel;
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
+use learning::toolkit::cost_fn::CostFunc;
+use learning::toolkit::cost_fn::MeanSqError;
+use learning::optim::grad_desc::GradientDesc;
+use learning::optim::OptimAlgorithm;
+use learning::optim::Optimizable;
 
 /// Linear Regression Model.
 ///
@@ -16,6 +45,25 @@ use linalg::vector::Vector;
 pub struct LinRegressor {
     /// The parameters for the regression model.
     parameters: Option<Vector<f64>>,
+}
+
+impl Default for LinRegressor {
+    fn default() -> LinRegressor {
+        LinRegressor { parameters: None }
+    }
+}
+
+impl LinRegressor {
+
+    /// Get the parameters from the model.
+    ///
+    /// Returns an option that is None if the model has not been trained.
+    pub fn parameters(&self) -> Option<Vector<f64>> {
+        match self.parameters {
+            None => None,
+            Some(ref x) => Some(x.clone()),
+        }
+    }
 }
 
 impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
@@ -31,50 +79,63 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
     /// use rusty_machine::linalg::vector::Vector;
     /// use rusty_machine::learning::SupModel;
     ///
-    /// let mut lin_mod = LinRegressor::new();
-    /// let inputs = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
+    /// let mut lin_mod = LinRegressor::default();
+    /// let inputs = Matrix::new(3,1, vec![2.0, 3.0, 4.0]);
     /// let targets = Vector::new(vec![5.0, 6.0, 7.0]);
     ///
     /// lin_mod.train(&inputs, &targets);
     /// ```
     fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) {
-        let xt = inputs.transpose();
+        let ones = Matrix::<f64>::ones(inputs.rows(), 1);
+        let full_inputs = ones.hcat(inputs);
 
-        self.parameters = Some(((&xt * inputs).inverse() * &xt) * targets);
+        let xt = full_inputs.transpose();
+
+        self.parameters = Some(((&xt * full_inputs).inverse() * &xt) * targets);
     }
 
     /// Predict output value from input data.
     ///
     /// Model must be trained before prediction can be made.
     fn predict(&self, inputs: &Matrix<f64>) -> Vector<f64> {
-        match self.parameters {
-            Some(ref v) => inputs * v,
-            None => panic!("Model has not been trained."),
+        if let Some(ref v) = self.parameters {
+            let ones = Matrix::<f64>::ones(inputs.rows(), 1);
+            let full_inputs = ones.hcat(inputs);
+            full_inputs * v
+        }
+        else {
+            panic!("Model has not been trained.");
         }
     }
 }
 
-impl LinRegressor {
-    /// Constructs untrained linear regression model.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::learning::lin_reg::LinRegressor;
-    ///
-    /// let mut lin_mod = LinRegressor::new();
-    /// ```
-    pub fn new() -> LinRegressor {
-        LinRegressor { parameters: None }
-    }
+impl Optimizable for LinRegressor {
+    type Inputs = Matrix<f64>;
+    type Targets = Vector<f64>;
 
-    /// Get the parameters from the model.
-    ///
-    /// Returns an option that is None if the model has not been trained.
-    pub fn parameters(&self) -> Option<Vector<f64>> {
-        match self.parameters {
-            None => None,
-            Some(ref x) => Some(x.clone()),
-        }
+    fn compute_grad(&self, params: &[f64], inputs: &Matrix<f64>, targets: &Vector<f64>) -> (f64, Vec<f64>) {
+        
+        let beta_vec = Vector::new(params.to_vec());
+        let outputs = inputs * beta_vec;
+
+        let cost = MeanSqError::cost(&outputs, targets);
+        let grad = (inputs.transpose() * (outputs-targets)) / (inputs.rows() as f64);
+
+        (cost, grad.into_vec())
+    }
+}
+
+impl LinRegressor {
+
+    /// Train the linear regressor using Gradient Descent.
+    pub fn train_with_optimization(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) {
+        let ones = Matrix::<f64>::ones(inputs.rows(), 1);
+        let full_inputs = ones.hcat(inputs);
+
+        let initial_params = vec![0.; full_inputs.cols()];
+
+        let gd = GradientDesc::default();
+        let optimal_w = gd.optimize(self, &initial_params[..], &full_inputs, targets);
+        self.parameters = Some(Vector::new(optimal_w));
     }
 }
