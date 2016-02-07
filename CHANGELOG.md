@@ -4,6 +4,23 @@ This document will be used to keep track of changes made between release version
 
 ---
 
+## 0.1.7
+
+### Breaking changes
+
+- None
+
+### Features
+
+- Added the stats module behind the optional feature flag `stats`.
+- `stats` currently includes support for the Exponential and Gaussian distributions.
+
+### Minor Changes
+
+- Some rustfmt code cleanup.
+
+---
+
 ## 0.1.6
 
 ### Breaking Changes

@@ -21,6 +21,7 @@ There is now a first pass at the linear algebra library and some basic machine l
 - K-Means Clustering
 - Neural Networks
 - Gaussian Processes
+- Logistic Regression
 
 I've decided for now to halt optimization efforts. It seems the best course of action is to decide as a community a single linear algebra library to utilize. This should also probably utilize BLAS and LAPACK bindings.
 
@@ -59,6 +60,5 @@ For Coordinate descent I will follow the algorithm defined in [this paper](http:
 
 - Multi-threaded divide and conquer matrix multiplication (currently iterative).
 - Tidy up indexing.
-- Start work on statistics components - R.V. sampling etc.
 - Data Handling.
 - Convolutional and Recurrent neural nets.
