@@ -1,6 +1,6 @@
 [package]
 name = "rusty-machine"
-version = "0.1.6"
+version = "0.1.7"
 authors = ["AtheMathmo"]
 
 description = "A machine learning library."
@@ -10,6 +10,8 @@ keywords = ["machine","learning","stats","statistics","algebra"]
 readme = "../README.md"
 license = "MIT"
 
+[features]
+stats = []
 
 [dependencies]
 num = {version = "0.1.*", default-features = false }

@@ -69,7 +69,12 @@ impl Default for ConjugateGD {
 }
 
 impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
-    fn optimize(&self, model: &M, start: &[f64], inputs: &M::Inputs, targets: &M::Targets) -> Vec<f64> {
+    fn optimize(&self,
+                model: &M,
+                start: &[f64],
+                inputs: &M::Inputs,
+                targets: &M::Targets)
+                -> Vec<f64> {
         let mut i = 0usize;
         let mut ls_failed = false;
 
@@ -87,7 +92,7 @@ impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
 
         let mut x = Vector::new(start.to_vec());
 
-        let (mut f2, mut df2) : (f64, Vector<f64>);
+        let (mut f2, mut df2): (f64, Vector<f64>);
 
         while (i as i32) < length.abs() {
             if length > 0 {
@@ -154,7 +159,7 @@ impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
                     z1 = z1 + z2;
                     x = x + &s * z2;
                     let cost_grad = model.compute_grad(&x.data()[..], inputs, targets);
-                    f2 =  cost_grad.0;
+                    f2 = cost_grad.0;
                     df2 = Vector::new(cost_grad.1);
 
                     m -= 1i32;
@@ -202,7 +207,7 @@ impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
                 x = x + &s * z2;
 
                 let cost_grad = model.compute_grad(&x.data()[..], inputs, targets);
-                f2 =  cost_grad.0;
+                f2 = cost_grad.0;
                 df2 = Vector::new(cost_grad.1);
 
                 m -= 1;

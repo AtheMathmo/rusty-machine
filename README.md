@@ -1,6 +1,6 @@
 # rusty-machine
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.1.6](https://crates.io/crates/rusty-machine/0.1.6).
+Here is the API documentation for the rust crate. Currently up to date for [version 0.1.7](https://crates.io/crates/rusty-machine/0.1.7).
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
@@ -42,7 +42,7 @@ This key motivation behind this project was for me to learn some systems program
 
 ## Current Progress
 
-There is now a first pass at the linear algebra library and some basic machine learning algorithms in place.
+There is now a first pass at the linear algebra library and some machine learning algorithms in place. There is also a `stats` module behind an optional features flag.
 
 ### Matrices
 
