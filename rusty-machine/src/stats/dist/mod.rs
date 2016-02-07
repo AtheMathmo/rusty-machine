@@ -1,4 +1,3 @@
-
 mod ziggurat_tables;
 
 /// Sample a random number using the Ziggurat method (specifically the
@@ -63,4 +62,9 @@ fn ziggurat<R: Rng, P, Z>(
             return x;
         }
     }
+}
+
+pub mod consts {
+    pub const SQRT_2_PI = 2.50662827463100050241576528481104525_f64;
+    pub const LN_2_PI = 1.83787706640934548356065947281123527_f64;
 }

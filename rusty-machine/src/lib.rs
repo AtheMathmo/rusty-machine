@@ -197,5 +197,6 @@ pub mod stats {
         }
 
         pub mod exponential;
+        pub mod gaussian;
     }
 }
