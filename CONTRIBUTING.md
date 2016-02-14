@@ -7,12 +7,14 @@ Contributing can take place in many forms, including but not limited to:
 - [Bug Reports](#bug-reports)
 - [Feature Requests](#feature-requests)
 - [Pull Requests](#pull-requests)
-	- [Interested (but confused)?](#interested-but-confused?)
-	- [How can I test this?](#how-can-i-test-out-this-project?)
+	- [Interested (but confused)?](#interested-but-confused)
+	- [How can I test this?](#how-can-i-test-out-this-project)
 
 Bug Reports and Feature Requests are easy and the project is happily accepting them now. Please fire away!
 
 As for Pull Requests I am excited to take on new contributors who can help with the code. Please see the section below about getting started.
+
+---
 
 ## Bug Reports
 
@@ -34,15 +36,15 @@ This section will cover the process for making code contributions to rusty-machi
 
 We currently use a [fork](https://help.github.com/articles/fork-a-repo/) and [pull request](https://help.github.com/articles/using-pull-requests/) model to allow contributions to rusty-machine.
 
-Please take a look through the code and API documentation to identify the areas you'd like to help out with. Take a look through the current issues and see if there's anything you'd like to tackle. Simple issues will be tagged with the label `easy`.
+Please take a look through the code and [API documentation](https://athemathmo.github.io/rusty-machine/rusty-machine/doc/rusty_machine/index.html) to identify the areas you'd like to help out with. Take a look through the current issues and see if there's anything you'd like to tackle. Simple issues will be tagged with the label `easy`.
 
-If you decide you want to tackle an issue please comment on the issue that you would like to work on it. This will help us keep track of who is working on what. (I'm sure there's a better way to handle this - other ideas are welcome).
+If you decide you want to tackle an issue please comment on that issue stating that you would like to work on it. This will help us keep track of who is working on what. (I'm sure there's a better way to handle this - other ideas are welcome).
 
 ### Making Code Changes
 
-So by now you should have the project forked and are ready to start working on a new issue. There are no hard conventions in place at the moment but please follow these general guidelines:
+So by now you should have the project forked and are ready to start working on the code. There are no hard conventions in place at the moment but please follow these general guidelines:
 
-- Document all public facing functions, structs, fields, etc. You can check this by adding `#![deny(missing_docs)]` to the top of the `lib.rs` file. This should include exampes, panics and failures. If you see these missing anywhere please create an issue.
+- Document all public facing functions, structs, fields, etc. You can check this by adding `#![deny(missing_docs)]` to the top of the `lib.rs` file. This should include exampes, panics and failures. (If you see these missing anywhere in the current code please create an issue.)
 - Add comments to all private functions detailing what they do.
 - Make lots of small commits as opposed to one large commit.
 - Ensure that all existing (and new) tests pass for each commit.
@@ -67,6 +69,6 @@ For now I have no special measures in place to assist with this. Due to this I'm
 
 Where is the test data? How do I know the current algorithms even work? How can I test things I've implemented?
 
-All good questions. At the moment rusty-machine doesn't offer built in support for data loading or vizualisation - though I'm looking to fix this. For now I have been using a separate project to test the algorithms on some open source data sets. This has been messy on my part but I'd be more than happy to share this if it helps other contributors test out their work (and my work thus far).
+All good questions. At the moment rusty-machine doesn't offer built in support for data loading or vizualisation - though I'm looking to fix this. For now I have been using my own separate project to test the algorithms on some open source data sets. This has been messy on my part but I'd be more than happy to share this if it helps other contributors test out their work (and my work thus far).
 
-Otherwise I'd encourage you to write you're own small projects to test out the algorithms. There are some great datasets [here](https://archive.ics.uci.edu/ml/datasets.html) from UCI. I've done some testing with the [Wisconsin breast cancer data](https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Diagnostic)). Please provide feedback based on your experience!
+Otherwise I'd encourage you to write your own small projects to test out the algorithms. There are some great datasets [here](https://archive.ics.uci.edu/ml/datasets.html) from UCI. I've done some testing with the [Wisconsin breast cancer data](https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Diagnostic)). Please provide feedback based on your experience!
