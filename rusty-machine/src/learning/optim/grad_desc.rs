@@ -20,11 +20,14 @@ pub struct GradientDesc {
     pub iters: usize,
 }
 
+/// The default gradient descent algorithm.
+///
+/// The defaults are:
+///
+/// - alpha = 0.3
+/// - iters = 100
 impl Default for GradientDesc {
-    /// Constructs a gradient descent algorithm
-    /// with default settings.
-    ///
-    /// Uses 10000 iterations and step size of 0.3.
+    
     fn default() -> GradientDesc {
         GradientDesc {
             alpha: 0.3,
@@ -87,11 +90,15 @@ pub struct StochasticGD {
     pub iters: usize,
 }
 
+/// The default Stochastic GD algorithm.
+///
+/// The defaults are:
+///
+/// - alpha = 0.1
+/// - mu = 0.1
+/// - iters = 20
 impl Default for StochasticGD {
-    /// Constructs a stochastic gradient descent algorithm
-    /// with default settings.
-    ///
-    /// Uses 5 iterations, momentum of 0.1 and rate of 0.3.
+    
     fn default() -> StochasticGD {
         StochasticGD {
             alpha: 0.1,

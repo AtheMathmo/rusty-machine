@@ -54,6 +54,17 @@ pub struct ConjugateGD {
     pub iters: usize,
 }
 
+/// The default Conjugate GD algorithm.
+/// 
+/// The defaults are:
+///
+/// - rho = 0.01
+/// - sig = 0.5
+/// - int = 0.1
+/// - ext = 3
+/// - max = 20
+/// - ration = 100
+/// - iters = 100
 impl Default for ConjugateGD {
     fn default() -> ConjugateGD {
         ConjugateGD {

@@ -24,8 +24,15 @@ pub struct Gaussian {
     _std_dev: f64,
 }
 
+/// The default Gaussian random variable.
+/// This is the Standard Normal random variable.
+///
+/// The defaults are:
+///
+/// - mean = 0
+/// - variance = 1
 impl Default for Gaussian {
-    /// Constructs a Standard Normal random variable.
+    
     fn default() -> Gaussian {
         Gaussian {
             mean: 0f64,
@@ -57,6 +64,10 @@ impl Gaussian {
     }
 }
 
+/// The distribution of the gaussian random variable.
+///
+/// Accurately computes the PDF and log PDF.
+/// Estimates the CDF accurate only to 0.003.
 impl Distribution<f64> for Gaussian {
 
     /// The pdf of the normal distribution

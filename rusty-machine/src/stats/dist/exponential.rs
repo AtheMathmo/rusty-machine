@@ -14,13 +14,18 @@ pub struct Exponential {
     lambda: f64,
 }
 
+/// The default Exponential random variable.
+///
+/// The defaults are:
+///
+/// - lambda = 1
 impl Default for Exponential {
-    /// Construct a new Exponential random variable
-    /// with a rate of 1.
+    
     fn default() -> Exponential {
         Exponential { lambda: 1f64 }
     }
 }
+
 impl Exponential {
     /// Constructs a new Exponential random variable with given
     /// lambda parameter.
