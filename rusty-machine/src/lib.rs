@@ -106,6 +106,7 @@ pub mod learning {
     pub mod k_means;
     pub mod nnet;
     pub mod gp;
+    pub mod svm;
 
     /// Trait for supervised model.
     pub trait SupModel<T,U> {
