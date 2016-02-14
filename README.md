@@ -1,6 +1,6 @@
 # rusty-machine
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.1.7](https://crates.io/crates/rusty-machine/0.1.7).
+Here is the API documentation for the rust crate. Currently up to date for [version 0.1.8](https://crates.io/crates/rusty-machine/0.1.8).
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
@@ -23,10 +23,6 @@ So this project is now going to be a machine learning crate for Rust. I began th
 This project is currently looking for contributors of all capacities!
 
 I have now created a dedicated page for [contributing](CONTRIBUTING.md). If you're interested please take a look.
-
-#### Help!
-
-I've probably introduced some bad practices as I've been learning Rust. If you have any suggestions for structure or optimization please let me know.
 
 ---
 
@@ -58,6 +54,7 @@ There is now a first pass at the linear algebra library and some machine learnin
 - K-Means Clustering
 - Neural Networks
 - Gaussian Process Regression
+- Support Vector Machines
 
 ---
 
@@ -107,9 +104,10 @@ The learning module contains machine learning models. The machine learning imple
 The current algorithms included are:
 
 - Linear Regression
-- K-Means Clustering
 - Logistic Regression
+- K-Means Clustering
 - Feed forward neural networks
 - Gaussian Proces regression
+- Support Vector Machines
 
 ---

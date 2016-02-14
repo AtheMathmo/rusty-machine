@@ -18,7 +18,9 @@
 //! - Gaussian Process Regression
 //! - K-means classification
 //! - Linear Regression
-//! - Neural Networks (simple feed forward).
+//! - Logistic Regression
+//! - Neural Networks (simple feed forward)
+//! - Support Vector Machines
 //!
 //! ### linalg
 //!
