@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/james/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/libc-0.2.4/src/unix/notbsd/linux/other/b64/x86_64.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/james/.multirust/toolchains/nightly/cargo/registry/src/github.com-88ac128001ac3a9a/libc-0.2.7/src/unix/notbsd/linux/other/b64/x86_64.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>x86_64.rs.html -- source</title>
@@ -26,7 +26,7 @@
     
 
     <nav class="sidebar">
-        <a href='../../../../../../../libc/index.html'><img src='https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png' alt='' width='100'></a>
+        <a href='../../../../../../../libc/index.html'><img src='https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png' alt='logo' width='100'></a>
         
     </nav>
 
@@ -109,6 +109,20 @@
 <span id="66">66</span>
 <span id="67">67</span>
 <span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! x86_64-specific definitions for 64-bit linux-like values</span>
 
@@ -123,6 +137,20 @@
 <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>O_DIRECT</span>: ::<span class='ident'>c_int</span> <span class='op'>=</span> <span class='number'>0x4000</span>;
 <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>O_DIRECTORY</span>: ::<span class='ident'>c_int</span> <span class='op'>=</span> <span class='number'>0x10000</span>;
 <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>O_NOFOLLOW</span>: ::<span class='ident'>c_int</span> <span class='op'>=</span> <span class='number'>0x20000</span>;
+
+<span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>MAP_LOCKED</span>: ::<span class='ident'>c_int</span> <span class='op'>=</span> <span class='number'>0x02000</span>;
+<span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>MAP_NORESERVE</span>: ::<span class='ident'>c_int</span> <span class='op'>=</span> <span class='number'>0x04000</span>;
+
+<span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>EDEADLOCK</span>: ::<span class='ident'>c_int</span> <span class='op'>=</span> <span class='number'>35</span>;
+
+<span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>SO_PEERCRED</span>: ::<span class='ident'>c_int</span> <span class='op'>=</span> <span class='number'>17</span>;
+<span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>SO_RCVLOWAT</span>: ::<span class='ident'>c_int</span> <span class='op'>=</span> <span class='number'>18</span>;
+<span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>SO_SNDLOWAT</span>: ::<span class='ident'>c_int</span> <span class='op'>=</span> <span class='number'>19</span>;
+<span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>SO_RCVTIMEO</span>: ::<span class='ident'>c_int</span> <span class='op'>=</span> <span class='number'>20</span>;
+<span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>SO_SNDTIMEO</span>: ::<span class='ident'>c_int</span> <span class='op'>=</span> <span class='number'>21</span>;
+
+<span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>FIOCLEX</span>: ::<span class='ident'>c_ulong</span> <span class='op'>=</span> <span class='number'>0x5451</span>;
+<span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>FIONBIO</span>: ::<span class='ident'>c_ulong</span> <span class='op'>=</span> <span class='number'>0x5421</span>;
 
 <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>PTRACE_GETFPREGS</span>: ::<span class='ident'>c_uint</span> <span class='op'>=</span> <span class='number'>14</span>;
 <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>PTRACE_SETFPREGS</span>: ::<span class='ident'>c_uint</span> <span class='op'>=</span> <span class='number'>15</span>;

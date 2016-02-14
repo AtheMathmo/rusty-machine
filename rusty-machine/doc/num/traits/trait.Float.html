@@ -26,7 +26,7 @@
     
 
     <nav class="sidebar">
-        <a href='../../num/index.html'><img src='http://rust-num.github.io/num/rust-logo-128x128-blk-v2.png' alt='' width='100'></a>
+        <a href='../../num/index.html'><img src='http://rust-num.github.io/num/rust-logo-128x128-blk-v2.png' alt='logo' width='100'></a>
         <p class='location'><a href='../index.html'>num</a>::<wbr><a href='index.html'>traits</a></p><script>window.sidebarCurrent = {name: 'Float', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
@@ -92,7 +92,7 @@
     fn <a href='#tymethod.acos' class='fnname'>acos</a>(self) -&gt; Self;
     fn <a href='#tymethod.atan' class='fnname'>atan</a>(self) -&gt; Self;
     fn <a href='#tymethod.atan2' class='fnname'>atan2</a>(self, other: Self) -&gt; Self;
-    fn <a href='#tymethod.sin_cos' class='fnname'>sin_cos</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(Self, Self)</a>;
+    fn <a href='#tymethod.sin_cos' class='fnname'>sin_cos</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a>Self, Self<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a>;
     fn <a href='#tymethod.exp_m1' class='fnname'>exp_m1</a>(self) -&gt; Self;
     fn <a href='#tymethod.ln_1p' class='fnname'>ln_1p</a>(self) -&gt; Self;
     fn <a href='#tymethod.sinh' class='fnname'>sinh</a>(self) -&gt; Self;
@@ -101,7 +101,7 @@
     fn <a href='#tymethod.asinh' class='fnname'>asinh</a>(self) -&gt; Self;
     fn <a href='#tymethod.acosh' class='fnname'>acosh</a>(self) -&gt; Self;
     fn <a href='#tymethod.atanh' class='fnname'>atanh</a>(self) -&gt; Self;
-    fn <a href='#tymethod.integer_decode' class='fnname'>integer_decode</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a>)</a>;
+    fn <a href='#tymethod.integer_decode' class='fnname'>integer_decode</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a>;
 }</pre>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
@@ -113,7 +113,6 @@ fn main() {
     let nan: f32 = Float::nan();
     
     assert!(nan.is_nan());
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -131,7 +130,6 @@ fn main() {
     assert!(infinity.is_infinite());
     assert!(!infinity.is_finite());
     assert!(infinity &gt; f32::MAX);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f32</span>;
@@ -152,7 +150,6 @@ fn main() {
     assert!(neg_infinity.is_infinite());
     assert!(!neg_infinity.is_finite());
     assert!(neg_infinity &lt; f32::MIN);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f32</span>;
@@ -174,7 +171,6 @@ fn main() {
     assert_eq!(zero, neg_zero);
     assert_eq!(7.0f32/inf, zero);
     assert_eq!(zero * 10.0, zero);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::{<span class='ident'>Zero</span>, <span class='ident'>Float</span>};
 
@@ -194,7 +190,6 @@ fn main() {
     let x: f64 = Float::min_value();
     
     assert_eq!(x, f64::MIN);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -211,7 +206,6 @@ fn main() {
     let x: f64 = Float::min_positive_value();
     
     assert_eq!(x, f64::MIN_POSITIVE);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -227,7 +221,6 @@ fn main() {
     
     let x: f64 = Float::max_value();
     assert_eq!(x, f64::MAX);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -245,7 +238,6 @@ fn main() {
     
     assert!(nan.is_nan());
     assert!(!f.is_nan());
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -272,7 +264,6 @@ fn main() {
     
     assert!(inf.is_infinite());
     assert!(neg_inf.is_infinite());
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f32</span>;
@@ -303,7 +294,6 @@ fn main() {
     assert!(!nan.is_finite());
     assert!(!inf.is_finite());
     assert!(!neg_inf.is_finite());
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f32</span>;
@@ -338,7 +328,6 @@ fn main() {
     assert!(!f32::INFINITY.is_normal());
     // Values between `0` and `min` are Subnormal.
     assert!(!lower_than_min.is_normal());
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f32</span>;
@@ -370,7 +359,6 @@ fn main() {
     
     assert_eq!(num.classify(), FpCategory::Normal);
     assert_eq!(inf.classify(), FpCategory::Infinite);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>num</span>::<span class='ident'>FpCategory</span>;
@@ -391,7 +379,6 @@ fn main() {
     
     assert_eq!(f.floor(), 3.0);
     assert_eq!(g.floor(), 3.0);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -410,7 +397,6 @@ fn main() {
     
     assert_eq!(f.ceil(), 4.0);
     assert_eq!(g.ceil(), 4.0);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -430,7 +416,6 @@ fn main() {
     
     assert_eq!(f.round(), 3.0);
     assert_eq!(g.round(), -3.0);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -449,7 +434,6 @@ fn main() {
     
     assert_eq!(f.trunc(), 3.0);
     assert_eq!(g.trunc(), -3.0);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -470,7 +454,6 @@ fn main() {
     
     assert!(abs_difference_x &lt; 1e-10);
     assert!(abs_difference_y &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -498,7 +481,6 @@ fn main() {
     assert!(abs_difference_y &lt; 1e-10);
     
     assert!(f64::NAN.abs().is_nan());
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -531,7 +513,6 @@ fn main() {
     assert_eq!(f64::NEG_INFINITY.signum(), -1.0);
     
     assert!(f64::NAN.signum().is_nan());
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -558,7 +539,6 @@ fn main() {
     assert!(!g.is_sign_positive());
     // Requires both tests to determine if is `NaN`
     assert!(!nan.is_sign_positive() &amp;&amp; !nan.is_sign_negative());
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -588,7 +568,6 @@ fn main() {
     assert!(g.is_sign_negative());
     // Requires both tests to determine if is `NaN`.
     assert!(!nan.is_sign_positive() &amp;&amp; !nan.is_sign_negative());
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -617,7 +596,6 @@ fn main() {
     let abs_difference = (m.mul_add(x, b) - (m*x + b)).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -638,7 +616,6 @@ fn main() {
     let abs_difference = (x.recip() - (1.0/x)).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -657,7 +634,6 @@ fn main() {
     let abs_difference = (x.powi(2) - x*x).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -674,7 +650,6 @@ fn main() {
     let abs_difference = (x.powf(2.0) - x*x).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -696,7 +671,6 @@ fn main() {
     
     assert!(abs_difference &lt; 1e-10);
     assert!(negative.sqrt().is_nan());
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -720,7 +694,6 @@ fn main() {
     let abs_difference = (e.ln() - 1.0).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -743,7 +716,6 @@ fn main() {
     let abs_difference = (f.exp2() - 4.0).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -766,7 +738,6 @@ fn main() {
     let abs_difference = (e.ln() - 1.0).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -794,7 +765,6 @@ fn main() {
     
     assert!(abs_difference_10 &lt; 1e-10);
     assert!(abs_difference_2 &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -820,7 +790,6 @@ fn main() {
     let abs_difference = (two.log2() - 1.0).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -841,7 +810,6 @@ fn main() {
     let abs_difference = (ten.log10() - 1.0).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -860,7 +828,6 @@ fn main() {
     let y = 2.0;
     
     assert_eq!(x.max(y), y);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -877,7 +844,6 @@ fn main() {
     let y = 2.0;
     
     assert_eq!(x.min(y), x);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -903,7 +869,6 @@ fn main() {
     
     assert!(abs_difference_x &lt; 1e-10);
     assert!(abs_difference_y &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -926,7 +891,6 @@ fn main() {
     let abs_difference = (x.cbrt() - 2.0).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -949,7 +913,6 @@ fn main() {
     let abs_difference = (x.hypot(y) - (x.powi(2) + y.powi(2)).sqrt()).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -971,7 +934,6 @@ fn main() {
     let abs_difference = (x.sin() - 1.0).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -992,7 +954,6 @@ fn main() {
     let abs_difference = (x.cos() - 1.0).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -1012,7 +973,6 @@ fn main() {
     let abs_difference = (x.tan() - 1.0).abs();
     
     assert!(abs_difference &lt; 1e-14);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -1035,7 +995,6 @@ fn main() {
     let abs_difference = (f.sin().asin() - f64::consts::PI / 2.0).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -1060,7 +1019,6 @@ fn main() {
     let abs_difference = (f.cos().acos() - f64::consts::PI / 4.0).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -1083,7 +1041,6 @@ fn main() {
     let abs_difference = (f.tan().atan() - 1.0).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -1121,7 +1078,6 @@ fn main() {
     
     assert!(abs_difference_1 &lt; 1e-10);
     assert!(abs_difference_2 &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -1141,7 +1097,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference_1</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference_2</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
-</div><h3 id='tymethod.sin_cos' class='method stab '><code>fn <a href='#tymethod.sin_cos' class='fnname'>sin_cos</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(Self, Self)</a></code></h3><div class='docblock'><p>Simultaneously computes the sine and cosine of the number, <code>x</code>. Returns
+</div><h3 id='tymethod.sin_cos' class='method stab '><code>fn <a href='#tymethod.sin_cos' class='fnname'>sin_cos</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a>Self, Self<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code></h3><div class='docblock'><p>Simultaneously computes the sine and cosine of the number, <code>x</code>. Returns
 <code>(sin(x), cos(x))</code>.</p>
 <span class='rusttest'>extern crate num;
 fn main() {
@@ -1156,7 +1112,6 @@ fn main() {
     
     assert!(abs_difference_0 &lt; 1e-10);
     assert!(abs_difference_0 &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -1181,7 +1136,6 @@ fn main() {
     let abs_difference = (x.ln().exp_m1() - 6.0).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -1204,7 +1158,6 @@ fn main() {
     let abs_difference = (x.ln_1p() - 1.0).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -1230,7 +1183,6 @@ fn main() {
     let abs_difference = (f - g).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -1259,7 +1211,6 @@ fn main() {
     
     // Same result
     assert!(abs_difference &lt; 1.0e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -1288,7 +1239,6 @@ fn main() {
     let abs_difference = (f - g).abs();
     
     assert!(abs_difference &lt; 1.0e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -1313,7 +1263,6 @@ fn main() {
     let abs_difference = (f - x).abs();
     
     assert!(abs_difference &lt; 1.0e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -1334,7 +1283,6 @@ fn main() {
     let abs_difference = (f - x).abs();
     
     assert!(abs_difference &lt; 1.0e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 
@@ -1356,7 +1304,6 @@ fn main() {
     let abs_difference = (f - e).abs();
     
     assert!(abs_difference &lt; 1.0e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -1367,7 +1314,7 @@ fn main() {
 <span class='kw'>let</span> <span class='ident'>abs_difference</span> <span class='op'>=</span> (<span class='ident'>f</span> <span class='op'>-</span> <span class='ident'>e</span>).<span class='ident'>abs</span>();
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1.0e-10</span>);</pre>
-</div><h3 id='tymethod.integer_decode' class='method stab '><code>fn <a href='#tymethod.integer_decode' class='fnname'>integer_decode</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a>)</a></code></h3><div class='docblock'><p>Returns the mantissa, base 2 exponent, and sign as integers, respectively.
+</div><h3 id='tymethod.integer_decode' class='method stab '><code>fn <a href='#tymethod.integer_decode' class='fnname'>integer_decode</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code></h3><div class='docblock'><p>Returns the mantissa, base 2 exponent, and sign as integers, respectively.
 The original number can be recovered by <code>sign * mantissa * 2 ^ exponent</code>.
 The floating point encoding is documented in the <a href="../../../../../reference.html#machine-types">Reference</a>.</p>
 <span class='rusttest'>extern crate num;
@@ -1386,7 +1333,6 @@ fn main() {
     let abs_difference = (sign_f * mantissa_f * exponent_f - num).abs();
     
     assert!(abs_difference &lt; 1e-10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>Float</span>;
 

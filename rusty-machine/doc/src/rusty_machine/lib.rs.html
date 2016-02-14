@@ -221,6 +221,9 @@
 <span id="178">178</span>
 <span id="179">179</span>
 <span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! # The rusty-machine crate.</span>
 <span class='doccomment'>//!</span>
@@ -242,7 +245,9 @@
 <span class='doccomment'>//! - Gaussian Process Regression</span>
 <span class='doccomment'>//! - K-means classification</span>
 <span class='doccomment'>//! - Linear Regression</span>
-<span class='doccomment'>//! - Neural Networks (simple feed forward).</span>
+<span class='doccomment'>//! - Logistic Regression</span>
+<span class='doccomment'>//! - Neural Networks (simple feed forward)</span>
+<span class='doccomment'>//! - Support Vector Machines</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ### linalg</span>
 <span class='doccomment'>//!</span>
@@ -330,6 +335,7 @@
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>k_means</span>;
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>nnet</span>;
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>gp</span>;
+    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>svm</span>;
 
     <span class='doccomment'>/// Trait for supervised model.</span>
     <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>SupModel</span><span class='op'>&lt;</span><span class='ident'>T</span>,<span class='ident'>U</span><span class='op'>&gt;</span> {

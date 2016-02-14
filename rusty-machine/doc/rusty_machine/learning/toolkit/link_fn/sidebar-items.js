@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Exp","Exponential link function."],["Linear","Linear link function."],["Sigmoid","Sigmoid link function."]],"trait":[["LinkFunc","Trait for link functions in models."]]});

@@ -26,7 +26,7 @@
     
 
     <nav class="sidebar">
-        <a href='../../num/index.html'><img src='http://rust-num.github.io/num/rust-logo-128x128-blk-v2.png' alt='' width='100'></a>
+        <a href='../../num/index.html'><img src='http://rust-num.github.io/num/rust-logo-128x128-blk-v2.png' alt='logo' width='100'></a>
         <p class='location'><a href='../index.html'>num</a>::<wbr><a href='index.html'>traits</a></p><script>window.sidebarCurrent = {name: 'PrimInt', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
@@ -72,7 +72,6 @@ fn main() {
     let n = 0b01001100u8;
     
     assert_eq!(n.count_ones(), 3);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>PrimInt</span>;
 
@@ -88,7 +87,6 @@ fn main() {
     let n = 0b01001100u8;
     
     assert_eq!(n.count_zeros(), 5);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>PrimInt</span>;
 
@@ -105,7 +103,6 @@ fn main() {
     let n = 0b0101000u16;
     
     assert_eq!(n.leading_zeros(), 10);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>PrimInt</span>;
 
@@ -122,7 +119,6 @@ fn main() {
     let n = 0b0101000u16;
     
     assert_eq!(n.trailing_zeros(), 3);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>PrimInt</span>;
 
@@ -140,7 +136,6 @@ fn main() {
     let m = 0x3456789ABCDEF012u64;
     
     assert_eq!(n.rotate_left(12), m);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>PrimInt</span>;
 
@@ -159,7 +154,6 @@ fn main() {
     let m = 0xDEF0123456789ABCu64;
     
     assert_eq!(n.rotate_right(12), m);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>PrimInt</span>;
 
@@ -177,7 +171,6 @@ fn main() {
     let m = 0xEFCDAB8967452301u64;
     
     assert_eq!(n.swap_bytes(), m);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>PrimInt</span>;
 
@@ -200,7 +193,6 @@ fn main() {
     } else {
         assert_eq!(u64::from_be(n), n.swap_bytes())
     }
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>PrimInt</span>;
 
@@ -226,7 +218,6 @@ fn main() {
     } else {
         assert_eq!(u64::from_le(n), n.swap_bytes())
     }
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>PrimInt</span>;
 
@@ -252,7 +243,6 @@ fn main() {
     } else {
         assert_eq!(n.to_be(), n.swap_bytes())
     }
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>PrimInt</span>;
 
@@ -278,7 +268,6 @@ fn main() {
     } else {
         assert_eq!(n.to_le(), n.swap_bytes())
     }
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>PrimInt</span>;
 
@@ -296,7 +285,6 @@ fn main() {
     use num::traits::PrimInt;
     
     assert_eq!(2i32.pow(4), 16);
-    
 }</span><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>num</span>::<span class='ident'>traits</span>::<span class='ident'>PrimInt</span>;
 

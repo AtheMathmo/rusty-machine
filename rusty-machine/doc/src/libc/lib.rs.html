@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/james/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/libc-0.2.4/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/james/.multirust/toolchains/nightly/cargo/registry/src/github.com-88ac128001ac3a9a/libc-0.2.7/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -26,7 +26,7 @@
     
 
     <nav class="sidebar">
-        <a href='../../libc/index.html'><img src='https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png' alt='' width='100'></a>
+        <a href='../../libc/index.html'><img src='https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png' alt='logo' width='100'></a>
         
     </nav>
 
@@ -303,6 +303,7 @@
 <span id="260">260</span>
 <span id="261">261</span>
 <span id="262">262</span>
+<span id="263">263</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright 2012-2015 The Rust Project Developers. See the COPYRIGHT</span>
 <span class='comment'>// file at the top-level directory of this distribution and at</span>
@@ -512,6 +513,7 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>malloc</span>(<span class='ident'>size</span>: <span class='ident'>size_t</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>realloc</span>(<span class='ident'>p</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>, <span class='ident'>size</span>: <span class='ident'>size_t</span>) <span class='op'>-&gt;</span> <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>free</span>(<span class='ident'>p</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>c_void</span>);
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>abort</span>() <span class='op'>-&gt;</span> <span class='op'>!</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>exit</span>(<span class='ident'>status</span>: <span class='ident'>c_int</span>) <span class='op'>-&gt;</span> <span class='op'>!</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>_exit</span>(<span class='ident'>status</span>: <span class='ident'>c_int</span>) <span class='op'>-&gt;</span> <span class='op'>!</span>;
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>atexit</span>(<span class='ident'>cb</span>: <span class='kw'>extern</span> <span class='kw'>fn</span>()) <span class='op'>-&gt;</span> <span class='ident'>c_int</span>;
