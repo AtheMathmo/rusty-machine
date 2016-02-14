@@ -1,3 +1,38 @@
+//! Support Vector Machine Module
+//!
+//! Contains implementation of Support Vector Machine
+//! using the [Pegasos training algorithm](http://ttic.uchicago.edu/~nati/Publications/PegasosMPB.pdf).
+//!
+//! The SVM model currently only support binary classification.
+//! The model inputs should be a matrix and the training targets are
+//! in the form of a vector of `-1`s and `1`s.
+//!
+//! # Examples
+//!
+//! ```
+//! use rusty_machine::learning::svm::SVM;
+//! use rusty_machine::learning::SupModel;
+//!
+//! use rusty_machine::linalg::matrix::Matrix;
+//! use rusty_machine::linalg::vector::Vector;
+//!
+//! let inputs = Matrix::new(4,1,vec![1.0,3.0,5.0,7.0]);
+//! let targets = Vector::new(vec![-1.,-1.,1.,1.]);
+//!
+//! let mut svm_mod = SVM::default();
+//!
+//! // Train the model
+//! svm_mod.train(&inputs, &targets);
+//! 
+//! // Now we'll predict a new point
+//! let new_point = Matrix::new(1,1,vec![10.]);
+//! let output = svm_mod.predict(&new_point);
+//!
+//! // Hopefully we classified our new point correctly!
+//! assert!(output[0] == 1f64, "Our classifier isn't very good!");
+//! ```
+
+
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
 
@@ -83,7 +118,7 @@ impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
         if let (&Some(ref alpha),
                 &Some(ref train_inputs),
                 &Some(ref train_targets)) = (&self.alpha, &self.train_inputs, &self.train_targets) {
-            let ker_mat = self.ker_mat(train_inputs, &full_inputs);
+            let ker_mat = self.ker_mat(&full_inputs, train_inputs);
             let weight_vec = alpha.elemul(train_targets) / self.lambda;
 
             let plane_dist = ker_mat * weight_vec;
