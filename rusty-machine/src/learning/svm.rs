@@ -3,7 +3,7 @@
 //! Contains implementation of Support Vector Machine
 //! using the [Pegasos training algorithm](http://ttic.uchicago.edu/~nati/Publications/PegasosMPB.pdf).
 //!
-//! The SVM model currently only support binary classification.
+//! The SVM models currently only support binary classification.
 //! The model inputs should be a matrix and the training targets are
 //! in the form of a vector of `-1`s and `1`s.
 //!
@@ -49,6 +49,8 @@ pub struct SVM<K: Kernel> {
     train_inputs: Option<Matrix<f64>>,
     train_targets: Option<Vector<f64>>,
     lambda: f64,
+    /// Number of iterations for training. Defaults to 100.
+    pub optim_iters: usize,
 }
 
 impl Default for SVM<SquaredExp> {
@@ -59,6 +61,7 @@ impl Default for SVM<SquaredExp> {
             train_inputs: None,
             train_targets: None,
             lambda: 0.3f64,
+            optim_iters: 100,
         }
     }
 }
@@ -83,6 +86,7 @@ impl<K: Kernel> SVM<K> {
 			train_inputs: None,
 			train_targets: None,
 			lambda: lambda,
+			optim_iters: 100,
 		}
 	}
 }
@@ -141,8 +145,7 @@ impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
         let full_inputs = ones.hcat(inputs);
         let m = full_inputs.cols();
 
-        // TODO: Make T a variable instead of 1000 constant.
-        for t in 0..1000 {
+        for t in 0..self.optim_iters {
             let i = rng.gen_range(0, n);
             let mut sum = 0f64;
             for j in 0..n {
@@ -157,7 +160,7 @@ impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
             }
         }
 
-        self.alpha = Some(Vector::new(alpha) / 1000f64);
+        self.alpha = Some(Vector::new(alpha) / (self.optim_iters as f64));
         self.train_inputs = Some(full_inputs);
         self.train_targets = Some(targets.clone());
     }
