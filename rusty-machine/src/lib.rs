@@ -18,7 +18,9 @@
 //! - Gaussian Process Regression
 //! - K-means classification
 //! - Linear Regression
-//! - Neural Networks (simple feed forward).
+//! - Logistic Regression
+//! - Neural Networks (simple feed forward)
+//! - Support Vector Machines
 //!
 //! ### linalg
 //!
@@ -106,6 +108,7 @@ pub mod learning {
     pub mod k_means;
     pub mod nnet;
     pub mod gp;
+    pub mod svm;
 
     /// Trait for supervised model.
     pub trait SupModel<T,U> {

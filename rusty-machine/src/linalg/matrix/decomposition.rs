@@ -535,13 +535,15 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
                 }
 
                 // Update the transformation matrix
-                let trans_block = transformation.select(&(0..n).collect::<Vec<usize>>(), &[k, k+1, k+2]);
+                let trans_block = transformation.select(&(0..n).collect::<Vec<usize>>(),
+                                                        &[k, k + 1, k + 2]);
                 let reduc_block = trans_block * householder.transpose();
 
                 // Reassign the trans block
                 for i in 0..n {
-                    for j in k..k+3 {
-                        transformation.data[i*transformation.cols + j] = reduc_block.data[i*reduc_block.cols + j - k];
+                    for j in k..k + 3 {
+                        transformation.data[i * transformation.cols + j] =
+                            reduc_block.data[i * reduc_block.cols + j - k];
                     }
                 }
 
@@ -582,13 +584,14 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
             }
 
             // Update the transformation matrix
-            let trans_block = transformation.select(&(0..n).collect::<Vec<usize>>(), &[p-1, p]);
+            let trans_block = transformation.select(&(0..n).collect::<Vec<usize>>(), &[p - 1, p]);
             let reduc_block = trans_block * givens_mat.transpose();
 
             // Reassign the trans block
             for i in 0..n {
-                for j in p-1..p+1 {
-                    transformation.data[i*transformation.cols + j] = reduc_block.data[i*reduc_block.cols + j - (p-1)];
+                for j in p - 1..p + 1 {
+                    transformation.data[i * transformation.cols + j] =
+                        reduc_block.data[i * reduc_block.cols + j - (p - 1)];
                 }
             }
 

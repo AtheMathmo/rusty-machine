@@ -42,7 +42,8 @@ impl<T> Matrix<T> {
     /// - The input data does not match the given dimensions.
     pub fn new(rows: usize, cols: usize, data: Vec<T>) -> Matrix<T> {
 
-        assert!(cols * rows == data.len(), "Data does not match given dimensions.");
+        assert!(cols * rows == data.len(),
+                "Data does not match given dimensions.");
         Matrix {
             cols: cols,
             rows: rows,
@@ -109,7 +110,8 @@ impl<T: Copy> Matrix<T> {
         let mut mat_vec = Vec::with_capacity(rows.len() * self.cols);
 
         for row in rows {
-            assert!(*row < self.rows, "Row index is greater than number of rows.");
+            assert!(*row < self.rows,
+                    "Row index is greater than number of rows.");
         }
 
         unsafe {
@@ -151,7 +153,8 @@ impl<T: Copy> Matrix<T> {
         let mut mat_vec = Vec::with_capacity(cols.len() * self.rows);
 
         for col in cols {
-            assert!(*col < self.cols, "Column index is greater than number of columns.");
+            assert!(*col < self.cols,
+                    "Column index is greater than number of columns.");
         }
 
         unsafe {
@@ -195,11 +198,13 @@ impl<T: Copy> Matrix<T> {
         let mut mat_vec = Vec::with_capacity(cols.len() * rows.len());
 
         for col in cols {
-            assert!(*col < self.cols, "Column index is greater than number of columns.");
+            assert!(*col < self.cols,
+                    "Column index is greater than number of columns.");
         }
 
         for row in rows {
-            assert!(*row < self.rows, "Row index is greater than number of columns.");
+            assert!(*row < self.rows,
+                    "Row index is greater than number of columns.");
         }
 
         unsafe {
@@ -278,7 +283,7 @@ impl<T: Copy> Matrix<T> {
     ///
     /// - Self and m have different column counts.
     pub fn vcat(&self, m: &Matrix<T>) -> Matrix<T> {
-        assert!(self.cols==m.cols, "Matrix column counts are not equal.");
+        assert!(self.cols == m.cols, "Matrix column counts are not equal.");
 
         let mut new_data = Vec::with_capacity((self.rows + m.rows) * self.cols);
 
@@ -558,7 +563,7 @@ impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
         let mut col_sum = Vec::with_capacity(self.rows);
 
         for i in 0..self.rows {
-            col_sum.push(utils::unrolled_sum(&self.data[i * self.cols .. (i+1)*self.cols]));
+            col_sum.push(utils::unrolled_sum(&self.data[i * self.cols..(i + 1) * self.cols]));
         }
         Vector::new(col_sum)
     }
@@ -600,8 +605,8 @@ impl<T: Copy + Zero + Mul<T, Output = T>> Matrix<T> {
     /// - The matrices have different row counts.
     /// - The matrices have different column counts.
     pub fn elemul(&self, m: &Matrix<T>) -> Matrix<T> {
-        assert!(self.rows==m.rows, "Matrix row counts not equal.");
-        assert!(self.cols==m.cols, "Matrix column counts not equal.");
+        assert!(self.rows == m.rows, "Matrix row counts not equal.");
+        assert!(self.cols == m.cols, "Matrix column counts not equal.");
 
         Matrix::new(self.rows, self.cols, utils::ele_mul(&self.data, &m.data))
     }
@@ -627,8 +632,8 @@ impl<T: Copy + Zero + Div<T, Output = T>> Matrix<T> {
     /// - The matrices have different row counts.
     /// - The matrices have different column counts.
     pub fn elediv(&self, m: &Matrix<T>) -> Matrix<T> {
-        assert!(self.rows==m.rows, "Matrix row counts not equal.");
-        assert!(self.cols==m.cols, "Matrix column counts not equal.");
+        assert!(self.rows == m.rows, "Matrix row counts not equal.");
+        assert!(self.cols == m.cols, "Matrix column counts not equal.");
 
         Matrix::new(self.rows, self.cols, utils::ele_div(&self.data, &m.data))
     }
@@ -1312,7 +1317,7 @@ impl<'a, 'b, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<&'b T> f
 }
 
 /// Gets negative of matrix.
-impl<T: Neg<Output=T> + Copy> Neg for Matrix<T> {
+impl<T: Neg<Output = T> + Copy> Neg for Matrix<T> {
     type Output = Matrix<T>;
 
     fn neg(self) -> Matrix<T> {
@@ -1327,7 +1332,7 @@ impl<T: Neg<Output=T> + Copy> Neg for Matrix<T> {
 }
 
 /// Gets negative of matrix.
-impl<'a, T: Neg<Output=T> + Copy> Neg for &'a Matrix<T> {
+impl<'a, T: Neg<Output = T> + Copy> Neg for &'a Matrix<T> {
     type Output = Matrix<T>;
 
     fn neg(self) -> Matrix<T> {
@@ -1348,8 +1353,10 @@ impl<T> Index<[usize; 2]> for Matrix<T> {
     type Output = T;
 
     fn index(&self, idx: [usize; 2]) -> &T {
-        assert!(idx[0] < self.rows, "Row index is greater than row dimension.");
-        assert!(idx[1] < self.cols, "Column index is greater than column dimension.");
+        assert!(idx[0] < self.rows,
+                "Row index is greater than row dimension.");
+        assert!(idx[1] < self.cols,
+                "Column index is greater than column dimension.");
         unsafe { &self.data.get_unchecked(idx[0] * self.cols + idx[1]) }
     }
 }

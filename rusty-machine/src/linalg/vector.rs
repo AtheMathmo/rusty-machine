@@ -227,7 +227,7 @@ impl<T: Copy + Zero + Add<T, Output = T>> Vector<T> {
     /// assert_eq!(c, 10.0);
     /// ```
     pub fn sum(&self) -> T {
-        self.data.iter().fold(T::zero(), |sum, &val| sum + val)
+        utils::unrolled_sum(&self.data[..])
     }
 }
 
