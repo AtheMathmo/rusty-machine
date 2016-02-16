@@ -3,6 +3,22 @@
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
 ---
+## 0.1.8
+
+### Breaking changes
+
+- None
+
+### Features
+
+- Add Support Vector Machines.
+
+### Minor Changes
+
+- Minor code cleanup.
+- Some micro optimization.
+
+---
 
 ## 0.1.7
 
