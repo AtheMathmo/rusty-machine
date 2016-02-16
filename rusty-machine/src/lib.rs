@@ -103,6 +103,7 @@ pub mod linalg {
 
 /// Module for machine learning.
 pub mod learning {
+    pub mod gen_lin_mod;
     pub mod lin_reg;
     pub mod logistic_reg;
     pub mod k_means;
