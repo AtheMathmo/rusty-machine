@@ -3,6 +3,11 @@ use linalg::matrix::Matrix;
 
 use learning::SupModel;
 
+/// The Generalized Linear Model
+///
+/// The model is generic over a Criterion
+/// which specifies the distribution family and
+/// the link function.
 pub struct GenLinearModel<C: Criterion> {
     parameters: Option<Vector<f64>>,
     criterion: C,
@@ -17,11 +22,9 @@ impl<C: Criterion> GenLinearModel<C> {
     ///
     /// ```
     /// use rusty_machine::learning::glm::GenLinearModel;
-    /// //use rusty_machine::learning::glm::Criterion;
     /// use rusty_machine::learning::glm::Bernoulli;
     ///
     /// let glm = GenLinearModel::new(Bernoulli);
-    ///
     /// ```
 	pub fn new(criterion: C) -> GenLinearModel<C> {
 		GenLinearModel {
@@ -31,6 +34,11 @@ impl<C: Criterion> GenLinearModel<C> {
 	}
 }
 
+/// Supervised model trait for the GLM.
+///
+/// Predictions are made from the model by computing g^-1(Xb).
+///
+/// The model is trained using Iteratively Re-weighted Least Squares.
 impl<C: Criterion> SupModel<Matrix<f64>, Vector<f64>> for GenLinearModel<C> {
     /// Predict output from inputs.
     fn predict(&self, inputs: &Matrix<f64>) -> Vector<f64> {
@@ -53,7 +61,7 @@ impl<C: Criterion> SupModel<Matrix<f64>, Vector<f64>> for GenLinearModel<C> {
         // Construct initial estimate for mu
         let mut mu = Vector::new(self.criterion.initialize_mu(targets.data()));
         let mut z = mu.clone();
-        let mut beta : Vector<f64> = Vector::new(vec![]);
+        let mut beta : Vector<f64> = Vector::new(vec![0f64; inputs.cols() + 1]);
 
         let ones = Matrix::<f64>::ones(inputs.rows(), 1);
         let full_inputs = ones.hcat(inputs);
@@ -69,7 +77,13 @@ impl<C: Criterion> SupModel<Matrix<f64>, Vector<f64>> for GenLinearModel<C> {
 
             let x_t_w = &x_t * w;
 
-            beta = (&x_t_w * &full_inputs).inverse() * x_t_w * z;
+            let new_beta = (&x_t_w * &full_inputs).inverse() * x_t_w * z;
+            let diff = (beta-&new_beta).apply(&|x| x.abs()).sum();
+            beta = new_beta;
+
+            if diff < 1e-10 {
+                break;
+            }
 
             // Update z and mu
             let fitted = &full_inputs * &beta;
