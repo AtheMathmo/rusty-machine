@@ -48,21 +48,22 @@ use learning::optim::Optimizable;
 /// Logistic Regression Model.
 ///
 /// Contains option for optimized parameter.
-pub struct LogisticRegressor {
-    /// The parameters for the regression model.
-    parameters: Option<Vector<f64>>,
-    gd: GradientDesc,
+pub struct LogisticRegressor<A>
+    where A : OptimAlgorithm<BaseLogisticRegressor> {
+    base: BaseLogisticRegressor,
+    alg: A,
 }
 
-impl Default for LogisticRegressor {
-    fn default() -> LogisticRegressor {
+impl Default for LogisticRegressor<GradientDesc> {
+    fn default() -> LogisticRegressor<GradientDesc> {
         LogisticRegressor {
-            parameters: None,
-            gd: GradientDesc::default(),
+            base: BaseLogisticRegressor::default(),
+            alg: GradientDesc::default(),
         }
     }
 }
-impl LogisticRegressor {
+
+impl<A : OptimAlgorithm<BaseLogisticRegressor>> LogisticRegressor<A> {
     /// Constructs untrained logistic regression model.
     ///
     /// # Examples
@@ -74,10 +75,10 @@ impl LogisticRegressor {
     /// let gd = GradientDesc::default();
     /// let mut logistic_mod = LogisticRegressor::new(gd);
     /// ```
-    pub fn new(gd: GradientDesc) -> LogisticRegressor {
+    pub fn new(alg: A) -> LogisticRegressor<A> {
         LogisticRegressor {
-            parameters: None,
-            gd: gd,
+            base: BaseLogisticRegressor::default(),
+            alg: alg,
         }
     }
 
@@ -85,14 +86,14 @@ impl LogisticRegressor {
     ///
     /// Returns an option that is None if the model has not been trained.
     pub fn parameters(&self) -> Option<Vector<f64>> {
-        match self.parameters {
-            None => None,
-            Some(ref x) => Some(x.clone()),
+        match self.base.parameters() {
+            &Some(ref p) => Some(p.clone()),
+            &None => None,
         }
     }
 }
 
-impl SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor {
+impl<A : OptimAlgorithm<BaseLogisticRegressor>> SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor<A> {
     /// Train the logistic regression model.
     ///
     /// Takes training data and output values as input.
@@ -117,15 +118,15 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor {
 
         let initial_params = vec![0.5; full_inputs.cols()];
 
-        let optimal_w = self.gd.optimize(self, &initial_params[..], &full_inputs, targets);
-        self.parameters = Some(Vector::new(optimal_w));
+        let optimal_w = self.alg.optimize(&self.base, &initial_params[..], &full_inputs, targets);
+        self.base.set_parameters(Vector::new(optimal_w));
     }
 
     /// Predict output value from input data.
     ///
     /// Model must be trained before prediction can be made.
     fn predict(&self, inputs: &Matrix<f64>) -> Vector<f64> {
-        if let Some(ref v) = self.parameters {
+        if let &Some(ref v) = self.base.parameters() {
             let ones = Matrix::<f64>::ones(inputs.rows(), 1);
             let full_inputs = ones.hcat(inputs);
             (full_inputs * v).apply(&Sigmoid::func)
@@ -135,7 +136,29 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor {
     }
 }
 
-impl Optimizable for LogisticRegressor {
+pub struct BaseLogisticRegressor {
+    parameters: Option<Vector<f64>>,
+}
+
+impl Default for BaseLogisticRegressor {
+    fn default() -> BaseLogisticRegressor {
+        BaseLogisticRegressor {
+            parameters : None,
+        }
+    }
+}
+
+impl BaseLogisticRegressor {
+    pub fn parameters(&self) -> &Option<Vector<f64>> {
+        &self.parameters
+    }
+
+    pub fn set_parameters(&mut self, params: Vector<f64>) {
+        self.parameters = Some(params);
+    } 
+}
+
+impl Optimizable for BaseLogisticRegressor {
     type Inputs = Matrix<f64>;
     type Targets = Vector<f64>;
 
