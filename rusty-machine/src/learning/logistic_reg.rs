@@ -37,33 +37,33 @@
 use learning::SupModel;
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
-use learning::toolkit::activ_fn::ActivationFunc;
-use learning::toolkit::activ_fn::Sigmoid;
-use learning::toolkit::cost_fn::CostFunc;
-use learning::toolkit::cost_fn::CrossEntropyError;
+use learning::toolkit::activ_fn::{ActivationFunc, Sigmoid};
+use learning::toolkit::cost_fn::{CostFunc, CrossEntropyError};
 use learning::optim::grad_desc::GradientDesc;
-use learning::optim::OptimAlgorithm;
-use learning::optim::Optimizable;
+use learning::optim::{OptimAlgorithm, Optimizable};
 
 /// Logistic Regression Model.
 ///
 /// Contains option for optimized parameter.
 pub struct LogisticRegressor<A>
-    where A : OptimAlgorithm<BaseLogisticRegressor> {
+    where A: OptimAlgorithm<BaseLogisticRegressor>
+{
     base: BaseLogisticRegressor,
     alg: A,
 }
 
+/// Constructs a default Logistic Regression model
+/// using standard gradient descent.
 impl Default for LogisticRegressor<GradientDesc> {
     fn default() -> LogisticRegressor<GradientDesc> {
         LogisticRegressor {
-            base: BaseLogisticRegressor::default(),
+            base: BaseLogisticRegressor::new(),
             alg: GradientDesc::default(),
         }
     }
 }
 
-impl<A : OptimAlgorithm<BaseLogisticRegressor>> LogisticRegressor<A> {
+impl<A: OptimAlgorithm<BaseLogisticRegressor>> LogisticRegressor<A> {
     /// Constructs untrained logistic regression model.
     ///
     /// # Examples
@@ -77,7 +77,7 @@ impl<A : OptimAlgorithm<BaseLogisticRegressor>> LogisticRegressor<A> {
     /// ```
     pub fn new(alg: A) -> LogisticRegressor<A> {
         LogisticRegressor {
-            base: BaseLogisticRegressor::default(),
+            base: BaseLogisticRegressor::new(),
             alg: alg,
         }
     }
@@ -136,28 +136,43 @@ impl<A : OptimAlgorithm<BaseLogisticRegressor>> SupModel<Matrix<f64>, Vector<f64
     }
 }
 
+/// The Base Logistic Regression model.
+///
+/// This model cannot be instantianated and is used internally only.
 pub struct BaseLogisticRegressor {
     parameters: Option<Vector<f64>>,
 }
 
-impl Default for BaseLogisticRegressor {
-    fn default() -> BaseLogisticRegressor {
-        BaseLogisticRegressor {
-            parameters : None,
-        }
+impl BaseLogisticRegressor {
+
+    /// Construct a new BaseLogisticRegressor
+    /// with parameters set to None.
+    fn new() -> BaseLogisticRegressor {
+        BaseLogisticRegressor { parameters: None }
     }
 }
 
 impl BaseLogisticRegressor {
-    pub fn parameters(&self) -> &Option<Vector<f64>> {
+
+    /// Returns a reference to the parameters.
+    fn parameters(&self) -> &Option<Vector<f64>> {
         &self.parameters
     }
 
-    pub fn set_parameters(&mut self, params: Vector<f64>) {
+    /// Set the parameters to `Some` vector.
+    fn set_parameters(&mut self, params: Vector<f64>) {
         self.parameters = Some(params);
-    } 
+    }
 }
 
+/// Computing the gradient of the underlying Logistic
+/// Regression model.
+///
+/// The gradient is given by
+///
+/// X<sup>T</sup>(h(Xb) - y) / m
+///
+/// where `h` is the sigmoid function and `b` the underlying model parameters.
 impl Optimizable for BaseLogisticRegressor {
     type Inputs = Matrix<f64>;
     type Targets = Vector<f64>;
