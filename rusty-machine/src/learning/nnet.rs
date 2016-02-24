@@ -10,9 +10,9 @@
 //! use rusty_machine::learning::SupModel;
 //!
 //! let inputs = Matrix::new(5,3, vec![1.,1.,1.,2.,2.,2.,3.,3.,3.,
-//! 								4.,4.,4.,5.,5.,5.,]);
+//!                                 4.,4.,4.,5.,5.,5.,]);
 //! let targets = Matrix::new(5,3, vec![1.,0.,0.,0.,1.,0.,0.,0.,1.,
-//! 									0.,0.,1.,0.,0.,1.]);
+//!                                     0.,0.,1.,0.,0.,1.]);
 //!
 //! let layers = &[3,5,11,7,3];
 //! let mut model = NeuralNet::default(layers);
@@ -41,15 +41,27 @@ use learning::optim::grad_desc::StochasticGD;
 
 use rand::{Rng, thread_rng};
 
-/// Neural Network struct
-pub struct NeuralNet<'a, T: Criterion> {
-    layer_sizes: &'a [usize],
-    weights: Vec<f64>,
-    gd: StochasticGD,
-    criterion: T,
+pub struct NeuralNet<'a, T, A> where T: Criterion, A : OptimAlgorithm<BaseNeuralNet<'a, T>> {
+    base: BaseNeuralNet<'a, T>,
+    alg: A,
 }
 
-impl<'a> NeuralNet<'a, BCECriterion> {
+impl<'a, T, A> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, T, A>
+    where T: Criterion, A: OptimAlgorithm<BaseNeuralNet<'a, T>> {
+    /// Predict neural network output using forward propagation.
+    fn predict(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
+        self.base.forward_prop(inputs)
+    }
+
+    /// Train the model using gradient optimization and back propagation.
+    fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) {
+        let start = self.base.weights.clone();
+        let optimal_w = self.alg.optimize(&self.base, &start[..], inputs, targets);
+        self.base.weights = optimal_w;
+    }
+}
+
+impl<'a> NeuralNet<'a, BCECriterion, StochasticGD> {
     /// Creates a neural network with the specified layer sizes.
     ///
     /// Uses the default settings (gradient descent and sigmoid activation function).
@@ -63,16 +75,16 @@ impl<'a> NeuralNet<'a, BCECriterion> {
     /// let layers = &[3; 4];
     /// let mut net = NeuralNet::default(layers);
     /// ```
-    pub fn default(layer_sizes: &[usize]) -> NeuralNet<BCECriterion> {
+    pub fn default(layer_sizes: &[usize]) -> NeuralNet<BCECriterion, StochasticGD> {
         NeuralNet {
-            layer_sizes: layer_sizes,
-            weights: NeuralNet::<BCECriterion>::create_weights(layer_sizes),
-            gd: StochasticGD::default(),
-            criterion: BCECriterion,
+            base: BaseNeuralNet::default(layer_sizes),
+            alg: StochasticGD::default(),
         }
     }
 }
-impl<'a, T: Criterion> NeuralNet<'a, T> {
+
+impl<'a, T, A> NeuralNet<'a, T, A>
+ where T: Criterion, A: OptimAlgorithm<BaseNeuralNet<'a, T>> {
     /// Create a new neural network with the specified layer sizes.
     ///
     /// The layer sizes slice should include the input, hidden layers, and output layer sizes.
@@ -85,16 +97,64 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
     /// ```
     /// use rusty_machine::learning::nnet::BCECriterion;
     /// use rusty_machine::learning::nnet::NeuralNet;
+    /// use rusty_machine::learning::optim::grad_desc::StochasticGD;
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.
     /// let layers = &[3; 4];
-    /// let mut net = NeuralNet::new(layers, BCECriterion);
+    /// let mut net = NeuralNet::new(layers, BCECriterion, StochasticGD::default());
     /// ```
-    pub fn new(layer_sizes: &[usize], criterion: T) -> NeuralNet<T> {
+    pub fn new(layer_sizes: &'a [usize], criterion: T, alg: A) -> NeuralNet<'a, T, A> {
         NeuralNet {
+            base: BaseNeuralNet::new(layer_sizes, criterion),
+            alg: alg,
+        }
+    }
+
+    /// Gets matrix of weights between specified layer and forward layer.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::nnet::NeuralNet;
+    ///
+    /// // Create a neural net with 4 layers, 3 neurons in each.
+    /// let layers = &[3; 4];
+    /// let mut net = NeuralNet::default(layers);
+    ///
+    /// let w = &net.get_net_weights(2);
+    ///
+    /// // We add a bias term to the weight matrix
+    /// assert_eq!(w.rows(), 4);
+    /// assert_eq!(w.cols(), 3);
+    /// ```
+    pub fn get_net_weights(&self, idx: usize) -> Matrix<f64> {
+        self.base.get_layer_weights(&self.base.weights[..], idx)
+    }
+}
+
+/// Neural Network struct
+pub struct BaseNeuralNet<'a, T: Criterion> {
+    layer_sizes: &'a [usize],
+    weights: Vec<f64>,
+    criterion: T,
+}
+
+impl<'a> BaseNeuralNet<'a, BCECriterion> {
+    /// Creates a base neural network with the specified layer sizes.
+    fn default(layer_sizes: &[usize]) -> BaseNeuralNet<BCECriterion> {
+        BaseNeuralNet {
             layer_sizes: layer_sizes,
-            weights: NeuralNet::<T>::create_weights(layer_sizes),
-            gd: StochasticGD::default(),
+            weights: BaseNeuralNet::<BCECriterion>::create_weights(layer_sizes),
+            criterion: BCECriterion,
+        }
+    }
+}
+impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
+    /// Create a new base neural network with the specified layer sizes.
+    fn new(layer_sizes: &[usize], criterion: T) -> BaseNeuralNet<T> {
+        BaseNeuralNet {
+            layer_sizes: layer_sizes,
+            weights: BaseNeuralNet::<T>::create_weights(layer_sizes),
             criterion: criterion,
         }
     }
@@ -106,7 +166,7 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
         let mut layers = Vec::new();
 
         for (l, item) in layer_sizes.iter().enumerate().take(total_layers - 1) {
-            layers.append(&mut NeuralNet::<T>::initialize_weights(item + 1,
+            layers.append(&mut BaseNeuralNet::<T>::initialize_weights(item + 1,
                                                              layer_sizes[l + 1]));
         }
         layers.shrink_to_fit();
@@ -163,24 +223,9 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
 
     }
 
-    /// Gets matrix of weights between specified layer and forward layer.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::learning::nnet::NeuralNet;
-    ///
-    /// // Create a neural net with 4 layers, 3 neurons in each.
-    /// let layers = &[3; 4];
-    /// let mut net = NeuralNet::default(layers);
-    ///
-    /// let w = &net.get_net_weights(2);
-    ///
-    /// // We add a bias term to the weight matrix
-    /// assert_eq!(w.rows(), 4);
-    /// assert_eq!(w.cols(), 3);
-    /// ```
-    pub fn get_net_weights(&self, idx: usize) -> Matrix<f64> {
+    /// Gets matrix of weights between specified layer and forward layer
+    /// for the base model.
+    fn get_net_weights(&self, idx: usize) -> Matrix<f64> {
         self.get_layer_weights(&self.weights[..], idx)
     }
 
@@ -304,9 +349,9 @@ impl<'a, T: Criterion> NeuralNet<'a, T> {
     }
 }
 
-impl<'a, T: Criterion> Optimizable for NeuralNet<'a, T> {
+impl<'a, T: Criterion> Optimizable for BaseNeuralNet<'a, T> {
     type Inputs = Matrix<f64>;
-	type Targets = Matrix<f64>;
+    type Targets = Matrix<f64>;
 
     /// Compute the gradient of the neural network.
     fn compute_grad(&self,
@@ -315,20 +360,6 @@ impl<'a, T: Criterion> Optimizable for NeuralNet<'a, T> {
                     targets: &Matrix<f64>)
                     -> (f64, Vec<f64>) {
         self.compute_grad(params, inputs, targets)
-    }
-}
-
-impl<'a, T: Criterion> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, T> {
-    /// Predict neural network output using forward propagation.
-    fn predict(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
-        self.forward_prop(inputs)
-    }
-
-    /// Train the model using gradient optimization and back propagation.
-    fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) {
-        let start = self.weights.clone();
-        let optimal_w = self.gd.optimize(self, &start[..], inputs, targets);
-        self.weights = optimal_w;
     }
 }
 
