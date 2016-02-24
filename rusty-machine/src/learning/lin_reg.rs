@@ -128,6 +128,27 @@ impl Optimizable for LinRegressor {
 impl LinRegressor {
 
     /// Train the linear regressor using Gradient Descent.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::lin_reg::LinRegressor;
+    /// use rusty_machine::learning::SupModel;
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::vector::Vector;
+    ///
+    /// let inputs = Matrix::new(4,1,vec![1.0,3.0,5.0,7.0]);
+    /// let targets = Vector::new(vec![1.,5.,9.,13.]);
+    ///
+    /// let mut lin_mod = LinRegressor::default();
+    /// 
+    /// // Train the model
+    /// lin_mod.train_with_optimization(&inputs, &targets);
+    ///
+    /// // Now we'll predict a new point
+    /// let new_point = Matrix::new(1,1,vec![10.]);
+    /// let _ = lin_mod.predict(&new_point);
+    /// ```
     pub fn train_with_optimization(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) {
         let ones = Matrix::<f64>::ones(inputs.rows(), 1);
         let full_inputs = ones.hcat(inputs);
