@@ -41,13 +41,25 @@ use learning::optim::grad_desc::StochasticGD;
 
 use rand::{Rng, thread_rng};
 
-pub struct NeuralNet<'a, T, A> where T: Criterion, A : OptimAlgorithm<BaseNeuralNet<'a, T>> {
+/// Neural Network Model
+///
+/// The Neural Network struct specifies a Criterion and
+/// a gradient descent algorithm.
+pub struct NeuralNet<'a, T, A>
+    where T: Criterion,
+          A: OptimAlgorithm<BaseNeuralNet<'a, T>>
+{
     base: BaseNeuralNet<'a, T>,
     alg: A,
 }
 
+/// Supervised learning for the Neural Network.
+///
+/// The model is trained using back propagation.
 impl<'a, T, A> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, T, A>
-    where T: Criterion, A: OptimAlgorithm<BaseNeuralNet<'a, T>> {
+    where T: Criterion,
+          A: OptimAlgorithm<BaseNeuralNet<'a, T>>
+{
     /// Predict neural network output using forward propagation.
     fn predict(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
         self.base.forward_prop(inputs)
@@ -64,7 +76,10 @@ impl<'a, T, A> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, T, A>
 impl<'a> NeuralNet<'a, BCECriterion, StochasticGD> {
     /// Creates a neural network with the specified layer sizes.
     ///
-    /// Uses the default settings (gradient descent and sigmoid activation function).
+    /// The layer sizes slice should include the input, hidden layers, and output layer sizes.
+    /// The type of activation function must be specified.
+    ///
+    /// Uses the default settings (stochastic gradient descent and sigmoid activation function).
     ///
     /// # Examples
     ///
@@ -84,7 +99,9 @@ impl<'a> NeuralNet<'a, BCECriterion, StochasticGD> {
 }
 
 impl<'a, T, A> NeuralNet<'a, T, A>
- where T: Criterion, A: OptimAlgorithm<BaseNeuralNet<'a, T>> {
+    where T: Criterion,
+          A: OptimAlgorithm<BaseNeuralNet<'a, T>>
+{
     /// Create a new neural network with the specified layer sizes.
     ///
     /// The layer sizes slice should include the input, hidden layers, and output layer sizes.
@@ -132,12 +149,15 @@ impl<'a, T, A> NeuralNet<'a, T, A>
     }
 }
 
-/// Neural Network struct
+/// Base Neural Network struct
+///
+/// This struct cannot be instantianated and is used internally only.
 pub struct BaseNeuralNet<'a, T: Criterion> {
     layer_sizes: &'a [usize],
     weights: Vec<f64>,
     criterion: T,
 }
+
 
 impl<'a> BaseNeuralNet<'a, BCECriterion> {
     /// Creates a base neural network with the specified layer sizes.
@@ -149,6 +169,8 @@ impl<'a> BaseNeuralNet<'a, BCECriterion> {
         }
     }
 }
+
+
 impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
     /// Create a new base neural network with the specified layer sizes.
     fn new(layer_sizes: &[usize], criterion: T) -> BaseNeuralNet<T> {
@@ -167,7 +189,7 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
 
         for (l, item) in layer_sizes.iter().enumerate().take(total_layers - 1) {
             layers.append(&mut BaseNeuralNet::<T>::initialize_weights(item + 1,
-                                                             layer_sizes[l + 1]));
+                                                                      layer_sizes[l + 1]));
         }
         layers.shrink_to_fit();
 
@@ -229,26 +251,25 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
         self.get_layer_weights(&self.weights[..], idx)
     }
 
-    // Get the matrix of weights without the bias terms.
+    // // Get the matrix of weights without the bias terms.
     // fn get_regular_weights(&self, weights: &[f64]) -> Vec<f64> {
-    // let mut reg_weights = Vec::new();
-    //
-    // Check that the weights are the right size.
-    // let mut start = 0usize;
-    // for l in 0..self.layer_sizes.len() - 1 {
-    //
-    // for i in 0..self.layer_sizes[l] {
-    // for j in 0..self.layer_sizes[l + 1] {
-    // reg_weights.push(weights[start + j*(1+self.layer_sizes[l]) + 1 + i] )
+    //     let mut reg_weights = Vec::new();
+
+    //     // Check that the weights are the right size.
+    //     let mut start = 0usize;
+    //     for l in 0..self.layer_sizes.len() - 1 {
+
+    //         for i in 0..self.layer_sizes[l] {
+    //             for j in 0..self.layer_sizes[l + 1] {
+    //                 reg_weights.push(weights[start + j * (1 + self.layer_sizes[l]) + 1 + i])
+    //             }
+    //         }
+
+    //         start += (self.layer_sizes[l] + 1) * self.layer_sizes[l + 1];
+    //     }
+
+    //     reg_weights
     // }
-    // }
-    //
-    // start += (self.layer_sizes[l]+1) * self.layer_sizes[l + 1];
-    // }
-    //
-    // reg_weights
-    // }
-    //
 
     /// Compute the gradient using the back propagation algorithm.
     fn compute_grad(&self,
@@ -349,6 +370,8 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
     }
 }
 
+/// Compute the gradient of the Neural Network using the
+/// back propagation algorithm.
 impl<'a, T: Criterion> Optimizable for BaseNeuralNet<'a, T> {
     type Inputs = Matrix<f64>;
     type Targets = Matrix<f64>;

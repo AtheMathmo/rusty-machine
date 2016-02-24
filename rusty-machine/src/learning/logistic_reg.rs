@@ -138,7 +138,7 @@ impl<A : OptimAlgorithm<BaseLogisticRegressor>> SupModel<Matrix<f64>, Vector<f64
 
 /// The Base Logistic Regression model.
 ///
-/// This model cannot be instantianated and is used internally only.
+/// This struct cannot be instantianated and is used internally only.
 pub struct BaseLogisticRegressor {
     parameters: Option<Vector<f64>>,
 }
