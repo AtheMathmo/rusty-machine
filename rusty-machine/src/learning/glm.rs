@@ -1,3 +1,40 @@
+//! Generalized Linear Model module
+//!
+//! <i>This model is likely to undergo changes in the near future.
+//! These changes will improve the learning algorithm.</i>
+//!
+//! Contains implemention of generalized linear models using
+//! iteratively reweighted least squares.
+//!
+//! The model will automatically add the intercept term to the
+//! input data.
+//!
+//! # Usage
+//!
+//! ```
+//! use rusty_machine::learning::glm::{GenLinearModel, Bernoulli};
+//! use rusty_machine::learning::SupModel;
+//! use rusty_machine::linalg::matrix::Matrix;
+//! use rusty_machine::linalg::vector::Vector;
+//!
+//! let inputs = Matrix::new(4,1,vec![1.0,3.0,5.0,7.0]);
+//! let targets = Vector::new(vec![0.,0.,1.,1.]);
+//!
+//! // Construct a GLM with a Bernoulli distribution
+//! // This is equivalent to a logistic regression model.
+//! let mut log_mod = GenLinearModel::new(Bernoulli);
+//!
+//! // Train the model
+//! log_mod.train(&inputs, &targets);
+//!
+//! // Now we'll predict a new point
+//! let new_point = Matrix::new(1,1,vec![10.]);
+//! let output = log_mod.predict(&new_point);
+//!
+//! // Hopefully we classified our new point correctly!
+//! assert!(output[0] > 0.5, "Our classifier isn't very good!");
+//! ```
+
 use linalg::vector::Vector;
 use linalg::matrix::Matrix;
 
@@ -315,7 +352,7 @@ impl Criterion for Bernoulli {
     }
 }
 
-/// The binomial regression family.
+/// The Binomial regression family.
 pub struct Binomial {
     weights: Vec<f64>,
 }
@@ -421,5 +458,9 @@ impl Criterion for Poisson {
         }
 
         mu_data
+    }
+
+    fn compute_working_weight(&self, mu: &[f64]) -> Vec<f64> {
+        mu.to_vec()
     }
 }
