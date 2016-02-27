@@ -6,14 +6,15 @@ This document will keep track of my development goals for this project.
 
 ## Current Progress
 
-There is now a first pass at the linear algebra library and some basic machine learning algorithms in place.
+The linear algebra library is now fairly filled out. But there is still lots of room for optimization (it is almost definitely better to switch to BLAS/LAPACK).
 
-### Matrices
+### Linear Algebra
 
 - Generic data matrices
 - Concatenation
 - Data manipulation (row and column selection/repetition etc.)
 - Arithmetic
+- Inverses and decompositions
 
 ### Machine Learning
 
@@ -22,8 +23,8 @@ There is now a first pass at the linear algebra library and some basic machine l
 - Neural Networks
 - Gaussian Processes
 - Logistic Regression
-
-I've decided for now to halt optimization efforts. It seems the best course of action is to decide as a community a single linear algebra library to utilize. This should also probably utilize BLAS and LAPACK bindings.
+- Generalized Linear Model
+- Support Vector Machines
 
 ---
 
@@ -36,25 +37,11 @@ This marks my intended release goals. I won't estimate the actual dates of relea
         <th>Version</th><th>Features</th><th>Dependencies</th>
     </tr>
     <tr>
-        <td>0.1.*</td><td><ul><li>Logistic Regression.</li><ul></td><td><ul><li>Looking to Generalized lin reg.</li><ul></td>
-    </tr>
-    <tr>
-        <td>0.1.*</td><td><ul><li>SVMs</li><ul></td><td><ul><li>(Adaptive) Coordinate Descent. <i>See below</i></li><li>Subgradient methods.</li><ul></td>
-    </tr>
-    <tr>
-        <td>0.1.*</td><td><ul><li>Generalized linear regression.</li><ul></td><td><ul><li>None.</li><ul></td>
-    </tr>
-    <tr>
-        <td>0.1.*</td><td><ul><li>Regularization on cost functions.</li><ul></td><td><ul><li>Data Normalization.</li><li>Some refactoring.</li><ul></td>
-    </tr>
-    <tr>
-        <td>0.2.0</td><td><ul><li>More advanced GD algorithms.</li><li>Optimization</li><li>Bug fixes</li></ul></td><td></td>
+        <td>0.2.X</td><td><ul><li>More advanced GD algorithms.</li><li>Model Regularization.</li><li>Improvements to GLM.</li><li>SVM Coordinate descent.</li></ul></td><td><ul><li>Lots</li></ul></td>
     </tr>
 </table>
 
 For Coordinate descent I will follow the algorithm defined in [this paper](http://www.loshchilov.com/publications/GECCO2011_AdaptiveCoordinateDescent.pdf).
-
-*Note*: Regularization has been pushed back as it will require careful planning. I plan to implement the other features first and then try to round off the 0.2.0 release with regularization.
 
 ### Unplanned:
 

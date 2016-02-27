@@ -2,6 +2,23 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.2.0
+
+### Breaking changes
+
+- Neural network instantiation `new` method now requires a training algorithm to be specified.
+
+### Features
+
+- Adding more kernels (for full list see API documentation).
+- Generalized Linear Model.
+- Updated model structures to allow more freedom in training algorithms.
+
+### Minor Changes
+
+- Some more documentation.
+- Some minor code formatting.
+
 ---
 ## 0.1.8
 
