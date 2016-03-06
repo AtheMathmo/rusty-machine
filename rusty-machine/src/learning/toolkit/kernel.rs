@@ -2,6 +2,8 @@
 //!
 //! Currently used within Gaussian Processes and SVMs.
 
+use std::ops::{Add, Mul};
+
 use linalg::vector::Vector;
 use linalg::utils;
 use linalg::Metric;
@@ -17,6 +19,111 @@ pub trait Kernel {
     ///
     /// Takes two equal length slices and returns a scalar.
     fn kernel(&self, x1: &[f64], x2: &[f64]) -> f64;
+}
+
+/// The sum of two kernels
+///
+/// This struct should not be directly instantiated but instead
+/// is created when we add two kernels together.
+///
+/// Note that it will be more efficient to implement the final kernel
+/// manually yourself. However this provides an easy mechanism to test
+/// different combinations.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::learning::toolkit::kernel::{Kernel, Polynomial, HyperTan, KernelArith};
+///
+/// let poly_ker = Polynomial::new(1f64,2f64,3f64);
+/// let hypert_ker = HyperTan::new(1f64,2.5);
+///
+/// let poly_plus_hypert_ker = KernelArith(poly_ker) + KernelArith(hypert_ker);
+///
+/// println!("{0}", poly_plus_hypert_ker.kernel(&[1f64,2f64,3f64],
+///                                             &[3f64,1f64,2f64]));
+/// ```
+pub struct KernelSum<T, U>
+    where T: Kernel,
+          U: Kernel
+{
+    k1: T,
+    k2: U,
+}
+
+/// Computes the sum of the two associated kernels.
+impl<T, U> Kernel for KernelSum<T, U>
+    where T: Kernel,
+          U: Kernel
+{
+    fn kernel(&self, x1: &[f64], x2: &[f64]) -> f64 {
+        self.k1.kernel(x1, x2) + self.k2.kernel(x1, x2)
+    }
+}
+
+/// The pointwise product of two kernels
+///
+/// This struct should not be directly instantiated but instead
+/// is created when we multiply two kernels together.
+///
+/// Note that it will be more efficient to implement the final kernel
+/// manually yourself. However this provides an easy mechanism to test
+/// different combinations.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::learning::toolkit::kernel::{Kernel, Polynomial, HyperTan, KernelArith};
+///
+/// let poly_ker = Polynomial::new(1f64,2f64,3f64);
+/// let hypert_ker = HyperTan::new(1f64,2.5);
+///
+/// let poly_plus_hypert_ker = KernelArith(poly_ker) * KernelArith(hypert_ker);
+///
+/// println!("{0}", poly_plus_hypert_ker.kernel(&[1f64,2f64,3f64],
+///                                             &[3f64,1f64,2f64]));
+/// ```
+pub struct KernelProd<T, U>
+    where T: Kernel,
+          U: Kernel
+{
+    k1: T,
+    k2: U,
+}
+
+/// Computes the product of the two associated kernels.
+impl<T, U> Kernel for KernelProd<T, U>
+    where T: Kernel,
+          U: Kernel
+{
+    fn kernel(&self, x1: &[f64], x2: &[f64]) -> f64 {
+        self.k1.kernel(x1, x2) * self.k2.kernel(x1, x2)
+    }
+}
+
+/// A wrapper tuple struct used for kernel arithmetic
+pub struct KernelArith<K: Kernel>(pub K);
+
+impl<T: Kernel, U: Kernel> Add<KernelArith<T>> for KernelArith<U> {
+    type Output = KernelSum<U, T>;
+
+    fn add(self, ker: KernelArith<T>) -> KernelSum<U, T> {
+        KernelSum {
+            k1: self.0,
+            k2: ker.0,
+        }
+    }
+}
+
+impl<T: Kernel, U: Kernel> Mul<KernelArith<T>> for KernelArith<U> {
+    type Output = KernelProd<U, T>;
+
+    fn mul(self, ker: KernelArith<T>) -> KernelProd<U, T> {
+        KernelProd {
+            k1: self.0,
+            k2: ker.0,
+        }
+    }
 }
 
 /// The Linear Kernel
@@ -41,9 +148,7 @@ impl Linear {
     /// println!("{0}", ker.kernel(&[1.,2.,3.], &[3.,4.,5.]));
     /// ```
     pub fn new(c: f64) -> Linear {
-        Linear {
-            c : c,
-        }
+        Linear { c: c }
     }
 }
 
@@ -54,9 +159,7 @@ impl Linear {
 /// - c = 0
 impl Default for Linear {
     fn default() -> Linear {
-        Linear {
-            c: 0f64,
-        }
+        Linear { c: 0f64 }
     }
 }
 
@@ -79,7 +182,6 @@ pub struct Polynomial {
 }
 
 impl Polynomial {
-    
     /// Constructs a new Polynomial Kernel.
     ///
     /// # Examples
@@ -96,7 +198,7 @@ impl Polynomial {
     pub fn new(alpha: f64, c: f64, d: f64) -> Polynomial {
         Polynomial {
             alpha: alpha,
-            c : c,
+            c: c,
             d: d,
         }
     }
@@ -229,7 +331,6 @@ impl Exponential {
 /// - ls = 1
 /// - amplitude = 1
 impl Default for Exponential {
-    
     fn default() -> Exponential {
         Exponential {
             ls: 1f64,
@@ -261,7 +362,6 @@ pub struct HyperTan {
 }
 
 impl HyperTan {
-
     /// Constructs a new Hyperbolic Tangent Kernel.
     ///
     /// # Examples
@@ -278,7 +378,7 @@ impl HyperTan {
     pub fn new(alpha: f64, c: f64) -> HyperTan {
         HyperTan {
             alpha: alpha,
-            c : c,
+            c: c,
         }
     }
 }
@@ -313,7 +413,6 @@ pub struct Multiquadric {
 }
 
 impl Multiquadric {
-
     /// Constructs a new Multiquadric Kernel.
     ///
     /// # Examples
@@ -328,9 +427,7 @@ impl Multiquadric {
     /// println!("{0}", ker.kernel(&[1.,2.,3.], &[3.,4.,5.]));
     /// ```
     pub fn new(c: f64) -> Multiquadric {
-        Multiquadric {
-            c : c,
-        }
+        Multiquadric { c: c }
     }
 }
 
@@ -341,9 +438,7 @@ impl Multiquadric {
 /// - c = 0
 impl Default for Multiquadric {
     fn default() -> Multiquadric {
-        Multiquadric {
-            c: 0f64,
-        }
+        Multiquadric { c: 0f64 }
     }
 }
 
@@ -368,7 +463,6 @@ pub struct RationalQuadratic {
 }
 
 impl RationalQuadratic {
-
     /// Constructs a new Rational Quadratic Kernel.
     ///
     /// # Examples
