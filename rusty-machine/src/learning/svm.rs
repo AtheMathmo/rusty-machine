@@ -49,10 +49,17 @@ pub struct SVM<K: Kernel> {
     train_inputs: Option<Matrix<f64>>,
     train_targets: Option<Vector<f64>>,
     lambda: f64,
-    /// Number of iterations for training. Defaults to 100.
+    /// Number of iterations for training.
     pub optim_iters: usize,
 }
 
+/// The default Support Vector Machine.
+///
+/// The defaults are:
+///
+/// - ker = SquaredExp::default()
+/// - lambda = 0.3
+/// - optim_iters = 100
 impl Default for SVM<SquaredExp> {
     fn default() -> SVM<SquaredExp> {
         SVM {
@@ -114,6 +121,8 @@ impl<K: Kernel> SVM<K> {
     }
 }
 
+/// Train the model using the Pegasos algorithm and
+/// predict the model output from new data.
 impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
     fn predict(&self, inputs: &Matrix<f64>) -> Vector<f64> {
     	let ones = Matrix::<f64>::ones(inputs.rows(), 1);

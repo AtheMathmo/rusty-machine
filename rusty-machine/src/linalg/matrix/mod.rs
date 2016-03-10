@@ -66,6 +66,11 @@ impl<T> Matrix<T> {
         &self.data
     }
 
+    /// Returns a mutable reference to the underlying data.
+    pub fn mut_data(&mut self) -> &mut Vec<T> {
+        &mut self.data
+    }
+
     /// Consumes the Matrix and returns the Vec of data.
     pub fn into_vec(self) -> Vec<T> {
         self.data

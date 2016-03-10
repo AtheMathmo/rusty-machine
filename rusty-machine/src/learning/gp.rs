@@ -42,15 +42,8 @@ pub struct ConstMean {
     a: f64,
 }
 
+/// Constructs the zero function.
 impl Default for ConstMean {
-    /// Constructs the zero function.
-    ///
-    /// # Examples
-    /// ```
-    /// use rusty_machine::learning::gp::ConstMean;
-    ///
-    /// let zero_m = ConstMean::default();
-    /// ```
     fn default() -> ConstMean {
         ConstMean { a: 0f64 }
     }
@@ -77,16 +70,18 @@ pub struct GaussianProcess<T: Kernel, U: MeanFunc> {
     train_data: Option<Matrix<f64>>,
 }
 
+/// Construct a default Gaussian Process
+///
+/// The defaults are:
+///
+/// - Squared Exponential kernel.
+/// - Zero-mean function.
+/// - Zero noise.
+///
+/// Note that zero noise can often lead to numerical instability.
+/// A small value for the noise may be a better alternative.
 impl Default for GaussianProcess<SquaredExp, ConstMean> {
-    /// Construct a default Gaussian Process
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::learning::gp;
-    ///
-    /// let gp = gp::GaussianProcess::default();
-    /// ```
+    
     fn default() -> GaussianProcess<SquaredExp, ConstMean> {
         GaussianProcess {
             ker: SquaredExp::default(),
