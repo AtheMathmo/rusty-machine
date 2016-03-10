@@ -1,11 +1,35 @@
+//! Gaussian Mixture Models
+//!
+//! Provides implementation of GMMs.
+//!
+//! # Usage
+//!
+//! ```
+//! use rusty_machine::linalg::matrix::Matrix;
+//! use rusty_machine::learning::gmm::GaussianMixtureModel;
+//! use rusty_machine::learning::UnSupModel;
+//!
+//! let inputs = Matrix::new(4, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0, 5.0, 1.0]);
+//! let test_inputs = Matrix::new(2, 2, vec![1.0, 3.5, 4.0, 1.0]);
+//!
+//! // Create gmm with k(=2) classes.
+//! let mut model = GaussianMixtureModel::new(3);
+//!
+//! // Where inputs is a Matrix with features in columns.
+//! model.train(&inputs);
+//!
+//! // Where pred_data is a Matrix with features in columns.
+//! let a = model.predict(&test_inputs);
+//! assert!(false);
+//! ```
+
 use linalg::vector::Vector;
 use linalg::matrix::Matrix;
+use linalg::utils;
 
 use learning::UnSupModel;
 
-pub const SQRT_2_PI: f64 = 2.50662827463100050241576528481104525_f64;
-
-/// A gaussian mixture model
+/// A Gaussian Micture Model
 ///
 /// Currently contains it's own parameters.
 /// In future we should construct a finite
@@ -36,7 +60,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
         // TODO: Use randomization, or k-means.
         self.model_means = Some(inputs.select_rows(&(0..k).collect::<Vec<usize>>()[..]));
 
-        for _ in 0..10 {
+        for _ in 0..4 {
             let weights = self.membership_weights(inputs);
             self.update_params(inputs, weights);
         }
@@ -54,6 +78,14 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
 }
 
 impl GaussianMixtureModel {
+    /// Constructs a new Gaussian Mixture Model
+    ///
+    /// # Examples
+    /// ```
+    /// use rusty_machine::learning::gmm::GaussianMixtureModel;
+    ///
+    /// let gmm = GaussianMixtureModel::new(3);
+    /// ```
     pub fn new(k: usize) -> GaussianMixtureModel {
         GaussianMixtureModel {
             comp_count: k,
@@ -64,10 +96,7 @@ impl GaussianMixtureModel {
     }
 
     fn membership_weights(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
-        let d = inputs.cols();
         let n = inputs.rows();
-
-        let pi_d = SQRT_2_PI.powi(d as i32);
 
         let mut member_weights_data = Vec::with_capacity(n * self.comp_count);
 
@@ -76,49 +105,47 @@ impl GaussianMixtureModel {
         let mut cov_invs = Vec::with_capacity(self.comp_count);
 
         if let Some(ref covars) = self.model_covars {
-	        for k in 0..self.comp_count {
-	            // TODO: combine these. We compute det to get the inverse.
-	            let covar_det = covars[k].det();
-	            let covar_inv = covars[k].inverse();
+            for k in 0..self.comp_count {
+                // TODO: combine these. We compute det to get the inverse.
+                let covar_det = covars[k].det();
+                let covar_inv = covars[k].inverse();
 
-	            cov_sqrt_dets.push(covar_det.sqrt());
-	            cov_invs.push(covar_inv);
-	        }
-	    }
+                cov_sqrt_dets.push(covar_det.sqrt());
+                cov_invs.push(covar_inv);
+            }
+        }
 
         // Now we compute the membership weights
         if let Some(ref means) = self.model_means {
-	        for i in 0..n {
-	            for k in 0..self.comp_count {
+            for i in 0..n {
+                let mut pdfs = Vec::with_capacity(self.comp_count);
+                let x_i = inputs.select_rows(&[i]);
 
-	                let mut pdf_inv_sum = 0f64;
-	                let x_i = inputs.select_rows(&[i]);
+                for j in 0..self.comp_count {
+                    let mu_j = means.select_rows(&[j]);
+                    let diff = &x_i - mu_j;
 
-	                for j in 0..self.comp_count {
-	                    if j == k {
-	                        continue;
-	                    }
+                    let pdf = (&diff * &cov_invs[j] * diff.transpose() * -0.5).into_vec()[0]
+                                  .exp() / cov_sqrt_dets[j];
+                    pdfs.push(pdf);
+                }
 
-	                    let mu_j = means.select_rows(&[j]);
-	                    let diff = &x_i - mu_j;
+                for j in 0..self.comp_count {
+                    let weighted_pdf_sum = utils::dot(&pdfs, self.mix_weights.data());
+                    member_weights_data.push(self.mix_weights[j] * pdfs[j] /
+                                             (weighted_pdf_sum));
+                }
 
-	                    // diff is 1 x d
-	                    let exponent = (&diff * &cov_invs[j] * diff.transpose() * 0.5).into_vec()[0];
 
-	                    pdf_inv_sum += exponent.exp() * cov_sqrt_dets[j] / self.mix_weights[j];
-	                }
-
-	                member_weights_data.push(self.mix_weights[k] * pi_d * pdf_inv_sum);
-	            }
-	        }
-	    }
+            }
+        }
 
         Matrix::new(n, self.comp_count, member_weights_data)
     }
 
     fn update_params(&mut self, inputs: &Matrix<f64>, membership_weights: Matrix<f64>) {
         let n = membership_weights.rows();
-        let d = membership_weights.cols();
+        let d = inputs.cols();
 
         let sum_weights = membership_weights.sum_rows();
 
@@ -143,8 +170,8 @@ impl GaussianMixtureModel {
                 let diff = inputs.select_rows(&[i]) - new_means.select_rows(&[k]);
                 cov_mat = cov_mat + (diff.transpose() * diff) * membership_weights[[i, k]];
             }
-
             new_covs.push(cov_mat / sum_weights[k]);
+
         }
 
         self.model_means = Some(new_means);
