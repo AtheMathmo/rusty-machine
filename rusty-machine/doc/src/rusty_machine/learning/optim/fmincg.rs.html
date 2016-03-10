@@ -304,6 +304,17 @@
 <span id="261">261</span>
 <span id="262">262</span>
 <span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Module for the fmincg optimization algorithm.</span>
 <span class='doccomment'>//!</span>
@@ -361,6 +372,17 @@
     <span class='kw'>pub</span> <span class='ident'>iters</span>: <span class='ident'>usize</span>,
 }
 
+<span class='doccomment'>/// The default Conjugate GD algorithm.</span>
+<span class='doccomment'>/// </span>
+<span class='doccomment'>/// The defaults are:</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// - rho = 0.01</span>
+<span class='doccomment'>/// - sig = 0.5</span>
+<span class='doccomment'>/// - int = 0.1</span>
+<span class='doccomment'>/// - ext = 3</span>
+<span class='doccomment'>/// - max = 20</span>
+<span class='doccomment'>/// - ration = 100</span>
+<span class='doccomment'>/// - iters = 100</span>
 <span class='kw'>impl</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>ConjugateGD</span> {
     <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='ident'>ConjugateGD</span> {
         <span class='ident'>ConjugateGD</span> {

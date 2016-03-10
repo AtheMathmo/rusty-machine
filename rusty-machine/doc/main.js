@@ -280,7 +280,7 @@
                 var parts = val.split("->").map(trimmer);
                 var input = parts[0];
                 // sort inputs so that order does not matter
-                var inputs = input.split(",").map(trimmer).sort();
+                var inputs = input.split(",").map(trimmer).sort().toString();
                 var output = parts[1];
 
                 for (var i = 0; i < nSearchWords; ++i) {
@@ -296,8 +296,8 @@
 
                     // allow searching for void (no output) functions as well
                     var typeOutput = type.output ? type.output.name : "";
-                    if (inputs.toString() === typeInputs.toString() &&
-                        output == typeOutput) {
+                    if ((inputs === "*" || inputs === typeInputs.toString()) &&
+                        (output === "*" || output == typeOutput)) {
                         results.push({id: i, index: -1, dontValidate: true});
                     }
                 }
@@ -580,6 +580,9 @@
                         displayPath = "";
                         href = rootPath + item.path.replace(/::/g, '/') +
                                '/' + type + '.' + name + '.html';
+                    } else if (type === "externcrate") {
+                        displayPath = "";
+                        href = rootPath + name + '/index.html';
                     } else if (item.parent !== undefined) {
                         var myparent = item.parent;
                         var anchor = '#' + type + '.' + name;
@@ -677,6 +680,16 @@
             var searchWords = [];
             for (var crate in rawSearchIndex) {
                 if (!rawSearchIndex.hasOwnProperty(crate)) { continue; }
+
+                searchWords.push(crate);
+                searchIndex.push({
+                    crate: crate,
+                    ty: 1, // == ExternCrate
+                    name: crate,
+                    path: "",
+                    desc: rawSearchIndex[crate].doc,
+                    type: null,
+                });
 
                 // an array of [(Number) item type,
                 //              (String) name,

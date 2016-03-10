@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1452' class='srclink' href='../../../src/rusty_machine/learning/k_means.rs.html#67-76' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-1771' class='srclink' href='../../../src/rusty_machine/src/learning/k_means.rs.html.html#66-75' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct KMeansClassifier {
     pub iters: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>,
     pub k: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>,
@@ -71,7 +71,8 @@ Specifies iterations and number of classes.</p>
 <p>Requires number of classes to be specified.
 Defaults to 100 iterations and kmeans++ initialization.</p>
 
-<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1><pre class='rust rust-example-rendered'>
+<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
+<pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>learning</span>::<span class='ident'>k_means</span>::<span class='ident'>KMeansClassifier</span>;
 
 <span class='kw'>let</span> <span class='ident'>model</span> <span class='op'>=</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>new</span>(<span class='number'>5</span>);</pre>
@@ -120,7 +121,7 @@ Defaults to 100 iterations and kmeans++ initialization.</p>
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>

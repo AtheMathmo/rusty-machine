@@ -46,26 +46,43 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-2132' class='srclink' href='../../../../src/rusty_machine/learning/toolkit/kernel.rs.html#26-29' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-2546' class='srclink' href='../../../../src/rusty_machine/src/learning/toolkit/kernel.rs.html.html#237-242' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct SquaredExp {
-    // some fields omitted
+    pub ls: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>,
+    pub ampl: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>,
 }</pre><div class='docblock'><p>Squared exponential kernel</p>
 
 <p>Equivalently a gaussian function.</p>
 
-<p>The kernel function is given by:</p>
-
-<p>f(x1,x2) = A <em>exp</em>(-||x1-x2||<sup>2</sup> / 2(l<sup>2))</sup></p>
+<p>k(x,y) = A <em>exp</em>(-||x-y||<sup>2</sup> / 2l<sup>2</sup>)</p>
 
 <p>Where A is the amplitude and l the length scale.</p>
-</div><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(ls: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>, ampl: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h4>
+</div><h2 class='fields'>Fields</h2>
+<table><tr class='stab '>
+                                  <td id='structfield.ls'><code>ls</code></td><td><div class='docblock'><p>The length scale of the kernel.</p>
+</div></td></tr><tr class='stab '>
+                                  <td id='structfield.ampl'><code>ampl</code></td><td><div class='docblock'><p>The amplitude of the kernel.</p>
+</div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(ls: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>, ampl: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h4>
 <div class='docblock'><p>Construct a new squared exponential kernel.</p>
 
-<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1><pre class='rust rust-example-rendered'>
-<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>kernel</span>::<span class='ident'>SquaredExp</span>;
+<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>kernel</span>;
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>kernel</span>::<span class='ident'>Kernel</span>;
 
-<span class='kw'>let</span> <span class='ident'>ker</span> <span class='op'>=</span> <span class='ident'>SquaredExp</span>::<span class='ident'>new</span>(<span class='number'>2f64</span>, <span class='number'>1f64</span>);</pre>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h3><div class='impl-items'><h4 id='method.default' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#method.default' class='fnname'>default</a>() -&gt; <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h4>
+<span class='comment'>// Construct a kernel with lengthscale 2 and amplitude 1.</span>
+<span class='kw'>let</span> <span class='ident'>ker</span> <span class='op'>=</span> <span class='ident'>kernel</span>::<span class='ident'>SquaredExp</span>::<span class='ident'>new</span>(<span class='number'>2f64</span>, <span class='number'>1f64</span>);
+
+<span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{0}&quot;</span>, <span class='ident'>ker</span>.<span class='ident'>kernel</span>(<span class='kw-2'>&amp;</span>[<span class='number'>1.</span>,<span class='number'>2.</span>,<span class='number'>3.</span>], <span class='kw-2'>&amp;</span>[<span class='number'>3.</span>,<span class='number'>4.</span>,<span class='number'>5.</span>]));</pre>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h3><div class='docblock'><p>Constructs the default Squared Exp kernel.</p>
+
+<p>The defaults are:</p>
+
+<ul>
+<li>ls = 1</li>
+<li>ampl = 1</li>
+</ul>
+</div><div class='impl-items'><h4 id='method.default' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#method.default' class='fnname'>default</a>() -&gt; <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h4>
 </div><h3 class='impl'><code>impl <a class='trait' href='../../../../rusty_machine/learning/toolkit/kernel/trait.Kernel.html' title='rusty_machine::learning::toolkit::kernel::Kernel'>Kernel</a> for <a class='struct' href='../../../../rusty_machine/learning/toolkit/kernel/struct.SquaredExp.html' title='rusty_machine::learning::toolkit::kernel::SquaredExp'>SquaredExp</a></code></h3><div class='impl-items'><h4 id='method.kernel' class='method'><code>fn <a href='../../../../rusty_machine/learning/toolkit/kernel/trait.Kernel.html#method.kernel' class='fnname'>kernel</a>(&amp;self, x1: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>, x2: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
@@ -110,7 +127,7 @@
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>
