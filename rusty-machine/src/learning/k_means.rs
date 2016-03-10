@@ -10,7 +10,6 @@
 //! use rusty_machine::learning::UnSupModel;
 //!
 //! let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
-//! let targets = Matrix::new(1, 2, vec![0.0, 0.0]);
 //! let test_inputs = Matrix::new(1, 2, vec![1.0, 3.5]);
 //!
 //! // Create model with k(=2) classes.
@@ -19,7 +18,7 @@
 //! // Where inputs is a Matrix with features in columns.
 //! model.train(&inputs);
 //!
-//! // Where pred_data is a Matrix with features in columns.
+//! // Where test_inputs is a Matrix with features in columns.
 //! let a = model.predict(&test_inputs);
 //! ```
 //!
