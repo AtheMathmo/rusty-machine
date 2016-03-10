@@ -139,6 +139,7 @@ impl<C: Criterion> SupModel<Matrix<f64>, Vector<f64>> for GenLinearModel<C> {
 /// to specify the regression family. The other functions need not
 /// be specified but can be used to control optimization.
 pub trait Criterion {
+    /// The link function of the GLM Criterion.
 	type Link : LinkFunc;
 
     /// The variance of the regression family.

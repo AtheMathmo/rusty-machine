@@ -1,3 +1,7 @@
+//! Utility functions for random sampling
+//!
+//! Currently this module only includes reservoir sampling.
+
 use rand::{Rng, thread_rng};
 
 /// ```
