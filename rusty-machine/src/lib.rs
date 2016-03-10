@@ -173,6 +173,7 @@ pub mod learning {
         pub mod activ_fn;
         pub mod kernel;
         pub mod cost_fn;
+        pub mod rand_utils;
     }
 }
 

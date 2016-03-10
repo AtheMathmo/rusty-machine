@@ -30,6 +30,7 @@ use linalg::matrix::Matrix;
 use linalg::utils;
 
 use learning::UnSupModel;
+use learning::toolkit::rand_utils;
 
 /// Covariance options for GMMs.
 ///
@@ -37,12 +38,12 @@ use learning::UnSupModel;
 /// - Regularized : Adds a regularization constant to the covariance diagonal.
 /// - Diagonal : Only the diagonal covariance structure.
 pub enum CovOption {
-	/// The full covariance structure.
-	Full,
-	/// Adds a regularization constant to the covariance diagonal.
-	Regularized(f64),
-	/// Only the diagonal covariance structure.
-	Diagonal,
+    /// The full covariance structure.
+    Full,
+    /// Adds a regularization constant to the covariance diagonal.
+    Regularized(f64),
+    /// Only the diagonal covariance structure.
+    Diagonal,
 }
 
 
@@ -73,18 +74,21 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
 
         self.model_covars = Some(cov_vec);
 
-        // TODO: Use randomization, or k-means.
-        self.model_means = Some(inputs.select_rows(&(0..k).collect::<Vec<usize>>()[..]));
+        let random_rows: Vec<usize> = rand_utils::reservoir_sample(&(0..inputs.rows())
+                                                                        .collect::<Vec<usize>>(),
+                                                                   k);
+
+        self.model_means = Some(inputs.select_rows(&random_rows));
 
         for _ in 0..self.max_iters {
-        	let log_lik_0 = self.log_lik;
+            let log_lik_0 = self.log_lik;
 
             let (weights, log_lik_1) = self.membership_weights(inputs);
 
             if (log_lik_1 - log_lik_0).abs() < 1e-10 {
-            	break;
+                break;
             }
-            
+
             self.log_lik = log_lik_1;
 
             self.update_params(inputs, weights);
@@ -137,7 +141,7 @@ impl GaussianMixtureModel {
     /// gmm.set_max_iters(5);
     /// ```
     pub fn set_max_iters(&mut self, iters: usize) {
-    	self.max_iters = iters;
+        self.max_iters = iters;
     }
 
     fn membership_weights(&self, inputs: &Matrix<f64>) -> (Matrix<f64>, f64) {
@@ -150,10 +154,10 @@ impl GaussianMixtureModel {
         let mut cov_invs = Vec::with_capacity(self.comp_count);
 
         if let Some(ref covars) = self.model_covars {
-            for k in 0..self.comp_count {
+            for cov in covars {
                 // TODO: combine these. We compute det to get the inverse.
-                let covar_det = covars[k].det();
-                let covar_inv = covars[k].inverse();
+                let covar_det = cov.det();
+                let covar_inv = cov.inverse();
 
                 cov_sqrt_dets.push(covar_det.sqrt());
                 cov_invs.push(covar_inv);
@@ -179,16 +183,16 @@ impl GaussianMixtureModel {
 
                 let weighted_pdf_sum = utils::dot(&pdfs, self.mix_weights.data());
 
-                for j in 0..self.comp_count {    
-                    member_weights_data.push(self.mix_weights[j] * pdfs[j] /
-                                             (weighted_pdf_sum));
+                for (idx, pdf) in pdfs.iter().enumerate() {
+                    member_weights_data.push(self.mix_weights[idx] * pdf / (weighted_pdf_sum));
                 }
 
                 log_lik += weighted_pdf_sum.ln();
             }
         }
 
-        (Matrix::new(n, self.comp_count, member_weights_data), log_lik)
+        (Matrix::new(n, self.comp_count, member_weights_data),
+         log_lik)
     }
 
     fn update_params(&mut self, inputs: &Matrix<f64>, membership_weights: Matrix<f64>) {
@@ -225,10 +229,10 @@ impl GaussianMixtureModel {
     }
 
     fn compute_cov(&self, diff: Matrix<f64>, weight: f64) -> Matrix<f64> {
-    	match self.cov_option {
-    		CovOption::Full => (diff.transpose() * diff) * weight,
-    		CovOption::Regularized(eps) => (diff.transpose() * diff) * weight + eps,
-    		CovOption::Diagonal => Matrix::from_diag(&diff.elemul(&diff).into_vec()),
-    	}
+        match self.cov_option {
+            CovOption::Full => (diff.transpose() * diff) * weight,
+            CovOption::Regularized(eps) => (diff.transpose() * diff) * weight + eps,
+            CovOption::Diagonal => Matrix::from_diag(&diff.elemul(&diff).into_vec()),
+        }
     }
 }
