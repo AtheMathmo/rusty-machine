@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/AtheMathmo/rusty-machine](https://badges.gitter.im/AtheMathmo/rusty-machine.svg)](https://gitter.im/AtheMathmo/rusty-machine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.2.0](https://crates.io/crates/rusty-machine/0.2.0).
+Here is the API documentation for the rust crate. Currently up to date for [version 0.2.1](https://crates.io/crates/rusty-machine/0.2.1).
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
@@ -40,7 +40,9 @@ This key motivation behind this project was for me to learn some systems program
 
 ## Current Progress
 
-There is now a first pass at the linear algebra library and some machine learning algorithms in place. There is also a `stats` module behind an optional features flag.
+The linear algebra library is now fairly filled out. But there is still lots of room for optimization (it is almost definitely better to switch to BLAS/LAPACK).
+
+There is also a `stats` module behind an optional features flag.
 
 ### Matrices
 
@@ -57,6 +59,7 @@ There is now a first pass at the linear algebra library and some machine learnin
 - Neural Networks
 - Gaussian Process Regression
 - Support Vector Machines
+- Gaussian Mixture Models
 
 ---
 

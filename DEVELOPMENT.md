@@ -25,6 +25,7 @@ The linear algebra library is now fairly filled out. But there is still lots of 
 - Logistic Regression
 - Generalized Linear Model
 - Support Vector Machines
+- Gaussian Mixture Models
 
 ---
 
