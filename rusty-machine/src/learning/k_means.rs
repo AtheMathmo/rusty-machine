@@ -266,13 +266,13 @@ impl KMeansClassifier {
         let mut init_centroids = Vec::with_capacity(k * inputs.cols());
         let first_cen = rng.gen_range(0usize, inputs.rows());
 
-        init_centroids.append(&mut inputs.select_rows(&vec![first_cen]).into_vec());
+        init_centroids.append(&mut inputs.select_rows(&[first_cen]).into_vec());
 
         for i in 1..k {
             let temp_centroids = Matrix::new(i, inputs.cols(), init_centroids.clone());
             let (_, dist) = KMeansClassifier::find_closest_centroids(&temp_centroids, &inputs);
             let next_cen = sample_discretely(dist);
-            init_centroids.append(&mut inputs.select_rows(&vec![next_cen]).into_vec())
+            init_centroids.append(&mut inputs.select_rows(&[next_cen]).into_vec())
         }
 
         Matrix::new(k, inputs.cols(), init_centroids)
