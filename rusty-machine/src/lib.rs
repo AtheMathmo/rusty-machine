@@ -104,6 +104,7 @@ pub mod linalg {
 /// Module for machine learning.
 pub mod learning {
     pub mod glm;
+    pub mod gmm;
     pub mod lin_reg;
     pub mod logistic_reg;
     pub mod k_means;
@@ -172,6 +173,7 @@ pub mod learning {
         pub mod activ_fn;
         pub mod kernel;
         pub mod cost_fn;
+        pub mod rand_utils;
     }
 }
 
