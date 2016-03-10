@@ -1,26 +1,28 @@
 //! Gaussian Mixture Models
 //!
-//! Provides implementation of GMMs.
+//! Provides implementation of GMMs using the EM algorithm.
 //!
 //! # Usage
 //!
 //! ```
 //! use rusty_machine::linalg::matrix::Matrix;
-//! use rusty_machine::learning::gmm::GaussianMixtureModel;
+//! use rusty_machine::learning::gmm::{CovOption, GaussianMixtureModel};
 //! use rusty_machine::learning::UnSupModel;
 //!
-//! let inputs = Matrix::new(4, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0, 5.0, 1.0]);
-//! let test_inputs = Matrix::new(2, 2, vec![1.0, 3.5, 4.0, 1.0]);
+//! let inputs = Matrix::new(4, 2, vec![1.0, 2.0, 3.0, 3.0, 2.0, 4.0, 5.0, 2.5]);
+//! let test_inputs = Matrix::new(3, 2, vec![1.0, 2.0, 3.0, 2.9, 2.4, 2.5]);
 //!
 //! // Create gmm with k(=2) classes.
-//! let mut model = GaussianMixtureModel::new(3);
+//! let mut model = GaussianMixtureModel::new(2);
+//! model.set_max_iters(10);
+//! model.cov_option = CovOption::Diagonal;
 //!
 //! // Where inputs is a Matrix with features in columns.
 //! model.train(&inputs);
 //!
 //! // Where pred_data is a Matrix with features in columns.
 //! let a = model.predict(&test_inputs);
-//! assert!(false);
+//! println!("{:?}", a.data());
 //! ```
 
 use linalg::vector::Vector;
@@ -29,17 +31,31 @@ use linalg::utils;
 
 use learning::UnSupModel;
 
-/// A Gaussian Micture Model
+/// Covariance options for GMMs.
 ///
-/// Currently contains it's own parameters.
-/// In future we should construct a finite
-/// mixture model and have the GaussianMixtureModel
-/// own this.
+/// - Full : The full covariance structure.
+/// - Regularized : Adds a regularization constant to the covariance diagonal.
+/// - Diagonal : Only the diagonal covariance structure.
+pub enum CovOption {
+	/// The full covariance structure.
+	Full,
+	/// Adds a regularization constant to the covariance diagonal.
+	Regularized(f64),
+	/// Only the diagonal covariance structure.
+	Diagonal,
+}
+
+
+/// A Gaussian Mixture Model
 pub struct GaussianMixtureModel {
     comp_count: usize,
     mix_weights: Vector<f64>,
     model_means: Option<Matrix<f64>>,
     model_covars: Option<Vec<Matrix<f64>>>,
+    log_lik: f64,
+    max_iters: usize,
+    /// The covariance options for the GMM.
+    pub cov_option: CovOption,
 }
 
 impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
@@ -60,8 +76,17 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
         // TODO: Use randomization, or k-means.
         self.model_means = Some(inputs.select_rows(&(0..k).collect::<Vec<usize>>()[..]));
 
-        for _ in 0..4 {
-            let weights = self.membership_weights(inputs);
+        for _ in 0..self.max_iters {
+        	let log_lik_0 = self.log_lik;
+
+            let (weights, log_lik_1) = self.membership_weights(inputs);
+
+            if (log_lik_1 - log_lik_0).abs() < 1e-10 {
+            	break;
+            }
+            
+            self.log_lik = log_lik_1;
+
             self.update_params(inputs, weights);
         }
     }
@@ -69,7 +94,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
     /// Predict output from inputs.
     fn predict(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
         if let (&Some(_), &Some(_)) = (&self.model_means, &self.model_covars) {
-            self.membership_weights(inputs)
+            self.membership_weights(inputs).0
         } else {
             panic!("Model has not been trained.");
         }
@@ -79,6 +104,9 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
 
 impl GaussianMixtureModel {
     /// Constructs a new Gaussian Mixture Model
+    ///
+    /// Defaults to 100 maximum iterations and
+    /// full covariance structure.
     ///
     /// # Examples
     /// ```
@@ -92,10 +120,27 @@ impl GaussianMixtureModel {
             mix_weights: Vector::ones(k) / (k as f64),
             model_means: None,
             model_covars: None,
+            log_lik: 0f64,
+            max_iters: 100,
+            cov_option: CovOption::Full,
         }
     }
 
-    fn membership_weights(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
+    /// Sets the max number of iterations for the EM algorithm.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::gmm::GaussianMixtureModel;
+    ///
+    /// let mut gmm = GaussianMixtureModel::new(2);
+    /// gmm.set_max_iters(5);
+    /// ```
+    pub fn set_max_iters(&mut self, iters: usize) {
+    	self.max_iters = iters;
+    }
+
+    fn membership_weights(&self, inputs: &Matrix<f64>) -> (Matrix<f64>, f64) {
         let n = inputs.rows();
 
         let mut member_weights_data = Vec::with_capacity(n * self.comp_count);
@@ -115,6 +160,8 @@ impl GaussianMixtureModel {
             }
         }
 
+        let mut log_lik = 0f64;
+
         // Now we compute the membership weights
         if let Some(ref means) = self.model_means {
             for i in 0..n {
@@ -130,17 +177,18 @@ impl GaussianMixtureModel {
                     pdfs.push(pdf);
                 }
 
-                for j in 0..self.comp_count {
-                    let weighted_pdf_sum = utils::dot(&pdfs, self.mix_weights.data());
+                let weighted_pdf_sum = utils::dot(&pdfs, self.mix_weights.data());
+
+                for j in 0..self.comp_count {    
                     member_weights_data.push(self.mix_weights[j] * pdfs[j] /
                                              (weighted_pdf_sum));
                 }
 
-
+                log_lik += weighted_pdf_sum.ln();
             }
         }
 
-        Matrix::new(n, self.comp_count, member_weights_data)
+        (Matrix::new(n, self.comp_count, member_weights_data), log_lik)
     }
 
     fn update_params(&mut self, inputs: &Matrix<f64>, membership_weights: Matrix<f64>) {
@@ -153,22 +201,20 @@ impl GaussianMixtureModel {
 
         let mut new_means = membership_weights.transpose() * inputs;
 
-        // TODO: Optimize
         for (idx, mean) in new_means.mut_data().chunks_mut(d).enumerate() {
-            for i in 0..d {
-                mean[i] = mean[i] / sum_weights[idx];
+            for m in mean {
+                *m = *m / sum_weights[idx];
             }
         }
 
         let mut new_covs = Vec::with_capacity(self.comp_count);
 
-        // TODO: Optimize
         for k in 0..self.comp_count {
             let mut cov_mat = Matrix::zeros(d, d);
 
             for i in 0..n {
                 let diff = inputs.select_rows(&[i]) - new_means.select_rows(&[k]);
-                cov_mat = cov_mat + (diff.transpose() * diff) * membership_weights[[i, k]];
+                cov_mat = cov_mat + self.compute_cov(diff, membership_weights[[i, k]]);
             }
             new_covs.push(cov_mat / sum_weights[k]);
 
@@ -176,5 +222,13 @@ impl GaussianMixtureModel {
 
         self.model_means = Some(new_means);
         self.model_covars = Some(new_covs);
+    }
+
+    fn compute_cov(&self, diff: Matrix<f64>, weight: f64) -> Matrix<f64> {
+    	match self.cov_option {
+    		CovOption::Full => (diff.transpose() * diff) * weight,
+    		CovOption::Regularized(eps) => (diff.transpose() * diff) * weight + eps,
+    		CovOption::Diagonal => Matrix::from_diag(&diff.elemul(&diff).into_vec()),
+    	}
     }
 }
