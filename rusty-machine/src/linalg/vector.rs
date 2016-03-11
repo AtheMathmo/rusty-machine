@@ -12,6 +12,7 @@ use linalg::utils;
 /// The Vector struct.
 ///
 /// Can be instantiated with any type.
+#[derive(Debug)]
 pub struct Vector<T> {
     size: usize,
     data: Vec<T>,

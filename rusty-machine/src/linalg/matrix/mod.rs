@@ -15,6 +15,7 @@ mod decomposition;
 /// The Matrix struct.
 ///
 /// Can be instantiated with any type.
+#[derive(Debug)]
 pub struct Matrix<T> {
     rows: usize,
     cols: usize,
