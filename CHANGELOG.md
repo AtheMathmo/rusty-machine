@@ -2,6 +2,27 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+
+## 0.2.1
+
+### New Contributors
+
+- [zackmdavis](https://github.com/zackmdavis) (contributed all features for this version, thank you!)
+
+### Breaking Changes
+
+- None
+
+### Features
+
+- Can now debug print matrices and vectors.
+- Can now pretty print matrices to given precision.
+
+### Minor Changes
+
+- Fixed the dependency versions used in Cargo.toml.
+- Updated the library documentation with complete list of ML tools.
+
 ## 0.2.1
 
 ### Breaking Changes

@@ -15,12 +15,14 @@
 //!
 //! The currently supported techniques are:
 //!
-//! - Gaussian Process Regression
-//! - K-means classification
 //! - Linear Regression
 //! - Logistic Regression
-//! - Neural Networks (simple feed forward)
+//! - Generalized Linear Models
+//! - K-Means Clustering
+//! - Neural Networks
+//! - Gaussian Process Regression
 //! - Support Vector Machines
+//! - Gaussian Mixture Modelss
 //!
 //! ### linalg
 //!
