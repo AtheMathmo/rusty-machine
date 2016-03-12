@@ -1393,7 +1393,10 @@ impl<T: fmt::Display> fmt::Display for Matrix<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         let mut max_datum_width = 0;
         for datum in &self.data {
-            let datum_width = format!("{}", datum).len();
+            let datum_width = match f.precision() {
+                Some(places) => format!("{:.1$}", datum, places).len(),
+                None => format!("{}", datum).len()
+            };
             if datum_width > max_datum_width {
                 max_datum_width = datum_width;
             }
@@ -1407,7 +1410,14 @@ impl<T: fmt::Display> fmt::Display for Matrix<T> {
                                       -> Result<(), fmt::Error> {
                 try!(write!(f, "{}", left_delimiter));
                 for (index, datum) in row.iter().enumerate() {
-                    try!(write!(f, "{:1$}", datum, width));
+                    match f.precision() {
+                        Some(places) => {
+                            try!(write!(f, "{:1$.2$}", datum, width, places));
+                        },
+                        None => {
+                            try!(write!(f, "{:1$}", datum, width));
+                        }
+                    }
                     if index < row.len() - 1 {
                         try!(write!(f, " "));
                     }
@@ -1466,4 +1476,28 @@ mod tests {
                                   ⎣2.68545   1.282   10000⎦";
         assert_eq!(second_expectation, format!("{}", second_matrix));
     }
+
+    #[test]
+    fn test_display_formatting_precision() {
+        let our_matrix = Matrix::new(2, 3, vec![1.2, 1.23, 1.234,
+                                                1.2345, 1.23456, 1.234567]);
+        let expectations = vec![
+            "⎡1.2 1.2 1.2⎤\n\
+             ⎣1.2 1.2 1.2⎦",
+
+            "⎡1.20 1.23 1.23⎤\n\
+             ⎣1.23 1.23 1.23⎦",
+
+            "⎡1.200 1.230 1.234⎤\n\
+             ⎣1.234 1.235 1.235⎦",
+
+            "⎡1.2000 1.2300 1.2340⎤\n\
+             ⎣1.2345 1.2346 1.2346⎦"
+        ];
+
+        for (places, &expectation) in (1..5).zip(expectations.iter()) {
+            assert_eq!(expectation, format!("{:.1$}", our_matrix, places));
+        }
+    }
+
 }
