@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/AtheMathmo/rusty-machine](https://badges.gitter.im/AtheMathmo/rusty-machine.svg)](https://gitter.im/AtheMathmo/rusty-machine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.2.1](https://crates.io/crates/rusty-machine/0.2.1).
+Here is the API documentation for the rust crate. Currently up to date for [version 0.2.2](https://crates.io/crates/rusty-machine/0.2.2).
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
@@ -55,6 +55,7 @@ There is also a `stats` module behind an optional features flag.
 
 - Linear Regression
 - Logistic Regression
+- Generalized Linear Models
 - K-Means Clustering
 - Neural Networks
 - Gaussian Process Regression
@@ -110,9 +111,11 @@ The current algorithms included are:
 
 - Linear Regression
 - Logistic Regression
+- Generalized Linear Models
 - K-Means Clustering
-- Feed forward neural networks
-- Gaussian Proces regression
+- Neural Networks
+- Gaussian Process Regression
 - Support Vector Machines
+- Gaussian Mixture Models
 
 ---

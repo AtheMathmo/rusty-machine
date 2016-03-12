@@ -3,6 +3,7 @@
 //! Currently contains all code
 //! relating to the matrix linear algebra struct.
 
+use std::fmt;
 use std::ops::{Mul, Add, Div, Sub, Index, Neg};
 use libnum::{One, Zero, Float, FromPrimitive};
 use std::cmp::{PartialEq, min};
@@ -15,6 +16,7 @@ mod decomposition;
 /// The Matrix struct.
 ///
 /// Can be instantiated with any type.
+#[derive(Debug)]
 pub struct Matrix<T> {
     rows: usize,
     cols: usize,
@@ -1385,4 +1387,124 @@ impl<T: Float> Metric<T> for Matrix<T> {
 
         s.sqrt()
     }
+}
+
+impl<T: fmt::Display> fmt::Display for Matrix<T> {
+    /// Formats the Matrix for display.
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        let mut max_datum_width = 0;
+        for datum in &self.data {
+            let datum_width = match f.precision() {
+                Some(places) => format!("{:.1$}", datum, places).len(),
+                None => format!("{}", datum).len()
+            };
+            if datum_width > max_datum_width {
+                max_datum_width = datum_width;
+            }
+        }
+        let width = max_datum_width;
+
+        fn write_row<T: fmt::Display>(f: &mut fmt::Formatter, row: &[T],
+                                      left_delimiter: &str,
+                                      right_delimiter: &str,
+                                      width: usize)
+                                      -> Result<(), fmt::Error> {
+                try!(write!(f, "{}", left_delimiter));
+                for (index, datum) in row.iter().enumerate() {
+                    match f.precision() {
+                        Some(places) => {
+                            try!(write!(f, "{:1$.2$}", datum, width, places));
+                        },
+                        None => {
+                            try!(write!(f, "{:1$}", datum, width));
+                        }
+                    }
+                    if index < row.len() - 1 {
+                        try!(write!(f, " "));
+                    }
+                }
+            write!(f, "{}", right_delimiter)
+        }
+
+        match self.rows {
+            1 => write_row(f, &self.data, "[", "]", width),
+            _ => {
+                try!(write_row(f, &self.data[0..self.cols],
+                               "⎡", // \u{23a1} LEFT SQUARE BRACKET UPPER CORNER
+                               "⎤", // \u{23a4} RIGHT SQUARE BRACKET UPPER CORNER
+                               width));
+                try!(f.write_str("\n"));
+                for row_index in 1..self.rows-1 {
+                    try!(write_row(f,
+                                   &self.data[row_index*self.cols..
+                                              (row_index+1)*self.cols],
+                                   "⎢", // \u{23a2} LEFT SQUARE BRACKET EXTENSION
+                                   "⎥", // \u{23a5} RIGHT SQUARE BRACKET EXTENSION
+                                   width));
+                    try!(f.write_str("\n"));
+                }
+                write_row(f,
+                          &self.data[(self.rows-1)*self.cols..
+                                     self.rows*self.cols],
+                          "⎣", // \u{23a3} LEFT SQUARE BRACKET LOWER CORNER
+                          "⎦", // \u{23a6} RIGHT SQUARE BRACKET LOWER CORNER
+                          width)
+            }
+        }
+
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::Matrix;
+
+    #[test]
+    fn test_display_formatting() {
+        let first_matrix = Matrix::new(2, 3, vec![1, 2, 3, 4, 5, 6]);
+        let first_expectation = "⎡1 2 3⎤\n\
+                                 ⎣4 5 6⎦";
+        assert_eq!(first_expectation, format!("{}", first_matrix));
+
+        let second_matrix = Matrix::new(4, 3, vec![3.14, 2.718, 1.414,
+                                                   2.503, 4.669, 1.202,
+                                                   1.618, 0.5772, 1.3,
+                                                   2.68545, 1.282, 10000.]);
+        let second_expectation = "⎡   3.14   2.718   1.414⎤\n\
+                                  ⎢  2.503   4.669   1.202⎥\n\
+                                  ⎢  1.618  0.5772     1.3⎥\n\
+                                  ⎣2.68545   1.282   10000⎦";
+        assert_eq!(second_expectation, format!("{}", second_matrix));
+    }
+
+    #[test]
+    fn test_single_row_display_formatting() {
+        let one_row_matrix = Matrix::new(1, 4, vec![1, 2, 3, 4]);
+        assert_eq!("[1 2 3 4]", format!("{}", one_row_matrix));
+    }
+
+    #[test]
+    fn test_display_formatting_precision() {
+        let our_matrix = Matrix::new(2, 3, vec![1.2, 1.23, 1.234,
+                                                1.2345, 1.23456, 1.234567]);
+        let expectations = vec![
+            "⎡1.2 1.2 1.2⎤\n\
+             ⎣1.2 1.2 1.2⎦",
+
+            "⎡1.20 1.23 1.23⎤\n\
+             ⎣1.23 1.23 1.23⎦",
+
+            "⎡1.200 1.230 1.234⎤\n\
+             ⎣1.234 1.235 1.235⎦",
+
+            "⎡1.2000 1.2300 1.2340⎤\n\
+             ⎣1.2345 1.2346 1.2346⎦"
+        ];
+
+        for (places, &expectation) in (1..5).zip(expectations.iter()) {
+            assert_eq!(expectation, format!("{:.1$}", our_matrix, places));
+        }
+    }
+
 }
