@@ -430,6 +430,60 @@
 <span id="387">387</span>
 <span id="388">388</span>
 <span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Neural Network module</span>
 <span class='doccomment'>//!</span>
@@ -443,9 +497,9 @@
 <span class='doccomment'>//! use rusty_machine::learning::SupModel;</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! let inputs = Matrix::new(5,3, vec![1.,1.,1.,2.,2.,2.,3.,3.,3.,</span>
-<span class='doccomment'>//! 								4.,4.,4.,5.,5.,5.,]);</span>
+<span class='doccomment'>//!                                 4.,4.,4.,5.,5.,5.,]);</span>
 <span class='doccomment'>//! let targets = Matrix::new(5,3, vec![1.,0.,0.,0.,1.,0.,0.,0.,1.,</span>
-<span class='doccomment'>//! 									0.,0.,1.,0.,0.,1.]);</span>
+<span class='doccomment'>//!                                     0.,0.,1.,0.,0.,1.]);</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! let layers = &amp;[3,5,11,7,3];</span>
 <span class='doccomment'>//! let mut model = NeuralNet::default(layers);</span>
@@ -474,18 +528,45 @@
 
 <span class='kw'>use</span> <span class='ident'>rand</span>::{<span class='ident'>Rng</span>, <span class='ident'>thread_rng</span>};
 
-<span class='doccomment'>/// Neural Network struct</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Criterion</span><span class='op'>&gt;</span> {
-    <span class='ident'>layer_sizes</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> [<span class='ident'>usize</span>],
-    <span class='ident'>weights</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>,
-    <span class='ident'>gd</span>: <span class='ident'>StochasticGD</span>,
-    <span class='ident'>criterion</span>: <span class='ident'>T</span>,
+<span class='doccomment'>/// Neural Network Model</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// The Neural Network struct specifies a Criterion and</span>
+<span class='doccomment'>/// a gradient descent algorithm.</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>, <span class='ident'>A</span><span class='op'>&gt;</span>
+    <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Criterion</span>,
+          <span class='ident'>A</span>: <span class='ident'>OptimAlgorithm</span><span class='op'>&lt;</span><span class='ident'>BaseNeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;&gt;</span>
+{
+    <span class='ident'>base</span>: <span class='ident'>BaseNeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span>,
+    <span class='ident'>alg</span>: <span class='ident'>A</span>,
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>BCECriterion</span><span class='op'>&gt;</span> {
+<span class='doccomment'>/// Supervised learning for the Neural Network.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// The model is trained using back propagation.</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>, <span class='ident'>A</span><span class='op'>&gt;</span> <span class='ident'>SupModel</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>, <span class='ident'>A</span><span class='op'>&gt;</span>
+    <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Criterion</span>,
+          <span class='ident'>A</span>: <span class='ident'>OptimAlgorithm</span><span class='op'>&lt;</span><span class='ident'>BaseNeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;&gt;</span>
+{
+    <span class='doccomment'>/// Predict neural network output using forward propagation.</span>
+    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>forward_prop</span>(<span class='ident'>inputs</span>)
+    }
+
+    <span class='doccomment'>/// Train the model using gradient optimization and back propagation.</span>
+    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
+        <span class='kw'>let</span> <span class='ident'>start</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>weights</span>.<span class='ident'>clone</span>();
+        <span class='kw'>let</span> <span class='ident'>optimal_w</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>alg</span>.<span class='ident'>optimize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>base</span>, <span class='kw-2'>&amp;</span><span class='ident'>start</span>[..], <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
+        <span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>weights</span> <span class='op'>=</span> <span class='ident'>optimal_w</span>;
+    }
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>BCECriterion</span>, <span class='ident'>StochasticGD</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Creates a neural network with the specified layer sizes.</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Uses the default settings (gradient descent and sigmoid activation function).</span>
+    <span class='doccomment'>/// The layer sizes slice should include the input, hidden layers, and output layer sizes.</span>
+    <span class='doccomment'>/// The type of activation function must be specified.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Uses the default settings (stochastic gradient descent and sigmoid activation function).</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Examples</span>
     <span class='doccomment'>///</span>
@@ -496,16 +577,18 @@
     <span class='doccomment'>/// let layers = &amp;[3; 4];</span>
     <span class='doccomment'>/// let mut net = NeuralNet::default(layers);</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>default</span>(<span class='ident'>layer_sizes</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>usize</span>]) <span class='op'>-&gt;</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='ident'>BCECriterion</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>default</span>(<span class='ident'>layer_sizes</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>usize</span>]) <span class='op'>-&gt;</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='ident'>BCECriterion</span>, <span class='ident'>StochasticGD</span><span class='op'>&gt;</span> {
         <span class='ident'>NeuralNet</span> {
-            <span class='ident'>layer_sizes</span>: <span class='ident'>layer_sizes</span>,
-            <span class='ident'>weights</span>: <span class='ident'>NeuralNet</span>::<span class='op'>&lt;</span><span class='ident'>BCECriterion</span><span class='op'>&gt;</span>::<span class='ident'>create_weights</span>(<span class='ident'>layer_sizes</span>),
-            <span class='ident'>gd</span>: <span class='ident'>StochasticGD</span>::<span class='ident'>default</span>(),
-            <span class='ident'>criterion</span>: <span class='ident'>BCECriterion</span>,
+            <span class='ident'>base</span>: <span class='ident'>BaseNeuralNet</span>::<span class='ident'>default</span>(<span class='ident'>layer_sizes</span>),
+            <span class='ident'>alg</span>: <span class='ident'>StochasticGD</span>::<span class='ident'>default</span>(),
         }
     }
 }
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Criterion</span><span class='op'>&gt;</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>, <span class='ident'>A</span><span class='op'>&gt;</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>, <span class='ident'>A</span><span class='op'>&gt;</span>
+    <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Criterion</span>,
+          <span class='ident'>A</span>: <span class='ident'>OptimAlgorithm</span><span class='op'>&lt;</span><span class='ident'>BaseNeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;&gt;</span>
+{
     <span class='doccomment'>/// Create a new neural network with the specified layer sizes.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// The layer sizes slice should include the input, hidden layers, and output layer sizes.</span>
@@ -518,16 +601,69 @@
     <span class='doccomment'>/// ```</span>
     <span class='doccomment'>/// use rusty_machine::learning::nnet::BCECriterion;</span>
     <span class='doccomment'>/// use rusty_machine::learning::nnet::NeuralNet;</span>
+    <span class='doccomment'>/// use rusty_machine::learning::optim::grad_desc::StochasticGD;</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// // Create a neural net with 4 layers, 3 neurons in each.</span>
     <span class='doccomment'>/// let layers = &amp;[3; 4];</span>
-    <span class='doccomment'>/// let mut net = NeuralNet::new(layers, BCECriterion);</span>
+    <span class='doccomment'>/// let mut net = NeuralNet::new(layers, BCECriterion, StochasticGD::default());</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>layer_sizes</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>usize</span>], <span class='ident'>criterion</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>layer_sizes</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> [<span class='ident'>usize</span>], <span class='ident'>criterion</span>: <span class='ident'>T</span>, <span class='ident'>alg</span>: <span class='ident'>A</span>) <span class='op'>-&gt;</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>, <span class='ident'>A</span><span class='op'>&gt;</span> {
         <span class='ident'>NeuralNet</span> {
+            <span class='ident'>base</span>: <span class='ident'>BaseNeuralNet</span>::<span class='ident'>new</span>(<span class='ident'>layer_sizes</span>, <span class='ident'>criterion</span>),
+            <span class='ident'>alg</span>: <span class='ident'>alg</span>,
+        }
+    }
+
+    <span class='doccomment'>/// Gets matrix of weights between specified layer and forward layer.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::learning::nnet::NeuralNet;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// // Create a neural net with 4 layers, 3 neurons in each.</span>
+    <span class='doccomment'>/// let layers = &amp;[3; 4];</span>
+    <span class='doccomment'>/// let mut net = NeuralNet::default(layers);</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let w = &amp;net.get_net_weights(2);</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// // We add a bias term to the weight matrix</span>
+    <span class='doccomment'>/// assert_eq!(w.rows(), 4);</span>
+    <span class='doccomment'>/// assert_eq!(w.cols(), 3);</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_net_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>idx</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>get_layer_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>weights</span>[..], <span class='ident'>idx</span>)
+    }
+}
+
+<span class='doccomment'>/// Base Neural Network struct</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// This struct cannot be instantianated and is used internally only.</span>
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>BaseNeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Criterion</span><span class='op'>&gt;</span> {
+    <span class='ident'>layer_sizes</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> [<span class='ident'>usize</span>],
+    <span class='ident'>weights</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>,
+    <span class='ident'>criterion</span>: <span class='ident'>T</span>,
+}
+
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>BaseNeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>BCECriterion</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// Creates a base neural network with the specified layer sizes.</span>
+    <span class='kw'>fn</span> <span class='ident'>default</span>(<span class='ident'>layer_sizes</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>usize</span>]) <span class='op'>-&gt;</span> <span class='ident'>BaseNeuralNet</span><span class='op'>&lt;</span><span class='ident'>BCECriterion</span><span class='op'>&gt;</span> {
+        <span class='ident'>BaseNeuralNet</span> {
             <span class='ident'>layer_sizes</span>: <span class='ident'>layer_sizes</span>,
-            <span class='ident'>weights</span>: <span class='ident'>NeuralNet</span>::<span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>::<span class='ident'>create_weights</span>(<span class='ident'>layer_sizes</span>),
-            <span class='ident'>gd</span>: <span class='ident'>StochasticGD</span>::<span class='ident'>default</span>(),
+            <span class='ident'>weights</span>: <span class='ident'>BaseNeuralNet</span>::<span class='op'>&lt;</span><span class='ident'>BCECriterion</span><span class='op'>&gt;</span>::<span class='ident'>create_weights</span>(<span class='ident'>layer_sizes</span>),
+            <span class='ident'>criterion</span>: <span class='ident'>BCECriterion</span>,
+        }
+    }
+}
+
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Criterion</span><span class='op'>&gt;</span> <span class='ident'>BaseNeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// Create a new base neural network with the specified layer sizes.</span>
+    <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>layer_sizes</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>usize</span>], <span class='ident'>criterion</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>BaseNeuralNet</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='ident'>BaseNeuralNet</span> {
+            <span class='ident'>layer_sizes</span>: <span class='ident'>layer_sizes</span>,
+            <span class='ident'>weights</span>: <span class='ident'>BaseNeuralNet</span>::<span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>::<span class='ident'>create_weights</span>(<span class='ident'>layer_sizes</span>),
             <span class='ident'>criterion</span>: <span class='ident'>criterion</span>,
         }
     }
@@ -539,8 +675,8 @@
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>layers</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
 
         <span class='kw'>for</span> (<span class='ident'>l</span>, <span class='ident'>item</span>) <span class='kw'>in</span> <span class='ident'>layer_sizes</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>().<span class='ident'>take</span>(<span class='ident'>total_layers</span> <span class='op'>-</span> <span class='number'>1</span>) {
-            <span class='ident'>layers</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>NeuralNet</span>::<span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>::<span class='ident'>initialize_weights</span>(<span class='ident'>item</span> <span class='op'>+</span> <span class='number'>1</span>,
-                                                             <span class='ident'>layer_sizes</span>[<span class='ident'>l</span> <span class='op'>+</span> <span class='number'>1</span>]));
+            <span class='ident'>layers</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>BaseNeuralNet</span>::<span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>::<span class='ident'>initialize_weights</span>(<span class='ident'>item</span> <span class='op'>+</span> <span class='number'>1</span>,
+                                                                      <span class='ident'>layer_sizes</span>[<span class='ident'>l</span> <span class='op'>+</span> <span class='number'>1</span>]));
         }
         <span class='ident'>layers</span>.<span class='ident'>shrink_to_fit</span>();
 
@@ -596,47 +732,31 @@
 
     }
 
-    <span class='doccomment'>/// Gets matrix of weights between specified layer and forward layer.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Examples</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use rusty_machine::learning::nnet::NeuralNet;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// // Create a neural net with 4 layers, 3 neurons in each.</span>
-    <span class='doccomment'>/// let layers = &amp;[3; 4];</span>
-    <span class='doccomment'>/// let mut net = NeuralNet::default(layers);</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let w = &amp;net.get_net_weights(2);</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// // We add a bias term to the weight matrix</span>
-    <span class='doccomment'>/// assert_eq!(w.rows(), 4);</span>
-    <span class='doccomment'>/// assert_eq!(w.cols(), 3);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_net_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>idx</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// Gets matrix of weights between specified layer and forward layer</span>
+    <span class='doccomment'>/// for the base model.</span>
+    <span class='kw'>fn</span> <span class='ident'>get_net_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>idx</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>get_layer_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>weights</span>[..], <span class='ident'>idx</span>)
     }
 
-    <span class='comment'>// Get the matrix of weights without the bias terms.</span>
+    <span class='comment'>// // Get the matrix of weights without the bias terms.</span>
     <span class='comment'>// fn get_regular_weights(&amp;self, weights: &amp;[f64]) -&gt; Vec&lt;f64&gt; {</span>
-    <span class='comment'>// let mut reg_weights = Vec::new();</span>
-    <span class='comment'>//</span>
-    <span class='comment'>// Check that the weights are the right size.</span>
-    <span class='comment'>// let mut start = 0usize;</span>
-    <span class='comment'>// for l in 0..self.layer_sizes.len() - 1 {</span>
-    <span class='comment'>//</span>
-    <span class='comment'>// for i in 0..self.layer_sizes[l] {</span>
-    <span class='comment'>// for j in 0..self.layer_sizes[l + 1] {</span>
-    <span class='comment'>// reg_weights.push(weights[start + j*(1+self.layer_sizes[l]) + 1 + i] )</span>
+    <span class='comment'>//     let mut reg_weights = Vec::new();</span>
+
+    <span class='comment'>//     // Check that the weights are the right size.</span>
+    <span class='comment'>//     let mut start = 0usize;</span>
+    <span class='comment'>//     for l in 0..self.layer_sizes.len() - 1 {</span>
+
+    <span class='comment'>//         for i in 0..self.layer_sizes[l] {</span>
+    <span class='comment'>//             for j in 0..self.layer_sizes[l + 1] {</span>
+    <span class='comment'>//                 reg_weights.push(weights[start + j * (1 + self.layer_sizes[l]) + 1 + i])</span>
+    <span class='comment'>//             }</span>
+    <span class='comment'>//         }</span>
+
+    <span class='comment'>//         start += (self.layer_sizes[l] + 1) * self.layer_sizes[l + 1];</span>
+    <span class='comment'>//     }</span>
+
+    <span class='comment'>//     reg_weights</span>
     <span class='comment'>// }</span>
-    <span class='comment'>// }</span>
-    <span class='comment'>//</span>
-    <span class='comment'>// start += (self.layer_sizes[l]+1) * self.layer_sizes[l + 1];</span>
-    <span class='comment'>// }</span>
-    <span class='comment'>//</span>
-    <span class='comment'>// reg_weights</span>
-    <span class='comment'>// }</span>
-    <span class='comment'>//</span>
 
     <span class='doccomment'>/// Compute the gradient using the back propagation algorithm.</span>
     <span class='kw'>fn</span> <span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>,
@@ -737,9 +857,11 @@
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Criterion</span><span class='op'>&gt;</span> <span class='ident'>Optimizable</span> <span class='kw'>for</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='doccomment'>/// Compute the gradient of the Neural Network using the</span>
+<span class='doccomment'>/// back propagation algorithm.</span>
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Criterion</span><span class='op'>&gt;</span> <span class='ident'>Optimizable</span> <span class='kw'>for</span> <span class='ident'>BaseNeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>type</span> <span class='ident'>Inputs</span> <span class='op'>=</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>;
-	<span class='kw'>type</span> <span class='ident'>Targets</span> <span class='op'>=</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>;
+    <span class='kw'>type</span> <span class='ident'>Targets</span> <span class='op'>=</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>;
 
     <span class='doccomment'>/// Compute the gradient of the neural network.</span>
     <span class='kw'>fn</span> <span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>,
@@ -748,20 +870,6 @@
                     <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>)
                     <span class='op'>-&gt;</span> (<span class='ident'>f64</span>, <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
         <span class='self'>self</span>.<span class='ident'>compute_grad</span>(<span class='ident'>params</span>, <span class='ident'>inputs</span>, <span class='ident'>targets</span>)
-    }
-}
-
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Criterion</span><span class='op'>&gt;</span> <span class='ident'>SupModel</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
-    <span class='doccomment'>/// Predict neural network output using forward propagation.</span>
-    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-        <span class='self'>self</span>.<span class='ident'>forward_prop</span>(<span class='ident'>inputs</span>)
-    }
-
-    <span class='doccomment'>/// Train the model using gradient optimization and back propagation.</span>
-    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
-        <span class='kw'>let</span> <span class='ident'>start</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>weights</span>.<span class='ident'>clone</span>();
-        <span class='kw'>let</span> <span class='ident'>optimal_w</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>gd</span>.<span class='ident'>optimize</span>(<span class='self'>self</span>, <span class='kw-2'>&amp;</span><span class='ident'>start</span>[..], <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
-        <span class='self'>self</span>.<span class='ident'>weights</span> <span class='op'>=</span> <span class='ident'>optimal_w</span>;
     }
 }
 

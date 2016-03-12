@@ -26,7 +26,7 @@
     
 
     <nav class="sidebar">
-        <a href='../../../rand/index.html'><img src='https://www.rust-lang.org/logos/rust-logo-128x128-blk.png' alt='logo' width='100'></a>
+        <a href='../../../rand/index.html'><img src='https://www.rust-lang.org/logos/rust-logo-128x128-blk.png' alt='' width='100'></a>
         <p class='location'><a href='../../index.html'>rand</a>::<wbr><a href='../index.html'>distributions</a>::<wbr><a href='index.html'>gamma</a></p><script>window.sidebarCurrent = {name: 'ChiSquared', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-308' class='srclink' href='../../../src/rand/distributions/gamma.rs.html.html#198-200' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-308' class='srclink' href='../../../src/rand/distributions/gamma.rs.html#198-200' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct ChiSquared {
     // some fields omitted
 }</pre><div class='docblock'><p>The chi-squared distribution <code>χ²(k)</code>, where <code>k</code> is the degrees of
@@ -56,8 +56,7 @@ freedom.</p>
 of <code>k</code> independent standard normal random variables. For other
 <code>k</code>, this uses the equivalent characterisation <code>χ²(k) = Gamma(k/2, 2)</code>.</p>
 
-<h1 id='example' class='section-header'><a href='#example'>Example</a></h1>
-<pre class='rust rust-example-rendered'>
+<h1 id='example' class='section-header'><a href='#example'>Example</a></h1><pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>rand</span>::<span class='ident'>distributions</span>::{<span class='ident'>ChiSquared</span>, <span class='ident'>IndependentSample</span>};
 
 <span class='kw'>let</span> <span class='ident'>chi</span> <span class='op'>=</span> <span class='ident'>ChiSquared</span>::<span class='ident'>new</span>(<span class='number'>11.0</span>);
@@ -69,7 +68,7 @@ of <code>k</code> independent standard normal random variables. For other
 </div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../../../rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../../rand/distributions/gamma/struct.ChiSquared.html' title='rand::distributions::gamma::ChiSquared'>ChiSquared</a></code></h3><div class='impl-items'><h4 id='method.sample' class='method'><code>fn <a href='../../../rand/distributions/trait.Sample.html#method.sample' class='fnname'>sample</a>&lt;R: <a class='trait' href='../../../rand/trait.Rng.html' title='rand::Rng'>Rng</a>&gt;(&amp;mut self, rng: &amp;mut R) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h4>
 </div><h3 class='impl'><code>impl <a class='trait' href='../../../rand/distributions/trait.IndependentSample.html' title='rand::distributions::IndependentSample'>IndependentSample</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../../rand/distributions/gamma/struct.ChiSquared.html' title='rand::distributions::gamma::ChiSquared'>ChiSquared</a></code></h3><div class='impl-items'><h4 id='method.ind_sample' class='method'><code>fn <a href='../../../rand/distributions/trait.IndependentSample.html#method.ind_sample' class='fnname'>ind_sample</a>&lt;R: <a class='trait' href='../../../rand/trait.Rng.html' title='rand::Rng'>Rng</a>&gt;(&amp;self, rng: &amp;mut R) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h4>
 </div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> for <a class='struct' href='../../../rand/distributions/gamma/struct.ChiSquared.html' title='rand::distributions::gamma::ChiSquared'>ChiSquared</a></code></h3><div class='impl-items'></div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../../../rand/distributions/gamma/struct.ChiSquared.html' title='rand::distributions::gamma::ChiSquared'>ChiSquared</a></code></h3><div class='impl-items'><h4 id='method.clone' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../../../rand/distributions/gamma/struct.ChiSquared.html' title='rand::distributions::gamma::ChiSquared'>ChiSquared</a></code></h4>
-<h4 id='method.clone_from' class='method'><span class="since">1.0.0</span><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
+<h4 id='method.clone_from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 
@@ -113,7 +112,7 @@ of <code>k</code> independent standard normal random variables. For other
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                    <code>vec -> usize</code>)
                 </p>
             </div>
         </div>

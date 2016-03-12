@@ -46,11 +46,11 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-1515' class='srclink' href='../../../src/rusty_machine/src/learning/glm.rs.html.html#429' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-1598' class='srclink' href='../../../src/rusty_machine/learning/glm.rs.html#429' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Normal;</pre><div class='docblock'><p>The Normal regression family.</p>
 
 <p>This is equivalent to the Linear Regression model.</p>
-</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../../../rusty_machine/learning/glm/trait.Criterion.html' title='rusty_machine::learning::glm::Criterion'>Criterion</a> for <a class='struct' href='../../../rusty_machine/learning/glm/struct.Normal.html' title='rusty_machine::learning::glm::Normal'>Normal</a></code></h3><div class='impl-items'><h4 id='associatedtype.Link' class='type'><code>type Link = <a class='struct' href='../../../rusty_machine/learning/glm/struct.Identity.html' title='rusty_machine::learning::glm::Identity'>Identity</a></code></h4>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../../../rusty_machine/learning/glm/trait.Criterion.html' title='rusty_machine::learning::glm::Criterion'>Criterion</a> for <a class='struct' href='../../../rusty_machine/learning/glm/struct.Normal.html' title='rusty_machine::learning::glm::Normal'>Normal</a></code></h3><div class='impl-items'><h4 id='assoc_type.Link' class='type'><code>type Link = <a class='struct' href='../../../rusty_machine/learning/glm/struct.Identity.html' title='rusty_machine::learning::glm::Identity'>Identity</a></code></h4>
 <h4 id='method.model_variance' class='method'><code>fn <a href='../../../rusty_machine/learning/glm/trait.Criterion.html#method.model_variance' class='fnname'>model_variance</a>(&amp;self, _: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h4>
 <h4 id='method.initialize_mu' class='method'><code>fn <a href='../../../rusty_machine/learning/glm/trait.Criterion.html#method.initialize_mu' class='fnname'>initialize_mu</a>(&amp;self, y: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;</code></h4>
 <h4 id='method.compute_working_weight' class='method'><code>fn <a href='../../../rusty_machine/learning/glm/trait.Criterion.html#method.compute_working_weight' class='fnname'>compute_working_weight</a>(&amp;self, mu: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;</code></h4>
@@ -101,7 +101,7 @@
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                    <code>vec -> usize</code>)
                 </p>
             </div>
         </div>

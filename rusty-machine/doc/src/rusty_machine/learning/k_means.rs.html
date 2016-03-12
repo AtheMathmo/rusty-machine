@@ -343,7 +343,6 @@
 <span id="300">300</span>
 <span id="301">301</span>
 <span id="302">302</span>
-<span id="303">303</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! K-means Classification</span>
 <span class='doccomment'>//!</span>
@@ -357,7 +356,6 @@
 <span class='doccomment'>//! use rusty_machine::learning::UnSupModel;</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);</span>
-<span class='doccomment'>//! let targets = Matrix::new(1, 2, vec![0.0, 0.0]);</span>
 <span class='doccomment'>//! let test_inputs = Matrix::new(1, 2, vec![1.0, 3.5]);</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Create model with k(=2) classes.</span>
@@ -366,7 +364,7 @@
 <span class='doccomment'>//! // Where inputs is a Matrix with features in columns.</span>
 <span class='doccomment'>//! model.train(&amp;inputs);</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! // Where pred_data is a Matrix with features in columns.</span>
+<span class='doccomment'>//! // Where test_inputs is a Matrix with features in columns.</span>
 <span class='doccomment'>//! let a = model.predict(&amp;test_inputs);</span>
 <span class='doccomment'>//! ```</span>
 <span class='doccomment'>//!</span>
@@ -614,13 +612,13 @@
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>init_centroids</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>k</span> <span class='op'>*</span> <span class='ident'>inputs</span>.<span class='ident'>cols</span>());
         <span class='kw'>let</span> <span class='ident'>first_cen</span> <span class='op'>=</span> <span class='ident'>rng</span>.<span class='ident'>gen_range</span>(<span class='number'>0usize</span>, <span class='ident'>inputs</span>.<span class='ident'>rows</span>());
 
-        <span class='ident'>init_centroids</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>first_cen</span>]).<span class='ident'>into_vec</span>());
+        <span class='ident'>init_centroids</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='ident'>first_cen</span>]).<span class='ident'>into_vec</span>());
 
         <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>1</span>..<span class='ident'>k</span> {
             <span class='kw'>let</span> <span class='ident'>temp_centroids</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>i</span>, <span class='ident'>inputs</span>.<span class='ident'>cols</span>(), <span class='ident'>init_centroids</span>.<span class='ident'>clone</span>());
             <span class='kw'>let</span> (_, <span class='ident'>dist</span>) <span class='op'>=</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='kw-2'>&amp;</span><span class='ident'>temp_centroids</span>, <span class='kw-2'>&amp;</span><span class='ident'>inputs</span>);
             <span class='kw'>let</span> <span class='ident'>next_cen</span> <span class='op'>=</span> <span class='ident'>sample_discretely</span>(<span class='ident'>dist</span>);
-            <span class='ident'>init_centroids</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>next_cen</span>]).<span class='ident'>into_vec</span>())
+            <span class='ident'>init_centroids</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='ident'>next_cen</span>]).<span class='ident'>into_vec</span>())
         }
 
         <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>k</span>, <span class='ident'>inputs</span>.<span class='ident'>cols</span>(), <span class='ident'>init_centroids</span>)
