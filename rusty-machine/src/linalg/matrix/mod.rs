@@ -1478,6 +1478,12 @@ mod tests {
     }
 
     #[test]
+    fn test_single_row_display_formatting() {
+        let one_row_matrix = Matrix::new(1, 4, vec![1, 2, 3, 4]);
+        assert_eq!("[1 2 3 4]", format!("{}", one_row_matrix));
+    }
+
+    #[test]
     fn test_display_formatting_precision() {
         let our_matrix = Matrix::new(2, 3, vec![1.2, 1.23, 1.234,
                                                 1.2345, 1.23456, 1.234567]);
