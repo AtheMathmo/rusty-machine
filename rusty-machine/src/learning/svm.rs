@@ -23,7 +23,7 @@
 //!
 //! // Train the model
 //! svm_mod.train(&inputs, &targets);
-//! 
+//!
 //! // Now we'll predict a new point
 //! let new_point = Matrix::new(1,1,vec![10.]);
 //! let output = svm_mod.predict(&new_point);
@@ -43,6 +43,7 @@ use rand;
 use rand::Rng;
 
 /// Support Vector Machine
+#[derive(Debug)]
 pub struct SVM<K: Kernel> {
     ker: K,
     alpha: Option<Vector<f64>>,

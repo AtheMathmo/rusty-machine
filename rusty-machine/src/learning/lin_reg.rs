@@ -18,7 +18,7 @@
 //! let targets = Vector::new(vec![1.,5.,9.,13.]);
 //!
 //! let mut lin_mod = LinRegressor::default();
-//! 
+//!
 //! // Train the model
 //! lin_mod.train(&inputs, &targets);
 //!
@@ -42,6 +42,7 @@ use learning::optim::Optimizable;
 /// Linear Regression Model.
 ///
 /// Contains option for optimized parameter.
+#[derive(Debug)]
 pub struct LinRegressor {
     /// The parameters for the regression model.
     parameters: Option<Vector<f64>>,
@@ -114,7 +115,7 @@ impl Optimizable for LinRegressor {
     type Targets = Vector<f64>;
 
     fn compute_grad(&self, params: &[f64], inputs: &Matrix<f64>, targets: &Vector<f64>) -> (f64, Vec<f64>) {
-        
+
         let beta_vec = Vector::new(params.to_vec());
         let outputs = inputs * beta_vec;
 
@@ -141,7 +142,7 @@ impl LinRegressor {
     /// let targets = Vector::new(vec![1.,5.,9.,13.]);
     ///
     /// let mut lin_mod = LinRegressor::default();
-    /// 
+    ///
     /// // Train the model
     /// lin_mod.train_with_optimization(&inputs, &targets);
     ///
