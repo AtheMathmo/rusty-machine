@@ -132,7 +132,7 @@ impl<T: Kernel, U: Kernel> Mul<KernelArith<T>> for KernelArith<U> {
 /// The Linear Kernel
 ///
 /// k(x,y) = x<sup>T</sup>y + c
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Linear {
     /// Constant term added to inner product.
     pub c: f64,
@@ -176,7 +176,7 @@ impl Kernel for Linear {
 /// The Polynomial Kernel
 ///
 /// k(x,y) = (αx<sup>T</sup>y + c)<sup>d</sup>
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Polynomial {
     /// Scaling of the inner product.
     pub alpha: f64,
@@ -239,7 +239,7 @@ impl Kernel for Polynomial {
 /// k(x,y) = A _exp_(-||x-y||<sup>2</sup> / 2l<sup>2</sup>)
 ///
 /// Where A is the amplitude and l the length scale.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct SquaredExp {
     /// The length scale of the kernel.
     pub ls: f64,
@@ -301,7 +301,7 @@ impl Kernel for SquaredExp {
 /// k(x,y) = A _exp_(-||x-y|| / 2l<sup>2</sup>)
 ///
 /// Where A is the amplitude and l is the length scale.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Exponential {
     /// The length scale of the kernel.
     pub ls: f64,
@@ -361,7 +361,7 @@ impl Kernel for Exponential {
 /// The Hyperbolic Tangent Kernel.
 ///
 /// ker(x,y) = _tanh_(αx<sup>T</sup>y + c)
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct HyperTan {
     /// The scaling of the inner product.
     pub alpha: f64,
@@ -415,7 +415,7 @@ impl Kernel for HyperTan {
 /// The Multiquadric Kernel.
 ///
 /// k(x,y) = _sqrt_(||x-y||<sup>2</sup> + c<sup>2</sup>)
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Multiquadric {
     /// Constant added to square of difference.
     pub c: f64,
@@ -464,7 +464,7 @@ impl Kernel for Multiquadric {
 /// The Rational Quadratic Kernel.
 ///
 /// k(x,y) = (1 + ||x-y||<sup>2</sup> / (2αl<sup>2</sup>))<sup>-α</sup>
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct RationalQuadratic {
     /// Controls inverse power and difference scale.
     pub alpha: f64,

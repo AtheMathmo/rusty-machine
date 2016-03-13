@@ -37,7 +37,7 @@ use learning::toolkit::rand_utils;
 /// - Full : The full covariance structure.
 /// - Regularized : Adds a regularization constant to the covariance diagonal.
 /// - Diagonal : Only the diagonal covariance structure.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum CovOption {
     /// The full covariance structure.
     Full,

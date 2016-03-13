@@ -50,7 +50,7 @@ use rand::{Rng, thread_rng};
 use libnum::abs;
 
 /// Initialization Algorithm enum.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum InitAlgorithm {
     /// The Forgy initialization scheme.
     Forgy,

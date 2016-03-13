@@ -21,7 +21,7 @@ pub trait ActivationFunc {
 }
 
 /// Sigmoid activation function.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Sigmoid;
 
 impl ActivationFunc for Sigmoid {
@@ -45,7 +45,7 @@ impl ActivationFunc for Sigmoid {
 }
 
 /// Linear activation function.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Linear;
 
 impl ActivationFunc for Linear {
@@ -63,7 +63,7 @@ impl ActivationFunc for Linear {
 }
 
 /// Exponential activation function.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Exp;
 
 impl ActivationFunc for Exp {

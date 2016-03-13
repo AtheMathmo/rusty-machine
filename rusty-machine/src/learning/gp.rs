@@ -38,7 +38,7 @@ pub trait MeanFunc {
 }
 
 /// Constant mean function
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct ConstMean {
     a: f64,
 }

@@ -221,7 +221,7 @@ pub trait LinkFunc {
 /// The Logit link function.
 ///
 /// Used primarily as the canonical link in Binomial Regression.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Logit;
 
 /// The Logit link function.
@@ -245,7 +245,7 @@ impl LinkFunc for Logit {
 /// The log link function.
 ///
 /// Used primarily as the canonical link in Poisson Regression.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Log;
 
 /// The log link function.
@@ -268,7 +268,7 @@ impl LinkFunc for Log {
 /// The Identity link function.
 ///
 /// Used primarily as the canonical link in Linear Regression.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Identity;
 
 /// The Identity link function.
@@ -291,7 +291,7 @@ impl LinkFunc for Identity {
 /// The Bernoulli regression family.
 ///
 /// This is equivalent to logistic regression.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Bernoulli;
 
 impl Criterion for Bernoulli {
@@ -432,7 +432,7 @@ impl Criterion for Binomial {
 /// The Normal regression family.
 ///
 /// This is equivalent to the Linear Regression model.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Normal;
 
 impl Criterion for Normal {
@@ -444,7 +444,7 @@ impl Criterion for Normal {
 }
 
 /// The Poisson regression family.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Poisson;
 
 impl Criterion for Poisson {

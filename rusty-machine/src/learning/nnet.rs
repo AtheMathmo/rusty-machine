@@ -426,7 +426,7 @@ pub trait Criterion {
 ///
 /// Uses the Sigmoid activation function and the
 /// cross entropy error.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct BCECriterion;
 
 impl Criterion for BCECriterion {
@@ -438,7 +438,7 @@ impl Criterion for BCECriterion {
 ///
 /// Uses the Linear activation function and the
 /// mean squared error.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct MSECriterion;
 
 impl Criterion for MSECriterion {
