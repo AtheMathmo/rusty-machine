@@ -37,6 +37,7 @@ use learning::toolkit::rand_utils;
 /// - Full : The full covariance structure.
 /// - Regularized : Adds a regularization constant to the covariance diagonal.
 /// - Diagonal : Only the diagonal covariance structure.
+#[derive(Clone, Copy, Debug)]
 pub enum CovOption {
     /// The full covariance structure.
     Full,
@@ -48,6 +49,7 @@ pub enum CovOption {
 
 
 /// A Gaussian Mixture Model
+#[derive(Debug)]
 pub struct GaussianMixtureModel {
     comp_count: usize,
     mix_weights: Vector<f64>,

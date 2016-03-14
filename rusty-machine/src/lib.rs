@@ -81,6 +81,7 @@
 //! `let mut gp = GaussianProcess::default();`. Conversely, you could also implement
 //! your own kernels and mean functions by using the appropriate traits.
 
+#![warn(missing_debug_implementations)]
 
 extern crate num as libnum;
 extern crate rand;

@@ -38,6 +38,7 @@ pub trait MeanFunc {
 }
 
 /// Constant mean function
+#[derive(Clone, Copy, Debug)]
 pub struct ConstMean {
     a: f64,
 }
@@ -60,6 +61,7 @@ impl MeanFunc for ConstMean {
 /// Gaussian process with generic kernel and deterministic mean function.
 /// Can be used for gaussian process regression with noise.
 /// Currently does not support classification.
+#[derive(Debug)]
 pub struct GaussianProcess<T: Kernel, U: MeanFunc> {
     ker: T,
     mean: U,
@@ -81,7 +83,7 @@ pub struct GaussianProcess<T: Kernel, U: MeanFunc> {
 /// Note that zero noise can often lead to numerical instability.
 /// A small value for the noise may be a better alternative.
 impl Default for GaussianProcess<SquaredExp, ConstMean> {
-    
+
     fn default() -> GaussianProcess<SquaredExp, ConstMean> {
         GaussianProcess {
             ker: SquaredExp::default(),

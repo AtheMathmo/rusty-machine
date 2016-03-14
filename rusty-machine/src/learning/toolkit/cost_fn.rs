@@ -21,6 +21,7 @@ pub trait CostFunc<T> {
 }
 
 /// The mean squared error cost function.
+#[derive(Clone, Copy, Debug)]
 pub struct MeanSqError;
 
 // For generics we need a trait for "Hadamard product" here
@@ -56,6 +57,7 @@ impl CostFunc<Vector<f64>> for MeanSqError {
 }
 
 /// The cross entropy error cost function.
+#[derive(Clone, Copy, Debug)]
 pub struct CrossEntropyError;
 
 impl CostFunc<Matrix<f64>> for CrossEntropyError {
