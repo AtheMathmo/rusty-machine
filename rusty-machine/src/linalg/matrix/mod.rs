@@ -12,6 +12,7 @@ use linalg::vector::Vector;
 use linalg::utils;
 
 mod decomposition;
+pub mod slice;
 
 /// The Matrix struct.
 ///
@@ -76,6 +77,46 @@ impl<T> Matrix<T> {
     /// Consumes the Matrix and returns the Vec of data.
     pub fn into_vec(self) -> Vec<T> {
         self.data
+    }
+
+    pub fn split_rows_at(&self, mid: usize) -> (slice::MatrixSlice<T>, slice::MatrixSlice<T>) {
+        assert!(mid < self.rows);
+
+        let slice_1 = slice::MatrixSlice::from_matrix(self, [0,0], mid, self.cols);
+        let slice_2 = slice::MatrixSlice::from_matrix(self, [mid,0], self.rows - mid, self.cols);
+
+        (slice_1, slice_2)
+    }
+
+    pub fn split_cols_at(&self, mid: usize) -> (slice::MatrixSlice<T>, slice::MatrixSlice<T>) {
+        assert!(mid < self.rows);
+
+        let slice_1 = slice::MatrixSlice::from_matrix(self, [0,0], self.rows, mid);
+        let slice_2 = slice::MatrixSlice::from_matrix(self, [0,mid], self.rows, self.cols - mid);
+
+        (slice_1, slice_2)
+    }
+
+    pub fn split_rows_at_mut(&mut self, mid: usize) -> (slice::MatrixSliceMut<T>, slice::MatrixSliceMut<T>) {
+        assert!(mid < self.rows);
+
+        let mat_cols = self.cols;
+        let mat_rows = self.rows;
+        let slice_1 = slice::MatrixSliceMut::from_matrix(self, [0,0], mid, mat_cols);
+        let slice_2 = slice::MatrixSliceMut::from_matrix(self, [mid,0], mat_rows - mid, mat_cols);
+
+        (slice_1, slice_2)
+    }
+
+    pub fn split_cols_at_mut(&mut self, mid: usize) -> (slice::MatrixSliceMut<T>, slice::MatrixSliceMut<T>) {
+        assert!(mid < self.rows);
+
+        let mat_cols = self.cols;
+        let mat_rows = self.rows;
+        let slice_1 = slice::MatrixSliceMut::from_matrix(self, [0,0], mat_rows, mid);
+        let slice_2 = slice::MatrixSliceMut::from_matrix(self, [0,mid], mat_rows, mat_cols - mid);
+
+        (slice_1, slice_2)
     }
 }
 
