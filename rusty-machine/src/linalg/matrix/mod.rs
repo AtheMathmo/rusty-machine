@@ -68,7 +68,7 @@ impl<T> Matrix<T> {
         &self.data
     }
 
-    /// Returns an iterator over the mutable rows.
+    /// Returns a mutable slice of the underlying data.
     pub fn mut_data(&mut self) -> &mut [T] {
         &mut self.data
     }
