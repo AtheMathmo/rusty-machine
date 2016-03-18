@@ -4,7 +4,6 @@
 //! relating to the matrix linear algebra struct.
 
 use std::fmt;
-use std::slice::ChunksMut;
 use std::ops::{Mul, Add, Div, Sub, Index, Neg};
 use libnum::{One, Zero, Float, FromPrimitive};
 use std::cmp::{PartialEq, min};
@@ -70,8 +69,8 @@ impl<T> Matrix<T> {
     }
 
     /// Returns an iterator over the mutable rows.
-    pub fn iter_mut_rows(&mut self) -> ChunksMut<T> {
-        self.data.chunks_mut(self.cols)
+    pub fn mut_data(&mut self) -> &mut [T] {
+        &mut self.data
     }
 
     /// Consumes the Matrix and returns the Vec of data.
