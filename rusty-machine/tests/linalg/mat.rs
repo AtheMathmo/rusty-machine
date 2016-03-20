@@ -170,7 +170,7 @@ fn matrix_add() {
     let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
     let b = Matrix::new(3, 2, vec![2., 3., 4., 5., 6., 7.]);
 
-    // Reusing memory
+    // Allocating new memory
     let c = &a + &b;
 
     assert_eq!(c[[0, 0]], 3.0);
@@ -180,7 +180,7 @@ fn matrix_add() {
     assert_eq!(c[[2, 0]], 11.0);
     assert_eq!(c[[2, 1]], 13.0);
 
-    // Allocating new memory
+    // Reusing memory
     let c = a.clone() + &b;
 
     assert_eq!(c[[0, 0]], 3.0);
@@ -190,7 +190,7 @@ fn matrix_add() {
     assert_eq!(c[[2, 0]], 11.0);
     assert_eq!(c[[2, 1]], 13.0);
 
-    // Allocating new memory
+    // Reusing memory
     let c = &a + b.clone();
 
     assert_eq!(c[[0, 0]], 3.0);
@@ -200,7 +200,7 @@ fn matrix_add() {
     assert_eq!(c[[2, 0]], 11.0);
     assert_eq!(c[[2, 1]], 13.0);
 
-    // Allocating new memory
+    // Reusing memory
     let c = a + b;
 
     assert_eq!(c[[0, 0]], 3.0);

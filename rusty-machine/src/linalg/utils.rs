@@ -5,7 +5,6 @@
 use std::cmp;
 use libnum::Zero;
 use std::ops::{Add, Mul, Sub, Div};
-use std::mem;
 
 /// Compute dot product of two slices.
 ///
@@ -135,14 +134,10 @@ pub fn in_place_vec_bin_op<F, T: Copy>(mut u: &mut [T], v: &[T], mut f: F)
         let len = cmp::min(u.len(), v.len());
         
         let ys = &v[..len];
-        
-        let mut new_slice = mem::replace(&mut u, &mut []);
-        let (l,_) = new_slice.split_at_mut(len);
-        u = l;
-        
-    
+        let xs = &mut u[..len];
+
         for i in 0..len {
-            f(&mut u[i], &ys[i])
+            f(&mut xs[i], &ys[i])
         }
 }
 
