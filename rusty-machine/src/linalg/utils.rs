@@ -111,6 +111,60 @@ pub fn unrolled_sum<T>(mut xs: &[T]) -> T
     sum
 }
 
+/// Vectorized binary operation applied to two slices.
+/// The first argument should be a mutable slice which will
+/// be modified in place to prevent new memory allocation.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::linalg::utils;
+///
+/// let mut a = vec![2.0; 10];
+/// let b = vec![3.0; 10];
+///
+/// utils::in_place_vec_bin_op(&mut a, &b, |x, &y| { *x = 1f64 + *x * y });
+///
+/// // Will print a vector of `7`s.
+/// println!("{:?}", a);
+/// ```
+pub fn in_place_vec_bin_op<F, T: Copy>(mut u: &mut [T], v: &[T], mut f: F)
+    where F: FnMut(&mut T, &T) {
+        debug_assert_eq!(u.len(), v.len());
+        let len = cmp::min(u.len(), v.len());
+        
+        let ys = &v[..len];
+        let xs = &mut u[..len];
+
+        for i in 0..len {
+            f(&mut xs[i], &ys[i])
+        }
+}
+
+fn vec_bin_op<F, T: Copy>(u: &[T], v: &[T], f: F) -> Vec<T>
+    where F: Fn(T, T) -> T {
+        debug_assert_eq!(u.len(), v.len());
+        let len = cmp::min(u.len(), v.len());
+        
+        let xs = &u[..len];
+        let ys = &v[..len];
+        
+        let mut out_vec = Vec::with_capacity(len);
+        unsafe {
+            out_vec.set_len(len);
+        }
+        
+        {
+            let out_slice = &mut out_vec[..len];
+            
+            for i in 0..len {
+                out_slice[i] = f(xs[i], ys[i]);
+            }
+        }
+        
+        out_vec
+}
+
 /// Compute vector sum of two slices.
 ///
 /// # Examples
@@ -124,18 +178,10 @@ pub fn unrolled_sum<T>(mut xs: &[T]) -> T
 ///
 /// assert_eq!(c, vec![2.0,4.0, 6.0, 8.0]);
 /// ```
-pub fn vec_sum<T: Copy + Zero + Add<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
-    let len = cmp::min(u.len(), v.len());
-    let xs = &u[..len];
-    let ys = &v[..len];
-
-    let mut sum_data = Vec::with_capacity(len);
-
-    for i in 0..len {
-        sum_data.push(xs[i] + ys[i]);
-    }
-    sum_data
+pub fn vec_sum<T: Copy + Add<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
+    vec_bin_op(u, v, |x, y| { x + y })
 }
+
 
 /// Compute vector difference two slices.
 ///
@@ -150,17 +196,8 @@ pub fn vec_sum<T: Copy + Zero + Add<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> 
 ///
 /// assert_eq!(c, vec![0.0; 4]);
 /// ```
-pub fn vec_sub<T: Copy + Zero + Sub<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
-    let len = cmp::min(u.len(), v.len());
-    let xs = &u[..len];
-    let ys = &v[..len];
-
-    let mut sum_data = Vec::with_capacity(len);
-
-    for i in 0..len {
-        sum_data.push(xs[i] - ys[i]);
-    }
-    sum_data
+pub fn vec_sub<T: Copy + Sub<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
+    vec_bin_op(u, v, |x, y| { x - y })
 }
 
 /// Computes elementwise multiplication.
@@ -176,17 +213,8 @@ pub fn vec_sub<T: Copy + Zero + Sub<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> 
 ///
 /// assert_eq!(c, vec![1.0,4.0,9.0,16.0]);
 /// ```
-pub fn ele_mul<T: Copy + Zero + Mul<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
-    let len = cmp::min(u.len(), v.len());
-    let xs = &u[..len];
-    let ys = &v[..len];
-
-    let mut sum_data = Vec::with_capacity(len);
-
-    for i in 0..len {
-        sum_data.push(xs[i] * ys[i]);
-    }
-    sum_data
+pub fn ele_mul<T: Copy + Mul<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
+    vec_bin_op(u, v, |x, y| { x * y })
 }
 
 /// Computes elementwise division.
@@ -202,18 +230,10 @@ pub fn ele_mul<T: Copy + Zero + Mul<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> 
 ///
 /// assert_eq!(c, vec![1.0; 4]);
 /// ```
-pub fn ele_div<T: Copy + Zero + Div<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
-    let len = cmp::min(u.len(), v.len());
-    let xs = &u[..len];
-    let ys = &v[..len];
-
-    let mut sum_data = Vec::with_capacity(len);
-
-    for i in 0..len {
-        sum_data.push(xs[i] / ys[i]);
-    }
-    sum_data
+pub fn ele_div<T: Copy + Div<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
+    vec_bin_op(u, v, |x, y| { x / y })
 }
+
 
 /// Find argmax of slice.
 ///

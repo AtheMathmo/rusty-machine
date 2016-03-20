@@ -83,13 +83,11 @@ impl<T: Copy> Vector<T> {
     ///
     /// assert_eq!(b.into_vec(), vec![2.0; 4]);
     /// ```
-    pub fn apply(self, f: &Fn(T) -> T) -> Vector<T> {
-        let new_data = self.data.into_iter().map(f).collect();
-
-        Vector {
-            size: self.size,
-            data: new_data,
+    pub fn apply(mut self, f: &Fn(T) -> T) -> Vector<T> {
+        for val in self.data.iter_mut(){
+            *val = f(*val);
         }
+        self
     }
 }
 
@@ -323,7 +321,7 @@ impl<T: Copy + One + Zero + Mul<T, Output = T>> Mul<T> for Vector<T> {
     type Output = Vector<T>;
 
     fn mul(self, f: T) -> Vector<T> {
-        (&self) * (&f)
+        self * &f
     }
 }
 
@@ -340,8 +338,12 @@ impl<'a, T: Copy + One + Zero + Mul<T, Output = T>> Mul<T> for &'a Vector<T> {
 impl<'a, T: Copy + One + Zero + Mul<T, Output = T>> Mul<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
-    fn mul(self, f: &T) -> Vector<T> {
-        (&self) * f
+    fn mul(mut self, f: &T) -> Vector<T> {
+        for val in self.data.iter_mut() {
+            *val = *val * *f;
+        }
+
+        self
     }
 }
 
@@ -364,7 +366,7 @@ impl<T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<T> for Vector<T>
     type Output = Vector<T>;
 
     fn div(self, f: T) -> Vector<T> {
-        (&self) / (&f)
+        self / &f
     }
 }
 
@@ -373,7 +375,7 @@ impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<T> for &'a V
     type Output = Vector<T>;
 
     fn div(self, f: T) -> Vector<T> {
-        self / (&f)
+        self / &f
     }
 }
 
@@ -381,8 +383,12 @@ impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<T> for &'a V
 impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
-    fn div(self, f: &T) -> Vector<T> {
-        (&self) / f
+    fn div(mut self, f: &T) -> Vector<T> {
+        for val in self.data.iter_mut() {
+            *val = *val / *f;
+        }
+
+        self
     }
 }
 
@@ -406,7 +412,7 @@ impl<T: Copy + One + Zero + Add<T, Output = T>> Add<T> for Vector<T> {
     type Output = Vector<T>;
 
     fn add(self, f: T) -> Vector<T> {
-        (&self) + (&f)
+        self + &f
     }
 }
 
@@ -415,7 +421,7 @@ impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<T> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn add(self, f: T) -> Vector<T> {
-        self + (&f)
+        self + &f
     }
 }
 
@@ -423,8 +429,12 @@ impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<T> for &'a Vector<T> {
 impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
-    fn add(self, f: &T) -> Vector<T> {
-        (&self) + f
+    fn add(mut self, f: &T) -> Vector<T> {
+        for val in self.data.iter_mut() {
+            *val = *val + *f;
+        }
+
+        self
     }
 }
 
@@ -447,7 +457,7 @@ impl<T: Copy + One + Zero + Add<T, Output = T>> Add<Vector<T>> for Vector<T> {
     type Output = Vector<T>;
 
     fn add(self, v: Vector<T>) -> Vector<T> {
-        (&self) + (&v)
+        self + &v
     }
 }
 
@@ -456,7 +466,7 @@ impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<Vector<T>> for &'a Vecto
     type Output = Vector<T>;
 
     fn add(self, v: Vector<T>) -> Vector<T> {
-        self + (&v)
+        v + self
     }
 }
 
@@ -464,8 +474,10 @@ impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<Vector<T>> for &'a Vecto
 impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<&'a Vector<T>> for Vector<T> {
     type Output = Vector<T>;
 
-    fn add(self, v: &Vector<T>) -> Vector<T> {
-        (&self) + v
+    fn add(mut self, v: &Vector<T>) -> Vector<T> {
+        utils::in_place_vec_bin_op(&mut self.data, &v.data, |x, &y| { *x = *x + y});
+
+        self
     }
 }
 
@@ -490,7 +502,7 @@ impl<T: Copy + One + Zero + Sub<T, Output = T>> Sub<T> for Vector<T> {
     type Output = Vector<T>;
 
     fn sub(self, f: T) -> Vector<T> {
-        (&self) - (&f)
+        self - &f
     }
 }
 
@@ -499,7 +511,7 @@ impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<T> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn sub(self, f: T) -> Vector<T> {
-        self - (&f)
+        self - &f
     }
 }
 
@@ -507,8 +519,12 @@ impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<T> for &'a Vector<T> {
 impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
-    fn sub(self, f: &T) -> Vector<T> {
-        (&self) - f
+    fn sub(mut self, f: &T) -> Vector<T> {
+        for val in self.data.iter_mut() {
+            *val = *val - *f;
+        }
+
+        self
     }
 }
 
@@ -531,7 +547,7 @@ impl<T: Copy + One + Zero + Sub<T, Output = T>> Sub<Vector<T>> for Vector<T> {
     type Output = Vector<T>;
 
     fn sub(self, v: Vector<T>) -> Vector<T> {
-        (&self) - (&v)
+        self - &v
     }
 }
 
@@ -539,8 +555,10 @@ impl<T: Copy + One + Zero + Sub<T, Output = T>> Sub<Vector<T>> for Vector<T> {
 impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<Vector<T>> for &'a Vector<T> {
     type Output = Vector<T>;
 
-    fn sub(self, v: Vector<T>) -> Vector<T> {
-        self - (&v)
+    fn sub(self, mut v: Vector<T>) -> Vector<T> {
+        utils::in_place_vec_bin_op(&mut v.data, &self.data, |x, &y| { *x = y - *x});
+
+        v
     }
 }
 
@@ -548,8 +566,10 @@ impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<Vector<T>> for &'a Vecto
 impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'a Vector<T>> for Vector<T> {
     type Output = Vector<T>;
 
-    fn sub(self, v: &Vector<T>) -> Vector<T> {
-        (&self) - v
+    fn sub(mut self, v: &Vector<T>) -> Vector<T> {
+        utils::in_place_vec_bin_op(&mut self.data, &v.data, |x, &y| { *x = *x - y});
+
+        self
     }
 }
 
@@ -573,10 +593,12 @@ impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'b Vector<T>> for &
 impl<T: Neg<Output = T> + Copy> Neg for Vector<T> {
     type Output = Vector<T>;
 
-    fn neg(self) -> Vector<T> {
-        let new_data = self.data.iter().map(|v| -*v).collect();
+    fn neg(mut self) -> Vector<T> {
+        for val in self.data.iter_mut() {
+            *val = -*val;
+        }
 
-        Vector::new(new_data)
+        self
     }
 }
 

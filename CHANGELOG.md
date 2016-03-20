@@ -3,7 +3,22 @@
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
 
-## 0.2.1
+## 0.2.3
+
+### Breaking Changes
+
+- `mut_data` method now returns a mutable slice `&mut [T]` instead of a `Vec<T>`.
+
+### Features
+
+- More vectorization and optimization of linear algebra.
+
+### Minor Changes
+
+- Copy and Clone now implemented where applicable.
+- Added test coverage.
+
+## 0.2.2
 
 ### New Contributors
 

@@ -50,6 +50,7 @@ use rand::{Rng, thread_rng};
 use libnum::abs;
 
 /// Initialization Algorithm enum.
+#[derive(Clone, Copy, Debug)]
 pub enum InitAlgorithm {
     /// The Forgy initialization scheme.
     Forgy,
@@ -63,6 +64,7 @@ pub enum InitAlgorithm {
 ///
 /// Contains option for centroids.
 /// Specifies iterations and number of classes.
+#[derive(Debug)]
 pub struct KMeansClassifier {
     /// Max iterations of algorithm to run.
     pub iters: usize,

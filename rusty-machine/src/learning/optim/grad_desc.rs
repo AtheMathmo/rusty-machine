@@ -13,6 +13,7 @@ use linalg::vector::Vector;
 use linalg::matrix::Matrix;
 
 /// Batch Gradient Descent algorithm
+#[derive(Clone, Copy, Debug)]
 pub struct GradientDesc {
     /// The step-size for the gradient descent steps.
     pub alpha: f64,
@@ -27,7 +28,7 @@ pub struct GradientDesc {
 /// - alpha = 0.3
 /// - iters = 100
 impl Default for GradientDesc {
-    
+
     fn default() -> GradientDesc {
         GradientDesc {
             alpha: 0.3,
@@ -81,6 +82,7 @@ impl<M: Optimizable> OptimAlgorithm<M> for GradientDesc {
 /// Stochastic Gradient Descent algorithm.
 ///
 /// Uses basic momentum to control the learning rate.
+#[derive(Clone, Copy, Debug)]
 pub struct StochasticGD {
     /// Controls the momentum of the descent
     pub alpha: f64,
@@ -98,7 +100,7 @@ pub struct StochasticGD {
 /// - mu = 0.1
 /// - iters = 20
 impl Default for StochasticGD {
-    
+
     fn default() -> StochasticGD {
         StochasticGD {
             alpha: 0.1,

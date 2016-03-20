@@ -45,6 +45,7 @@ use rand::{Rng, thread_rng};
 ///
 /// The Neural Network struct specifies a Criterion and
 /// a gradient descent algorithm.
+#[derive(Debug)]
 pub struct NeuralNet<'a, T, A>
     where T: Criterion,
           A: OptimAlgorithm<BaseNeuralNet<'a, T>>
@@ -152,6 +153,7 @@ impl<'a, T, A> NeuralNet<'a, T, A>
 /// Base Neural Network struct
 ///
 /// This struct cannot be instantianated and is used internally only.
+#[derive(Debug)]
 pub struct BaseNeuralNet<'a, T: Criterion> {
     layer_sizes: &'a [usize],
     weights: Vec<f64>,
@@ -424,6 +426,7 @@ pub trait Criterion {
 ///
 /// Uses the Sigmoid activation function and the
 /// cross entropy error.
+#[derive(Clone, Copy, Debug)]
 pub struct BCECriterion;
 
 impl Criterion for BCECriterion {
@@ -435,6 +438,7 @@ impl Criterion for BCECriterion {
 ///
 /// Uses the Linear activation function and the
 /// mean squared error.
+#[derive(Clone, Copy, Debug)]
 pub struct MSECriterion;
 
 impl Criterion for MSECriterion {

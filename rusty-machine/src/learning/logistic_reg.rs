@@ -45,6 +45,7 @@ use learning::optim::{OptimAlgorithm, Optimizable};
 /// Logistic Regression Model.
 ///
 /// Contains option for optimized parameter.
+#[derive(Debug)]
 pub struct LogisticRegressor<A>
     where A: OptimAlgorithm<BaseLogisticRegressor>
 {
@@ -139,6 +140,7 @@ impl<A : OptimAlgorithm<BaseLogisticRegressor>> SupModel<Matrix<f64>, Vector<f64
 /// The Base Logistic Regression model.
 ///
 /// This struct cannot be instantianated and is used internally only.
+#[derive(Debug)]
 pub struct BaseLogisticRegressor {
     parameters: Option<Vector<f64>>,
 }
