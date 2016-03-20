@@ -89,7 +89,8 @@ fn matrix_mul() {
     let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
     let b = Matrix::new(2, 3, vec![1., 2., 3., 4., 5., 6.]);
 
-    let c = a * b;
+    // Allocating new memory
+    let c = &a * &b;
 
     assert_eq!(c.rows(), 3);
     assert_eq!(c.cols(), 3);
@@ -123,6 +124,37 @@ fn matrix_vec_mul() {
 fn matrix_f32_mul() {
     let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
 
+    // Allocating new memory
+    let c = &a * &2.0;
+
+    assert_eq!(c[[0, 0]], 2.0);
+    assert_eq!(c[[0, 1]], 4.0);
+    assert_eq!(c[[1, 0]], 6.0);
+    assert_eq!(c[[1, 1]], 8.0);
+    assert_eq!(c[[2, 0]], 10.0);
+    assert_eq!(c[[2, 1]], 12.0);
+
+    // Allocating new memory
+    let c = &a * 2.0;
+
+    assert_eq!(c[[0, 0]], 2.0);
+    assert_eq!(c[[0, 1]], 4.0);
+    assert_eq!(c[[1, 0]], 6.0);
+    assert_eq!(c[[1, 1]], 8.0);
+    assert_eq!(c[[2, 0]], 10.0);
+    assert_eq!(c[[2, 1]], 12.0);
+
+    // Reusing memory
+    let c = a.clone() * &2.0;
+
+    assert_eq!(c[[0, 0]], 2.0);
+    assert_eq!(c[[0, 1]], 4.0);
+    assert_eq!(c[[1, 0]], 6.0);
+    assert_eq!(c[[1, 1]], 8.0);
+    assert_eq!(c[[2, 0]], 10.0);
+    assert_eq!(c[[2, 1]], 12.0);
+
+    // Reusing memory
     let c = a * 2.0;
 
     assert_eq!(c[[0, 0]], 2.0);
@@ -138,6 +170,37 @@ fn matrix_add() {
     let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
     let b = Matrix::new(3, 2, vec![2., 3., 4., 5., 6., 7.]);
 
+    // Allocating new memory
+    let c = &a + &b;
+
+    assert_eq!(c[[0, 0]], 3.0);
+    assert_eq!(c[[0, 1]], 5.0);
+    assert_eq!(c[[1, 0]], 7.0);
+    assert_eq!(c[[1, 1]], 9.0);
+    assert_eq!(c[[2, 0]], 11.0);
+    assert_eq!(c[[2, 1]], 13.0);
+
+    // Reusing memory
+    let c = a.clone() + &b;
+
+    assert_eq!(c[[0, 0]], 3.0);
+    assert_eq!(c[[0, 1]], 5.0);
+    assert_eq!(c[[1, 0]], 7.0);
+    assert_eq!(c[[1, 1]], 9.0);
+    assert_eq!(c[[2, 0]], 11.0);
+    assert_eq!(c[[2, 1]], 13.0);
+
+    // Reusing memory
+    let c = &a + b.clone();
+
+    assert_eq!(c[[0, 0]], 3.0);
+    assert_eq!(c[[0, 1]], 5.0);
+    assert_eq!(c[[1, 0]], 7.0);
+    assert_eq!(c[[1, 1]], 9.0);
+    assert_eq!(c[[2, 0]], 11.0);
+    assert_eq!(c[[2, 1]], 13.0);
+
+    // Reusing memory
     let c = a + b;
 
     assert_eq!(c[[0, 0]], 3.0);
@@ -153,6 +216,37 @@ fn matrix_f32_add() {
     let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
     let b = 3.0;
 
+    // Allocating new memory
+    let c = &a + &b;
+
+    assert_eq!(c[[0, 0]], 4.0);
+    assert_eq!(c[[0, 1]], 5.0);
+    assert_eq!(c[[1, 0]], 6.0);
+    assert_eq!(c[[1, 1]], 7.0);
+    assert_eq!(c[[2, 0]], 8.0);
+    assert_eq!(c[[2, 1]], 9.0);
+
+    // Allocating new memory
+    let c = &a + b;
+
+    assert_eq!(c[[0, 0]], 4.0);
+    assert_eq!(c[[0, 1]], 5.0);
+    assert_eq!(c[[1, 0]], 6.0);
+    assert_eq!(c[[1, 1]], 7.0);
+    assert_eq!(c[[2, 0]], 8.0);
+    assert_eq!(c[[2, 1]], 9.0);
+
+    // Reusing memory
+    let c = a.clone() + &b;
+
+    assert_eq!(c[[0, 0]], 4.0);
+    assert_eq!(c[[0, 1]], 5.0);
+    assert_eq!(c[[1, 0]], 6.0);
+    assert_eq!(c[[1, 1]], 7.0);
+    assert_eq!(c[[2, 0]], 8.0);
+    assert_eq!(c[[2, 1]], 9.0);
+
+    // Reusing memory
     let c = a + b;
 
     assert_eq!(c[[0, 0]], 4.0);
@@ -168,7 +262,38 @@ fn matrix_sub() {
     let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
     let b = Matrix::new(3, 2, vec![2., 3., 4., 5., 6., 7.]);
 
-    let c = a - b;
+    // Allocate new memory
+    let c = &a - &b;
+
+    assert_eq!(c[[0, 0]], -1.0);
+    assert_eq!(c[[0, 1]], -1.0);
+    assert_eq!(c[[1, 0]], -1.0);
+    assert_eq!(c[[1, 1]], -1.0);
+    assert_eq!(c[[2, 0]], -1.0);
+    assert_eq!(c[[2, 1]], -1.0);
+
+    // Reusing memory
+    let c = a.clone() - &b;
+
+    assert_eq!(c[[0, 0]], -1.0);
+    assert_eq!(c[[0, 1]], -1.0);
+    assert_eq!(c[[1, 0]], -1.0);
+    assert_eq!(c[[1, 1]], -1.0);
+    assert_eq!(c[[2, 0]], -1.0);
+    assert_eq!(c[[2, 1]], -1.0);
+
+    // Reusing memory
+    let c = &a - b.clone();
+
+    assert_eq!(c[[0, 0]], -1.0);
+    assert_eq!(c[[0, 1]], -1.0);
+    assert_eq!(c[[1, 0]], -1.0);
+    assert_eq!(c[[1, 1]], -1.0);
+    assert_eq!(c[[2, 0]], -1.0);
+    assert_eq!(c[[2, 1]], -1.0);
+
+    // Reusing memory
+    let c = &a - b;
 
     assert_eq!(c[[0, 0]], -1.0);
     assert_eq!(c[[0, 1]], -1.0);
@@ -183,6 +308,37 @@ fn matrix_f32_sub() {
     let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
     let b = 3.0;
 
+    // Allocating new memory
+    let c = &a - &b;
+
+    assert_eq!(c[[0, 0]], -2.0);
+    assert_eq!(c[[0, 1]], -1.0);
+    assert_eq!(c[[1, 0]], 0.0);
+    assert_eq!(c[[1, 1]], 1.0);
+    assert_eq!(c[[2, 0]], 2.0);
+    assert_eq!(c[[2, 1]], 3.0);
+
+    // Allocating new memory
+    let c = &a - b;
+
+    assert_eq!(c[[0, 0]], -2.0);
+    assert_eq!(c[[0, 1]], -1.0);
+    assert_eq!(c[[1, 0]], 0.0);
+    assert_eq!(c[[1, 1]], 1.0);
+    assert_eq!(c[[2, 0]], 2.0);
+    assert_eq!(c[[2, 1]], 3.0);
+
+    // Reusing memory
+    let c = a.clone() - &b;
+
+    assert_eq!(c[[0, 0]], -2.0);
+    assert_eq!(c[[0, 1]], -1.0);
+    assert_eq!(c[[1, 0]], 0.0);
+    assert_eq!(c[[1, 1]], 1.0);
+    assert_eq!(c[[2, 0]], 2.0);
+    assert_eq!(c[[2, 1]], 3.0);
+
+    // Reusing memory
     let c = a - b;
 
     assert_eq!(c[[0, 0]], -2.0);
@@ -198,6 +354,37 @@ fn matrix_f32_div() {
     let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
     let b = 3.0;
 
+    // Allocating new memory
+    let c = &a / &b;
+
+    assert_eq!(c[[0, 0]], 1.0 / 3.0);
+    assert_eq!(c[[0, 1]], 2.0 / 3.0);
+    assert_eq!(c[[1, 0]], 1.0);
+    assert_eq!(c[[1, 1]], 4.0 / 3.0);
+    assert_eq!(c[[2, 0]], 5.0 / 3.0);
+    assert_eq!(c[[2, 1]], 2.0);
+
+    // Allocating new memory
+    let c = &a / b;
+
+    assert_eq!(c[[0, 0]], 1.0 / 3.0);
+    assert_eq!(c[[0, 1]], 2.0 / 3.0);
+    assert_eq!(c[[1, 0]], 1.0);
+    assert_eq!(c[[1, 1]], 4.0 / 3.0);
+    assert_eq!(c[[2, 0]], 5.0 / 3.0);
+    assert_eq!(c[[2, 1]], 2.0);
+
+    // Reusing memory
+    let c = a.clone() / &b;
+
+    assert_eq!(c[[0, 0]], 1.0 / 3.0);
+    assert_eq!(c[[0, 1]], 2.0 / 3.0);
+    assert_eq!(c[[1, 0]], 1.0);
+    assert_eq!(c[[1, 1]], 4.0 / 3.0);
+    assert_eq!(c[[2, 0]], 5.0 / 3.0);
+    assert_eq!(c[[2, 1]], 2.0);
+
+    // Reusing memory
     let c = a / b;
 
     assert_eq!(c[[0, 0]], 1.0 / 3.0);
