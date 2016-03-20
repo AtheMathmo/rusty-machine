@@ -227,6 +227,9 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! # The rusty-machine crate.</span>
 <span class='doccomment'>//!</span>
@@ -245,12 +248,14 @@
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! The currently supported techniques are:</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! - Gaussian Process Regression</span>
-<span class='doccomment'>//! - K-means classification</span>
 <span class='doccomment'>//! - Linear Regression</span>
 <span class='doccomment'>//! - Logistic Regression</span>
-<span class='doccomment'>//! - Neural Networks (simple feed forward)</span>
+<span class='doccomment'>//! - Generalized Linear Models</span>
+<span class='doccomment'>//! - K-Means Clustering</span>
+<span class='doccomment'>//! - Neural Networks</span>
+<span class='doccomment'>//! - Gaussian Process Regression</span>
 <span class='doccomment'>//! - Support Vector Machines</span>
+<span class='doccomment'>//! - Gaussian Mixture Modelss</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ### linalg</span>
 <span class='doccomment'>//!</span>
@@ -309,6 +314,7 @@
 <span class='doccomment'>//! `let mut gp = GaussianProcess::default();`. Conversely, you could also implement</span>
 <span class='doccomment'>//! your own kernels and mean functions by using the appropriate traits.</span>
 
+<span class='attribute'>#<span class='op'>!</span>[<span class='ident'>warn</span>(<span class='ident'>missing_debug_implementations</span>)]</span>
 
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>num</span> <span class='kw'>as</span> <span class='ident'>libnum</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rand</span>;

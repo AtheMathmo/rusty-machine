@@ -217,6 +217,7 @@
 <span id="174">174</span>
 <span id="175">175</span>
 <span id="176">176</span>
+<span id="177">177</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Support Vector Machine Module</span>
 <span class='doccomment'>//!</span>
@@ -243,7 +244,7 @@
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Train the model</span>
 <span class='doccomment'>//! svm_mod.train(&amp;inputs, &amp;targets);</span>
-<span class='doccomment'>//! </span>
+<span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Now we&#39;ll predict a new point</span>
 <span class='doccomment'>//! let new_point = Matrix::new(1,1,vec![10.]);</span>
 <span class='doccomment'>//! let output = svm_mod.predict(&amp;new_point);</span>
@@ -263,6 +264,7 @@
 <span class='kw'>use</span> <span class='ident'>rand</span>::<span class='ident'>Rng</span>;
 
 <span class='doccomment'>/// Support Vector Machine</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>SVM</span><span class='op'>&lt;</span><span class='ident'>K</span>: <span class='ident'>Kernel</span><span class='op'>&gt;</span> {
     <span class='ident'>ker</span>: <span class='ident'>K</span>,
     <span class='ident'>alpha</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span>,

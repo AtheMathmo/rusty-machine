@@ -315,6 +315,7 @@
 <span id="272">272</span>
 <span id="273">273</span>
 <span id="274">274</span>
+<span id="275">275</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Module for the fmincg optimization algorithm.</span>
 <span class='doccomment'>//!</span>
@@ -354,6 +355,7 @@
 
 
 <span class='doccomment'>/// Conjugate Gradient Descent algorithm</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>ConjugateGD</span> {
     <span class='doccomment'>/// Constant in the Wolfe-Powell conditions.</span>
     <span class='kw'>pub</span> <span class='ident'>rho</span>: <span class='ident'>f64</span>,
@@ -373,7 +375,7 @@
 }
 
 <span class='doccomment'>/// The default Conjugate GD algorithm.</span>
-<span class='doccomment'>/// </span>
+<span class='doccomment'>///</span>
 <span class='doccomment'>/// The defaults are:</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// - rho = 0.01</span>

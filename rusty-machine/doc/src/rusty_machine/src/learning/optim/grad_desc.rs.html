@@ -197,6 +197,8 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Gradient Descent</span>
 <span class='doccomment'>//!</span>
@@ -213,6 +215,7 @@
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>matrix</span>::<span class='ident'>Matrix</span>;
 
 <span class='doccomment'>/// Batch Gradient Descent algorithm</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>GradientDesc</span> {
     <span class='doccomment'>/// The step-size for the gradient descent steps.</span>
     <span class='kw'>pub</span> <span class='ident'>alpha</span>: <span class='ident'>f64</span>,
@@ -227,7 +230,7 @@
 <span class='doccomment'>/// - alpha = 0.3</span>
 <span class='doccomment'>/// - iters = 100</span>
 <span class='kw'>impl</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>GradientDesc</span> {
-    
+
     <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='ident'>GradientDesc</span> {
         <span class='ident'>GradientDesc</span> {
             <span class='ident'>alpha</span>: <span class='number'>0.3</span>,
@@ -281,6 +284,7 @@
 <span class='doccomment'>/// Stochastic Gradient Descent algorithm.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Uses basic momentum to control the learning rate.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>StochasticGD</span> {
     <span class='doccomment'>/// Controls the momentum of the descent</span>
     <span class='kw'>pub</span> <span class='ident'>alpha</span>: <span class='ident'>f64</span>,
@@ -298,7 +302,7 @@
 <span class='doccomment'>/// - mu = 0.1</span>
 <span class='doccomment'>/// - iters = 20</span>
 <span class='kw'>impl</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>StochasticGD</span> {
-    
+
     <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='ident'>StochasticGD</span> {
         <span class='ident'>StochasticGD</span> {
             <span class='ident'>alpha</span>: <span class='number'>0.1</span>,

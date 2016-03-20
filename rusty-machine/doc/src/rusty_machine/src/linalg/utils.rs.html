@@ -340,6 +340,26 @@
 <span id="297">297</span>
 <span id="298">298</span>
 <span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Linear algebra utils module.</span>
 <span class='doccomment'>//!</span>
@@ -454,6 +474,60 @@
     <span class='ident'>sum</span>
 }
 
+<span class='doccomment'>/// Vectorized binary operation applied to two slices.</span>
+<span class='doccomment'>/// The first argument should be a mutable slice which will</span>
+<span class='doccomment'>/// be modified in place to prevent new memory allocation.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// # Examples</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// ```</span>
+<span class='doccomment'>/// use rusty_machine::linalg::utils;</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// let mut a = vec![2.0; 10];</span>
+<span class='doccomment'>/// let b = vec![3.0; 10];</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// utils::in_place_vec_bin_op(&amp;mut a, &amp;b, |x, &amp;y| { *x = 1f64 + *x * y });</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// // Will print a vector of `7`s.</span>
+<span class='doccomment'>/// println!(&quot;{:?}&quot;, a);</span>
+<span class='doccomment'>/// ```</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>in_place_vec_bin_op</span><span class='op'>&lt;</span><span class='ident'>F</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span><span class='op'>&gt;</span>(<span class='kw-2'>mut</span> <span class='ident'>u</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='kw-2'>mut</span> <span class='ident'>f</span>: <span class='ident'>F</span>)
+    <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>FnMut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>T</span>, <span class='kw-2'>&amp;</span><span class='ident'>T</span>) {
+        <span class='macro'>debug_assert_eq</span><span class='macro'>!</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());
+        <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());
+        
+        <span class='kw'>let</span> <span class='ident'>ys</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>v</span>[..<span class='ident'>len</span>];
+        <span class='kw'>let</span> <span class='ident'>xs</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>u</span>[..<span class='ident'>len</span>];
+
+        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>len</span> {
+            <span class='ident'>f</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>xs</span>[<span class='ident'>i</span>], <span class='kw-2'>&amp;</span><span class='ident'>ys</span>[<span class='ident'>i</span>])
+        }
+}
+
+<span class='kw'>fn</span> <span class='ident'>vec_bin_op</span><span class='op'>&lt;</span><span class='ident'>F</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span><span class='op'>&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>
+    <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>Fn</span>(<span class='ident'>T</span>, <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span> {
+        <span class='macro'>debug_assert_eq</span><span class='macro'>!</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());
+        <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());
+        
+        <span class='kw'>let</span> <span class='ident'>xs</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>u</span>[..<span class='ident'>len</span>];
+        <span class='kw'>let</span> <span class='ident'>ys</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>v</span>[..<span class='ident'>len</span>];
+        
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>out_vec</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>len</span>);
+        <span class='kw'>unsafe</span> {
+            <span class='ident'>out_vec</span>.<span class='ident'>set_len</span>(<span class='ident'>len</span>);
+        }
+        
+        {
+            <span class='kw'>let</span> <span class='ident'>out_slice</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>out_vec</span>[..<span class='ident'>len</span>];
+            
+            <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>len</span> {
+                <span class='ident'>out_slice</span>[<span class='ident'>i</span>] <span class='op'>=</span> <span class='ident'>f</span>(<span class='ident'>xs</span>[<span class='ident'>i</span>], <span class='ident'>ys</span>[<span class='ident'>i</span>]);
+            }
+        }
+        
+        <span class='ident'>out_vec</span>
+}
+
 <span class='doccomment'>/// Compute vector sum of two slices.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// # Examples</span>
@@ -467,18 +541,10 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// assert_eq!(c, vec![2.0,4.0, 6.0, 8.0]);</span>
 <span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>vec_sum</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-    <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());
-    <span class='kw'>let</span> <span class='ident'>xs</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>u</span>[..<span class='ident'>len</span>];
-    <span class='kw'>let</span> <span class='ident'>ys</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>v</span>[..<span class='ident'>len</span>];
-
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sum_data</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>len</span>);
-
-    <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>len</span> {
-        <span class='ident'>sum_data</span>.<span class='ident'>push</span>(<span class='ident'>xs</span>[<span class='ident'>i</span>] <span class='op'>+</span> <span class='ident'>ys</span>[<span class='ident'>i</span>]);
-    }
-    <span class='ident'>sum_data</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>vec_sum</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='ident'>vec_bin_op</span>(<span class='ident'>u</span>, <span class='ident'>v</span>, <span class='op'>|</span><span class='ident'>x</span>, <span class='ident'>y</span><span class='op'>|</span> { <span class='ident'>x</span> <span class='op'>+</span> <span class='ident'>y</span> })
 }
+
 
 <span class='doccomment'>/// Compute vector difference two slices.</span>
 <span class='doccomment'>///</span>
@@ -493,17 +559,8 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// assert_eq!(c, vec![0.0; 4]);</span>
 <span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>vec_sub</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-    <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());
-    <span class='kw'>let</span> <span class='ident'>xs</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>u</span>[..<span class='ident'>len</span>];
-    <span class='kw'>let</span> <span class='ident'>ys</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>v</span>[..<span class='ident'>len</span>];
-
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sum_data</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>len</span>);
-
-    <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>len</span> {
-        <span class='ident'>sum_data</span>.<span class='ident'>push</span>(<span class='ident'>xs</span>[<span class='ident'>i</span>] <span class='op'>-</span> <span class='ident'>ys</span>[<span class='ident'>i</span>]);
-    }
-    <span class='ident'>sum_data</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>vec_sub</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='ident'>vec_bin_op</span>(<span class='ident'>u</span>, <span class='ident'>v</span>, <span class='op'>|</span><span class='ident'>x</span>, <span class='ident'>y</span><span class='op'>|</span> { <span class='ident'>x</span> <span class='op'>-</span> <span class='ident'>y</span> })
 }
 
 <span class='doccomment'>/// Computes elementwise multiplication.</span>
@@ -519,17 +576,8 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// assert_eq!(c, vec![1.0,4.0,9.0,16.0]);</span>
 <span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ele_mul</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-    <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());
-    <span class='kw'>let</span> <span class='ident'>xs</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>u</span>[..<span class='ident'>len</span>];
-    <span class='kw'>let</span> <span class='ident'>ys</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>v</span>[..<span class='ident'>len</span>];
-
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sum_data</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>len</span>);
-
-    <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>len</span> {
-        <span class='ident'>sum_data</span>.<span class='ident'>push</span>(<span class='ident'>xs</span>[<span class='ident'>i</span>] <span class='op'>*</span> <span class='ident'>ys</span>[<span class='ident'>i</span>]);
-    }
-    <span class='ident'>sum_data</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ele_mul</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='ident'>vec_bin_op</span>(<span class='ident'>u</span>, <span class='ident'>v</span>, <span class='op'>|</span><span class='ident'>x</span>, <span class='ident'>y</span><span class='op'>|</span> { <span class='ident'>x</span> <span class='op'>*</span> <span class='ident'>y</span> })
 }
 
 <span class='doccomment'>/// Computes elementwise division.</span>
@@ -545,18 +593,10 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// assert_eq!(c, vec![1.0; 4]);</span>
 <span class='doccomment'>/// ```</span>
-<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ele_div</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-    <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());
-    <span class='kw'>let</span> <span class='ident'>xs</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>u</span>[..<span class='ident'>len</span>];
-    <span class='kw'>let</span> <span class='ident'>ys</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>v</span>[..<span class='ident'>len</span>];
-
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sum_data</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>len</span>);
-
-    <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>len</span> {
-        <span class='ident'>sum_data</span>.<span class='ident'>push</span>(<span class='ident'>xs</span>[<span class='ident'>i</span>] <span class='op'>/</span> <span class='ident'>ys</span>[<span class='ident'>i</span>]);
-    }
-    <span class='ident'>sum_data</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>ele_div</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='ident'>vec_bin_op</span>(<span class='ident'>u</span>, <span class='ident'>v</span>, <span class='op'>|</span><span class='ident'>x</span>, <span class='ident'>y</span><span class='op'>|</span> { <span class='ident'>x</span> <span class='op'>/</span> <span class='ident'>y</span> })
 }
+
 
 <span class='doccomment'>/// Find argmax of slice.</span>
 <span class='doccomment'>///</span>

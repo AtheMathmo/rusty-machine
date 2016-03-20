@@ -141,6 +141,8 @@
 <span id="98"> 98</span>
 <span id="99"> 99</span>
 <span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Cost Functions.</span>
 <span class='doccomment'>//!</span>
@@ -165,6 +167,7 @@
 }
 
 <span class='doccomment'>/// The mean squared error cost function.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>MeanSqError</span>;
 
 <span class='comment'>// For generics we need a trait for &quot;Hadamard product&quot; here</span>
@@ -200,6 +203,7 @@
 }
 
 <span class='doccomment'>/// The cross entropy error cost function.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>CrossEntropyError</span>;
 
 <span class='kw'>impl</span> <span class='ident'>CostFunc</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>CrossEntropyError</span> {

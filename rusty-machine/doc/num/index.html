@@ -26,7 +26,7 @@
     
 
     <nav class="sidebar">
-        <a href='../num/index.html'><img src='http://rust-num.github.io/num/rust-logo-128x128-blk-v2.png' alt='' width='100'></a>
+        <a href='../num/index.html'><img src='http://rust-num.github.io/num/rust-logo-128x128-blk-v2.png' alt='logo' width='100'></a>
         <p class='location'></p><script>window.sidebarCurrent = {name: 'num', ty: 'mod', relpath: '../'};</script>
     </nav>
 
@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-0' class='srclink' href='../src/num/lib.rs.html#11-213' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-0' class='srclink' href='../src/num/lib.rs.html.html#11-213' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>A collection of numeric types and traits for Rust.</p>
 
 <p>This includes new types for big integers, rationals, and complex numbers,
@@ -56,6 +56,7 @@ and generic range iterators.</p>
 <h2 id='example' class='section-header'><a href='#example'>Example</a></h2>
 <p>This example uses the BigRational type and <a href="https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method">Newton&#39;s method</a> to
 approximate a square root to arbitrary precision:</p>
+
 <span class='rusttest'>extern crate num;
 #[cfg(all(feature = &quot;bigint&quot;, feature=&quot;rational&quot;))]
 mod test {
@@ -115,7 +116,6 @@ fn main() {
                                title='num::complex'>complex</a></td>
                         <td class='docblock short'>
                              <p>Complex numbers.</p>
-
                         </td>
                     </tr>
                 
@@ -124,7 +124,6 @@ fn main() {
                                title='num::integer'>integer</a></td>
                         <td class='docblock short'>
                              <p>Integer trait and functions.</p>
-
                         </td>
                     </tr>
                 
@@ -133,7 +132,6 @@ fn main() {
                                title='num::iter'>iter</a></td>
                         <td class='docblock short'>
                              <p>External iterators for generic mathematics</p>
-
                         </td>
                     </tr>
                 
@@ -142,7 +140,6 @@ fn main() {
                                title='num::traits'>traits</a></td>
                         <td class='docblock short'>
                              <p>Numeric traits for generic mathematics</p>
-
                         </td>
                     </tr>
                 </table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
@@ -152,7 +149,6 @@ fn main() {
                                title='num::abs'>abs</a></td>
                         <td class='docblock short'>
                              <p>Computes the absolute value.</p>
-
                         </td>
                     </tr>
                 
@@ -161,7 +157,6 @@ fn main() {
                                title='num::abs_sub'>abs_sub</a></td>
                         <td class='docblock short'>
                              <p>The positive difference of two numbers.</p>
-
                         </td>
                     </tr>
                 
@@ -170,7 +165,6 @@ fn main() {
                                title='num::checked_pow'>checked_pow</a></td>
                         <td class='docblock short'>
                              <p>Raises a value to the power of exp, returning <code>None</code> if an overflow occurred.</p>
-
                         </td>
                     </tr>
                 
@@ -179,7 +173,6 @@ fn main() {
                                title='num::one'>one</a></td>
                         <td class='docblock short'>
                              <p>Returns the multiplicative identity, <code>1</code>.</p>
-
                         </td>
                     </tr>
                 
@@ -188,7 +181,6 @@ fn main() {
                                title='num::pow'>pow</a></td>
                         <td class='docblock short'>
                              <p>Raises a value to the power of exp, using exponentiation by squaring.</p>
-
                         </td>
                     </tr>
                 
@@ -197,7 +189,6 @@ fn main() {
                                title='num::signum'>signum</a></td>
                         <td class='docblock short'>
                              <p>Returns the sign of the number.</p>
-
                         </td>
                     </tr>
                 
@@ -206,7 +197,6 @@ fn main() {
                                title='num::zero'>zero</a></td>
                         <td class='docblock short'>
                              <p>Returns the additive identity, <code>0</code>.</p>
-
                         </td>
                     </tr>
                 </table></section>
@@ -252,7 +242,7 @@ fn main() {
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>

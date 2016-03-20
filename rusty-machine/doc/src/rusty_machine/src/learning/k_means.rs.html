@@ -343,6 +343,8 @@
 <span id="300">300</span>
 <span id="301">301</span>
 <span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! K-means Classification</span>
 <span class='doccomment'>//!</span>
@@ -396,6 +398,7 @@
 <span class='kw'>use</span> <span class='ident'>libnum</span>::<span class='ident'>abs</span>;
 
 <span class='doccomment'>/// Initialization Algorithm enum.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>InitAlgorithm</span> {
     <span class='doccomment'>/// The Forgy initialization scheme.</span>
     <span class='ident'>Forgy</span>,
@@ -409,6 +412,7 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Contains option for centroids.</span>
 <span class='doccomment'>/// Specifies iterations and number of classes.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>KMeansClassifier</span> {
     <span class='doccomment'>/// Max iterations of algorithm to run.</span>
     <span class='kw'>pub</span> <span class='ident'>iters</span>: <span class='ident'>usize</span>,

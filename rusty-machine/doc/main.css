@@ -82,7 +82,7 @@ pre {
 }
 
 .content a.primitive { color: #39a7bf; }
-.content span.mod, .content a.mod, block a.current.mod { color: #4d76ae; }
+.content span.externcrate, span.mod, .content a.mod, block a.current.mod { color: #4d76ae; }
 .content span.fn, .content a.fn, .block a.current.fn,
 .content span.method, .content a.method, .block a.current.method,
 .content span.tymethod, .content a.tymethod, .block a.current.tymethod,
@@ -106,14 +106,14 @@ a {
 }
 
 .docblock a, .stability a {
-    color: #4e8bca;
+    color: #3873AD;
 }
 
 a.test-arrow {
     color: #f5f5f5;
 }
 
-.content span.trait, .content a.trait, .block a.current.trait { color: #8866ff; }
+.content span.trait, .content a.trait, .block a.current.trait { color: #7c5af3; }
 
 .search-input {
     color: #555;

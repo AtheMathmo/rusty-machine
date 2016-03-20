@@ -549,6 +549,16 @@
 <span id="506">506</span>
 <span id="507">507</span>
 <span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Module for kernels</span>
 <span class='doccomment'>//!</span>
@@ -595,6 +605,7 @@
 <span class='doccomment'>/// println!(&quot;{0}&quot;, poly_plus_hypert_ker.kernel(&amp;[1f64,2f64,3f64],</span>
 <span class='doccomment'>///                                             &amp;[3f64,1f64,2f64]));</span>
 <span class='doccomment'>/// ```</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>KernelSum</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>U</span><span class='op'>&gt;</span>
     <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Kernel</span>,
           <span class='ident'>U</span>: <span class='ident'>Kernel</span>
@@ -635,6 +646,7 @@
 <span class='doccomment'>/// println!(&quot;{0}&quot;, poly_plus_hypert_ker.kernel(&amp;[1f64,2f64,3f64],</span>
 <span class='doccomment'>///                                             &amp;[3f64,1f64,2f64]));</span>
 <span class='doccomment'>/// ```</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>KernelProd</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>U</span><span class='op'>&gt;</span>
     <span class='kw'>where</span> <span class='ident'>T</span>: <span class='ident'>Kernel</span>,
           <span class='ident'>U</span>: <span class='ident'>Kernel</span>
@@ -654,6 +666,7 @@
 }
 
 <span class='doccomment'>/// A wrapper tuple struct used for kernel arithmetic</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>KernelArith</span><span class='op'>&lt;</span><span class='ident'>K</span>: <span class='ident'>Kernel</span><span class='op'>&gt;</span>(<span class='kw'>pub</span> <span class='ident'>K</span>);
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Kernel</span>, <span class='ident'>U</span>: <span class='ident'>Kernel</span><span class='op'>&gt;</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>KernelArith</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>KernelArith</span><span class='op'>&lt;</span><span class='ident'>U</span><span class='op'>&gt;</span> {
@@ -681,6 +694,7 @@
 <span class='doccomment'>/// The Linear Kernel</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// k(x,y) = x&lt;sup&gt;T&lt;/sup&gt;y + c</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Linear</span> {
     <span class='doccomment'>/// Constant term added to inner product.</span>
     <span class='kw'>pub</span> <span class='ident'>c</span>: <span class='ident'>f64</span>,
@@ -707,7 +721,7 @@
 <span class='doccomment'>/// Constructs the default Linear Kernel</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// The defaults are:</span>
-<span class='doccomment'>/// </span>
+<span class='doccomment'>///</span>
 <span class='doccomment'>/// - c = 0</span>
 <span class='kw'>impl</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>Linear</span> {
     <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='ident'>Linear</span> {
@@ -724,6 +738,7 @@
 <span class='doccomment'>/// The Polynomial Kernel</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// k(x,y) = (αx&lt;sup&gt;T&lt;/sup&gt;y + c)&lt;sup&gt;d&lt;/sup&gt;</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Polynomial</span> {
     <span class='doccomment'>/// Scaling of the inner product.</span>
     <span class='kw'>pub</span> <span class='ident'>alpha</span>: <span class='ident'>f64</span>,
@@ -786,6 +801,7 @@
 <span class='doccomment'>/// k(x,y) = A _exp_(-||x-y||&lt;sup&gt;2&lt;/sup&gt; / 2l&lt;sup&gt;2&lt;/sup&gt;)</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Where A is the amplitude and l the length scale.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>SquaredExp</span> {
     <span class='doccomment'>/// The length scale of the kernel.</span>
     <span class='kw'>pub</span> <span class='ident'>ls</span>: <span class='ident'>f64</span>,
@@ -847,6 +863,7 @@
 <span class='doccomment'>/// k(x,y) = A _exp_(-||x-y|| / 2l&lt;sup&gt;2&lt;/sup&gt;)</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Where A is the amplitude and l is the length scale.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Exponential</span> {
     <span class='doccomment'>/// The length scale of the kernel.</span>
     <span class='kw'>pub</span> <span class='ident'>ls</span>: <span class='ident'>f64</span>,
@@ -862,7 +879,7 @@
     <span class='doccomment'>/// ```</span>
     <span class='doccomment'>/// use rusty_machine::learning::toolkit::kernel;</span>
     <span class='doccomment'>/// use rusty_machine::learning::toolkit::kernel::Kernel;</span>
-    <span class='doccomment'>/// </span>
+    <span class='doccomment'>///</span>
     <span class='doccomment'>/// // Construct a kernel with lengthscale 2 and amplitude 1.</span>
     <span class='doccomment'>/// let ker = kernel::Exponential::new(2f64, 1f64);</span>
     <span class='doccomment'>///</span>
@@ -906,6 +923,7 @@
 <span class='doccomment'>/// The Hyperbolic Tangent Kernel.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// ker(x,y) = _tanh_(αx&lt;sup&gt;T&lt;/sup&gt;y + c)</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>HyperTan</span> {
     <span class='doccomment'>/// The scaling of the inner product.</span>
     <span class='kw'>pub</span> <span class='ident'>alpha</span>: <span class='ident'>f64</span>,
@@ -959,6 +977,7 @@
 <span class='doccomment'>/// The Multiquadric Kernel.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// k(x,y) = _sqrt_(||x-y||&lt;sup&gt;2&lt;/sup&gt; + c&lt;sup&gt;2&lt;/sup&gt;)</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Multiquadric</span> {
     <span class='doccomment'>/// Constant added to square of difference.</span>
     <span class='kw'>pub</span> <span class='ident'>c</span>: <span class='ident'>f64</span>,
@@ -1007,6 +1026,7 @@
 <span class='doccomment'>/// The Rational Quadratic Kernel.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// k(x,y) = (1 + ||x-y||&lt;sup&gt;2&lt;/sup&gt; / (2αl&lt;sup&gt;2&lt;/sup&gt;))&lt;sup&gt;-α&lt;/sup&gt;</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>RationalQuadratic</span> {
     <span class='doccomment'>/// Controls inverse power and difference scale.</span>
     <span class='kw'>pub</span> <span class='ident'>alpha</span>: <span class='ident'>f64</span>,

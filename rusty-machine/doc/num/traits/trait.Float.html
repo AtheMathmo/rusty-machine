@@ -26,7 +26,7 @@
     
 
     <nav class="sidebar">
-        <a href='../../num/index.html'><img src='http://rust-num.github.io/num/rust-logo-128x128-blk-v2.png' alt='' width='100'></a>
+        <a href='../../num/index.html'><img src='http://rust-num.github.io/num/rust-logo-128x128-blk-v2.png' alt='logo' width='100'></a>
         <p class='location'><a href='../index.html'>num</a>::<wbr><a href='index.html'>traits</a></p><script>window.sidebarCurrent = {name: 'Float', ty: 'trait', relpath: ''};</script><script defer src="sidebar-items.js"></script>
     </nav>
 
@@ -46,7 +46,7 @@
             <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                 [<span class='inner'>&#x2212;</span>]
             </a>
-        </span><a id='src-4300' class='srclink' href='../../src/num/traits.rs.html#1429-2287' title='goto source code'>[src]</a></span></h1>
+        </span><a id='src-4300' class='srclink' href='../../src/num/traits.rs.html.html#1429-2287' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait Float: <a class='trait' href='../../num/traits/trait.Num.html' title='num::traits::Num'>Num</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> + <a class='trait' href='../../num/traits/trait.NumCast.html' title='num::traits::NumCast'>NumCast</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html' title='core::cmp::PartialOrd'>PartialOrd</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Neg.html' title='core::ops::Neg'>Neg</a>&lt;Output=Self&gt; {
     fn <a href='#tymethod.nan' class='fnname'>nan</a>() -&gt; Self;
     fn <a href='#tymethod.infinity' class='fnname'>infinity</a>() -&gt; Self;
@@ -92,7 +92,7 @@
     fn <a href='#tymethod.acos' class='fnname'>acos</a>(self) -&gt; Self;
     fn <a href='#tymethod.atan' class='fnname'>atan</a>(self) -&gt; Self;
     fn <a href='#tymethod.atan2' class='fnname'>atan2</a>(self, other: Self) -&gt; Self;
-    fn <a href='#tymethod.sin_cos' class='fnname'>sin_cos</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(Self, Self)</a>;
+    fn <a href='#tymethod.sin_cos' class='fnname'>sin_cos</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a>Self, Self<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a>;
     fn <a href='#tymethod.exp_m1' class='fnname'>exp_m1</a>(self) -&gt; Self;
     fn <a href='#tymethod.ln_1p' class='fnname'>ln_1p</a>(self) -&gt; Self;
     fn <a href='#tymethod.sinh' class='fnname'>sinh</a>(self) -&gt; Self;
@@ -101,11 +101,12 @@
     fn <a href='#tymethod.asinh' class='fnname'>asinh</a>(self) -&gt; Self;
     fn <a href='#tymethod.acosh' class='fnname'>acosh</a>(self) -&gt; Self;
     fn <a href='#tymethod.atanh' class='fnname'>atanh</a>(self) -&gt; Self;
-    fn <a href='#tymethod.integer_decode' class='fnname'>integer_decode</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a>)</a>;
+    fn <a href='#tymethod.integer_decode' class='fnname'>integer_decode</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a>;
 }</pre>
             <h2 id='required-methods'>Required Methods</h2>
             <div class='methods'>
         <h3 id='tymethod.nan' class='method stab '><code>fn <a href='#tymethod.nan' class='fnname'>nan</a>() -&gt; Self</code></h3><div class='docblock'><p>Returns the <code>NaN</code> value.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -120,6 +121,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>nan</span>.<span class='ident'>is_nan</span>());</pre>
 </div><h3 id='tymethod.infinity' class='method stab '><code>fn <a href='#tymethod.infinity' class='fnname'>infinity</a>() -&gt; Self</code></h3><div class='docblock'><p>Returns the infinite value.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -140,6 +142,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>infinity</span>.<span class='ident'>is_finite</span>());
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>infinity</span> <span class='op'>&gt;</span> <span class='ident'>f32</span>::<span class='ident'>MAX</span>);</pre>
 </div><h3 id='tymethod.neg_infinity' class='method stab '><code>fn <a href='#tymethod.neg_infinity' class='fnname'>neg_infinity</a>() -&gt; Self</code></h3><div class='docblock'><p>Returns the negative infinite value.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -160,6 +163,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>neg_infinity</span>.<span class='ident'>is_finite</span>());
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>neg_infinity</span> <span class='op'>&lt;</span> <span class='ident'>f32</span>::<span class='ident'>MIN</span>);</pre>
 </div><h3 id='tymethod.neg_zero' class='method stab '><code>fn <a href='#tymethod.neg_zero' class='fnname'>neg_zero</a>() -&gt; Self</code></h3><div class='docblock'><p>Returns <code>-0.0</code>.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::{Zero, Float};
@@ -182,6 +186,7 @@ fn main() {
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='number'>7.0f32</span><span class='op'>/</span><span class='ident'>inf</span>, <span class='ident'>zero</span>);
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>zero</span> <span class='op'>*</span> <span class='number'>10.0</span>, <span class='ident'>zero</span>);</pre>
 </div><h3 id='tymethod.min_value' class='method stab '><code>fn <a href='#tymethod.min_value' class='fnname'>min_value</a>() -&gt; Self</code></h3><div class='docblock'><p>Returns the smallest finite value that this type can represent.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -198,6 +203,7 @@ fn main() {
 
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>x</span>, <span class='ident'>f64</span>::<span class='ident'>MIN</span>);</pre>
 </div><h3 id='tymethod.min_positive_value' class='method stab '><code>fn <a href='#tymethod.min_positive_value' class='fnname'>min_positive_value</a>() -&gt; Self</code></h3><div class='docblock'><p>Returns the smallest positive, normalized value that this type can represent.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -214,6 +220,7 @@ fn main() {
 
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>x</span>, <span class='ident'>f64</span>::<span class='ident'>MIN_POSITIVE</span>);</pre>
 </div><h3 id='tymethod.max_value' class='method stab '><code>fn <a href='#tymethod.max_value' class='fnname'>max_value</a>() -&gt; Self</code></h3><div class='docblock'><p>Returns the largest finite value that this type can represent.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -228,6 +235,7 @@ fn main() {
 <span class='kw'>let</span> <span class='ident'>x</span>: <span class='ident'>f64</span> <span class='op'>=</span> <span class='ident'>Float</span>::<span class='ident'>max_value</span>();
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>x</span>, <span class='ident'>f64</span>::<span class='ident'>MAX</span>);</pre>
 </div><h3 id='tymethod.is_nan' class='method stab '><code>fn <a href='#tymethod.is_nan' class='fnname'>is_nan</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if this value is <code>NaN</code> and false otherwise.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -249,6 +257,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>f</span>.<span class='ident'>is_nan</span>());</pre>
 </div><h3 id='tymethod.is_infinite' class='method stab '><code>fn <a href='#tymethod.is_infinite' class='fnname'>is_infinite</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if this value is positive infinity or negative infinity and
 false otherwise.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -279,6 +288,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>inf</span>.<span class='ident'>is_infinite</span>());
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>neg_inf</span>.<span class='ident'>is_infinite</span>());</pre>
 </div><h3 id='tymethod.is_finite' class='method stab '><code>fn <a href='#tymethod.is_finite' class='fnname'>is_finite</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if this number is neither infinite nor <code>NaN</code>.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -310,6 +320,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>neg_inf</span>.<span class='ident'>is_finite</span>());</pre>
 </div><h3 id='tymethod.is_normal' class='method stab '><code>fn <a href='#tymethod.is_normal' class='fnname'>is_normal</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if the number is neither zero, infinite,
 <a href="http://en.wikipedia.org/wiki/Denormal_number">subnormal</a>, or <code>NaN</code>.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -348,6 +359,7 @@ fn main() {
 </div><h3 id='tymethod.classify' class='method stab '><code>fn <a href='#tymethod.classify' class='fnname'>classify</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/num/enum.FpCategory.html' title='core::num::FpCategory'>FpCategory</a></code></h3><div class='docblock'><p>Returns the floating point category of the number. If only one property
 is going to be tested, it is generally faster to use the specific
 predicate instead.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -370,6 +382,7 @@ fn main() {
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>num</span>.<span class='ident'>classify</span>(), <span class='ident'>FpCategory</span>::<span class='ident'>Normal</span>);
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>inf</span>.<span class='ident'>classify</span>(), <span class='ident'>FpCategory</span>::<span class='ident'>Infinite</span>);</pre>
 </div><h3 id='tymethod.floor' class='method stab '><code>fn <a href='#tymethod.floor' class='fnname'>floor</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Returns the largest integer less than or equal to a number.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -388,6 +401,7 @@ fn main() {
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>f</span>.<span class='ident'>floor</span>(), <span class='number'>3.0</span>);
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>g</span>.<span class='ident'>floor</span>(), <span class='number'>3.0</span>);</pre>
 </div><h3 id='tymethod.ceil' class='method stab '><code>fn <a href='#tymethod.ceil' class='fnname'>ceil</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Returns the smallest integer greater than or equal to a number.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -407,6 +421,7 @@ fn main() {
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>g</span>.<span class='ident'>ceil</span>(), <span class='number'>4.0</span>);</pre>
 </div><h3 id='tymethod.round' class='method stab '><code>fn <a href='#tymethod.round' class='fnname'>round</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Returns the nearest integer to a number. Round half-way cases away from
 <code>0.0</code>.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -425,6 +440,7 @@ fn main() {
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>f</span>.<span class='ident'>round</span>(), <span class='number'>3.0</span>);
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>g</span>.<span class='ident'>round</span>(), <span class='op'>-</span><span class='number'>3.0</span>);</pre>
 </div><h3 id='tymethod.trunc' class='method stab '><code>fn <a href='#tymethod.trunc' class='fnname'>trunc</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Return the integer part of a number.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -443,6 +459,7 @@ fn main() {
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>f</span>.<span class='ident'>trunc</span>(), <span class='number'>3.0</span>);
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>g</span>.<span class='ident'>trunc</span>(), <span class='op'>-</span><span class='number'>3.0</span>);</pre>
 </div><h3 id='tymethod.fract' class='method stab '><code>fn <a href='#tymethod.fract' class='fnname'>fract</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Returns the fractional part of a number.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -466,6 +483,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference_y</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.abs' class='method stab '><code>fn <a href='#tymethod.abs' class='fnname'>abs</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Computes the absolute value of <code>self</code>. Returns <code>Float::nan()</code> if the
 number is <code>Float::nan()</code>.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -502,6 +520,7 @@ fn main() {
 <li><code>-1.0</code> if the number is negative, <code>-0.0</code> or <code>Float::neg_infinity()</code></li>
 <li><code>Float::nan()</code> if the number is <code>Float::nan()</code></li>
 </ul>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -525,6 +544,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>f64</span>::<span class='ident'>NAN</span>.<span class='ident'>signum</span>().<span class='ident'>is_nan</span>());</pre>
 </div><h3 id='tymethod.is_sign_positive' class='method stab '><code>fn <a href='#tymethod.is_sign_positive' class='fnname'>is_sign_positive</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if <code>self</code> is positive, including <code>+0.0</code> and
 <code>Float::infinity()</code>.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -554,6 +574,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>nan</span>.<span class='ident'>is_sign_positive</span>() <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ident'>nan</span>.<span class='ident'>is_sign_negative</span>());</pre>
 </div><h3 id='tymethod.is_sign_negative' class='method stab '><code>fn <a href='#tymethod.is_sign_negative' class='fnname'>is_sign_negative</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h3><div class='docblock'><p>Returns <code>true</code> if <code>self</code> is negative, including <code>-0.0</code> and
 <code>Float::neg_infinity()</code>.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -584,6 +605,7 @@ fn main() {
 </div><h3 id='tymethod.mul_add' class='method stab '><code>fn <a href='#tymethod.mul_add' class='fnname'>mul_add</a>(self, a: Self, b: Self) -&gt; Self</code></h3><div class='docblock'><p>Fused multiply-add. Computes <code>(self * a) + b</code> with only one rounding
 error. This produces a more accurate result with better performance than
 a separate multiplication operation followed by an add.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -608,6 +630,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.recip' class='method stab '><code>fn <a href='#tymethod.recip' class='fnname'>recip</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Take the reciprocal (inverse) of a number, <code>1/x</code>.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -626,6 +649,7 @@ fn main() {
 </div><h3 id='tymethod.powi' class='method stab '><code>fn <a href='#tymethod.powi' class='fnname'>powi</a>(self, n: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>) -&gt; Self</code></h3><div class='docblock'><p>Raise a number to an integer power.</p>
 
 <p>Using this function is generally faster than using <code>powf</code></p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -642,6 +666,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.powf' class='method stab '><code>fn <a href='#tymethod.powf' class='fnname'>powf</a>(self, n: Self) -&gt; Self</code></h3><div class='docblock'><p>Raise a number to a floating point power.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -660,6 +685,7 @@ fn main() {
 </div><h3 id='tymethod.sqrt' class='method stab '><code>fn <a href='#tymethod.sqrt' class='fnname'>sqrt</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Take the square root of a number.</p>
 
 <p>Returns NaN if <code>self</code> is a negative number.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -682,6 +708,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>negative</span>.<span class='ident'>sqrt</span>().<span class='ident'>is_nan</span>());</pre>
 </div><h3 id='tymethod.exp' class='method stab '><code>fn <a href='#tymethod.exp' class='fnname'>exp</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Returns <code>e^(self)</code>, (the exponential function).</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -706,6 +733,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.exp2' class='method stab '><code>fn <a href='#tymethod.exp2' class='fnname'>exp2</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Returns <code>2^(self)</code>.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -726,6 +754,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.ln' class='method stab '><code>fn <a href='#tymethod.ln' class='fnname'>ln</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Returns the natural logarithm of the number.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -750,6 +779,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.log' class='method stab '><code>fn <a href='#tymethod.log' class='fnname'>log</a>(self, base: Self) -&gt; Self</code></h3><div class='docblock'><p>Returns the logarithm of the number with respect to an arbitrary base.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -780,6 +810,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference_10</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference_2</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.log2' class='method stab '><code>fn <a href='#tymethod.log2' class='fnname'>log2</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Returns the base 2 logarithm of the number.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -800,6 +831,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.log10' class='method stab '><code>fn <a href='#tymethod.log10' class='fnname'>log10</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Returns the base 10 logarithm of the number.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -820,6 +852,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.max' class='method stab '><code>fn <a href='#tymethod.max' class='fnname'>max</a>(self, other: Self) -&gt; Self</code></h3><div class='docblock'><p>Returns the maximum of the two numbers.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -836,6 +869,7 @@ fn main() {
 
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>x</span>.<span class='ident'>max</span>(<span class='ident'>y</span>), <span class='ident'>y</span>);</pre>
 </div><h3 id='tymethod.min' class='method stab '><code>fn <a href='#tymethod.min' class='fnname'>min</a>(self, other: Self) -&gt; Self</code></h3><div class='docblock'><p>Returns the minimum of the two numbers.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -857,6 +891,7 @@ fn main() {
 <li>If <code>self &lt;= other</code>: <code>0:0</code></li>
 <li>Else: <code>self - other</code></li>
 </ul>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -881,6 +916,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference_x</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference_y</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.cbrt' class='method stab '><code>fn <a href='#tymethod.cbrt' class='fnname'>cbrt</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Take the cubic root of a number.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -902,6 +938,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.hypot' class='method stab '><code>fn <a href='#tymethod.hypot' class='fnname'>hypot</a>(self, other: Self) -&gt; Self</code></h3><div class='docblock'><p>Calculate the length of the hypotenuse of a right-angle triangle given
 legs of length <code>x</code> and <code>y</code>.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -924,6 +961,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.sin' class='method stab '><code>fn <a href='#tymethod.sin' class='fnname'>sin</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Computes the sine of a number (in radians).</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -944,6 +982,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.cos' class='method stab '><code>fn <a href='#tymethod.cos' class='fnname'>cos</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Computes the cosine of a number (in radians).</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -964,6 +1003,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.tan' class='method stab '><code>fn <a href='#tymethod.tan' class='fnname'>tan</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Computes the tangent of a number (in radians).</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -984,6 +1024,7 @@ fn main() {
 </div><h3 id='tymethod.asin' class='method stab '><code>fn <a href='#tymethod.asin' class='fnname'>asin</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Computes the arcsine of a number. Return value is in radians in
 the range [-pi/2, pi/2] or NaN if the number is outside the range
 [-1, 1].</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -1008,6 +1049,7 @@ fn main() {
 </div><h3 id='tymethod.acos' class='method stab '><code>fn <a href='#tymethod.acos' class='fnname'>acos</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Computes the arccosine of a number. Return value is in radians in
 the range [0, pi] or NaN if the number is outside the range
 [-1, 1].</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -1031,6 +1073,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.atan' class='method stab '><code>fn <a href='#tymethod.atan' class='fnname'>atan</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Computes the arctangent of a number. Return value is in radians in the
 range [-pi/2, pi/2];</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -1058,6 +1101,7 @@ fn main() {
 <li><code>y &gt;= 0</code>: <code>arctan(y/x) + pi</code> -&gt; <code>(pi/2, pi]</code></li>
 <li><code>y &lt; 0</code>: <code>arctan(y/x) - pi</code> -&gt; <code>(-pi, -pi/2)</code></li>
 </ul>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -1097,8 +1141,9 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference_1</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference_2</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
-</div><h3 id='tymethod.sin_cos' class='method stab '><code>fn <a href='#tymethod.sin_cos' class='fnname'>sin_cos</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(Self, Self)</a></code></h3><div class='docblock'><p>Simultaneously computes the sine and cosine of the number, <code>x</code>. Returns
+</div><h3 id='tymethod.sin_cos' class='method stab '><code>fn <a href='#tymethod.sin_cos' class='fnname'>sin_cos</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a>Self, Self<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code></h3><div class='docblock'><p>Simultaneously computes the sine and cosine of the number, <code>x</code>. Returns
 <code>(sin(x), cos(x))</code>.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -1126,6 +1171,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference_0</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.exp_m1' class='method stab '><code>fn <a href='#tymethod.exp_m1' class='fnname'>exp_m1</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Returns <code>e^(self) - 1</code> in a way that is accurate even if the
 number is close to zero.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -1147,6 +1193,7 @@ fn main() {
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.ln_1p' class='method stab '><code>fn <a href='#tymethod.ln_1p' class='fnname'>ln_1p</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Returns <code>ln(1+n)</code> (natural logarithm) more accurately than if
 the operations were performed separately.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -1169,6 +1216,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.sinh' class='method stab '><code>fn <a href='#tymethod.sinh' class='fnname'>sinh</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Hyperbolic sine function.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -1197,6 +1245,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1e-10</span>);</pre>
 </div><h3 id='tymethod.cosh' class='method stab '><code>fn <a href='#tymethod.cosh' class='fnname'>cosh</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Hyperbolic cosine function.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -1225,6 +1274,7 @@ fn main() {
 <span class='comment'>// Same result</span>
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1.0e-10</span>);</pre>
 </div><h3 id='tymethod.tanh' class='method stab '><code>fn <a href='#tymethod.tanh' class='fnname'>tanh</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Hyperbolic tangent function.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -1253,6 +1303,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1.0e-10</span>);</pre>
 </div><h3 id='tymethod.asinh' class='method stab '><code>fn <a href='#tymethod.asinh' class='fnname'>asinh</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Inverse hyperbolic sine function.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -1273,6 +1324,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1.0e-10</span>);</pre>
 </div><h3 id='tymethod.acosh' class='method stab '><code>fn <a href='#tymethod.acosh' class='fnname'>acosh</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Inverse hyperbolic cosine function.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -1293,6 +1345,7 @@ fn main() {
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1.0e-10</span>);</pre>
 </div><h3 id='tymethod.atanh' class='method stab '><code>fn <a href='#tymethod.atanh' class='fnname'>atanh</a>(self) -&gt; Self</code></h3><div class='docblock'><p>Inverse hyperbolic tangent function.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -1314,9 +1367,10 @@ fn main() {
 <span class='kw'>let</span> <span class='ident'>abs_difference</span> <span class='op'>=</span> (<span class='ident'>f</span> <span class='op'>-</span> <span class='ident'>e</span>).<span class='ident'>abs</span>();
 
 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>abs_difference</span> <span class='op'>&lt;</span> <span class='number'>1.0e-10</span>);</pre>
-</div><h3 id='tymethod.integer_decode' class='method stab '><code>fn <a href='#tymethod.integer_decode' class='fnname'>integer_decode</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a>)</a></code></h3><div class='docblock'><p>Returns the mantissa, base 2 exponent, and sign as integers, respectively.
+</div><h3 id='tymethod.integer_decode' class='method stab '><code>fn <a href='#tymethod.integer_decode' class='fnname'>integer_decode</a>(self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a>, <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code></h3><div class='docblock'><p>Returns the mantissa, base 2 exponent, and sign as integers, respectively.
 The original number can be recovered by <code>sign * mantissa * 2 ^ exponent</code>.
 The floating point encoding is documented in the <a href="../../../../../reference.html#machine-types">Reference</a>.</p>
+
 <span class='rusttest'>extern crate num;
 fn main() {
     use num::traits::Float;
@@ -1398,7 +1452,7 @@ fn main() {
 
                 <p>
                     Search functions by type signature (e.g.
-                    <code>vec -> usize</code>)
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
                 </p>
             </div>
         </div>

@@ -235,6 +235,8 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Logistic Regression module</span>
 <span class='doccomment'>//!</span>
@@ -283,6 +285,7 @@
 <span class='doccomment'>/// Logistic Regression Model.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Contains option for optimized parameter.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>LogisticRegressor</span><span class='op'>&lt;</span><span class='ident'>A</span><span class='op'>&gt;</span>
     <span class='kw'>where</span> <span class='ident'>A</span>: <span class='ident'>OptimAlgorithm</span><span class='op'>&lt;</span><span class='ident'>BaseLogisticRegressor</span><span class='op'>&gt;</span>
 {
@@ -377,6 +380,7 @@
 <span class='doccomment'>/// The Base Logistic Regression model.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// This struct cannot be instantianated and is used internally only.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>BaseLogisticRegressor</span> {
     <span class='ident'>parameters</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span>,
 }
@@ -429,7 +433,8 @@
 
         (<span class='ident'>cost</span>, <span class='ident'>grad</span>.<span class='ident'>into_vec</span>())
     }
-}</pre>
+}
+</pre>
 </section>
     <section id='search' class="content hidden"></section>
 

@@ -279,6 +279,8 @@
 <span id="236">236</span>
 <span id="237">237</span>
 <span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Gaussian Mixture Models</span>
 <span class='doccomment'>//!</span>
@@ -319,6 +321,7 @@
 <span class='doccomment'>/// - Full : The full covariance structure.</span>
 <span class='doccomment'>/// - Regularized : Adds a regularization constant to the covariance diagonal.</span>
 <span class='doccomment'>/// - Diagonal : Only the diagonal covariance structure.</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>enum</span> <span class='ident'>CovOption</span> {
     <span class='doccomment'>/// The full covariance structure.</span>
     <span class='ident'>Full</span>,
@@ -330,6 +333,7 @@
 
 
 <span class='doccomment'>/// A Gaussian Mixture Model</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>GaussianMixtureModel</span> {
     <span class='ident'>comp_count</span>: <span class='ident'>usize</span>,
     <span class='ident'>mix_weights</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>,
