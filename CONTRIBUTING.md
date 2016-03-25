@@ -44,7 +44,7 @@ If you decide you want to tackle an issue please comment on that issue stating t
 
 So by now you should have the project forked and are ready to start working on the code. There are no hard conventions in place at the moment but please follow these general guidelines:
 
-- Document all public facing functions, structs, fields, etc. You can check this by adding `#![deny(missing_docs)]` to the top of the `lib.rs` file. This should include exampes, panics and failures. (If you see these missing anywhere in the current code please create an issue.)
+- Document all public facing functions, structs, fields, etc. You can check this by adding `#![deny(missing_docs)]` to the top of the `lib.rs` file. This should include examples, panics and failures. (If you see these missing anywhere in the current code please create an issue.)
 - Add comments to all private functions detailing what they do.
 - Make lots of small commits as opposed to one large commit.
 - Ensure that all existing (and new) tests pass for each commit.
