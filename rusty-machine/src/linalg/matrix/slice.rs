@@ -135,6 +135,37 @@ impl<T> MatrixSlice<T> {
         }
     }
 
+    /// Produce a matrix slice from an existing matrix slice.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::slice::MatrixSlice;
+    ///
+    /// let a = Matrix::new(3,3, (0..9).collect::<Vec<usize>>());
+    /// let slice = MatrixSlice::from_matrix(&a, [1,1], 2, 2);
+    /// let new_slice = slice.reslice([0,0], 1, 1);
+    /// ```
+    pub fn reslice(mut self,
+                            start: [usize; 2],
+                            rows: usize,
+                            cols: usize)
+                            -> MatrixSlice<T> {
+        assert!(start[0] + rows <= self.rows,
+            "View dimensions exceed matrix dimensions.");
+        assert!(start[1] + cols <= self.cols,
+                "View dimensions exceed matrix dimensions.");
+
+        unsafe {
+            self.ptr = self.ptr.offset((start[0] * self.cols + start[1]) as isize);
+        }
+        self.rows = rows;
+        self.cols = cols;
+
+        self
+    }
+
     /// Returns an iterator over the matrix slice.
     ///
     /// # Examples
@@ -207,6 +238,37 @@ impl<T> MatrixSliceMut<T> {
                 row_stride: mat_cols,
             }
         }
+    }
+
+    /// Produce a matrix slice from an existing matrix slice.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::slice::MatrixSliceMut;
+    ///
+    /// let mut a = Matrix::new(3,3, (0..9).collect::<Vec<usize>>());
+    /// let slice = MatrixSliceMut::from_matrix(&mut a, [1,1], 2, 2);
+    /// let new_slice = slice.reslice([0,0], 1, 1);
+    /// ```
+    pub fn reslice(mut self,
+                            start: [usize; 2],
+                            rows: usize,
+                            cols: usize)
+                            -> MatrixSliceMut<T> {
+        assert!(start[0] + rows <= self.rows,
+            "View dimensions exceed matrix dimensions.");
+        assert!(start[1] + cols <= self.cols,
+                "View dimensions exceed matrix dimensions.");
+
+        unsafe {
+            self.ptr = self.ptr.offset((start[0] * self.cols + start[1]) as isize);
+        }
+        self.rows = rows;
+        self.cols = cols;
+
+        self
     }
 
     /// Returns an iterator over the matrix slice.
@@ -733,6 +795,7 @@ impl_neg_slice!(MatrixSliceMut);
 mod tests {
 	use super::MatrixSlice;
     use super::MatrixSliceMut;
+    use super::BaseSlice;
 	use super::super::Matrix;
 
 	#[test]
@@ -741,6 +804,44 @@ mod tests {
 		let a = Matrix::new(3,3, vec![2.0; 9]);
 		let _ = MatrixSlice::from_matrix(&a, [1,1], 3, 2);
 	}
+
+    #[test]
+    fn make_slice() {
+        let a = Matrix::new(3,3, vec![2.0; 9]);
+        let b = MatrixSlice::from_matrix(&a, [1,1], 2, 2);
+
+        assert_eq!(b.rows(), 2);
+        assert_eq!(b.cols(), 2);
+    }
+
+    #[test]
+    fn reslice() {
+        let mut a = Matrix::new(4,4, (0..16).collect());
+        let b = MatrixSlice::from_matrix(&a, [1,1], 3, 3);
+        {
+            let c = b.reslice([0,1], 2, 2);
+
+            assert_eq!(c.rows(), 2);
+            assert_eq!(c.cols(), 2);
+
+            assert_eq!(c[[0,0]], 6);
+            assert_eq!(c[[0,1]], 7);
+            assert_eq!(c[[1,0]], 10);
+            assert_eq!(c[[1,1]], 11);
+        }
+
+        let b = MatrixSliceMut::from_matrix(&mut a, [1,1], 3, 3);
+
+        let c = b.reslice([0,1], 2, 2);
+
+        assert_eq!(c.rows(), 2);
+        assert_eq!(c.cols(), 2);
+
+        assert_eq!(c[[0,0]], 6);
+        assert_eq!(c[[0,1]], 7);
+        assert_eq!(c[[1,0]], 10);
+        assert_eq!(c[[1,1]], 11);
+    }
 
 	#[test]
 	fn add_slice() {
