@@ -211,13 +211,10 @@ impl<T: Copy> Matrix<T> {
                     "Row index is greater than number of rows.");
         }
 
-        unsafe {
-            for row in rows {
-                for i in 0..self.cols {
-                    mat_vec.push(*self.data.get_unchecked(*row * self.cols + i));
-                }
-            }
+        for row in rows {
+            mat_vec.extend_from_slice(&self.data[*row * self.cols..(*row+1) * self.cols]);
         }
+
         Matrix {
             cols: self.cols,
             rows: rows.len(),
@@ -1700,5 +1697,32 @@ mod tests {
         }
 
         assert_eq!(a[[0,0]], 13.0);
+    }
+
+    #[test]
+    fn test_matrix_select_rows() {
+        let a = Matrix::new(4,2, (0..8).collect::<Vec<usize>>());
+
+        let b = a.select_rows(&[0,2,3]);
+
+        assert_eq!(b.into_vec(), vec![0,1,4,5,6,7]);
+    }
+
+    #[test]
+    fn test_matrix_select_cols() {
+        let a = Matrix::new(4,2, (0..8).collect::<Vec<usize>>());
+
+        let b = a.select_cols(&[1]);
+
+        assert_eq!(b.into_vec(), vec![1,3,5,7]);
+    }
+
+    #[test]
+    fn test_matrix_select() {
+        let a = Matrix::new(4,2, (0..8).collect::<Vec<usize>>());
+
+        let b = a.select(&[0,2], &[1]);
+
+        assert_eq!(b.into_vec(), vec![1,5]);
     }
 }

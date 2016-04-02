@@ -61,6 +61,7 @@ There is also a `stats` module behind an optional features flag.
 - Gaussian Process Regression
 - Support Vector Machines
 - Gaussian Mixture Models
+- Naive Bayes Classifiers
 
 ---
 

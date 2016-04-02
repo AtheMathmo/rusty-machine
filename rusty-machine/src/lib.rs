@@ -22,7 +22,8 @@
 //! - Neural Networks
 //! - Gaussian Process Regression
 //! - Support Vector Machines
-//! - Gaussian Mixture Modelss
+//! - Gaussian Mixture Models
+//! - Naive Bayes Classifiers
 //!
 //! ### linalg
 //!
@@ -114,6 +115,7 @@ pub mod learning {
     pub mod nnet;
     pub mod gp;
     pub mod svm;
+    pub mod naive_bayes;
 
     /// Trait for supervised model.
     pub trait SupModel<T,U> {
