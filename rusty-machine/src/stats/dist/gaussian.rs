@@ -18,6 +18,7 @@ use std::f64::consts as float_consts;
 /// the distribution functions and sampling.
 ///
 /// It is most efficient to construct the struct using the `from_std_dev` constructor.
+#[derive(Debug, Clone, Copy)]
 pub struct Gaussian {
     mean: f64,
     variance: f64,

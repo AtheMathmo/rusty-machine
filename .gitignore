@@ -1,3 +1,6 @@
 # compiled code
 rusty-machine/target/
 rusty-machine/Cargo.lock
+*~
+*.swp
+*.swo

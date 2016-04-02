@@ -1,0 +1,14 @@
+language: rust
+rust:
+  - stable
+  - beta
+  - nightly
+matrix:
+  allow_failures:
+    - rust: nightly
+script:
+  - cd rusty-machine
+  - cargo build --verbose
+  - cargo test --verbose
+  - cargo build --features stats
+  - cargo test --features stats

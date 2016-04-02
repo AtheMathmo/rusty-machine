@@ -10,6 +10,7 @@ use rand::distributions::{Sample, IndependentSample};
 use rand::distributions::exponential::Exp1;
 
 /// An Exponential random variable.
+#[derive(Debug, Clone, Copy)]
 pub struct Exponential {
     lambda: f64,
 }

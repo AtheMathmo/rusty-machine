@@ -60,6 +60,93 @@ pub enum InitAlgorithm {
     KPlusPlus,
 }
 
+/// K-Means Classification Builder.
+#[derive(Debug)]
+pub struct KMeansClassifierBuilder {
+    k: usize,
+    iters: usize,
+    init_algorithm: InitAlgorithm
+}
+
+impl KMeansClassifierBuilder {
+    /// Create a K-Means Classification Builder.
+    ///
+    /// Requires number of classes to be specified.
+    /// Defaults to 100 iterations and kmeans++ initialization.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::k_means::KMeansClassifierBuilder;
+    ///
+    /// // Creates a new KMeansClassifier with 5 clusters
+    /// let model = KMeansClassifierBuilder::new(5).finalize();
+    /// ```
+    pub fn new(k: usize) -> Self {
+        KMeansClassifierBuilder {
+            k: k,
+            iters: 100,
+            init_algorithm: InitAlgorithm::KPlusPlus
+        }
+    }
+
+    /// Changes the number of iterations.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::k_means::KMeansClassifierBuilder;
+    ///
+    /// // Creates a new KMeansClassifier with 5 clusters and 42 iterations
+    /// let model = KMeansClassifierBuilder::new(5).iters(42).finalize();
+    /// ```
+    pub fn iters(&mut self, iters: usize) -> &mut KMeansClassifierBuilder {
+        self.iters = iters;
+        self
+    }
+
+    /// Changes the initialization algorithm.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::k_means::KMeansClassifierBuilder;
+    /// use rusty_machine::learning::k_means::InitAlgorithm;
+    ///
+    /// // Creates a new KMeansClassifier with 5 clusters and uses
+    /// // the Forgy initialization algorithm
+    /// let model = KMeansClassifierBuilder::new(5).init_algorithm(InitAlgorithm::Forgy)
+    ///                                            .finalize();
+    /// ```
+    pub fn init_algorithm(&mut self, init_algorithm: InitAlgorithm) -> &mut KMeansClassifierBuilder {
+        self.init_algorithm = init_algorithm;
+        self
+    }
+
+    /// Returns the KMeansClassifier with the options previously specified.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::k_means::KMeansClassifierBuilder;
+    /// use rusty_machine::learning::k_means::InitAlgorithm;
+    ///
+    /// // Creates a new KMeansClassifier with 5 clusters, 42 iterations
+    /// // using the Forgy initialization algorithm
+    /// let model = KMeansClassifierBuilder::new(5).iters(42)
+    ///                                            .init_algorithm(InitAlgorithm::Forgy)
+    ///                                            .finalize();
+    /// ```
+    pub fn finalize(&self) -> KMeansClassifier {
+        KMeansClassifier {
+            k: self.k,
+            iters: self.iters,
+            centroids: None,
+            init_algorithm: self.init_algorithm
+        }
+    }
+}
+
 /// K-Means Classification model.
 ///
 /// Contains option for centroids.
@@ -128,6 +215,44 @@ impl KMeansClassifier {
             centroids: None,
             init_algorithm: InitAlgorithm::KPlusPlus,
         }
+    }
+
+    /// Constructs untrained k-means classifier model.
+    ///
+    /// Requires number of classes, number of iterations, and
+    /// the initialization algorithm to use.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::k_means::KMeansClassifier;
+    /// use rusty_machine::learning::k_means::InitAlgorithm;
+    ///
+    /// let model = KMeansClassifier::new_specified(5, 42, InitAlgorithm::Forgy);
+    /// ```
+    pub fn new_specified(k: usize, iters: usize,
+                         algo: InitAlgorithm) -> KMeansClassifier {
+        KMeansClassifier {
+            iters: iters,
+            k: k,
+            centroids: None,
+            init_algorithm: algo,
+        }
+    }
+
+    /// Get the number of classes
+    pub fn k(&self) -> usize {
+        self.k
+    }
+
+    /// Get the number of iterations
+    pub fn iters(&self) -> usize {
+        self.iters
+    }
+
+    /// Get the initialization algorithm
+    pub fn init_algorithm(&self) -> InitAlgorithm {
+        self.init_algorithm
     }
 
     /// Initialize the centroids.

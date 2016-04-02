@@ -2,6 +2,26 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.2.4
+
+### New Contributors
+
+- [vishalsodani](https://github.com/vishalsodani) (fixing some typos)
+- [danlrobertson](https://github.com/danlrobertson) (added the `KMeansClassifierBuilder`)
+
+### Breaking Changes
+
+- None
+
+### Features
+
+- `KMeansClassifier` now has a builder!
+
+### Minor Changes
+
+- We're now using travis for CI.
+- Deriving Debug, Clone, Copy for Gaussian and Exponential distributions.
+
 
 ## 0.2.3
 
