@@ -4,7 +4,7 @@
 //! relating to the matrix linear algebra struct.
 
 use std::fmt;
-use std::ops::{Mul, Add, Div, Sub, Index, Neg};
+use std::ops::{Mul, Add, Div, Sub, Index, IndexMut, Neg};
 use libnum::{One, Zero, Float, FromPrimitive};
 use std::cmp::{PartialEq, min};
 use linalg::Metric;
@@ -12,6 +12,16 @@ use linalg::vector::Vector;
 use linalg::utils;
 
 mod decomposition;
+pub mod slice;
+
+/// Matrix dimensions
+#[derive(Debug, Clone, Copy)]
+pub enum Axes {
+    /// The row axis.
+    Row,
+    /// The column axis.
+    Col,
+}
 
 /// The Matrix struct.
 ///
@@ -73,9 +83,89 @@ impl<T> Matrix<T> {
         &mut self.data
     }
 
+    /// Get a reference to a point in the matrix without bounds checks.
+    pub unsafe fn get_unchecked(&self, index: [usize; 2]) -> &T {
+        self.data.get_unchecked(index[0] * self.cols + index[1])
+    }
+
+    /// Get a mutable reference to a point in the matrix without bounds checks.
+    pub unsafe fn get_unchecked_mut(&mut self, index: [usize; 2]) -> &T {
+        self.data.get_unchecked_mut(index[0] * self.cols + index[1])
+    }
+
     /// Consumes the Matrix and returns the Vec of data.
     pub fn into_vec(self) -> Vec<T> {
         self.data
+    }
+
+    /// Split the matrix at the specified axis returning two `MatrixSlice`s.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::Axes;
+    ///
+    /// let a = Matrix::new(3,3, vec![2.0; 9]);
+    /// let (b,c) = a.split_at(1, Axes::Row);
+    /// ```
+    pub fn split_at(&self, mid: usize, axis: Axes) -> (slice::MatrixSlice<T>, slice::MatrixSlice<T>) {
+        let slice_1 : slice::MatrixSlice<T>;
+        let slice_2 : slice::MatrixSlice<T>;
+
+        match axis {
+            Axes::Row => {
+                assert!(mid < self.rows);
+
+                slice_1 = slice::MatrixSlice::from_matrix(self, [0,0], mid, self.cols);
+                slice_2 = slice::MatrixSlice::from_matrix(self, [mid,0], self.rows - mid, self.cols);
+            },
+            Axes::Col => {
+                assert!(mid < self.cols);
+
+                slice_1 = slice::MatrixSlice::from_matrix(self, [0,0], self.rows, mid);
+                slice_2 = slice::MatrixSlice::from_matrix(self, [0,mid], self.rows, self.cols - mid);
+            }
+        }
+
+        (slice_1, slice_2)
+    }
+
+    /// Split the matrix at the specified axis returning two `MatrixSlice`s.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::Axes;
+    ///
+    /// let mut a = Matrix::new(3,3, vec![2.0; 9]);
+    /// let (b,c) = a.split_at_mut(1, Axes::Col);
+    /// ```
+    pub fn split_at_mut(&mut self, mid: usize, axis: Axes) -> (slice::MatrixSliceMut<T>, slice::MatrixSliceMut<T>) {
+
+        let mat_cols = self.cols;
+        let mat_rows = self.rows;
+
+        let slice_1 : slice::MatrixSliceMut<T>;
+        let slice_2 : slice::MatrixSliceMut<T>;
+
+        match axis {
+            Axes::Row => {
+                assert!(mid < self.rows);
+
+                slice_1 = slice::MatrixSliceMut::from_matrix(self, [0,0], mid, mat_cols);
+                slice_2 = slice::MatrixSliceMut::from_matrix(self, [mid,0], mat_rows - mid, mat_cols);
+            },
+            Axes::Col => {
+                assert!(mid < self.cols);
+
+                slice_1 = slice::MatrixSliceMut::from_matrix(self, [0,0], mat_rows, mid);
+                slice_2 = slice::MatrixSliceMut::from_matrix(self, [0,mid], mat_rows, mat_cols - mid);
+            }
+        }
+
+        (slice_1, slice_2)
     }
 }
 
@@ -1385,6 +1475,21 @@ impl<T> Index<[usize; 2]> for Matrix<T> {
     }
 }
 
+/// Indexes mutable matrix.
+///
+/// Takes row index first then column.
+impl<T> IndexMut<[usize; 2]> for Matrix<T> {
+
+    fn index_mut(&mut self, idx: [usize; 2]) -> &mut T {
+        assert!(idx[0] < self.rows,
+                "Row index is greater than row dimension.");
+        assert!(idx[1] < self.cols,
+                "Column index is greater than column dimension.");
+        let self_cols = self.cols;
+        unsafe { self.data.get_unchecked_mut(idx[0] * self_cols + idx[1]) }
+    }
+}
+
 impl<T: Float> Metric<T> for Matrix<T> {
     /// Compute euclidean norm for matrix.
     ///
@@ -1476,6 +1581,8 @@ impl<T: fmt::Display> fmt::Display for Matrix<T> {
 #[cfg(test)]
 mod tests {
     use super::Matrix;
+    use super::Axes;
+    use super::slice::BaseSlice;
 
     #[test]
     fn test_display_formatting() {
@@ -1524,4 +1631,74 @@ mod tests {
         }
     }
 
+    #[test]
+    fn test_split_matrix() {
+        let a = Matrix::new(3, 3, (0..9).collect());
+
+        let (b,c) = a.split_at(1, Axes::Row);
+
+        assert_eq!(b.rows(), 1);
+        assert_eq!(b.cols(), 3);
+        assert_eq!(c.rows(), 2);
+        assert_eq!(c.cols(), 3);
+
+        assert_eq!(b[[0,0]], 0);
+        assert_eq!(b[[0,1]], 1);
+        assert_eq!(b[[0,2]], 2);
+        assert_eq!(c[[0,0]], 3);
+        assert_eq!(c[[0,1]], 4);
+        assert_eq!(c[[0,2]], 5);
+        assert_eq!(c[[1,0]], 6);
+        assert_eq!(c[[1,1]], 7);
+        assert_eq!(c[[1,2]], 8);
+    }
+
+    #[test]
+    fn test_split_matrix_mut() {
+        let mut a = Matrix::new(3, 3, (0..9).collect());
+
+        let (mut b, mut c) = a.split_at_mut(1, Axes::Row);
+
+        assert_eq!(b.rows(), 1);
+        assert_eq!(b.cols(), 3);
+        assert_eq!(c.rows(), 2);
+        assert_eq!(c.cols(), 3);
+
+        assert_eq!(b[[0,0]], 0);
+        assert_eq!(b[[0,1]], 1);
+        assert_eq!(b[[0,2]], 2);
+        assert_eq!(c[[0,0]], 3);
+        assert_eq!(c[[0,1]], 4);
+        assert_eq!(c[[0,2]], 5);
+        assert_eq!(c[[1,0]], 6);
+        assert_eq!(c[[1,1]], 7);
+        assert_eq!(c[[1,2]], 8);
+
+        b[[0,0]] = 4;
+        c[[0,0]] = 5;
+
+        assert_eq!(a[[0,0]], 4);
+        assert_eq!(a[[0,1]], 1);
+        assert_eq!(a[[0,2]], 2);
+        assert_eq!(a[[1,0]], 5);
+        assert_eq!(a[[1,1]], 4);
+        assert_eq!(a[[1,2]], 5);
+        assert_eq!(a[[2,0]], 6);
+        assert_eq!(a[[2,1]], 7);
+        assert_eq!(a[[2,2]], 8);
+
+    }
+
+    #[test]
+    fn test_matrix_index_mut() {
+        let mut a = Matrix::new(3, 3, vec![2.0; 9]);
+
+        a[[0,0]] = 13.0;
+
+        for i in 1..9 {
+            assert_eq!(a.data()[i], 2.0);
+        }
+
+        assert_eq!(a[[0,0]], 13.0);
+    }
 }
