@@ -72,14 +72,14 @@ The library usage is described well in the [API documentation](https://AtheMathm
 
 The library is most easily used with [cargo](http://doc.crates.io/guide.html). Simply include the following in your Cargo.toml file:
 
-```
+```toml
 [dependencies.rusty-machine]
 version="*"
 ```
 
 And then import the library using:
 
-```
+```rust
 extern crate rusty_machine as rm;
 ```
 
@@ -89,7 +89,7 @@ The library consists of two core components. The linear algebra module and the l
 
 The linear algebra module contains the Matrix and Vector data structures and related methods - such as matrix decomposition. Usage looks like this:
 
-```
+```rust
 extern crate rusty_machine as rm;
 
 use rm::linalg::matrix::Matrix;
