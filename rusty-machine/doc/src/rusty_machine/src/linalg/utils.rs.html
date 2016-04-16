@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    
 
     
     
@@ -360,6 +361,21 @@
 <span id="317">317</span>
 <span id="318">318</span>
 <span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Linear algebra utils module.</span>
 <span class='doccomment'>//!</span>
@@ -504,7 +520,22 @@
         }
 }
 
-<span class='kw'>fn</span> <span class='ident'>vec_bin_op</span><span class='op'>&lt;</span><span class='ident'>F</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span><span class='op'>&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>
+<span class='doccomment'>/// Vectorized binary operation applied to two slices.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// # Examples</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// ```</span>
+<span class='doccomment'>/// use rusty_machine::linalg::utils;</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// let mut a = vec![2.0; 10];</span>
+<span class='doccomment'>/// let b = vec![3.0; 10];</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// let c = utils::vec_bin_op(&amp;a, &amp;b, |x, y| { 1f64 + x * y });</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// // Will print a vector of `7`s.</span>
+<span class='doccomment'>/// println!(&quot;{:?}&quot;, a);</span>
+<span class='doccomment'>/// ```</span>
+<span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>vec_bin_op</span><span class='op'>&lt;</span><span class='ident'>F</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span><span class='op'>&gt;</span>(<span class='ident'>u</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>v</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>f</span>: <span class='ident'>F</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>
     <span class='kw'>where</span> <span class='ident'>F</span>: <span class='ident'>Fn</span>(<span class='ident'>T</span>, <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span> {
         <span class='macro'>debug_assert_eq</span><span class='macro'>!</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());
         <span class='kw'>let</span> <span class='ident'>len</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='ident'>u</span>.<span class='ident'>len</span>(), <span class='ident'>v</span>.<span class='ident'>len</span>());

@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
+    
 
     
     
@@ -43,10 +44,10 @@
 
     <section id='main' class="content mod">
 <h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>rusty_machine</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-0' class='srclink' href='../src/rusty_machine/src/lib.rs.html.html#1-189' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-0' class='srclink' href='../src/rusty_machine/src/lib.rs.html#1-203' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'>
 <h1 id='the-rusty-machine-crate' class='section-header'><a href='#the-rusty-machine-crate'>The rusty-machine crate.</a></h1>
 <p>Crate built for machine learning with some linear algebra thrown in.</p>
@@ -70,7 +71,8 @@ This means the algorithms, models and related tools.</p>
 <li>Neural Networks</li>
 <li>Gaussian Process Regression</li>
 <li>Support Vector Machines</li>
-<li>Gaussian Mixture Modelss</li>
+<li>Gaussian Mixture Models</li>
+<li>Naive Bayes Classifiers</li>
 </ul>
 
 <h3 id='linalg' class='section-header'><a href='#linalg'>linalg</a></h3>
@@ -126,24 +128,37 @@ other things are left explicitly to the user.</p>
 <p>Of course this code could have been a lot simpler if we had simply adopted
 <code>let mut gp = GaussianProcess::default();</code>. Conversely, you could also implement
 your own kernels and mean functions by using the appropriate traits.</p>
+
+<p>Additionally you&#39;ll notice there&#39;s quite a few <code>use</code> statements at the top of this code.
+We can remove some of these by utilizing the <code>prelude</code>:</p>
+
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>prelude</span>::<span class='op'>*</span>;
+
+<span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>,<span class='number'>2</span>,<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>2.0</span>;<span class='number'>4</span>]);</pre>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
-                    <tr class=' module-item'>
-                        <td><a class='mod' href='learning/index.html'
-                               title='rusty_machine::learning'>learning</a></td>
-                        <td class='docblock short'>
-                             <p>Module for machine learning.</p>
-                        </td>
-                    </tr>
-                
-                    <tr class=' module-item'>
-                        <td><a class='mod' href='linalg/index.html'
-                               title='rusty_machine::linalg'>linalg</a></td>
-                        <td class='docblock short'>
-                             <p>Module for linear algebra.</p>
-                        </td>
-                    </tr>
-                </table></section>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='learning/index.html'
+                                  title='rusty_machine::learning'>learning</a></td>
+                           <td class='docblock short'>
+                                <p>Module for machine learning.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='linalg/index.html'
+                                  title='rusty_machine::linalg'>linalg</a></td>
+                           <td class='docblock short'>
+                                <p>Module for linear algebra.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='prelude/index.html'
+                                  title='rusty_machine::prelude'>prelude</a></td>
+                           <td class='docblock short'>
+                                <p>The rusty-machine prelude.</p>
+                           </td>
+                       </tr></table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

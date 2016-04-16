@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
+    
 
     
     
@@ -230,6 +231,20 @@
 <span id="187">187</span>
 <span id="188">188</span>
 <span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! # The rusty-machine crate.</span>
 <span class='doccomment'>//!</span>
@@ -255,7 +270,8 @@
 <span class='doccomment'>//! - Neural Networks</span>
 <span class='doccomment'>//! - Gaussian Process Regression</span>
 <span class='doccomment'>//! - Support Vector Machines</span>
-<span class='doccomment'>//! - Gaussian Mixture Modelss</span>
+<span class='doccomment'>//! - Gaussian Mixture Models</span>
+<span class='doccomment'>//! - Naive Bayes Classifiers</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ### linalg</span>
 <span class='doccomment'>//!</span>
@@ -313,11 +329,23 @@
 <span class='doccomment'>//! Of course this code could have been a lot simpler if we had simply adopted</span>
 <span class='doccomment'>//! `let mut gp = GaussianProcess::default();`. Conversely, you could also implement</span>
 <span class='doccomment'>//! your own kernels and mean functions by using the appropriate traits.</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! Additionally you&#39;ll notice there&#39;s quite a few `use` statements at the top of this code.</span>
+<span class='doccomment'>//! We can remove some of these by utilizing the `prelude`:</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! ```</span>
+<span class='doccomment'>//! use rusty_machine::prelude::*;</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! let _ = Matrix::new(2,2,vec![2.0;4]);</span>
+<span class='doccomment'>//! ```</span>
 
 <span class='attribute'>#<span class='op'>!</span>[<span class='ident'>warn</span>(<span class='ident'>missing_debug_implementations</span>)]</span>
 
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>num</span> <span class='kw'>as</span> <span class='ident'>libnum</span>;
 <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rand</span>;
+<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>matrixmultiply</span>;
+
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>prelude</span>;
 
 <span class='doccomment'>/// Module for linear algebra.</span>
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>linalg</span> {
@@ -347,6 +375,7 @@
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>nnet</span>;
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>gp</span>;
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>svm</span>;
+    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>naive_bayes</span>;
 
     <span class='doccomment'>/// Trait for supervised model.</span>
     <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>SupModel</span><span class='op'>&lt;</span><span class='ident'>T</span>,<span class='ident'>U</span><span class='op'>&gt;</span> {

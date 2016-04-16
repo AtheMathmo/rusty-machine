@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Bernoulli","The Bernoulli Naive Bayes model distribution."],["Gaussian","The Gaussian Naive Bayes model distribution."],["Multinomial","The Multinomial Naive Bayes model distribution."],["NaiveBayes","The Naive Bayes model."]],"trait":[["Distribution","Naive Bayes Distribution."]]});

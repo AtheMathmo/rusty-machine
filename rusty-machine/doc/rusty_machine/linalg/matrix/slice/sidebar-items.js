@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SliceIter","Iterator for the MatrixSlice"],["SliceIterMut","Iterator for MatrixSliceMut."]],"trait":[["BaseSlice","Trait for Matrix Slices."]]});
