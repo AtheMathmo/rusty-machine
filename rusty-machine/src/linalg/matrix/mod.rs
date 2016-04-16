@@ -3,8 +3,9 @@
 //! Currently contains all code
 //! relating to the matrix linear algebra struct.
 
+use std::any::Any;
 use std::fmt;
-use std::ops::{Mul, Add, Div, Sub, Index, Neg};
+use std::ops::{Mul, Add, Div, Sub, Neg};
 use libnum::{One, Zero, Float, FromPrimitive};
 use std::cmp::{PartialEq, min};
 use linalg::Metric;
@@ -12,6 +13,18 @@ use linalg::vector::Vector;
 use linalg::utils;
 
 mod decomposition;
+mod impl_ops;
+mod mat_mul;
+pub mod slice;
+
+/// Matrix dimensions
+#[derive(Debug, Clone, Copy)]
+pub enum Axes {
+    /// The row axis.
+    Row,
+    /// The column axis.
+    Col,
+}
 
 /// The Matrix struct.
 ///
@@ -21,6 +34,34 @@ pub struct Matrix<T> {
     rows: usize,
     cols: usize,
     data: Vec<T>,
+}
+
+/// A MatrixSlice
+///
+/// This struct provides a slice into a matrix.
+///
+/// The struct contains the upper left point of the slice
+/// and the width and height of the slice.
+#[derive(Debug, Clone, Copy)]
+pub struct MatrixSlice<T> {
+    ptr: *const T,
+    rows: usize,
+    cols: usize,
+    row_stride: usize,
+}
+
+/// A mutable MatrixSlice
+///
+/// This struct provides a mutable slice into a matrix.
+///
+/// The struct contains the upper left point of the slice
+/// and the width and height of the slice.
+#[derive(Debug)]
+pub struct MatrixSliceMut<T> {
+    ptr: *mut T,
+    rows: usize,
+    cols: usize,
+    row_stride: usize,
 }
 
 impl<T> Matrix<T> {
@@ -73,9 +114,94 @@ impl<T> Matrix<T> {
         &mut self.data
     }
 
+    /// Get a reference to a point in the matrix without bounds checks.
+    pub unsafe fn get_unchecked(&self, index: [usize; 2]) -> &T {
+        self.data.get_unchecked(index[0] * self.cols + index[1])
+    }
+
+    /// Get a mutable reference to a point in the matrix without bounds checks.
+    pub unsafe fn get_unchecked_mut(&mut self, index: [usize; 2]) -> &T {
+        self.data.get_unchecked_mut(index[0] * self.cols + index[1])
+    }
+
+    /// Returns pointer to first element of underlying data.
+    pub fn as_ptr(&self) -> *const T {
+        self.data.as_ptr()
+    }
+
     /// Consumes the Matrix and returns the Vec of data.
     pub fn into_vec(self) -> Vec<T> {
         self.data
+    }
+
+    /// Split the matrix at the specified axis returning two `MatrixSlice`s.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::Axes;
+    ///
+    /// let a = Matrix::new(3,3, vec![2.0; 9]);
+    /// let (b,c) = a.split_at(1, Axes::Row);
+    /// ```
+    pub fn split_at(&self, mid: usize, axis: Axes) -> (MatrixSlice<T>, MatrixSlice<T>) {
+        let slice_1 : MatrixSlice<T>;
+        let slice_2 : MatrixSlice<T>;
+
+        match axis {
+            Axes::Row => {
+                assert!(mid < self.rows);
+
+                slice_1 = MatrixSlice::from_matrix(self, [0,0], mid, self.cols);
+                slice_2 = MatrixSlice::from_matrix(self, [mid,0], self.rows - mid, self.cols);
+            },
+            Axes::Col => {
+                assert!(mid < self.cols);
+
+                slice_1 = MatrixSlice::from_matrix(self, [0,0], self.rows, mid);
+                slice_2 = MatrixSlice::from_matrix(self, [0,mid], self.rows, self.cols - mid);
+            }
+        }
+
+        (slice_1, slice_2)
+    }
+
+    /// Split the matrix at the specified axis returning two `MatrixSlice`s.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::Axes;
+    ///
+    /// let mut a = Matrix::new(3,3, vec![2.0; 9]);
+    /// let (b,c) = a.split_at_mut(1, Axes::Col);
+    /// ```
+    pub fn split_at_mut(&mut self, mid: usize, axis: Axes) -> (MatrixSliceMut<T>, MatrixSliceMut<T>) {
+
+        let mat_cols = self.cols;
+        let mat_rows = self.rows;
+
+        let slice_1 : MatrixSliceMut<T>;
+        let slice_2 : MatrixSliceMut<T>;
+
+        match axis {
+            Axes::Row => {
+                assert!(mid < self.rows);
+
+                slice_1 = MatrixSliceMut::from_matrix(self, [0,0], mid, mat_cols);
+                slice_2 = MatrixSliceMut::from_matrix(self, [mid,0], mat_rows - mid, mat_cols);
+            },
+            Axes::Col => {
+                assert!(mid < self.cols);
+
+                slice_1 = MatrixSliceMut::from_matrix(self, [0,0], mat_rows, mid);
+                slice_2 = MatrixSliceMut::from_matrix(self, [0,mid], mat_rows, mat_cols - mid);
+            }
+        }
+
+        (slice_1, slice_2)
     }
 }
 
@@ -121,13 +247,10 @@ impl<T: Copy> Matrix<T> {
                     "Row index is greater than number of rows.");
         }
 
-        unsafe {
-            for row in rows {
-                for i in 0..self.cols {
-                    mat_vec.push(*self.data.get_unchecked(*row * self.cols + i));
-                }
-            }
+        for row in rows {
+            mat_vec.extend_from_slice(&self.data[*row * self.cols..(*row+1) * self.cols]);
         }
+
         Matrix {
             cols: self.cols,
             rows: rows.len(),
@@ -750,7 +873,7 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
     }
 }
 
-impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
+impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
                            Add<T, Output=T> + Mul<T, Output=T> +
                            Sub<T, Output=T> + Div<T, Output=T> +
                            PartialOrd {
@@ -960,431 +1083,6 @@ impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
     }
 }
 
-/// Multiplies matrix by scalar.
-impl<T: Copy + One + Zero + Mul<T, Output = T>> Mul<T> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, f: T) -> Matrix<T> {
-        self * &f
-    }
-}
-
-/// Multiplies matrix by scalar.
-impl<'a, T: Copy + One + Zero + Mul<T, Output = T>> Mul<&'a T> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn mul(mut self, f: &T) -> Matrix<T> {
-        for val in self.data.iter_mut() {
-            *val = *val * *f;
-        }
-
-        self
-    }
-}
-
-/// Multiplies matrix by scalar.
-impl<'a, T: Copy + One + Zero + Mul<T, Output = T>> Mul<T> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, f: T) -> Matrix<T> {
-        self * (&f)
-    }
-}
-
-/// Multiplies matrix by scalar.
-impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output = T>> Mul<&'b T> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, f: &T) -> Matrix<T> {
-        let new_data: Vec<T> = self.data.iter().map(|v| (*v) * (*f)).collect();
-
-        Matrix {
-            cols: self.cols,
-            rows: self.rows,
-            data: new_data,
-        }
-    }
-}
-
-/// Multiplies matrix by matrix.
-impl<T: Copy + Zero + One + Mul<T, Output = T> + Add<T, Output = T>> Mul<Matrix<T>> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, m: Matrix<T>) -> Matrix<T> {
-        (&self) * (&m)
-    }
-}
-
-/// Multiplies matrix by matrix.
-impl <'a, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<Matrix<T>> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, m: Matrix<T>) -> Matrix<T> {
-        self * (&m)
-    }
-}
-
-/// Multiplies matrix by matrix.
-impl <'a, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'a Matrix<T>> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, m: &Matrix<T>) -> Matrix<T> {
-        (&self) * m
-    }
-}
-
-/// Multiplies matrix by matrix.
-impl<'a, 'b, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b Matrix<T>> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, m: &Matrix<T>) -> Matrix<T> {
-        assert!(self.cols == m.rows, "Matrix dimensions do not agree.");
-
-        let mut new_data = vec![T::zero(); self.rows * m.cols];
-
-        unsafe {
-            for i in 0..self.rows
-            {
-                for k in 0..m.rows
-                {
-                    for j in 0..m.cols
-                    {
-                        new_data[i*m.cols() + j] = *new_data.get_unchecked(i*m.cols() + j) + *self.data.get_unchecked(i * self.cols + k) * *m.data.get_unchecked(k*m.cols + j);
-                    }
-                }
-            }
-        }
-
-        Matrix {
-            rows: self.rows,
-            cols: m.cols,
-            data: new_data
-        }
-    }
-}
-
-/// Multiplies matrix by vector.
-impl<T: Copy + Zero + One + Mul<T, Output = T> + Add<T, Output = T>> Mul<Vector<T>> for Matrix<T> {
-    type Output = Vector<T>;
-
-    fn mul(self, m: Vector<T>) -> Vector<T> {
-        (&self) * (&m)
-    }
-}
-
-/// Multiplies matrix by vector.
-impl <'a, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<Vector<T>> for &'a Matrix<T> {
-    type Output = Vector<T>;
-
-    fn mul(self, m: Vector<T>) -> Vector<T> {
-        self * (&m)
-    }
-}
-
-/// Multiplies matrix by vector.
-impl <'a, T: Copy + Zero + One + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'a Vector<T>> for Matrix<T> {
-    type Output = Vector<T>;
-
-    fn mul(self, m: &Vector<T>) -> Vector<T> {
-        (&self) * m
-    }
-}
-
-/// Multiplies matrix by vector.
-impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b Vector<T>> for &'a Matrix<T> {
-    type Output = Vector<T>;
-
-    fn mul(self, v: &Vector<T>) -> Vector<T> {
-        assert!(v.size() == self.cols, "Matrix and Vector dimensions do not agree.");
-
-        let mut new_data = Vec::with_capacity(self.rows);
-
-        for i in 0..self.rows
-        {
-            new_data.push(utils::dot(&self.data[i*self.cols..(i+1)*self.cols], v.data()));
-        }
-
-        Vector::new(new_data)
-    }
-}
-
-/// Adds scalar to matrix.
-impl<T: Copy + One + Zero + Add<T, Output = T>> Add<T> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn add(self, f: T) -> Matrix<T> {
-        self + &f
-    }
-}
-
-/// Adds scalar to matrix.
-impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<T> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn add(self, f: T) -> Matrix<T> {
-        self + (&f)
-    }
-}
-
-/// Adds scalar to matrix.
-impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<&'a T> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn add(mut self, f: &T) -> Matrix<T> {
-        for val in self.data.iter_mut() {
-            *val = *val + *f;
-        }
-
-        self
-    }
-}
-
-impl<'a, 'b, T: Copy + One + Zero + Add<T, Output = T>> Add<&'b T> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn add(self, f: &T) -> Matrix<T> {
-        let new_data: Vec<T> = self.data.iter().map(|v| (*v) + (*f)).collect();
-
-        Matrix {
-            cols: self.cols,
-            rows: self.rows,
-            data: new_data,
-        }
-    }
-}
-
-/// Adds matrix to matrix.
-impl<T: Copy + One + Zero + Add<T, Output = T>> Add<Matrix<T>> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn add(self, f: Matrix<T>) -> Matrix<T> {
-        self + &f
-    }
-}
-
-/// Adds matrix to matrix.
-impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<Matrix<T>> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn add(self, f: Matrix<T>) -> Matrix<T> {
-        f + self
-    }
-}
-
-/// Adds matrix to matrix.
-impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<&'a Matrix<T>> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn add(mut self, f: &Matrix<T>) -> Matrix<T> {
-        utils::in_place_vec_bin_op(&mut self.data, &f.data, |x,&y| {*x = *x + y});
-        self
-    }
-}
-
-/// Adds matrix to matrix.
-impl<'a, 'b, T: Copy + One + Zero + Add<T, Output = T>> Add<&'b Matrix<T>> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn add(self, m: &Matrix<T>) -> Matrix<T> {
-        assert!(self.cols == m.cols, "Column dimensions do not agree.");
-        assert!(self.rows == m.rows, "Row dimensions do not agree.");
-
-        let new_data = utils::vec_sum(&self.data, &m.data);
-
-        Matrix {
-            cols: self.cols,
-            rows: self.rows,
-            data: new_data,
-        }
-    }
-}
-
-/// Subtracts scalar from matrix.
-impl<T: Copy + One + Zero + Sub<T, Output = T>> Sub<T> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn sub(self, f: T) -> Matrix<T> {
-        self - (&f)
-    }
-}
-
-/// Subtracts scalar from matrix.
-impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'a T> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn sub(mut self, f: &T) -> Matrix<T> {
-        for val in self.data.iter_mut() {
-            *val = *val - *f;
-        }
-
-        self
-    }
-}
-
-/// Subtracts scalar from matrix.
-impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<T> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn sub(self, f: T) -> Matrix<T> {
-        self - (&f)
-    }
-}
-
-/// Subtracts scalar from matrix.
-impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'b T> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn sub(self, f: &T) -> Matrix<T> {
-        let new_data = self.data.iter().map(|v| *v - *f).collect();
-
-        Matrix {
-            cols: self.cols,
-            rows: self.rows,
-            data: new_data,
-        }
-    }
-}
-
-/// Subtracts matrix from matrix.
-impl<T: Copy + One + Zero + Sub<T, Output = T>> Sub<Matrix<T>> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn sub(self, m: Matrix<T>) -> Matrix<T> {
-        self - &m
-    }
-}
-
-/// Subtracts matrix from matrix.
-impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<Matrix<T>> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn sub(self, mut m: Matrix<T>) -> Matrix<T> {
-        utils::in_place_vec_bin_op(&mut m.data, &self.data, |x,&y| {*x = y - *x});
-        
-        m
-    }
-}
-
-/// Subtracts matrix from matrix.
-impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'a Matrix<T>> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn sub(mut self, m: &Matrix<T>) -> Matrix<T> {
-        utils::in_place_vec_bin_op(&mut self.data, &m.data, |x,&y| {*x = *x - y});
-        
-        self
-    }
-}
-
-/// Subtracts matrix from matrix.
-impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'b Matrix<T>> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn sub(self, m: &Matrix<T>) -> Matrix<T> {
-        assert!(self.cols == m.cols, "Column dimensions do not agree.");
-        assert!(self.rows == m.rows, "Row dimensions do not agree.");
-
-        let new_data = utils::vec_sub(&self.data, &m.data);
-
-        Matrix {
-            cols: self.cols,
-            rows: self.rows,
-            data: new_data,
-        }
-    }
-}
-
-/// Divides matrix by scalar.
-impl<T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<T> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn div(self, f: T) -> Matrix<T> {
-        self / (&f)
-    }
-}
-
-/// Divides matrix by scalar.
-impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<T> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn div(self, f: T) -> Matrix<T> {
-        self / (&f)
-    }
-}
-
-/// Divides matrix by scalar.
-impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<&'a T> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn div(mut self, f: &T) -> Matrix<T> {
-        for val in self.data.iter_mut() {
-            *val = *val / *f;
-        }
-
-        self
-    }
-}
-
-/// Divides matrix by scalar.
-impl<'a, 'b, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<&'b T> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn div(self, f: &T) -> Matrix<T> {
-        assert!(*f != T::zero());
-
-        let new_data = self.data.iter().map(|v| *v / *f).collect();
-
-        Matrix {
-            cols: self.cols,
-            rows: self.rows,
-            data: new_data,
-        }
-    }
-}
-
-/// Gets negative of matrix.
-impl<T: Neg<Output = T> + Copy> Neg for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn neg(mut self) -> Matrix<T> {
-        for val in self.data.iter_mut() {
-            *val = -*val;
-        }
-
-        self
-    }
-}
-
-/// Gets negative of matrix.
-impl<'a, T: Neg<Output = T> + Copy> Neg for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn neg(self) -> Matrix<T> {
-        let new_data = self.data.iter().map(|v| -*v).collect();
-
-        Matrix {
-            cols: self.cols,
-            rows: self.rows,
-            data: new_data,
-        }
-    }
-}
-
-/// Indexes matrix.
-///
-/// Takes row index first then column.
-impl<T> Index<[usize; 2]> for Matrix<T> {
-    type Output = T;
-
-    fn index(&self, idx: [usize; 2]) -> &T {
-        assert!(idx[0] < self.rows,
-                "Row index is greater than row dimension.");
-        assert!(idx[1] < self.cols,
-                "Column index is greater than column dimension.");
-        unsafe { &self.data.get_unchecked(idx[0] * self.cols + idx[1]) }
-    }
-}
-
 impl<T: Float> Metric<T> for Matrix<T> {
     /// Compute euclidean norm for matrix.
     ///
@@ -1476,6 +1174,8 @@ impl<T: fmt::Display> fmt::Display for Matrix<T> {
 #[cfg(test)]
 mod tests {
     use super::Matrix;
+    use super::Axes;
+    use super::slice::BaseSlice;
 
     #[test]
     fn test_display_formatting() {
@@ -1524,4 +1224,101 @@ mod tests {
         }
     }
 
+    #[test]
+    fn test_split_matrix() {
+        let a = Matrix::new(3, 3, (0..9).collect());
+
+        let (b,c) = a.split_at(1, Axes::Row);
+
+        assert_eq!(b.rows(), 1);
+        assert_eq!(b.cols(), 3);
+        assert_eq!(c.rows(), 2);
+        assert_eq!(c.cols(), 3);
+
+        assert_eq!(b[[0,0]], 0);
+        assert_eq!(b[[0,1]], 1);
+        assert_eq!(b[[0,2]], 2);
+        assert_eq!(c[[0,0]], 3);
+        assert_eq!(c[[0,1]], 4);
+        assert_eq!(c[[0,2]], 5);
+        assert_eq!(c[[1,0]], 6);
+        assert_eq!(c[[1,1]], 7);
+        assert_eq!(c[[1,2]], 8);
+    }
+
+    #[test]
+    fn test_split_matrix_mut() {
+        let mut a = Matrix::new(3, 3, (0..9).collect());
+
+        let (mut b, mut c) = a.split_at_mut(1, Axes::Row);
+
+        assert_eq!(b.rows(), 1);
+        assert_eq!(b.cols(), 3);
+        assert_eq!(c.rows(), 2);
+        assert_eq!(c.cols(), 3);
+
+        assert_eq!(b[[0,0]], 0);
+        assert_eq!(b[[0,1]], 1);
+        assert_eq!(b[[0,2]], 2);
+        assert_eq!(c[[0,0]], 3);
+        assert_eq!(c[[0,1]], 4);
+        assert_eq!(c[[0,2]], 5);
+        assert_eq!(c[[1,0]], 6);
+        assert_eq!(c[[1,1]], 7);
+        assert_eq!(c[[1,2]], 8);
+
+        b[[0,0]] = 4;
+        c[[0,0]] = 5;
+
+        assert_eq!(a[[0,0]], 4);
+        assert_eq!(a[[0,1]], 1);
+        assert_eq!(a[[0,2]], 2);
+        assert_eq!(a[[1,0]], 5);
+        assert_eq!(a[[1,1]], 4);
+        assert_eq!(a[[1,2]], 5);
+        assert_eq!(a[[2,0]], 6);
+        assert_eq!(a[[2,1]], 7);
+        assert_eq!(a[[2,2]], 8);
+
+    }
+
+    #[test]
+    fn test_matrix_index_mut() {
+        let mut a = Matrix::new(3, 3, vec![2.0; 9]);
+
+        a[[0,0]] = 13.0;
+
+        for i in 1..9 {
+            assert_eq!(a.data()[i], 2.0);
+        }
+
+        assert_eq!(a[[0,0]], 13.0);
+    }
+
+    #[test]
+    fn test_matrix_select_rows() {
+        let a = Matrix::new(4,2, (0..8).collect::<Vec<usize>>());
+
+        let b = a.select_rows(&[0,2,3]);
+
+        assert_eq!(b.into_vec(), vec![0,1,4,5,6,7]);
+    }
+
+    #[test]
+    fn test_matrix_select_cols() {
+        let a = Matrix::new(4,2, (0..8).collect::<Vec<usize>>());
+
+        let b = a.select_cols(&[1]);
+
+        assert_eq!(b.into_vec(), vec![1,3,5,7]);
+    }
+
+    #[test]
+    fn test_matrix_select() {
+        let a = Matrix::new(4,2, (0..8).collect::<Vec<usize>>());
+
+        let b = a.select(&[0,2], &[1]);
+
+        assert_eq!(b.into_vec(), vec![1,5]);
+    }
 }

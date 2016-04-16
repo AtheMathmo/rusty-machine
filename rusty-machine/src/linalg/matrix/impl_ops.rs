@@ -1,0 +1,1016 @@
+use super::Matrix;
+use super::MatrixSlice;
+use super::MatrixSliceMut;
+use super::slice::BaseSlice;
+
+use super::super::utils;
+use super::super::vector::Vector;
+
+use std::ops::{Mul, Add, Div, Sub, Index, IndexMut, Neg};
+use libnum::Zero;
+
+
+macro_rules! impl_index (
+    ($mat_type:ident, $doc:expr) => (
+/// Indexes
+#[doc=$doc]
+///
+/// Takes row index first then column.
+impl<T> Index<[usize; 2]> for $mat_type<T> {
+    type Output = T;
+
+    fn index(&self, idx: [usize; 2]) -> &T {
+        assert!(idx[0] < self.rows,
+                "Row index is greater than row dimension.");
+        assert!(idx[1] < self.cols,
+                "Column index is greater than column dimension.");
+
+        unsafe {
+            &*(self.get_unchecked(idx))
+        }
+    }
+}
+    );
+);
+
+impl_index!(Matrix, "matrix.");
+impl_index!(MatrixSlice, "matrix slice.");
+impl_index!(MatrixSliceMut, "mutable matrix slice.");
+
+/// Indexes mutable matrix slice.
+///
+/// Takes row index first then column.
+impl<T> IndexMut<[usize; 2]> for MatrixSliceMut<T> {
+
+    fn index_mut(&mut self, idx: [usize; 2]) -> &mut T {
+        assert!(idx[0] < self.rows,
+                "Row index is greater than row dimension.");
+        assert!(idx[1] < self.cols,
+                "Column index is greater than column dimension.");
+
+        unsafe {
+            &mut *(self.ptr.offset((idx[0] * self.row_stride + idx[1]) as isize))
+        }
+    }
+}
+
+/// Indexes mutable matrix.
+///
+/// Takes row index first then column.
+impl<T> IndexMut<[usize; 2]> for Matrix<T> {
+
+    fn index_mut(&mut self, idx: [usize; 2]) -> &mut T {
+        assert!(idx[0] < self.rows,
+                "Row index is greater than row dimension.");
+        assert!(idx[1] < self.cols,
+                "Column index is greater than column dimension.");
+        let self_cols = self.cols;
+        unsafe { self.data.get_unchecked_mut(idx[0] * self_cols + idx[1]) }
+    }
+}
+
+macro_rules! impl_bin_op_scalar_slice (
+    ($trt:ident, $op:ident, $slice:ident, $doc:expr) => (
+
+/// Scalar
+#[doc=$doc]
+/// with matrix slice.
+impl<T: Copy + $trt<T, Output=T>> $trt<T> for $slice<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, f: T) -> Matrix<T> {
+        (&self).$op(&f)
+    }
+}
+
+/// Scalar
+#[doc=$doc]
+/// with matrix slice.
+impl<'a, T: Copy + $trt<T, Output=T>> $trt<&'a T> for $slice<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, f: &T) -> Matrix<T> {
+        (&self).$op(f)
+    }
+}
+
+/// Scalar
+#[doc=$doc]
+/// with matrix slice.
+impl<'a, T: Copy + $trt<T, Output=T>> $trt<T> for &'a $slice<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, f: T) -> Matrix<T> {
+        (&self).$op(&f)
+    }
+}
+
+/// Scalar
+#[doc=$doc]
+/// with matrix slice.
+impl<'a, 'b, T: Copy + $trt<T, Output=T>> $trt<&'b T> for &'a $slice<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, f: &T) -> Matrix<T> {
+        let new_data: Vec<T> = self.iter().map(|v| (*v).$op(*f)).collect();
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data,
+        }
+    }
+}
+    );
+);
+
+impl_bin_op_scalar_slice!(Mul, mul, MatrixSlice, "multiplication");
+impl_bin_op_scalar_slice!(Mul, mul, MatrixSliceMut, "multiplication");
+impl_bin_op_scalar_slice!(Div, div, MatrixSlice, "division");
+impl_bin_op_scalar_slice!(Div, div, MatrixSliceMut, "division");
+impl_bin_op_scalar_slice!(Add, add, MatrixSlice, "addition");
+impl_bin_op_scalar_slice!(Add, add, MatrixSliceMut, "addition");
+impl_bin_op_scalar_slice!(Sub, sub, MatrixSlice, "subtraction");
+impl_bin_op_scalar_slice!(Sub, sub, MatrixSliceMut, "subtraction");
+
+macro_rules! impl_bin_op_scalar_matrix (
+    ($trt:ident, $op:ident, $doc:expr) => (
+
+/// Scalar
+#[doc=$doc]
+/// with matrix.
+///
+/// Will reuse the memory allocated for the existing matrix.
+impl<T: Copy + $trt<T, Output=T>> $trt<T> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, f: T) -> Matrix<T> {
+        (self).$op(&f)
+    }
+}
+
+
+/// Scalar
+#[doc=$doc]
+/// with matrix.
+///
+/// Will reuse the memory allocated for the existing matrix.
+impl<'a, T: Copy + $trt<T, Output=T>> $trt<&'a T> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn $op(mut self, f: &T) -> Matrix<T> {
+        for val in self.data.iter_mut() {
+        	*val = (*val).$op(*f)
+        }
+
+        self
+    }
+}
+
+
+/// Scalar
+#[doc=$doc]
+/// with matrix.
+impl<'a, T: Copy + $trt<T, Output=T>> $trt<T> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, f: T) -> Matrix<T> {
+        (&self).$op(&f)
+    }
+}
+
+
+/// Scalar
+#[doc=$doc]
+/// with matrix.
+impl<'a, 'b, T: Copy + $trt<T, Output=T>> $trt<&'b T> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, f: &T) -> Matrix<T> {
+        let new_data: Vec<T> = self.data.iter().map(|v| (*v).$op(*f)).collect();
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data,
+        }
+    }
+}
+    );
+);
+
+impl_bin_op_scalar_matrix!(Add, add, "addition");
+impl_bin_op_scalar_matrix!(Mul, mul, "multiplication");
+impl_bin_op_scalar_matrix!(Sub, sub, "subtraction");
+impl_bin_op_scalar_matrix!(Div, div, "division");
+
+/// Multiplies matrix by vector.
+impl<T: Copy + Zero + Mul<T, Output = T> + Add<T, Output = T>> Mul<Vector<T>> for Matrix<T> {
+    type Output = Vector<T>;
+
+    fn mul(self, m: Vector<T>) -> Vector<T> {
+        (&self) * (&m)
+    }
+}
+
+/// Multiplies matrix by vector.
+impl <'a, T: Copy + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<Vector<T>> for &'a Matrix<T> {
+    type Output = Vector<T>;
+
+    fn mul(self, m: Vector<T>) -> Vector<T> {
+        self * (&m)
+    }
+}
+
+/// Multiplies matrix by vector.
+impl <'a, T: Copy + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'a Vector<T>> for Matrix<T> {
+    type Output = Vector<T>;
+
+    fn mul(self, m: &Vector<T>) -> Vector<T> {
+        (&self) * m
+    }
+}
+
+/// Multiplies matrix by vector.
+impl<'a, 'b, T: Copy + Zero + Mul<T, Output=T> + Add<T, Output=T>> Mul<&'b Vector<T>> for &'a Matrix<T> {
+    type Output = Vector<T>;
+
+    fn mul(self, v: &Vector<T>) -> Vector<T> {
+        assert!(v.size() == self.cols, "Matrix and Vector dimensions do not agree.");
+
+        let mut new_data = Vec::with_capacity(self.rows);
+
+        for i in 0..self.rows
+        {
+            new_data.push(utils::dot(&self.data[i*self.cols..(i+1)*self.cols], v.data()));
+        }
+
+        Vector::new(new_data)
+    }
+}
+
+macro_rules! impl_bin_op_slice (
+    ($trt:ident, $op:ident, $slice_1:ident, $slice_2:ident, $doc:expr) => (
+
+/// Performs elementwise
+#[doc=$doc]
+/// between the slices.
+impl<T: Copy + $trt<T, Output=T>> $trt<$slice_2<T>> for $slice_1<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, s: $slice_2<T>) -> Matrix<T> {
+        (&self).$op(&s)
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// between the slices.
+impl<'a, T: Copy + $trt<T, Output=T>> $trt<$slice_2<T>> for &'a $slice_1<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, s: $slice_2<T>) -> Matrix<T> {
+        (self).$op(&s)
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// between the slices.
+impl<'a, T: Copy + $trt<T, Output=T>> $trt<&'a $slice_2<T>> for $slice_1<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, s: &$slice_2<T>) -> Matrix<T> {
+        (&self).$op(s)
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// between the slices.
+impl<'a, 'b, T: Copy + $trt<T, Output=T>> $trt<&'b $slice_2<T>> for &'a $slice_1<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, s: &$slice_2<T>) -> Matrix<T> {
+        assert!(self.cols == s.cols, "Column dimensions do not agree.");
+        assert!(self.rows == s.rows, "Row dimensions do not agree.");
+
+        let mut res_data : Vec<T> = self.iter().map(|x| *x).collect();
+        let s_data : Vec<T> = s.iter().map(|x| *x).collect();
+
+        utils::in_place_vec_bin_op(&mut res_data, &s_data, |x, &y| { *x = (*x).$op(y) });
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: res_data,
+        }
+    }
+}
+    );
+);
+
+impl_bin_op_slice!(Add, add, MatrixSlice, MatrixSlice, "addition");
+impl_bin_op_slice!(Add, add, MatrixSliceMut, MatrixSlice, "addition");
+impl_bin_op_slice!(Add, add, MatrixSlice, MatrixSliceMut, "addition");
+impl_bin_op_slice!(Add, add, MatrixSliceMut, MatrixSliceMut, "addition");
+
+impl_bin_op_slice!(Sub, sub, MatrixSlice, MatrixSlice, "subtraction");
+impl_bin_op_slice!(Sub, sub, MatrixSliceMut, MatrixSlice, "subtraction");
+impl_bin_op_slice!(Sub, sub, MatrixSlice, MatrixSliceMut, "subtraction");
+impl_bin_op_slice!(Sub, sub, MatrixSliceMut, MatrixSliceMut, "subtraction");
+
+macro_rules! impl_bin_op_mat_slice (
+    ($trt:ident, $op:ident, $slice:ident, $doc:expr) => (
+
+/// Performs elementwise
+#[doc=$doc]
+/// between `Matrix` and `MatrixSlice`.
+impl<T: Copy + $trt<T, Output=T>> $trt<Matrix<T>> for $slice<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, m: Matrix<T>) -> Matrix<T> {
+        (&self).$op(&m)
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// between `Matrix` and `MatrixSlice`.
+impl<'a, T: Copy + $trt<T, Output=T>> $trt<Matrix<T>> for &'a $slice<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, m: Matrix<T>) -> Matrix<T> {
+        self.$op(&m)
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// between `Matrix` and `MatrixSlice`.
+impl<'a, T: Copy + $trt<T, Output=T>> $trt<&'a Matrix<T>> for $slice<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, m: &Matrix<T>) -> Matrix<T> {
+        (&self).$op(m)
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// between `Matrix` and `MatrixSlice`.
+impl<'a, 'b, T: Copy + $trt<T, Output=T>> $trt<&'b Matrix<T>> for &'a $slice<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, m: &Matrix<T>) -> Matrix<T> {
+        assert!(self.cols == m.cols, "Column dimensions do not agree.");
+        assert!(self.rows == m.rows, "Row dimensions do not agree.");
+
+        let mut new_data : Vec<T> = self.iter().map(|x| *x).collect();
+        utils::in_place_vec_bin_op(&mut new_data, &m.data(), |x, &y| { *x = (*x).$op(y) });
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data,
+        }
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// between `Matrix` and `MatrixSlice`.
+impl<T: Copy + $trt<T, Output=T>> $trt<$slice<T>> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, s: $slice<T>) -> Matrix<T> {
+        (&self).$op(s)
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// between `Matrix` and `MatrixSlice`.
+impl<'a, T: Copy + $trt<T, Output=T>> $trt<$slice<T>> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, s: $slice<T>) -> Matrix<T> {
+        self.$op(&s)
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// between `Matrix` and `MatrixSlice`.
+impl<'a, T: Copy + $trt<T, Output=T>> $trt<&'a $slice<T>> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, s: &$slice<T>) -> Matrix<T> {
+        (&self).$op(s)
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// between `Matrix` and `MatrixSlice`.
+impl<'a, 'b, T: Copy + $trt<T, Output=T>> $trt<&'b $slice<T>> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, s: &$slice<T>) -> Matrix<T> {
+        assert!(self.cols == s.cols, "Column dimensions do not agree.");
+        assert!(self.rows == s.rows, "Row dimensions do not agree.");
+
+        let mut new_data : Vec<T> = s.iter().map(|x| *x).collect();
+        utils::in_place_vec_bin_op(&mut new_data, self.data(), |x, &y| { *x = (y).$op(*x) });
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data,
+        }
+    }
+}
+    );
+);
+
+impl_bin_op_mat_slice!(Add, add, MatrixSlice, "addition");
+impl_bin_op_mat_slice!(Add, add, MatrixSliceMut, "addition");
+
+impl_bin_op_mat_slice!(Sub, sub, MatrixSlice, "subtraction");
+impl_bin_op_mat_slice!(Sub, sub, MatrixSliceMut, "subtraction");
+
+macro_rules! impl_bin_op_mat (
+    ($trt:ident, $op:ident, $doc:expr) => (
+
+/// Performs elementwise
+#[doc=$doc]
+/// between two matrices.
+///
+/// This will reuse allocated memory from `self`.
+impl<T: Copy + $trt<T, Output=T>> $trt<Matrix<T>> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, m: Matrix<T>) -> Matrix<T> {
+        self.$op(&m)
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// between two matrices.
+///
+/// This will reuse allocated memory from `m`.
+impl<'a, T: Copy + $trt<T, Output=T>> $trt<Matrix<T>> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, mut m: Matrix<T>) -> Matrix<T> {
+    	assert!(self.cols == m.cols, "Column dimensions do not agree.");
+        assert!(self.rows == m.rows, "Row dimensions do not agree.");
+
+        utils::in_place_vec_bin_op(&mut m.data, &self.data, |x,&y| {*x = (y).$op(*x)});
+        m
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// between two matrices.
+///
+/// This will reuse allocated memory from `self`.
+impl<'a, T: Copy + $trt<T, Output=T>> $trt<&'a Matrix<T>> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn $op(mut self, m: &Matrix<T>) -> Matrix<T> {
+    	assert!(self.cols == m.cols, "Column dimensions do not agree.");
+        assert!(self.rows == m.rows, "Row dimensions do not agree.");
+
+        utils::in_place_vec_bin_op(&mut self.data, &m.data, |x,&y| {*x = (*x).$op(y)});
+        self
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// between two matrices.
+impl<'a, 'b, T: Copy + $trt<T, Output=T>> $trt<&'b Matrix<T>> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn $op(self, m: &Matrix<T>) -> Matrix<T> {
+        assert!(self.cols == m.cols, "Column dimensions do not agree.");
+        assert!(self.rows == m.rows, "Row dimensions do not agree.");
+
+        let new_data = utils::vec_bin_op(&self.data, &m.data, |x, y| { x.$op(y) });
+
+        Matrix {
+        	rows: self.rows,
+        	cols: self.cols,
+        	data: new_data,
+        }
+    }
+}
+    );
+);
+
+impl_bin_op_mat!(Add, add, "addition");
+impl_bin_op_mat!(Sub, sub, "subtraction");
+
+macro_rules! impl_neg_slice (
+    ($slice:ident) => (
+
+/// Gets negative of matrix slice.
+impl<T: Neg<Output = T> + Copy> Neg for $slice<T> {
+    type Output = Matrix<T>;
+
+    fn neg(self) -> Matrix<T> {
+        - &self
+    }
+}
+
+/// Gets negative of matrix slice.
+impl<'a, T: Neg<Output = T> + Copy> Neg for &'a $slice<T> {
+    type Output = Matrix<T>;
+
+    fn neg(self) -> Matrix<T> {
+        let new_data = self.iter().map(|v| -*v).collect();
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data,
+        }
+    }
+}
+
+    );
+);
+
+impl_neg_slice!(MatrixSlice);
+impl_neg_slice!(MatrixSliceMut);
+
+/// Gets negative of matrix.
+impl<T: Neg<Output = T> + Copy> Neg for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn neg(mut self) -> Matrix<T> {
+        for val in self.data.iter_mut() {
+            *val = -*val;
+        }
+
+        self
+    }
+}
+
+/// Gets negative of matrix.
+impl<'a, T: Neg<Output = T> + Copy> Neg for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn neg(self) -> Matrix<T> {
+        let new_data = self.data.iter().map(|v| -*v).collect();
+
+        Matrix {
+            cols: self.cols,
+            rows: self.rows,
+            data: new_data,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::super::Matrix;
+    use super::super::MatrixSlice;
+    use super::super::MatrixSliceMut;
+    use super::super::super::vector::Vector;
+
+    #[test]
+    fn indexing_mat() {
+        let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
+
+        assert_eq!(a[[0, 0]], 1.0);
+        assert_eq!(a[[0, 1]], 2.0);
+        assert_eq!(a[[1, 0]], 3.0);
+        assert_eq!(a[[1, 1]], 4.0);
+        assert_eq!(a[[2, 0]], 5.0);
+        assert_eq!(a[[2, 1]], 6.0);
+    }
+
+    #[test]
+    fn matrix_vec_mul() {
+        let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
+        let b = Vector::new(vec![4., 7.]);
+
+        let c = a * b;
+
+        assert_eq!(c.size(), 3);
+
+        assert_eq!(c[0], 18.0);
+        assert_eq!(c[1], 40.0);
+        assert_eq!(c[2], 62.0);
+    }
+
+    #[test]
+    fn matrix_f32_mul() {
+        let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
+
+        // Allocating new memory
+        let c = &a * &2.0;
+
+        assert_eq!(c[[0, 0]], 2.0);
+        assert_eq!(c[[0, 1]], 4.0);
+        assert_eq!(c[[1, 0]], 6.0);
+        assert_eq!(c[[1, 1]], 8.0);
+        assert_eq!(c[[2, 0]], 10.0);
+        assert_eq!(c[[2, 1]], 12.0);
+
+        // Allocating new memory
+        let c = &a * 2.0;
+
+        assert_eq!(c[[0, 0]], 2.0);
+        assert_eq!(c[[0, 1]], 4.0);
+        assert_eq!(c[[1, 0]], 6.0);
+        assert_eq!(c[[1, 1]], 8.0);
+        assert_eq!(c[[2, 0]], 10.0);
+        assert_eq!(c[[2, 1]], 12.0);
+
+        // Reusing memory
+        let c = a.clone() * &2.0;
+
+        assert_eq!(c[[0, 0]], 2.0);
+        assert_eq!(c[[0, 1]], 4.0);
+        assert_eq!(c[[1, 0]], 6.0);
+        assert_eq!(c[[1, 1]], 8.0);
+        assert_eq!(c[[2, 0]], 10.0);
+        assert_eq!(c[[2, 1]], 12.0);
+
+        // Reusing memory
+        let c = a * 2.0;
+
+        assert_eq!(c[[0, 0]], 2.0);
+        assert_eq!(c[[0, 1]], 4.0);
+        assert_eq!(c[[1, 0]], 6.0);
+        assert_eq!(c[[1, 1]], 8.0);
+        assert_eq!(c[[2, 0]], 10.0);
+        assert_eq!(c[[2, 1]], 12.0);
+    }
+
+    #[test]
+    fn matrix_add() {
+        let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
+        let b = Matrix::new(3, 2, vec![2., 3., 4., 5., 6., 7.]);
+
+        // Allocating new memory
+        let c = &a + &b;
+
+        assert_eq!(c[[0, 0]], 3.0);
+        assert_eq!(c[[0, 1]], 5.0);
+        assert_eq!(c[[1, 0]], 7.0);
+        assert_eq!(c[[1, 1]], 9.0);
+        assert_eq!(c[[2, 0]], 11.0);
+        assert_eq!(c[[2, 1]], 13.0);
+
+        // Reusing memory
+        let c = a.clone() + &b;
+
+        assert_eq!(c[[0, 0]], 3.0);
+        assert_eq!(c[[0, 1]], 5.0);
+        assert_eq!(c[[1, 0]], 7.0);
+        assert_eq!(c[[1, 1]], 9.0);
+        assert_eq!(c[[2, 0]], 11.0);
+        assert_eq!(c[[2, 1]], 13.0);
+
+        // Reusing memory
+        let c = &a + b.clone();
+
+        assert_eq!(c[[0, 0]], 3.0);
+        assert_eq!(c[[0, 1]], 5.0);
+        assert_eq!(c[[1, 0]], 7.0);
+        assert_eq!(c[[1, 1]], 9.0);
+        assert_eq!(c[[2, 0]], 11.0);
+        assert_eq!(c[[2, 1]], 13.0);
+
+        // Reusing memory
+        let c = a + b;
+
+        assert_eq!(c[[0, 0]], 3.0);
+        assert_eq!(c[[0, 1]], 5.0);
+        assert_eq!(c[[1, 0]], 7.0);
+        assert_eq!(c[[1, 1]], 9.0);
+        assert_eq!(c[[2, 0]], 11.0);
+        assert_eq!(c[[2, 1]], 13.0);
+    }
+
+    #[test]
+    fn matrix_f32_add() {
+        let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
+        let b = 3.0;
+
+        // Allocating new memory
+        let c = &a + &b;
+
+        assert_eq!(c[[0, 0]], 4.0);
+        assert_eq!(c[[0, 1]], 5.0);
+        assert_eq!(c[[1, 0]], 6.0);
+        assert_eq!(c[[1, 1]], 7.0);
+        assert_eq!(c[[2, 0]], 8.0);
+        assert_eq!(c[[2, 1]], 9.0);
+
+        // Allocating new memory
+        let c = &a + b;
+
+        assert_eq!(c[[0, 0]], 4.0);
+        assert_eq!(c[[0, 1]], 5.0);
+        assert_eq!(c[[1, 0]], 6.0);
+        assert_eq!(c[[1, 1]], 7.0);
+        assert_eq!(c[[2, 0]], 8.0);
+        assert_eq!(c[[2, 1]], 9.0);
+
+        // Reusing memory
+        let c = a.clone() + &b;
+
+        assert_eq!(c[[0, 0]], 4.0);
+        assert_eq!(c[[0, 1]], 5.0);
+        assert_eq!(c[[1, 0]], 6.0);
+        assert_eq!(c[[1, 1]], 7.0);
+        assert_eq!(c[[2, 0]], 8.0);
+        assert_eq!(c[[2, 1]], 9.0);
+
+        // Reusing memory
+        let c = a + b;
+
+        assert_eq!(c[[0, 0]], 4.0);
+        assert_eq!(c[[0, 1]], 5.0);
+        assert_eq!(c[[1, 0]], 6.0);
+        assert_eq!(c[[1, 1]], 7.0);
+        assert_eq!(c[[2, 0]], 8.0);
+        assert_eq!(c[[2, 1]], 9.0);
+    }
+
+    #[test]
+    fn matrix_sub() {
+        let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
+        let b = Matrix::new(3, 2, vec![2., 3., 4., 5., 6., 7.]);
+
+        // Allocate new memory
+        let c = &a - &b;
+
+        assert_eq!(c[[0, 0]], -1.0);
+        assert_eq!(c[[0, 1]], -1.0);
+        assert_eq!(c[[1, 0]], -1.0);
+        assert_eq!(c[[1, 1]], -1.0);
+        assert_eq!(c[[2, 0]], -1.0);
+        assert_eq!(c[[2, 1]], -1.0);
+
+        // Reusing memory
+        let c = a.clone() - &b;
+
+        assert_eq!(c[[0, 0]], -1.0);
+        assert_eq!(c[[0, 1]], -1.0);
+        assert_eq!(c[[1, 0]], -1.0);
+        assert_eq!(c[[1, 1]], -1.0);
+        assert_eq!(c[[2, 0]], -1.0);
+        assert_eq!(c[[2, 1]], -1.0);
+
+        // Reusing memory
+        let c = &a - b.clone();
+
+        assert_eq!(c[[0, 0]], -1.0);
+        assert_eq!(c[[0, 1]], -1.0);
+        assert_eq!(c[[1, 0]], -1.0);
+        assert_eq!(c[[1, 1]], -1.0);
+        assert_eq!(c[[2, 0]], -1.0);
+        assert_eq!(c[[2, 1]], -1.0);
+
+        // Reusing memory
+        let c = &a - b;
+
+        assert_eq!(c[[0, 0]], -1.0);
+        assert_eq!(c[[0, 1]], -1.0);
+        assert_eq!(c[[1, 0]], -1.0);
+        assert_eq!(c[[1, 1]], -1.0);
+        assert_eq!(c[[2, 0]], -1.0);
+        assert_eq!(c[[2, 1]], -1.0);
+    }
+
+    #[test]
+    fn matrix_f32_sub() {
+        let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
+        let b = 3.0;
+
+        // Allocating new memory
+        let c = &a - &b;
+
+        assert_eq!(c[[0, 0]], -2.0);
+        assert_eq!(c[[0, 1]], -1.0);
+        assert_eq!(c[[1, 0]], 0.0);
+        assert_eq!(c[[1, 1]], 1.0);
+        assert_eq!(c[[2, 0]], 2.0);
+        assert_eq!(c[[2, 1]], 3.0);
+
+        // Allocating new memory
+        let c = &a - b;
+
+        assert_eq!(c[[0, 0]], -2.0);
+        assert_eq!(c[[0, 1]], -1.0);
+        assert_eq!(c[[1, 0]], 0.0);
+        assert_eq!(c[[1, 1]], 1.0);
+        assert_eq!(c[[2, 0]], 2.0);
+        assert_eq!(c[[2, 1]], 3.0);
+
+        // Reusing memory
+        let c = a.clone() - &b;
+
+        assert_eq!(c[[0, 0]], -2.0);
+        assert_eq!(c[[0, 1]], -1.0);
+        assert_eq!(c[[1, 0]], 0.0);
+        assert_eq!(c[[1, 1]], 1.0);
+        assert_eq!(c[[2, 0]], 2.0);
+        assert_eq!(c[[2, 1]], 3.0);
+
+        // Reusing memory
+        let c = a - b;
+
+        assert_eq!(c[[0, 0]], -2.0);
+        assert_eq!(c[[0, 1]], -1.0);
+        assert_eq!(c[[1, 0]], 0.0);
+        assert_eq!(c[[1, 1]], 1.0);
+        assert_eq!(c[[2, 0]], 2.0);
+        assert_eq!(c[[2, 1]], 3.0);
+    }
+
+    #[test]
+    fn matrix_f32_div() {
+        let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
+        let b = 3.0;
+
+        // Allocating new memory
+        let c = &a / &b;
+
+        assert_eq!(c[[0, 0]], 1.0 / 3.0);
+        assert_eq!(c[[0, 1]], 2.0 / 3.0);
+        assert_eq!(c[[1, 0]], 1.0);
+        assert_eq!(c[[1, 1]], 4.0 / 3.0);
+        assert_eq!(c[[2, 0]], 5.0 / 3.0);
+        assert_eq!(c[[2, 1]], 2.0);
+
+        // Allocating new memory
+        let c = &a / b;
+
+        assert_eq!(c[[0, 0]], 1.0 / 3.0);
+        assert_eq!(c[[0, 1]], 2.0 / 3.0);
+        assert_eq!(c[[1, 0]], 1.0);
+        assert_eq!(c[[1, 1]], 4.0 / 3.0);
+        assert_eq!(c[[2, 0]], 5.0 / 3.0);
+        assert_eq!(c[[2, 1]], 2.0);
+
+        // Reusing memory
+        let c = a.clone() / &b;
+
+        assert_eq!(c[[0, 0]], 1.0 / 3.0);
+        assert_eq!(c[[0, 1]], 2.0 / 3.0);
+        assert_eq!(c[[1, 0]], 1.0);
+        assert_eq!(c[[1, 1]], 4.0 / 3.0);
+        assert_eq!(c[[2, 0]], 5.0 / 3.0);
+        assert_eq!(c[[2, 1]], 2.0);
+
+        // Reusing memory
+        let c = a / b;
+
+        assert_eq!(c[[0, 0]], 1.0 / 3.0);
+        assert_eq!(c[[0, 1]], 2.0 / 3.0);
+        assert_eq!(c[[1, 0]], 1.0);
+        assert_eq!(c[[1, 1]], 4.0 / 3.0);
+        assert_eq!(c[[2, 0]], 5.0 / 3.0);
+        assert_eq!(c[[2, 1]], 2.0);
+    }
+
+        #[test]
+    fn add_slice() {
+        let a = 3.0;
+        let mut b = Matrix::new(3,3, vec![2.0; 9]);
+        let c = Matrix::new(2,2, vec![1.0; 4]);
+
+        let d = MatrixSlice::from_matrix(&b, [1,1], 2, 2);
+
+        let m_1 = &d + a.clone();
+        assert_eq!(m_1.into_vec(), vec![5.0; 4]);
+
+        let m_2 = c.clone() + &d;
+        assert_eq!(m_2.into_vec(), vec![3.0; 4]);
+
+        let m_3 = &d + c.clone();
+        assert_eq!(m_3.into_vec(), vec![3.0; 4]);
+
+        let m_4 = &d + &d;
+        assert_eq!(m_4.into_vec(), vec![4.0; 4]);       
+
+        let e = MatrixSliceMut::from_matrix(&mut b, [1,1], 2, 2);
+
+        let m_1 = &e + a.clone();
+        assert_eq!(m_1.into_vec(), vec![5.0; 4]);
+
+        let m_2 = c.clone() + &e;
+        assert_eq!(m_2.into_vec(), vec![3.0; 4]);
+
+        let m_3 = &e + c;
+        assert_eq!(m_3.into_vec(), vec![3.0; 4]);
+
+        let m_4 = &e + &e;
+        assert_eq!(m_4.into_vec(), vec![4.0; 4]);
+    }
+
+    #[test]
+    fn sub_slice() {
+        let a = 3.0;
+        let b = Matrix::new(2,2, vec![1.0; 4]);
+        let mut c = Matrix::new(3,3, vec![2.0; 9]);
+
+        let d = MatrixSlice::from_matrix(&c, [1,1], 2, 2);
+
+        let m_1 = &d - a.clone();
+        assert_eq!(m_1.into_vec(), vec![-1.0; 4]);
+
+        let m_2 = b.clone() - &d;
+        assert_eq!(m_2.into_vec(), vec![-1.0; 4]);
+
+        let m_3 = &d - b.clone();
+        assert_eq!(m_3.into_vec(), vec![1.0; 4]);
+
+        let m_4 = &d - &d;
+        assert_eq!(m_4.into_vec(), vec![0.0; 4]);
+
+        let e = MatrixSliceMut::from_matrix(&mut c, [1,1], 2, 2);
+
+        let m_1 = &e - a;
+        assert_eq!(m_1.into_vec(), vec![-1.0; 4]);
+
+        let m_2 = b.clone() - &e;
+        assert_eq!(m_2.into_vec(), vec![-1.0; 4]);
+
+        let m_3 = &e - b;
+        assert_eq!(m_3.into_vec(), vec![1.0; 4]);
+
+        let m_4 = &e - &e;
+        assert_eq!(m_4.into_vec(), vec![0.0; 4]);
+    }
+
+    #[test]
+    fn div_slice() {
+        let a = 3.0;
+
+        let mut b = Matrix::new(3,3, vec![2.0; 9]);
+
+        let c = MatrixSlice::from_matrix(&b, [1,1], 2, 2);
+
+        let m = c / a;
+        assert_eq!(m.into_vec(), vec![2.0/3.0 ;4]);
+
+        let d = MatrixSliceMut::from_matrix(&mut b, [1,1], 2, 2);
+
+        let m = d / a;
+        assert_eq!(m.into_vec(), vec![2.0/3.0 ;4]);
+    }
+
+    #[test]
+    fn neg_slice() {
+        let b = Matrix::new(3,3, vec![2.0; 9]);
+
+        let c = MatrixSlice::from_matrix(&b, [1,1], 2, 2);
+
+        let m = -c;
+        assert_eq!(m.into_vec(), vec![-2.0;4]);
+
+        let mut b = Matrix::new(3,3, vec![2.0; 9]);
+
+        let c = MatrixSliceMut::from_matrix(&mut b, [1,1], 2, 2);
+
+        let m = -c;
+        assert_eq!(m.into_vec(), vec![-2.0;4]);
+    }
+
+    #[test]
+    fn index_slice() {
+        let mut b = Matrix::new(3,3, (0..9).collect());
+
+        let c = MatrixSlice::from_matrix(&b, [1,1], 2, 2);
+        
+        assert_eq!(c[[0,0]], 4);
+        assert_eq!(c[[0,1]], 5);
+        assert_eq!(c[[1,0]], 7);
+        assert_eq!(c[[1,1]], 8);
+
+        let mut c = MatrixSliceMut::from_matrix(&mut b, [1,1], 2, 2);
+        
+        assert_eq!(c[[0,0]], 4);
+        assert_eq!(c[[0,1]], 5);
+        assert_eq!(c[[1,0]], 7);
+        assert_eq!(c[[1,1]], 8);
+
+        c[[0,0]] = 9;
+
+        assert_eq!(c[[0,0]], 9);
+        assert_eq!(c[[0,1]], 5);
+        assert_eq!(c[[1,0]], 7);
+        assert_eq!(c[[1,1]], 8);
+    }
+}

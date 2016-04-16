@@ -5,6 +5,7 @@
 
 use std::ops::{Mul, Add, Div, Sub, Neg};
 use std::cmp;
+use std::any::Any;
 
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
@@ -14,7 +15,7 @@ use linalg::utils;
 use libnum::{One, Zero, Float, NumCast, Signed};
 use libnum::{cast, abs};
 
-impl<T: Copy + Zero + Float> Matrix<T> {
+impl<T: Any  + Float> Matrix<T> {
     /// Cholesky decomposition
     ///
     /// Returns the cholesky decomposition of a positive definite matrix.
@@ -159,7 +160,7 @@ impl<T: Copy + Zero + Float> Matrix<T> {
     }
 }
 
-impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
+impl<T: Any + Float + Signed> Matrix<T> {
     /// Returns H, where H is the upper hessenberg form.
     ///
     /// If the transformation matrix is also required, you should
@@ -610,7 +611,7 @@ impl<T: Copy + Zero + One + Float + NumCast + Signed> Matrix<T> {
 }
 
 
-impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
+impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
                            Add<T, Output=T> + Mul<T, Output=T> +
                            Sub<T, Output=T> + Div<T, Output=T> +
                            PartialOrd {

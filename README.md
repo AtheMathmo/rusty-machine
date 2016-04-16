@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/AtheMathmo/rusty-machine](https://badges.gitter.im/AtheMathmo/rusty-machine.svg)](https://gitter.im/AtheMathmo/rusty-machine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/AtheMathmo/rusty-machine.svg?branch=master)](https://travis-ci.org/AtheMathmo/rusty-machine)
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.2.4](https://crates.io/crates/rusty-machine/0.2.4).
+Here is the API documentation for the rust crate. Currently up to date for [version 0.2.5](https://crates.io/crates/rusty-machine/0.2.5).
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
@@ -61,6 +61,7 @@ There is also a `stats` module behind an optional features flag.
 - Gaussian Process Regression
 - Support Vector Machines
 - Gaussian Mixture Models
+- Naive Bayes Classifiers
 
 ---
 
@@ -72,14 +73,14 @@ The library usage is described well in the [API documentation](https://AtheMathm
 
 The library is most easily used with [cargo](http://doc.crates.io/guide.html). Simply include the following in your Cargo.toml file:
 
-```
+```toml
 [dependencies.rusty-machine]
 version="*"
 ```
 
 And then import the library using:
 
-```
+```rust
 extern crate rusty_machine as rm;
 ```
 
@@ -89,7 +90,7 @@ The library consists of two core components. The linear algebra module and the l
 
 The linear algebra module contains the Matrix and Vector data structures and related methods - such as matrix decomposition. Usage looks like this:
 
-```
+```rust
 extern crate rusty_machine as rm;
 
 use rm::linalg::matrix::Matrix;

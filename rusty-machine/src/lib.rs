@@ -22,7 +22,8 @@
 //! - Neural Networks
 //! - Gaussian Process Regression
 //! - Support Vector Machines
-//! - Gaussian Mixture Modelss
+//! - Gaussian Mixture Models
+//! - Naive Bayes Classifiers
 //!
 //! ### linalg
 //!
@@ -80,11 +81,23 @@
 //! Of course this code could have been a lot simpler if we had simply adopted
 //! `let mut gp = GaussianProcess::default();`. Conversely, you could also implement
 //! your own kernels and mean functions by using the appropriate traits.
+//!
+//! Additionally you'll notice there's quite a few `use` statements at the top of this code.
+//! We can remove some of these by utilizing the `prelude`:
+//!
+//! ```
+//! use rusty_machine::prelude::*;
+//!
+//! let _ = Matrix::new(2,2,vec![2.0;4]);
+//! ```
 
 #![warn(missing_debug_implementations)]
 
 extern crate num as libnum;
 extern crate rand;
+extern crate matrixmultiply;
+
+pub mod prelude;
 
 /// Module for linear algebra.
 pub mod linalg {
@@ -114,6 +127,7 @@ pub mod learning {
     pub mod nnet;
     pub mod gp;
     pub mod svm;
+    pub mod naive_bayes;
 
     /// Trait for supervised model.
     pub trait SupModel<T,U> {
