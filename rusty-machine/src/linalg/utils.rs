@@ -141,7 +141,7 @@ pub fn in_place_vec_bin_op<F, T: Copy>(mut u: &mut [T], v: &[T], mut f: F)
         }
 }
 
-fn vec_bin_op<F, T: Copy>(u: &[T], v: &[T], f: F) -> Vec<T>
+pub fn vec_bin_op<F, T: Copy>(u: &[T], v: &[T], f: F) -> Vec<T>
     where F: Fn(T, T) -> T {
         debug_assert_eq!(u.len(), v.len());
         let len = cmp::min(u.len(), v.len());
