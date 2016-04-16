@@ -3,6 +3,7 @@
 //! Currently contains all code
 //! relating to the matrix linear algebra struct.
 
+use std::any::Any;
 use std::fmt;
 use std::ops::{Mul, Add, Div, Sub, Neg};
 use libnum::{One, Zero, Float, FromPrimitive};
@@ -13,6 +14,7 @@ use linalg::utils;
 
 mod decomposition;
 mod impl_ops;
+mod mat_mul;
 pub mod slice;
 
 /// Matrix dimensions
@@ -120,6 +122,11 @@ impl<T> Matrix<T> {
     /// Get a mutable reference to a point in the matrix without bounds checks.
     pub unsafe fn get_unchecked_mut(&mut self, index: [usize; 2]) -> &T {
         self.data.get_unchecked_mut(index[0] * self.cols + index[1])
+    }
+
+    /// Returns pointer to first element of underlying data.
+    pub fn as_ptr(&self) -> *const T {
+        self.data.as_ptr()
     }
 
     /// Consumes the Matrix and returns the Vec of data.
@@ -866,7 +873,7 @@ impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
     }
 }
 
-impl<T> Matrix<T> where T: Copy + One + Zero + Neg<Output=T> +
+impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
                            Add<T, Output=T> + Mul<T, Output=T> +
                            Sub<T, Output=T> + Div<T, Output=T> +
                            PartialOrd {

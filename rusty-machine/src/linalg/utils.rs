@@ -141,6 +141,21 @@ pub fn in_place_vec_bin_op<F, T: Copy>(mut u: &mut [T], v: &[T], mut f: F)
         }
 }
 
+/// Vectorized binary operation applied to two slices.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::linalg::utils;
+///
+/// let mut a = vec![2.0; 10];
+/// let b = vec![3.0; 10];
+///
+/// let c = utils::vec_bin_op(&a, &b, |x, y| { 1f64 + x * y });
+///
+/// // Will print a vector of `7`s.
+/// println!("{:?}", a);
+/// ```
 pub fn vec_bin_op<F, T: Copy>(u: &[T], v: &[T], f: F) -> Vec<T>
     where F: Fn(T, T) -> T {
         debug_assert_eq!(u.len(), v.len());
