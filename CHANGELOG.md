@@ -2,6 +2,24 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.2.5
+
+### Breaking Changes
+
+- None
+
+### Features
+
+- Adding Naive Bayes classifiers.
+- Adding a prelude for common imports.
+- Adding MatrixSlice and MatrixSliceMut for efficient matrix views.
+
+### Minor Changes
+
+- Using [matrixmultiply](https://github.com/bluss/matrixmultiply) to get huge performance gains! Thanks [bluss](https://github.com/bluss/).
+- Code refactor to split up the matrix module.
+
+
 ## 0.2.4
 
 ### New Contributors
