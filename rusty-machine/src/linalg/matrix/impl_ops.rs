@@ -204,78 +204,6 @@ impl_bin_op_scalar_matrix!(Mul, mul, "multiplication");
 impl_bin_op_scalar_matrix!(Sub, sub, "subtraction");
 impl_bin_op_scalar_matrix!(Div, div, "division");
 
-macro_rules! impl_mat_mul (
-    ($mat_1:ident, $mat_2:ident) => (
-
-/// Multiplies two matrices together.
-impl<T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<$mat_2<T>> for $mat_1<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, m: $mat_2<T>) -> Matrix<T> {
-        (&self) * (&m)
-    }
-}
-
-/// Multiplies two matrices together.
-impl<'a, T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'a $mat_2<T>> for $mat_1<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, m: &$mat_2<T>) -> Matrix<T> {
-        (&self) * (m)
-    }
-}
-
-/// Multiplies two matrices together.
-impl<'a, T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<$mat_2<T>> for &'a $mat_1<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, m: $mat_2<T>) -> Matrix<T> {
-        (self) * (&m)
-    }
-}
-
-/// Multiplies two matrices together.
-impl<'a, 'b, T: Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'b $mat_2<T>> for &'a $mat_1<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, m: &$mat_2<T>) -> Matrix<T> {
-        assert!(self.cols == m.rows, "Matrix dimensions do not agree.");
-
-        let mut new_data = vec![T::zero(); self.rows * m.cols];
-
-        unsafe {
-            for i in 0..self.rows
-            {
-                for k in 0..m.rows
-                {
-                    for j in 0..m.cols
-                    {
-                        new_data[i*m.cols() + j] = *new_data.get_unchecked(i*m.cols() + j) + *self.get_unchecked([i,k]) * *m.get_unchecked([k,j]);
-                    }
-                }
-            }
-        }
-
-        Matrix {
-            rows: self.rows,
-            cols: m.cols,
-            data: new_data
-        }
-    }
-}
-    );
-);
-
-impl_mat_mul!(Matrix, Matrix);
-impl_mat_mul!(Matrix, MatrixSlice);
-impl_mat_mul!(Matrix, MatrixSliceMut);
-impl_mat_mul!(MatrixSlice, Matrix);
-impl_mat_mul!(MatrixSlice, MatrixSlice);
-impl_mat_mul!(MatrixSlice, MatrixSliceMut);
-impl_mat_mul!(MatrixSliceMut, Matrix);
-impl_mat_mul!(MatrixSliceMut, MatrixSlice);
-impl_mat_mul!(MatrixSliceMut, MatrixSliceMut);
-
 /// Multiplies matrix by vector.
 impl<T: Copy + Zero + Mul<T, Output = T> + Add<T, Output = T>> Mul<Vector<T>> for Matrix<T> {
     type Output = Vector<T>;
@@ -668,28 +596,6 @@ mod tests {
     }
 
     #[test]
-    fn matrix_mul() {
-        let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
-        let b = Matrix::new(2, 3, vec![1., 2., 3., 4., 5., 6.]);
-
-        // Allocating new memory
-        let c = &a * &b;
-
-        assert_eq!(c.rows(), 3);
-        assert_eq!(c.cols(), 3);
-
-        assert_eq!(c[[0, 0]], 9.0);
-        assert_eq!(c[[0, 1]], 12.0);
-        assert_eq!(c[[0, 2]], 15.0);
-        assert_eq!(c[[1, 0]], 19.0);
-        assert_eq!(c[[1, 1]], 26.0);
-        assert_eq!(c[[1, 2]], 33.0);
-        assert_eq!(c[[2, 0]], 29.0);
-        assert_eq!(c[[2, 1]], 40.0);
-        assert_eq!(c[[2, 2]], 51.0);
-    }
-
-    #[test]
     fn matrix_vec_mul() {
         let a = Matrix::new(3, 2, vec![1., 2., 3., 4., 5., 6.]);
         let b = Vector::new(vec![4., 7.]);
@@ -1046,35 +952,6 @@ mod tests {
 
         let m_4 = &e - &e;
         assert_eq!(m_4.into_vec(), vec![0.0; 4]);
-    }
-
-    #[test]
-    fn mul_slice() {
-        let a = 3.0;
-        let b = Matrix::new(2,2, vec![1.0; 4]);
-        let mut c = Matrix::new(3,3, vec![2.0; 9]);
-
-        let d = MatrixSlice::from_matrix(&c, [1,1], 2, 2);
-
-        let m_1 = &d * a.clone();
-        assert_eq!(m_1.into_vec(), vec![6.0; 4]);
-
-        let m_2 = &d * b.clone();
-        assert_eq!(m_2.into_vec(), vec![4.0; 4]);
-
-        let m_3 = &d * &d;
-        assert_eq!(m_3.into_vec(), vec![8.0; 4]);
-
-        let e = MatrixSliceMut::from_matrix(&mut c, [1,1], 2, 2);
-
-        let m_1 = &e * a;
-        assert_eq!(m_1.into_vec(), vec![6.0; 4]);
-
-        let m_2 = &e * b;
-        assert_eq!(m_2.into_vec(), vec![4.0; 4]);
-
-        let m_3 = &e * &e;
-        assert_eq!(m_3.into_vec(), vec![8.0; 4]);
     }
 
     #[test]
