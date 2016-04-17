@@ -1366,6 +1366,12 @@
 <span id="1322">1322</span>
 <span id="1323">1323</span>
 <span id="1324">1324</span>
+<span id="1325">1325</span>
+<span id="1326">1326</span>
+<span id="1327">1327</span>
+<span id="1328">1328</span>
+<span id="1329">1329</span>
+<span id="1330">1330</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The matrix module.</span>
 <span class='doccomment'>//!</span>
@@ -1470,6 +1476,12 @@
 
     <span class='doccomment'>/// Returns the number of columns in the Matrix.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>cols</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
+        <span class='self'>self</span>.<span class='ident'>cols</span>
+    }
+
+    <span class='doccomment'>/// Returns the row-stride of the matrix. This is simply</span>
+    <span class='doccomment'>/// its column count.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>row_stride</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
         <span class='self'>self</span>.<span class='ident'>cols</span>
     }
 

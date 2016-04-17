@@ -47,10 +47,11 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1949' class='srclink' href='../../../../src/rusty_machine/src/linalg/matrix/slice.rs.html#27-39' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1949' class='srclink' href='../../../../src/rusty_machine/src/linalg/matrix/slice.rs.html#27-42' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait BaseSlice&lt;T&gt; {
     fn <a href='#tymethod.rows' class='fnname'>rows</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>;
     fn <a href='#tymethod.cols' class='fnname'>cols</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>;
+    fn <a href='#tymethod.row_stride' class='fnname'>row_stride</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>;
     fn <a href='#tymethod.as_ptr' class='fnname'>as_ptr</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const T</a>;
     unsafe fn <a href='#tymethod.get_unchecked' class='fnname'>get_unchecked</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>; 2]</a>) -&gt; &amp;T;
 }</pre><div class='docblock'><p>Trait for Matrix Slices.</p>
@@ -59,6 +60,7 @@
             <div class='methods'>
         <h3 id='tymethod.rows' class='method stab '><code>fn <a href='#tymethod.rows' class='fnname'>rows</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h3><div class='docblock'><p>Rows in the slice.</p>
 </div><h3 id='tymethod.cols' class='method stab '><code>fn <a href='#tymethod.cols' class='fnname'>cols</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h3><div class='docblock'><p>Columns in the slice.</p>
+</div><h3 id='tymethod.row_stride' class='method stab '><code>fn <a href='#tymethod.row_stride' class='fnname'>row_stride</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h3><div class='docblock'><p>Row stride in the slice.</p>
 </div><h3 id='tymethod.as_ptr' class='method stab '><code>fn <a href='#tymethod.as_ptr' class='fnname'>as_ptr</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const T</a></code></h3><div class='docblock'><p>Top left index of the slice.</p>
 </div><h3 id='tymethod.get_unchecked' class='method stab '><code>unsafe fn <a href='#tymethod.get_unchecked' class='fnname'>get_unchecked</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>; 2]</a>) -&gt; &amp;T</code></h3><div class='docblock'><p>Get a reference to a point in the slice without bounds checking.</p>
 </div></div>

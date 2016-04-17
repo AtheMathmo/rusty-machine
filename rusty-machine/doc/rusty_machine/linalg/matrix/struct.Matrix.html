@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-2112' class='srclink' href='../../../src/rusty_machine/src/linalg/matrix/mod.rs.html#33-37' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-2118' class='srclink' href='../../../src/rusty_machine/src/linalg/matrix/mod.rs.html#33-37' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Matrix&lt;T&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>The Matrix struct.</p>
@@ -200,6 +200,9 @@ out to the lapack implementations in the future.</p>
 <div class='docblock'><p>Returns the number of rows in the Matrix.</p>
 </div><h4 id='method.cols' class='method'><code>fn <a href='#method.cols' class='fnname'>cols</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
 <div class='docblock'><p>Returns the number of columns in the Matrix.</p>
+</div><h4 id='method.row_stride' class='method'><code>fn <a href='#method.row_stride' class='fnname'>row_stride</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h4>
+<div class='docblock'><p>Returns the row-stride of the matrix. This is simply
+its column count.</p>
 </div><h4 id='method.data' class='method'><code>fn <a href='#method.data' class='fnname'>data</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;</code></h4>
 <div class='docblock'><p>Returns a non-mutable reference to the underlying data.</p>
 </div><h4 id='method.mut_data' class='method'><code>fn <a href='#method.mut_data' class='fnname'>mut_data</a>(&amp;mut self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;mut [</a>T<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a></code></h4>
