@@ -104,6 +104,12 @@ impl<T> Matrix<T> {
         self.cols
     }
 
+    /// Returns the row-stride of the matrix. This is simply
+    /// its column count.
+    pub fn row_stride(&self) -> usize {
+        self.cols
+    }
+
     /// Returns a non-mutable reference to the underlying data.
     pub fn data(&self) -> &Vec<T> {
         &self.data
