@@ -61,3 +61,57 @@ fn mat_mul_128_1000(b: &mut Bencher) {
 
     b.iter(|| &a * &c)
 }
+
+#[bench]
+fn mat_mul_128_10000(b: &mut Bencher) {
+
+    let a = Matrix::new(128, 10000, vec![2f32; 1280000]);
+    let c = Matrix::new(10000, 128, vec![3f32; 1280000]);
+
+    b.iter(|| &a * &c)
+}
+
+#[bench]
+fn mat_mul_128_100000(b: &mut Bencher) {
+
+    let a = Matrix::new(128, 100000, vec![2f32; 12800000]);
+    let c = Matrix::new(100000, 128, vec![3f32; 12800000]);
+
+    b.iter(|| &a * &c)
+}
+
+#[bench]
+fn mat_paramul_128_100(b: &mut Bencher) {
+
+    let a = Matrix::new(128, 100, vec![2f32; 12800]);
+    let c = Matrix::new(100, 128, vec![3f32; 12800]);
+
+    b.iter(|| a.paramul(&c))
+}
+
+#[bench]
+fn mat_paramul_128_1000(b: &mut Bencher) {
+
+    let a = Matrix::new(128, 1000, vec![2f32; 128000]);
+    let c = Matrix::new(1000, 128, vec![3f32; 128000]);
+
+    b.iter(|| a.paramul(&c))
+}
+
+#[bench]
+fn mat_paramul_128_10000(b: &mut Bencher) {
+
+    let a = Matrix::new(128, 10000, vec![2f32; 1280000]);
+    let c = Matrix::new(10000, 128, vec![3f32; 1280000]);
+
+    b.iter(|| a.paramul(&c))
+}
+
+#[bench]
+fn mat_paramul_128_100000(b: &mut Bencher) {
+
+    let a = Matrix::new(128, 100000, vec![2f32; 12800000]);
+    let c = Matrix::new(100000, 128, vec![3f32; 12800000]);
+
+    b.iter(|| a.paramul(&c))
+}

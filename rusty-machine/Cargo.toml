@@ -17,3 +17,4 @@ stats = []
 num = {version = "0.1.31", default-features = false }
 rand = "0.3.14"
 matrixmultiply = "0.1.8"
+rayon = "0.3.1"

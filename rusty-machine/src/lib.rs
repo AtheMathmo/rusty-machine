@@ -96,6 +96,7 @@
 extern crate num as libnum;
 extern crate rand;
 extern crate matrixmultiply;
+extern crate rayon;
 
 pub mod prelude;
 

@@ -16,9 +16,7 @@
 //! let new_mat = &mat_slice * &mat_slice;
 //! ```
 
-use super::Matrix;
-use super::MatrixSlice;
-use super::MatrixSliceMut;
+use super::{Matrix, MatrixSlice, MatrixSliceMut, Axes};
 
 use std::marker::PhantomData;
 use std::mem;
@@ -173,6 +171,31 @@ impl<T: Copy> MatrixSlice<T> {
             data: slice_data,
         }
     }
+
+    pub fn split_at(self, mid: usize, axis: Axes) -> (MatrixSlice<T>, MatrixSlice<T>) {
+        let slice_1 : MatrixSlice<T>;
+        let slice_2 : MatrixSlice<T>;
+
+        let self_cols = self.cols;
+        let self_rows = self.rows;
+
+        match axis {
+            Axes::Row => {
+                assert!(mid < self.rows);
+
+                slice_1 = self.reslice([0,0], mid, self_cols);
+                slice_2 = self.reslice([mid,0], self_rows - mid, self_cols);
+            },
+            Axes::Col => {
+                assert!(mid < self.cols);
+
+                slice_1 = self.reslice([0,0], self_rows, mid);
+                slice_2 = self.reslice([0,mid], self_rows, self_cols - mid);
+            }
+        }
+
+        (slice_1, slice_2)
+    }
 }
 
 impl<T> MatrixSliceMut<T> {
@@ -313,6 +336,31 @@ impl<T: Copy> MatrixSliceMut<T> {
             cols: self.cols,
             data: slice_data,
         }
+    }
+
+    pub fn split_at(self, mid: usize, axis: Axes) -> (MatrixSliceMut<T>, MatrixSliceMut<T>) {
+        let slice_1 : MatrixSliceMut<T>;
+        let slice_2 : MatrixSliceMut<T>;
+
+        let self_cols = self.cols;
+        let self_rows = self.rows;
+
+        match axis {
+            Axes::Row => {
+                assert!(mid < self.rows);
+
+                slice_1 = self.clone().reslice([0,0], mid, self_cols);
+                slice_2 = self.reslice([mid,0], self_rows - mid, self_cols);
+            },
+            Axes::Col => {
+                assert!(mid < self.cols);
+
+                slice_1 = self.clone().reslice([0,0], self_rows, mid);
+                slice_2 = self.reslice([0,mid], self_rows, self_cols - mid);
+            }
+        }
+
+        (slice_1, slice_2)
     }
 }
 

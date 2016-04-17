@@ -1,4 +1,4 @@
-use super::{Matrix, MatrixSlice, MatrixSliceMut};
+use super::{Matrix, MatrixSlice, MatrixSliceMut, Axes};
 use super::slice::BaseSlice;
 
 use std::any::{Any, TypeId};
@@ -6,6 +6,7 @@ use std::ops::{Add, Mul};
 
 use libnum::Zero;
 use matrixmultiply;
+use rayon;
 
 #[inline(always)]
 /// Return `true` if `A` and `B` are the same type
@@ -139,6 +140,98 @@ impl_mat_mul!(MatrixSlice, MatrixSliceMut);
 impl_mat_mul!(MatrixSliceMut, Matrix);
 impl_mat_mul!(MatrixSliceMut, MatrixSlice);
 impl_mat_mul!(MatrixSliceMut, MatrixSliceMut);
+
+pub trait ParaMul
+    : Any
+    + Copy
+    + Sync
+    + Send
+    + Zero
+    + Mul<Self, Output=Self>
+    + Add<Self, Output=Self>
+{}
+
+impl ParaMul for f32 {}
+impl ParaMul for f64 {}
+
+use std::marker::{Sync, Send};
+
+unsafe impl<T: Send> Send for MatrixSlice<T> {}
+unsafe impl<T: Sync> Sync for MatrixSlice<T> {}
+
+impl< T: ParaMul> Matrix<T> {
+    pub fn paramul(&self, m: &Matrix<T>) -> Matrix<T> {
+        let s_1 = MatrixSlice::from_matrix(self, [0,0], self.rows, self.cols);
+        let s_2 = MatrixSlice::from_matrix(m, [0,0], m.rows, m.cols);
+
+        s_1.paramul(&s_2)
+    }
+}
+
+impl <T: ParaMul> MatrixSlice<T> {
+    /// Multiplies matrices using Parallel divide and conquer.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(3,3,vec![3.0; 9]);
+    /// let b = Matrix::new(3,3,vec![1.0; 9]);
+    ///
+    /// let c = a.paramul(&b);
+    /// assert_eq!(c.into_vec(), vec![9.0; 9]);
+    /// ```
+    pub fn paramul(&self, m: &MatrixSlice<T>) -> Matrix<T> {
+        let n = self.rows();
+        let p = self.cols();
+        let q = m.cols();
+
+        let mut max_dim = n;
+
+        if max_dim < p {
+            max_dim = p;
+        }
+        if max_dim < q {
+            max_dim = q;
+        }
+
+        if max_dim < 256 {
+            self * m
+        } else {
+            let split_point = max_dim / 2;
+            
+            if max_dim == n {
+                let (top, bottom) = self.split_at(split_point, Axes::Row);
+
+                let (a_1_b, a_2_b) = rayon::join(|| top.paramul(m),
+                                                 || bottom.paramul(m));
+
+                a_1_b.vcat(&a_2_b)
+            } else if max_dim == p {
+                // Split self vertically and b horizontally
+                let (a_left, a_right) = self.split_at(split_point, Axes::Col);
+
+                let (b_top, b_bottom) = m.split_at(split_point, Axes::Row);
+
+                let (a_1_b_1, a_2_b_2) = rayon::join(|| a_left.paramul(&b_top),
+                                                     || a_right.paramul(&b_bottom));
+
+                a_1_b_1 + a_2_b_2
+            } else if max_dim == q {
+                // Split m vertically
+                let (left, right) = m.split_at(split_point, Axes::Col);
+
+                let (a_b_1, a_b_2) = rayon::join(|| self.paramul(&left),
+                                                 || self.paramul(&right));
+
+                a_b_1.hcat(&a_b_2)
+            } else {
+                panic!("Couldn't find the max of the matrix dimensions.");
+            }
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {
