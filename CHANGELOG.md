@@ -2,6 +2,21 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.2.6
+
+### Breaking Changes
+
+- None
+
+### Features
+
+- None
+
+### Minor Changes
+
+- Fixing a bug with matrix slice multiplication.
+- Removing unneeded NumCast import.
+
 ## 0.2.5
 
 ### Breaking Changes

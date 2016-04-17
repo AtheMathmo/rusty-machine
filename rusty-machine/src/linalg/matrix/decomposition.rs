@@ -12,7 +12,7 @@ use linalg::vector::Vector;
 use linalg::Metric;
 use linalg::utils;
 
-use libnum::{One, Zero, Float, NumCast, Signed};
+use libnum::{One, Zero, Float, Signed};
 use libnum::{cast, abs};
 
 impl<T: Any  + Float> Matrix<T> {
