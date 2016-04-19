@@ -353,7 +353,7 @@ impl<T: Any + Float + Signed> Matrix<T> {
     ///
     /// ```
     /// use rusty_machine::linalg::matrix::Matrix;
-    /// 
+    ///
     /// let a = Matrix::new(4,4, (1..17).map(|v| v as f64).collect::<Vec<f64>>());
     /// let e = a.eigenvalues();
     /// println!("{:?}", e);
@@ -365,6 +365,26 @@ impl<T: Any + Float + Signed> Matrix<T> {
     pub fn eigenvalues(&self) -> Vec<T> {
         let n = self.rows();
         assert!(n == self.cols(), "Matrix must be square for eigendecomp.");
+
+        if n == 1 { // trivial
+            return vec![self.data[0]];
+        }
+
+        if n == 2 {
+            // The characteristic polynomial of a 2x2 matrix A is
+            // λ² − (a₁₁ + a₂₂)λ + (a₁₁a₂₂ − a₁₂a₂₁);
+            // the quadratic formula suffices.
+            let tr = self.data[0] + self.data[3];
+            let det = self.data[0]*self.data[3] - self.data[1]*self.data[2];
+
+            let two = T::one() + T::one();
+            let four = two + two;
+
+            let desc = (tr*tr - four*det).sqrt();
+            return vec![(tr-desc)/two, (tr+desc)/two];
+        }
+
+        // Beyond these, we have to do some actual work—
 
         let mut h = self.upper_hessenberg();
         h.balance_matrix();
@@ -461,19 +481,17 @@ impl<T: Any + Float + Signed> Matrix<T> {
         h.diag().into_vec()
     }
 
-    /// Eigen decomposition of a square matrix.
+    /// Eigendecomposition of a square matrix.
     ///
     /// Returns a Vec of eigenvalues, and a matrix with eigenvectors as the columns.
     ///
     /// The eigenvectors are only gauranteed to be correct if the matrix is real-symmetric.
-    /// I'm not planning on doing any more work on this for now and will prefer to switch
-    /// out to the lapack implementations in the future.
     ///
     /// # Examples
     ///
     /// ```
     /// use rusty_machine::linalg::matrix::Matrix;
-    /// 
+    ///
     /// let a = Matrix::new(3,3,vec![3.,2.,4.,2.,0.,2.,4.,2.,3.]);
     ///
     /// let (e, m) = a.eigendecomp();
@@ -487,6 +505,34 @@ impl<T: Any + Float + Signed> Matrix<T> {
     pub fn eigendecomp(&self) -> (Vec<T>, Matrix<T>) {
         let n = self.rows();
         assert!(n == self.cols(), "Matrix must be square for eigendecomp.");
+
+        if n == 1 {
+            return (vec![self.data[0]], Matrix::new(1, 1, vec![T::one()]));
+        }
+
+        if n == 2 {
+            let eigenvalues = self.eigenvalues();
+            // Thanks to
+            // http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
+            // for this characterization—
+            if self.data[2] != T::zero() {
+                return (eigenvalues.clone(),
+                        Matrix::new(2, 2, vec![eigenvalues[0]-self.data[3],
+                                               eigenvalues[1]-self.data[3],
+                                               self.data[2],
+                                               self.data[2]]));
+            } else if self.data[1] != T::zero() {
+                return (eigenvalues.clone(),
+                        Matrix::new(2, 2, vec![self.data[1],
+                                               self.data[1],
+                                               eigenvalues[0]-self.data[0],
+                                               eigenvalues[1]-self.data[0]]));
+            } else {
+                return (eigenvalues.clone(),
+                        Matrix::new(2, 2, vec![T::one(), T::zero(),
+                                               T::zero(), T::one()]));
+            }
+        }
 
         let (u, mut h) = self.upper_hess_decomp();
         h.balance_matrix();
@@ -688,4 +734,26 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
 
         (l,u,p)
     }
+}
+
+
+
+#[cfg(test)]
+mod tests {
+    use linalg::matrix::Matrix;
+
+    #[test]
+    fn test_1_by_1_matrix_eigenvalues() {
+        let a = Matrix::new(1, 1, vec![3.]);
+        assert_eq!(vec![3.], a.eigenvalues());
+    }
+
+    #[test]
+    fn test_2_by_2_matrix_eigenvalues() {
+        let a = Matrix::new(2, 2, vec![1., 2., 3., 4.]);
+        // characteristic polynomial is λ² − 5λ − 2
+        assert_eq!(vec![(5.-(33.0f32).sqrt())/2., (5.+(33.0f32).sqrt())/2.],
+                   a.eigenvalues());
+    }
+
 }
