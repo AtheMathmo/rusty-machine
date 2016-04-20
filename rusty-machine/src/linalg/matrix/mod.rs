@@ -15,6 +15,7 @@ use linalg::utils;
 mod decomposition;
 mod impl_ops;
 mod mat_mul;
+mod iter;
 pub mod slice;
 
 /// Matrix dimensions
