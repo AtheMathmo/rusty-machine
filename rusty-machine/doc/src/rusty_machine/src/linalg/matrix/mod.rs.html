@@ -1372,6 +1372,13 @@
 <span id="1328">1328</span>
 <span id="1329">1329</span>
 <span id="1330">1330</span>
+<span id="1331">1331</span>
+<span id="1332">1332</span>
+<span id="1333">1333</span>
+<span id="1334">1334</span>
+<span id="1335">1335</span>
+<span id="1336">1336</span>
+<span id="1337">1337</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The matrix module.</span>
 <span class='doccomment'>//!</span>
@@ -1404,7 +1411,7 @@
 <span class='doccomment'>/// The Matrix struct.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Can be instantiated with any type.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='ident'>rows</span>: <span class='ident'>usize</span>,
     <span class='ident'>cols</span>: <span class='ident'>usize</span>,
@@ -2559,6 +2566,13 @@
     <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>slice</span>::<span class='ident'>BaseSlice</span>;
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_equality</span>() { <span class='comment'>// well, &quot;PartialEq&quot;, at least</span>
+        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>, <span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.</span>, <span class='number'>2.</span>, <span class='number'>3.</span>, <span class='number'>4.</span>, <span class='number'>5.</span>, <span class='number'>6.</span>]);
+        <span class='kw'>let</span> <span class='ident'>a_redux</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>clone</span>();
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>, <span class='ident'>a_redux</span>);
+    }
+
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_display_formatting</span>() {
         <span class='kw'>let</span> <span class='ident'>first_matrix</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>, <span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>, <span class='number'>4</span>, <span class='number'>5</span>, <span class='number'>6</span>]);
         <span class='kw'>let</span> <span class='ident'>first_expectation</span> <span class='op'>=</span> <span class='string'>&quot;⎡1 2 3⎤\n\
@@ -2702,7 +2716,8 @@
 
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>into_vec</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>,<span class='number'>5</span>]);
     }
-}</pre>
+}
+</pre>
 </section>
     <section id='search' class="content hidden"></section>
 

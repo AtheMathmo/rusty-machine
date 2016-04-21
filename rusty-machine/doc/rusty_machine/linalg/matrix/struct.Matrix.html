@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-2118' class='srclink' href='../../../src/rusty_machine/src/linalg/matrix/mod.rs.html#33-37' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-2134' class='srclink' href='../../../src/rusty_machine/src/linalg/matrix/mod.rs.html#33-37' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct Matrix&lt;T&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>The Matrix struct.</p>
@@ -132,7 +132,7 @@ and U is the unitary transform matrix.</p>
 <h1 id='examples-4' class='section-header'><a href='#examples-4'>Examples</a></h1>
 <pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>linalg</span>::<span class='ident'>matrix</span>::<span class='ident'>Matrix</span>;
- 
+
 <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>4</span>,<span class='number'>4</span>, (<span class='number'>1</span>..<span class='number'>17</span>).<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='ident'>v</span> <span class='kw'>as</span> <span class='ident'>f64</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span>());
 <span class='kw'>let</span> <span class='ident'>e</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>eigenvalues</span>();
 <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{:?}&quot;</span>, <span class='ident'>e</span>);</pre>
@@ -142,18 +142,16 @@ and U is the unitary transform matrix.</p>
 <li>The matrix is not square.</li>
 </ul>
 </div><h4 id='method.eigendecomp' class='method'><code>fn <a href='#method.eigendecomp' class='fnname'>eigendecomp</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(</a><a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;, <a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;T&gt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>)</a></code></h4>
-<div class='docblock'><p>Eigen decomposition of a square matrix.</p>
+<div class='docblock'><p>Eigendecomposition of a square matrix.</p>
 
 <p>Returns a Vec of eigenvalues, and a matrix with eigenvectors as the columns.</p>
 
-<p>The eigenvectors are only gauranteed to be correct if the matrix is real-symmetric.
-I&#39;m not planning on doing any more work on this for now and will prefer to switch
-out to the lapack implementations in the future.</p>
+<p>The eigenvectors are only gauranteed to be correct if the matrix is real-symmetric.</p>
 
 <h1 id='examples-5' class='section-header'><a href='#examples-5'>Examples</a></h1>
 <pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>linalg</span>::<span class='ident'>matrix</span>::<span class='ident'>Matrix</span>;
- 
+
 <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>,<span class='number'>3</span>,<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>3.</span>,<span class='number'>2.</span>,<span class='number'>4.</span>,<span class='number'>2.</span>,<span class='number'>0.</span>,<span class='number'>2.</span>,<span class='number'>4.</span>,<span class='number'>2.</span>,<span class='number'>3.</span>]);
 
 <span class='kw'>let</span> (<span class='ident'>e</span>, <span class='ident'>m</span>) <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>eigendecomp</span>();
@@ -904,7 +902,9 @@ subtraction
 <h4 id='method.clone_from' class='method'><span class="since">1.0.0</span><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
 </div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='../../../num/traits/trait.Float.html' title='num::traits::Float'>Float</a>&gt; <a class='trait' href='../../../rusty_machine/linalg/trait.Metric.html' title='rusty_machine::linalg::Metric'>Metric</a>&lt;T&gt; for <a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.norm' class='method'><code>fn <a href='../../../rusty_machine/linalg/trait.Metric.html#tymethod.norm' class='fnname'>norm</a>(&amp;self) -&gt; T</code></h4>
 </div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html' title='core::fmt::Display'>Display</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html' title='core::fmt::Display'>Display</a> for <a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Error.html' title='core::fmt::Error'>Error</a>&gt;</code></h4>
-</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.fmt-1' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.eq' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;T&gt;) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.ne' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;T&gt;) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+</div><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.fmt-1' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

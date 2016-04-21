@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-2942' class='srclink' href='../../../src/rusty_machine/src/linalg/utils.rs.html#131-142' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-2994' class='srclink' href='../../../src/rusty_machine/src/linalg/utils.rs.html#131-142' title='goto source code'>[src]</a></span></h1>
 <pre class='rust fn'>pub fn in_place_vec_bin_op&lt;F, T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a>&gt;(u: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;mut [</a>T<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>, v: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a>T<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>, f: F) <span class='where'>where F: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.FnMut.html' title='core::ops::FnMut'>FnMut</a>(&amp;mut T, &amp;T)</span></pre><div class='docblock'><p>Vectorized binary operation applied to two slices.
 The first argument should be a mutable slice which will
 be modified in place to prevent new memory allocation.</p>

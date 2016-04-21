@@ -691,6 +691,20 @@
 <span id="647">647</span>
 <span id="648">648</span>
 <span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The vector module.</span>
 <span class='doccomment'>//!</span>
@@ -706,7 +720,7 @@
 <span class='doccomment'>/// The Vector struct.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Can be instantiated with any type.</span>
-<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
+<span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>PartialEq</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='ident'>size</span>: <span class='ident'>usize</span>,
     <span class='ident'>data</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>,
@@ -1340,6 +1354,20 @@
 
         <span class='ident'>s</span>.<span class='ident'>sqrt</span>()
     }
+}
+
+
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
+<span class='kw'>mod</span> <span class='ident'>tests</span> {
+    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>Vector</span>;
+
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_equality</span>() {
+        <span class='kw'>let</span> <span class='ident'>v</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>, <span class='number'>4</span>]);
+        <span class='kw'>let</span> <span class='ident'>v_redux</span> <span class='op'>=</span> <span class='ident'>v</span>.<span class='ident'>clone</span>();
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>v</span>, <span class='ident'>v_redux</span>);
+    }
+
 }
 </pre>
 </section>
