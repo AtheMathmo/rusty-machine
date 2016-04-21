@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/AtheMathmo/rusty-machine](https://badges.gitter.im/AtheMathmo/rusty-machine.svg)](https://gitter.im/AtheMathmo/rusty-machine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/AtheMathmo/rusty-machine.svg?branch=master)](https://travis-ci.org/AtheMathmo/rusty-machine)
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.2.6](https://crates.io/crates/rusty-machine/0.2.6).
+Here is the API documentation for the rust crate. Currently up to date for [version 0.2.7](https://crates.io/crates/rusty-machine/0.2.7).
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
