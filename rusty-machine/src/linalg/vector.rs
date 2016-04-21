@@ -12,7 +12,7 @@ use linalg::utils;
 /// The Vector struct.
 ///
 /// Can be instantiated with any type.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Vector<T> {
     size: usize,
     data: Vec<T>,
@@ -646,4 +646,18 @@ impl<T: Float> Metric<T> for Vector<T> {
 
         s.sqrt()
     }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::Vector;
+
+    #[test]
+    fn test_equality() {
+        let v = Vector::new(vec![1, 2, 3, 4]);
+        let v_redux = v.clone();
+        assert_eq!(v, v_redux);
+    }
+
 }

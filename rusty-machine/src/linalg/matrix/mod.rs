@@ -29,7 +29,7 @@ pub enum Axes {
 /// The Matrix struct.
 ///
 /// Can be instantiated with any type.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Matrix<T> {
     rows: usize,
     cols: usize,
@@ -1182,6 +1182,13 @@ mod tests {
     use super::Matrix;
     use super::Axes;
     use super::slice::BaseSlice;
+
+    #[test]
+    fn test_equality() { // well, "PartialEq", at least
+        let a = Matrix::new(2, 3, vec![1., 2., 3., 4., 5., 6.]);
+        let a_redux = a.clone();
+        assert_eq!(a, a_redux);
+    }
 
     #[test]
     fn test_display_formatting() {
