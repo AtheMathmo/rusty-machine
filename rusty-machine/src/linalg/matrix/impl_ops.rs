@@ -1233,7 +1233,7 @@ mod tests {
         let res_data = vec![0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5];
         let mut a = Matrix::new(3, 3, a_data.clone());
 
-        a /= 2f32;
+        a /= &2f32;
         assert_eq!(a.into_vec(), res_data.clone());
 
         let mut a = Matrix::new(3, 3, a_data.clone());
@@ -1247,7 +1247,7 @@ mod tests {
         let res_data = vec![2f32, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0];
         let mut a = Matrix::new(3, 3, a_data.clone());
 
-        a *= 2f32;
+        a *= &2f32;
         assert_eq!(a.into_vec(), res_data.clone());
 
         let mut a = Matrix::new(3, 3, a_data.clone());
@@ -1366,7 +1366,7 @@ mod tests {
         let mut a = Matrix::new(3, 3, a_data.clone());
         let mut a_slice = MatrixSliceMut::from_matrix(&mut a, [0,0], 3, 3);
 
-        a_slice /= 2f32;
+        a_slice /= &2f32;
         assert_eq!(a.into_vec(), res_data.clone());
 
         let mut a = Matrix::new(3, 3, a_data.clone());
@@ -1383,7 +1383,7 @@ mod tests {
         let mut a = Matrix::new(3, 3, a_data.clone());
         let mut a_slice = MatrixSliceMut::from_matrix(&mut a, [0,0], 3, 3);
 
-        a_slice *= 2f32;
+        a_slice *= &2f32;
         assert_eq!(a.into_vec(), res_data.clone());
 
         let mut a = Matrix::new(3, 3, a_data.clone());
