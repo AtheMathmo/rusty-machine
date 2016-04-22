@@ -30,13 +30,13 @@ impl<T> Vector<T> {
     ///
     /// let vec = Vector::new(vec![1.0,2.0,3.0,4.0]);
     /// ```
-    pub fn new(data: Vec<T>) -> Vector<T> {
-
-        let size = data.len();
+    pub fn new<U: Into<Vec<T>>>(data: U) -> Vector<T> {
+        let our_data = data.into();
+        let size = our_data.len();
 
         Vector {
             size: size,
-            data: data,
+            data: our_data,
         }
     }
 
@@ -607,7 +607,7 @@ impl<'a, T: Neg<Output = T> + Copy> Neg for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn neg(self) -> Vector<T> {
-        let new_data = self.data.iter().map(|v| -*v).collect();
+        let new_data = self.data.iter().map(|v| -*v).collect::<Vec<_>>();
 
         Vector::new(new_data)
     }
@@ -670,6 +670,15 @@ mod tests {
         for i in 0..12 {
             assert_eq!(a[i], 1.0);
         }
+    }
+
+    #[test]
+    fn create_vector_new_from_slice() {
+        let data_vec: Vec<u32> = vec![1, 2, 3];
+        let data_slice: &[u32] = &data_vec[..];
+        let from_vec = Vector::new(data_vec.clone());
+        let from_slice = Vector::new(data_slice);
+        assert_eq!(from_vec, from_slice);
     }
 
     #[test]
@@ -905,6 +914,5 @@ mod tests {
 
         assert_eq!(b, (1. + 4. + 9. + 16. + 25. + 36. as f32).sqrt());
     }
-
 
 }

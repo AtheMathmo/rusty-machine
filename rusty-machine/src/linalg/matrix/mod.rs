@@ -84,14 +84,15 @@ impl<T> Matrix<T> {
     /// # Panics
     ///
     /// - The input data does not match the given dimensions.
-    pub fn new(rows: usize, cols: usize, data: Vec<T>) -> Matrix<T> {
+    pub fn new<U: Into<Vec<T>>>(rows: usize, cols: usize, data: U) -> Matrix<T> {
+        let our_data = data.into();
 
-        assert!(cols * rows == data.len(),
+        assert!(cols * rows == our_data.len(),
                 "Data does not match given dimensions.");
         Matrix {
             cols: cols,
             rows: rows,
-            data: data,
+            data: our_data,
         }
     }
 
@@ -1211,6 +1212,15 @@ mod tests {
     }
 
     #[test]
+    fn test_new_from_slice() {
+        let data_vec: Vec<u32> = vec![1, 2, 3, 4, 5, 6];
+        let data_slice: &[u32] = &data_vec[..];
+        let from_vec = Matrix::new(3, 2, data_vec.clone());
+        let from_slice = Matrix::new(3, 2, data_slice);
+        assert_eq!(from_vec, from_slice);
+    }
+
+    #[test]
     fn test_display_formatting() {
         let first_matrix = Matrix::new(2, 3, vec![1, 2, 3, 4, 5, 6]);
         let first_expectation = "⎡1 2 3⎤\n\
@@ -1259,7 +1269,7 @@ mod tests {
 
     #[test]
     fn test_split_matrix() {
-        let a = Matrix::new(3, 3, (0..9).collect());
+        let a = Matrix::new(3, 3, (0..9).collect::<Vec<_>>());
 
         let (b,c) = a.split_at(1, Axes::Row);
 
@@ -1281,7 +1291,7 @@ mod tests {
 
     #[test]
     fn test_split_matrix_mut() {
-        let mut a = Matrix::new(3, 3, (0..9).collect());
+        let mut a = Matrix::new(3, 3, (0..9).collect::<Vec<_>>());
 
         let (mut b, mut c) = a.split_at_mut(1, Axes::Row);
 

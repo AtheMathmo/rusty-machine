@@ -1115,7 +1115,7 @@ mod tests {
 
     #[test]
     fn index_slice() {
-        let mut b = Matrix::new(3, 3, (0..9).collect());
+        let mut b = Matrix::new(3, 3, (0..9).collect::<Vec<_>>());
 
         let c = MatrixSlice::from_matrix(&b, [1, 1], 2, 2);
 
@@ -1187,7 +1187,7 @@ mod tests {
     #[test]
     fn matrix_sub_assign() {
         let mut a = Matrix::new(3, 3, (0..9).collect::<Vec<i32>>());
-        
+
         a -= &2;
         assert_eq!(a.into_vec(), (-2..7).collect::<Vec<_>>());
 
@@ -1312,7 +1312,7 @@ mod tests {
     fn slice_sub_assign() {
         let mut a = Matrix::new(3, 3, (0..9).collect::<Vec<i32>>());
         let mut a_slice = MatrixSliceMut::from_matrix(&mut a, [0,0], 3, 3);
-        
+
         a_slice -= &2;
         assert_eq!(a.into_vec(), (-2..7).collect::<Vec<_>>());
 
