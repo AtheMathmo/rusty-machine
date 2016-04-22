@@ -345,26 +345,22 @@ impl<T: Any + Float + Signed> Matrix<T> {
         (a / r, -b / r)
     }
 
-    /// Eigenvalues of a square matrix.
-    ///
-    /// Returns a Vec of eigenvalues.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// 
-    /// let a = Matrix::new(4,4, (1..17).map(|v| v as f64).collect::<Vec<f64>>());
-    /// let e = a.eigenvalues();
-    /// println!("{:?}", e);
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// - The matrix is not square.
-    pub fn eigenvalues(&self) -> Vec<T> {
+    fn direct_2_by_2_eigenvalues(&self) -> Vec<T> {
+        // The characteristic polynomial of a 2x2 matrix A is
+        // λ² − (a₁₁ + a₂₂)λ + (a₁₁a₂₂ − a₁₂a₂₁);
+        // the quadratic formula suffices.
+        let tr = self.data[0] + self.data[3];
+        let det = self.data[0]*self.data[3] - self.data[1]*self.data[2];
+
+        let two = T::one() + T::one();
+        let four = two + two;
+
+        let desc = (tr*tr - four*det).sqrt();
+        vec![(tr-desc)/two, (tr+desc)/two]
+    }
+
+    fn francis_shift_eigenvalues(&self) -> Vec<T> {
         let n = self.rows();
-        assert!(n == self.cols(), "Matrix must be square for eigendecomp.");
 
         let mut h = self.upper_hessenberg();
         h.balance_matrix();
@@ -461,33 +457,60 @@ impl<T: Any + Float + Signed> Matrix<T> {
         h.diag().into_vec()
     }
 
-    /// Eigen decomposition of a square matrix.
+    /// Eigenvalues of a square matrix.
     ///
-    /// Returns a Vec of eigenvalues, and a matrix with eigenvectors as the columns.
-    ///
-    /// The eigenvectors are only gauranteed to be correct if the matrix is real-symmetric.
-    /// I'm not planning on doing any more work on this for now and will prefer to switch
-    /// out to the lapack implementations in the future.
+    /// Returns a Vec of eigenvalues.
     ///
     /// # Examples
     ///
     /// ```
     /// use rusty_machine::linalg::matrix::Matrix;
-    /// 
-    /// let a = Matrix::new(3,3,vec![3.,2.,4.,2.,0.,2.,4.,2.,3.]);
     ///
-    /// let (e, m) = a.eigendecomp();
+    /// let a = Matrix::new(4,4, (1..17).map(|v| v as f64).collect::<Vec<f64>>());
+    /// let e = a.eigenvalues();
     /// println!("{:?}", e);
-    /// println!("{:?}", m.data());
     /// ```
     ///
     /// # Panics
     ///
     /// - The matrix is not square.
-    pub fn eigendecomp(&self) -> (Vec<T>, Matrix<T>) {
+    pub fn eigenvalues(&self) -> Vec<T> {
         let n = self.rows();
         assert!(n == self.cols(), "Matrix must be square for eigendecomp.");
 
+        match n {
+            1 => vec![self.data[0]],
+            2 => self.direct_2_by_2_eigenvalues(),
+            _ => self.francis_shift_eigenvalues(),
+        }
+    }
+
+    fn direct_2_by_2_eigendecomp(&self) -> (Vec<T>, Matrix<T>) {
+        let eigenvalues = self.eigenvalues();
+        // Thanks to
+        // http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
+        // for this characterization—
+        if self.data[2] != T::zero() {
+            return (eigenvalues.clone(),
+                    Matrix::new(2, 2, vec![eigenvalues[0]-self.data[3],
+                                           eigenvalues[1]-self.data[3],
+                                           self.data[2],
+                                           self.data[2]]));
+        } else if self.data[1] != T::zero() {
+            return (eigenvalues.clone(),
+                    Matrix::new(2, 2, vec![self.data[1],
+                                           self.data[1],
+                                           eigenvalues[0]-self.data[0],
+                                           eigenvalues[1]-self.data[0]]));
+        } else {
+            return (eigenvalues.clone(),
+                    Matrix::new(2, 2, vec![T::one(), T::zero(),
+                                           T::zero(), T::one()]));
+        }
+    }
+
+    fn francis_shift_eigendecomp(&self) -> (Vec<T>, Matrix<T>) {
+        let n = self.rows();
         let (u, mut h) = self.upper_hess_decomp();
         h.balance_matrix();
         let mut transformation = Matrix::identity(n);
@@ -608,6 +631,38 @@ impl<T: Any + Float + Signed> Matrix<T> {
 
         (h.diag().into_vec(), u * transformation)
     }
+
+    /// Eigendecomposition of a square matrix.
+    ///
+    /// Returns a Vec of eigenvalues, and a matrix with eigenvectors as the columns.
+    ///
+    /// The eigenvectors are only gauranteed to be correct if the matrix is real-symmetric.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(3,3,vec![3.,2.,4.,2.,0.,2.,4.,2.,3.]);
+    ///
+    /// let (e, m) = a.eigendecomp();
+    /// println!("{:?}", e);
+    /// println!("{:?}", m.data());
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// - The matrix is not square.
+    pub fn eigendecomp(&self) -> (Vec<T>, Matrix<T>) {
+        let n = self.rows();
+        assert!(n == self.cols(), "Matrix must be square for eigendecomp.");
+
+        match n {
+            1 => (vec![self.data[0]], Matrix::new(1, 1, vec![T::one()])),
+            2 => self.direct_2_by_2_eigendecomp(),
+            _ => self.francis_shift_eigendecomp()
+        }
+    }
 }
 
 
@@ -688,4 +743,43 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
 
         (l,u,p)
     }
+}
+
+
+
+#[cfg(test)]
+mod tests {
+    use linalg::matrix::Matrix;
+    use linalg::vector::Vector;
+
+    #[test]
+    fn test_1_by_1_matrix_eigenvalues() {
+        let a = Matrix::new(1, 1, vec![3.]);
+        assert_eq!(vec![3.], a.eigenvalues());
+    }
+
+    #[test]
+    fn test_2_by_2_matrix_eigenvalues() {
+        let a = Matrix::new(2, 2, vec![1., 2., 3., 4.]);
+        // characteristic polynomial is λ² − 5λ − 2
+        assert_eq!(vec![(5.-(33.0f32).sqrt())/2., (5.+(33.0f32).sqrt())/2.],
+                   a.eigenvalues());
+    }
+
+    #[test]
+    fn test_2_by_2_matrix_eigendecomp() {
+        let a = Matrix::new(2, 2, vec![20., 4., 20., 16.]);
+        let (eigenvals, eigenvecs) = a.eigendecomp();
+
+        let lambda_1 = eigenvals[0];
+        let lambda_2 = eigenvals[1];
+
+        let v1 = Vector::new(vec![eigenvecs[[0, 0]], eigenvecs[[1, 0]]]);
+        let v2 = Vector::new(vec![eigenvecs[[0, 1]], eigenvecs[[1, 1]]]);
+
+        let epsilon = 0.00001;
+        assert!((&a*&v1 - &v1*lambda_1).into_vec().iter().all(|&c| c < epsilon));
+        assert!((&a*&v2 - &v2*lambda_2).into_vec().iter().all(|&c| c < epsilon));
+    }
+
 }

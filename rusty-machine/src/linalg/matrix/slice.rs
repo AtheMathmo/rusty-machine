@@ -29,6 +29,9 @@ pub trait BaseSlice<T> {
     /// Columns in the slice.
     fn cols(&self) -> usize;
 
+    /// Row stride in the slice.
+    fn row_stride(&self) -> usize;
+
     /// Top left index of the slice.
     fn as_ptr(&self) -> *const T;
 
@@ -43,6 +46,10 @@ impl<T> BaseSlice<T> for MatrixSlice<T> {
 
     fn cols(&self) -> usize {
         self.cols
+    }
+
+    fn row_stride(&self) -> usize {
+        self.row_stride
     }
 
     fn as_ptr(&self) -> *const T {
@@ -61,6 +68,10 @@ impl<T> BaseSlice<T> for MatrixSliceMut<T> {
 
     fn cols(&self) -> usize {
         self.cols
+    }
+
+    fn row_stride(&self) -> usize {
+        self.row_stride
     }
 
     fn as_ptr(&self) -> *const T {

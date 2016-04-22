@@ -1,6 +1,6 @@
 [package]
 name = "rusty-machine"
-version = "0.2.5"
+version = "0.2.7"
 authors = ["AtheMathmo"]
 
 description = "A machine learning library."

@@ -2,6 +2,35 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.2.7
+
+### Breaking Changes
+
+- None
+
+### Features
+
+- `Matrix` and `Vector` now implement [PartialEq](https://doc.rust-lang.org/core/cmp/trait.PartialEq.html).
+
+### Minor Changes
+
+- Fixed a bug where eigendecomposition for 2x2 matrices was incorrect.
+
+## 0.2.6
+
+### Breaking Changes
+
+- None
+
+### Features
+
+- None
+
+### Minor Changes
+
+- Fixing a bug with matrix slice multiplication.
+- Removing unneeded NumCast import.
+
 ## 0.2.5
 
 ### Breaking Changes

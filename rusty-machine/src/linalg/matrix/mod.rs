@@ -15,6 +15,7 @@ use linalg::utils;
 mod decomposition;
 mod impl_ops;
 mod mat_mul;
+mod iter;
 pub mod slice;
 
 /// Matrix dimensions
@@ -29,7 +30,7 @@ pub enum Axes {
 /// The Matrix struct.
 ///
 /// Can be instantiated with any type.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Matrix<T> {
     rows: usize,
     cols: usize,
@@ -101,6 +102,12 @@ impl<T> Matrix<T> {
 
     /// Returns the number of columns in the Matrix.
     pub fn cols(&self) -> usize {
+        self.cols
+    }
+
+    /// Returns the row-stride of the matrix. This is simply
+    /// its column count.
+    pub fn row_stride(&self) -> usize {
         self.cols
     }
 
@@ -1176,6 +1183,13 @@ mod tests {
     use super::Matrix;
     use super::Axes;
     use super::slice::BaseSlice;
+
+    #[test]
+    fn test_equality() { // well, "PartialEq", at least
+        let a = Matrix::new(2, 3, vec![1., 2., 3., 4., 5., 6.]);
+        let a_redux = a.clone();
+        assert_eq!(a, a_redux);
+    }
 
     #[test]
     fn test_display_formatting() {

@@ -65,9 +65,9 @@ impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'b
                     p, q, r,
                     1f32,
                     self.as_ptr() as *const _,
-                    q as isize, 1,
+                    self.row_stride() as isize, 1,
                     m.as_ptr() as *const _,
-                    r as isize, 1,
+                    m.row_stride() as isize, 1,
                     0f32,
                     new_data.as_mut_ptr() as *mut _,
                     r as isize, 1
@@ -89,9 +89,9 @@ impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'b
                     p, q, r,
                     1f64,
                     self.as_ptr() as *const _,
-                    q as isize, 1,
+                    self.row_stride() as isize, 1,
                     m.as_ptr() as *const _,
-                    r as isize, 1,
+                    m.row_stride() as isize, 1,
                     0f64,
                     new_data.as_mut_ptr() as *mut _,
                     r as isize, 1
@@ -306,7 +306,7 @@ mod tests {
     }
 
     #[test]
-    fn mul_slice() {
+    fn mul_slice_basic() {
         let a = 3.0;
         let b = Matrix::new(2, 2, vec![1.0; 4]);
         let mut c = Matrix::new(3, 3, vec![2.0; 9]);
@@ -332,5 +332,35 @@ mod tests {
 
         let m_3 = &e * &e;
         assert_eq!(m_3.into_vec(), vec![8.0; 4]);
+    }
+
+    #[test]
+    fn mul_slice_uneven_data() {
+        let a = Matrix::new(2, 2, vec![1.0, 2.0, 3.0, 4.0]);
+
+        let c = Matrix::new(2, 3, vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        let d = MatrixSlice::from_matrix(&c, [0, 0], 2, 2);
+
+        let e = d * a;
+
+        assert_eq!(e[[0,0]], 7.0);
+        assert_eq!(e[[0,1]], 10.0);
+        assert_eq!(e[[1,0]], 19.0);
+        assert_eq!(e[[1,1]], 28.0);
+    }
+
+    #[test]
+    fn mul_slice_uneven_data_usize() {
+        let a = Matrix::new(2, 2, vec![1usize, 2, 3, 4]);
+
+        let c = Matrix::new(2, 3, vec![1usize, 2, 3, 4, 5, 6]);
+        let d = MatrixSlice::from_matrix(&c, [0, 0], 2, 2);
+
+        let e = d * a;
+
+        assert_eq!(e[[0,0]], 7);
+        assert_eq!(e[[0,1]], 10);
+        assert_eq!(e[[1,0]], 19);
+        assert_eq!(e[[1,1]], 28);
     }
 }
