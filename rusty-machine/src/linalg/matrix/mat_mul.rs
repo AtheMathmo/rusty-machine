@@ -158,17 +158,77 @@ use std::marker::{Sync, Send};
 
 unsafe impl<T: Send> Send for MatrixSlice<T> {}
 unsafe impl<T: Sync> Sync for MatrixSlice<T> {}
+unsafe impl<T: Send> Send for MatrixSliceMut<T> {}
+unsafe impl<T: Sync> Sync for MatrixSliceMut<T> {}
 
-impl< T: ParaMul> Matrix<T> {
-    pub fn paramul(&self, m: &Matrix<T>) -> Matrix<T> {
-        let s_1 = MatrixSlice::from_matrix(self, [0,0], self.rows, self.cols);
-        let s_2 = MatrixSlice::from_matrix(m, [0,0], m.rows, m.cols);
+fn fastmul<T: ParaMul>(a: &MatrixSlice<T>, b: &MatrixSlice<T>, c: MatrixSliceMut<T>) {
+    let p = a.rows;
+    let q = a.cols;
+    let r = b.cols;
 
-        s_1.paramul(&s_2)
+    assert!(q == b.rows, "Matrix dimensions do not agree.");
+    assert!(p == c.rows);
+    assert!(r == c.cols);
+
+    if same_type::<T, f32>() {
+        unsafe {
+            matrixmultiply::sgemm(p,
+                                  q,
+                                  r,
+                                  1f32,
+                                  a.ptr as *const _,
+                                  a.row_stride() as isize,
+                                  1,
+                                  b.ptr as *const _,
+                                  b.row_stride() as isize,
+                                  1,
+                                  0f32,
+                                  c.ptr as *mut _,
+                                  c.row_stride as isize,
+                                  1);
+        }
+    } else if same_type::<T, f64>() {
+        unsafe {
+            matrixmultiply::dgemm(p,
+                                  q,
+                                  r,
+                                  1f64,
+                                  a.ptr as *const _,
+                                  a.row_stride() as isize,
+                                  1,
+                                  b.ptr as *const _,
+                                  b.row_stride() as isize,
+                                  1,
+                                  0f64,
+                                  c.ptr as *mut _,
+                                  c.row_stride as isize,
+                                  1);
+        }
     }
 }
 
-impl <T: ParaMul> MatrixSlice<T> {
+impl<T: ParaMul> Matrix<T> {
+    pub fn paramul(&self, m: &Matrix<T>) -> Matrix<T> {
+        let s_1 = MatrixSlice::from_matrix(self, [0, 0], self.rows, self.cols);
+        let s_2 = MatrixSlice::from_matrix(m, [0, 0], m.rows, m.cols);
+
+        // Create uninitialized memory
+        let mut t_vec = Vec::with_capacity(self.rows.saturating_mul(m.cols));
+        unsafe {
+            t_vec.set_len(self.rows.saturating_mul(m.cols));
+        }
+
+        // Create mat holding and fill slice
+        let mut ret_mat = Matrix::new(self.rows, m.cols, t_vec);
+        let mat_slice = MatrixSliceMut::from_matrix(&mut ret_mat, [0, 0], self.rows, m.cols);
+
+        s_1.paramul(&s_2, mat_slice);
+
+        ret_mat
+    }
+}
+
+impl<T: ParaMul> MatrixSlice<T> {
     /// Multiplies matrices using Parallel divide and conquer.
     ///
     /// # Examples
@@ -182,7 +242,7 @@ impl <T: ParaMul> MatrixSlice<T> {
     /// let c = a.paramul(&b);
     /// assert_eq!(c.into_vec(), vec![9.0; 9]);
     /// ```
-    pub fn paramul(&self, m: &MatrixSlice<T>) -> Matrix<T> {
+    pub fn paramul(&self, m: &MatrixSlice<T>, mut c: MatrixSliceMut<T>) {
         let n = self.rows();
         let p = self.cols();
         let q = m.cols();
@@ -197,35 +257,40 @@ impl <T: ParaMul> MatrixSlice<T> {
         }
 
         if max_dim < 256 {
-            self * m
+            fastmul(self, m, c);
         } else {
             let split_point = max_dim / 2;
-            
+
             if max_dim == n {
                 let (top, bottom) = self.split_at(split_point, Axes::Row);
+                let (c_top, c_bottom) = c.split_at(split_point, Axes::Row);
 
-                let (a_1_b, a_2_b) = rayon::join(|| top.paramul(m),
-                                                 || bottom.paramul(m));
-
-                a_1_b.vcat(&a_2_b)
+                rayon::join(|| top.paramul(m, c_top), || bottom.paramul(m, c_bottom));
             } else if max_dim == p {
                 // Split self vertically and b horizontally
                 let (a_left, a_right) = self.split_at(split_point, Axes::Col);
 
                 let (b_top, b_bottom) = m.split_at(split_point, Axes::Row);
 
-                let (a_1_b_1, a_2_b_2) = rayon::join(|| a_left.paramul(&b_top),
-                                                     || a_right.paramul(&b_bottom));
+                let mut t_vec = Vec::with_capacity(n.saturating_mul(q));
+                unsafe {
+                    t_vec.set_len(n.saturating_mul(q));
+                }
+                let mut t_mat = Matrix::new(n, q, t_vec);
+                let t_mat_slice = MatrixSliceMut::from_matrix(&mut t_mat, [0, 0], n, q);
 
-                a_1_b_1 + a_2_b_2
+                rayon::join(|| a_left.paramul(&b_top, c.clone()),
+                            || a_right.paramul(&b_bottom, t_mat_slice));
+
+                c += t_mat
             } else if max_dim == q {
                 // Split m vertically
                 let (left, right) = m.split_at(split_point, Axes::Col);
+                let (c_left, c_right) = c.split_at(split_point, Axes::Col);
 
-                let (a_b_1, a_b_2) = rayon::join(|| self.paramul(&left),
-                                                 || self.paramul(&right));
+                rayon::join(|| self.paramul(&left, c_left),
+                            || self.paramul(&right, c_right));
 
-                a_b_1.hcat(&a_b_2)
             } else {
                 panic!("Couldn't find the max of the matrix dimensions.");
             }
@@ -343,10 +408,10 @@ mod tests {
 
         let e = d * a;
 
-        assert_eq!(e[[0,0]], 7.0);
-        assert_eq!(e[[0,1]], 10.0);
-        assert_eq!(e[[1,0]], 19.0);
-        assert_eq!(e[[1,1]], 28.0);
+        assert_eq!(e[[0, 0]], 7.0);
+        assert_eq!(e[[0, 1]], 10.0);
+        assert_eq!(e[[1, 0]], 19.0);
+        assert_eq!(e[[1, 1]], 28.0);
     }
 
     #[test]
@@ -358,9 +423,39 @@ mod tests {
 
         let e = d * a;
 
-        assert_eq!(e[[0,0]], 7);
-        assert_eq!(e[[0,1]], 10);
-        assert_eq!(e[[1,0]], 19);
-        assert_eq!(e[[1,1]], 28);
+        assert_eq!(e[[0, 0]], 7);
+        assert_eq!(e[[0, 1]], 10);
+        assert_eq!(e[[1, 0]], 19);
+        assert_eq!(e[[1, 1]], 28);
+    }
+
+    #[test]
+    fn paramul_n_large() {
+        let a = Matrix::new(1000, 20, vec![2.0; 20000]);
+        let b = Matrix::new(20, 20, vec![2.0; 400]);
+
+        let c = a.paramul(&b);
+
+        assert_eq!(c.into_vec(), vec![80.0; 20000]);
+    }
+
+    #[test]
+    fn paramul_k_large() {
+        let a = Matrix::new(20, 1000, vec![2.0; 20000]);
+        let b = Matrix::new(1000, 20, vec![2.0; 20000]);
+
+        let c = a.paramul(&b);
+
+        assert_eq!(c.into_vec(), vec![4000.0; 400]);
+    }
+
+    #[test]
+    fn paramul_m_large() {
+        let a = Matrix::new(20, 20, vec![2.0; 400]);
+        let b = Matrix::new(20, 1000, vec![2.0; 20000]);
+
+        let c = a.paramul(&b);
+
+        assert_eq!(c.into_vec(), vec![80.0; 20000]);
     }
 }
