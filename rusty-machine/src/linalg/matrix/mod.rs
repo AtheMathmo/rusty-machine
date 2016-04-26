@@ -1180,9 +1180,28 @@ impl<T: fmt::Display> fmt::Display for Matrix<T> {
 
 #[cfg(test)]
 mod tests {
+    use super::super::vector::Vector;
     use super::Matrix;
     use super::Axes;
     use super::slice::BaseSlice;
+    use libnum::abs;
+
+    #[test]
+    fn test_new_mat() {
+        let a = vec![2.0; 9];
+        let b = Matrix::new(3, 3, a);
+
+        assert_eq!(b.rows(), 3);
+        assert_eq!(b.cols(), 3);
+        assert_eq!(b.into_vec(), vec![2.0; 9]);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_new_mat_bad_data() {
+        let a = vec![2.0; 7];
+        let _ = Matrix::new(3, 3, a);
+    }
 
     #[test]
     fn test_equality() { // well, "PartialEq", at least
@@ -1334,5 +1353,127 @@ mod tests {
         let b = a.select(&[0,2], &[1]);
 
         assert_eq!(b.into_vec(), vec![1,5]);
+    }
+
+    #[test]
+    fn matrix_diag() {
+        let a = Matrix::new(3, 3, vec![1., 3., 5., 2., 4., 7., 1., 1., 0.]);
+
+        let b = a.is_diag();
+
+        assert!(!b);
+
+        let c = Matrix::new(3, 3, vec![1., 0., 0., 0., 2., 0., 0., 0., 3.]);
+        let d = c.is_diag();
+
+        assert!(d);
+    }
+
+    #[test]
+    fn matrix_det() {
+        let a = Matrix::new(2, 2, vec![2., 3., 1., 2.]);
+        let b = a.det();
+
+        assert_eq!(b, 1.);
+
+        let c = Matrix::new(3, 3, vec![1., 2., 3., 4., 5., 6., 7., 8., 9.]);
+        let d = c.det();
+
+        assert_eq!(d, 0.);
+
+        let e = Matrix::<f64>::new(5,
+                                   5,
+                                   vec![1., 2., 3., 4., 5., 3., 0., 4., 5., 6., 2., 1., 2., 3., 4.,
+                                        0., 0., 0., 6., 5., 0., 0., 0., 5., 6.]);
+
+        let f = e.det();
+
+        println!("det is {0}", f);
+        let error = abs(f - 99.);
+        assert!(error < 1e-10);
+    }
+
+    #[test]
+    fn matrix_solve() {
+        let a = Matrix::new(2, 2, vec![2., 3., 1., 2.]);
+
+        let y = Vector::new(vec![8., 5.]);
+
+        let x = a.solve(y);
+
+        assert_eq!(x.size(), 2);
+
+        assert_eq!(x[0], 1.);
+        assert_eq!(x[1], 2.);
+    }
+
+    #[test]
+    fn create_mat_zeros() {
+        let a = Matrix::<f32>::zeros(10, 10);
+
+        assert_eq!(a.rows(), 10);
+        assert_eq!(a.cols(), 10);
+
+        for i in 0..10 {
+            for j in 0..10 {
+                assert_eq!(a[[i, j]], 0.0);
+            }
+        }
+    }
+
+    #[test]
+    fn create_mat_identity() {
+        let a = Matrix::<f32>::identity(4);
+
+        assert_eq!(a.rows(), 4);
+        assert_eq!(a.cols(), 4);
+
+        assert_eq!(a[[0, 0]], 1.0);
+        assert_eq!(a[[1, 1]], 1.0);
+        assert_eq!(a[[2, 2]], 1.0);
+        assert_eq!(a[[3, 3]], 1.0);
+
+        assert_eq!(a[[0, 1]], 0.0);
+        assert_eq!(a[[2, 1]], 0.0);
+        assert_eq!(a[[3, 0]], 0.0);
+    }
+
+    #[test]
+    fn create_mat_diag() {
+        let a = Matrix::from_diag(&[1.0, 2.0, 3.0, 4.0]);
+
+        assert_eq!(a.rows(), 4);
+        assert_eq!(a.cols(), 4);
+
+        assert_eq!(a[[0, 0]], 1.0);
+        assert_eq!(a[[1, 1]], 2.0);
+        assert_eq!(a[[2, 2]], 3.0);
+        assert_eq!(a[[3, 3]], 4.0);
+
+        assert_eq!(a[[0, 1]], 0.0);
+        assert_eq!(a[[2, 1]], 0.0);
+        assert_eq!(a[[3, 0]], 0.0);
+    }
+
+    #[test]
+    fn transpose_mat() {
+        let a = Matrix::new(5, 2, vec![1., 2., 3., 4., 5., 6., 7., 8., 9., 10.]);
+
+        let c = a.transpose();
+
+        assert_eq!(c.cols(), a.rows());
+        assert_eq!(c.rows(), a.cols());
+
+        assert_eq!(a[[0, 0]], c[[0, 0]]);
+        assert_eq!(a[[1, 0]], c[[0, 1]]);
+        assert_eq!(a[[2, 0]], c[[0, 2]]);
+        assert_eq!(a[[3, 0]], c[[0, 3]]);
+        assert_eq!(a[[4, 0]], c[[0, 4]]);
+        assert_eq!(a[[0, 1]], c[[1, 0]]);
+        assert_eq!(a[[1, 1]], c[[1, 1]]);
+        assert_eq!(a[[2, 1]], c[[1, 2]]);
+        assert_eq!(a[[3, 1]], c[[1, 3]]);
+        assert_eq!(a[[4, 1]], c[[1, 4]]);
+
     }
 }
