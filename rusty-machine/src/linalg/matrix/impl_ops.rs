@@ -1187,7 +1187,7 @@ mod tests {
     #[test]
     fn matrix_sub_assign() {
         let mut a = Matrix::new(3, 3, (0..9).collect::<Vec<i32>>());
-        
+
         a -= &2;
         assert_eq!(a.into_vec(), (-2..7).collect::<Vec<_>>());
 
@@ -1255,7 +1255,8 @@ mod tests {
         assert_eq!(a.into_vec(), res_data.clone());
     }
 
-        #[test]
+    #[test]
+    #[allow(unused_assignments, unused_variables)]
     fn slice_add_assign() {
         let mut a = Matrix::new(3, 3, (0..9).collect::<Vec<i32>>());
         let mut a_slice = MatrixSliceMut::from_matrix(&mut a, [0,0], 3, 3);
@@ -1309,10 +1310,11 @@ mod tests {
     }
 
     #[test]
+    #[allow(unused_assignments, unused_variables)]
     fn slice_sub_assign() {
         let mut a = Matrix::new(3, 3, (0..9).collect::<Vec<i32>>());
         let mut a_slice = MatrixSliceMut::from_matrix(&mut a, [0,0], 3, 3);
-        
+
         a_slice -= &2;
         assert_eq!(a.into_vec(), (-2..7).collect::<Vec<_>>());
 
@@ -1360,6 +1362,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(unused_assignments, unused_variables)]
     fn slice_div_assign() {
         let a_data = vec![1f32, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
         let res_data = vec![0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5];
@@ -1377,6 +1380,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(unused_assignments, unused_variables)]
     fn slice_mul_assign() {
         let a_data = vec![1f32, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
         let res_data = vec![2f32, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0];
