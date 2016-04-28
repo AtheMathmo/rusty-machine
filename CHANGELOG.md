@@ -2,6 +2,23 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.2.8
+
+### Breaking Changes
+
+- The `new` constructors for `Matrix` and `Vector` now take an `Into<Vec>` generic type. May break some type inference.
+
+### Features
+
+- Added row iterators for each matrix struct.
+- Implemented OpAssign overloading for `Matrix` and `MatrixSliceMut`.
+
+### Minor Changes
+
+- Moved unit tests into respective modules.
+- Modified slice iterators to make the `offset` usage safe(er).
+- Removed some compiler warnings from the tests.
+
 ## 0.2.7
 
 ### Breaking Changes
