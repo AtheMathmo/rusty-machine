@@ -8,7 +8,7 @@
 //! use rusty_machine::linalg::matrix::MatrixSlice;
 //!
 //! let a = Matrix::new(3,3, (0..9).collect::<Vec<usize>>());
-//! 
+//!
 //! // Manually create our slice - [[4,5],[7,8]].
 //! let mat_slice = MatrixSlice::from_matrix(&a, [1,1], 2, 2);
 //!
@@ -413,7 +413,7 @@ mod tests {
 
     #[test]
     fn reslice() {
-        let mut a = Matrix::new(4,4, (0..16).collect());
+        let mut a = Matrix::new(4,4, (0..16).collect::<Vec<_>>());
         let b = MatrixSlice::from_matrix(&a, [1,1], 3, 3);
         {
             let c = b.reslice([0,1], 2, 2);
