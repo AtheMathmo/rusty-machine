@@ -15,5 +15,5 @@ fn test_default_gp() {
 
 	let test_inputs = Matrix::new(5,1,vec![2.3,4.4,5.1,6.2,7.1]);
 
-	let outputs = gp.predict(&test_inputs);
+	let _outputs = gp.predict(&test_inputs);
 }

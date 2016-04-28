@@ -3,7 +3,6 @@ extern crate num as libnum;
 
 pub mod linalg {
     mod mat;
-    mod vector;
 }
 
 pub mod learning {

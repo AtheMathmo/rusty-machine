@@ -8,7 +8,7 @@
 //! use rusty_machine::linalg::matrix::MatrixSlice;
 //!
 //! let a = Matrix::new(3,3, (0..9).collect::<Vec<usize>>());
-//! 
+//!
 //! // Manually create our slice - [[4,5],[7,8]].
 //! let mat_slice = MatrixSlice::from_matrix(&a, [1,1], 2, 2);
 //!
@@ -168,7 +168,7 @@ impl<T> MatrixSlice<T> {
             col_pos: 0,
             slice_rows: self.rows,
             slice_cols: self.cols,
-            row_diff: self.row_stride as isize - self.cols as isize + 1,
+            row_stride: self.row_stride,
             _marker: PhantomData::<&T>,
         }
     }
@@ -267,14 +267,13 @@ impl<T> MatrixSliceMut<T> {
     /// assert_eq!(slice_data, vec![4,5,7,8]);
     /// ```
     pub fn iter(&self) -> SliceIter<T> {
-        let row_diff = self.row_stride as isize - self.cols as isize + 1;
         SliceIter {
             slice_start: self.ptr as *const T,
             row_pos: 0,
             col_pos: 0,
             slice_rows: self.rows,
             slice_cols: self.cols,
-            row_diff: row_diff,
+            row_stride: self.row_stride,
             _marker: PhantomData::<&T>,
         }
     }
@@ -301,14 +300,13 @@ impl<T> MatrixSliceMut<T> {
     /// assert_eq!(a.into_vec(), vec![0,1,2,3,6,7,6,9,10]);
     /// ```
     pub fn iter_mut(&mut self) -> SliceIterMut<T> {
-        let row_diff = self.row_stride as isize - self.cols as isize + 1;
         SliceIterMut {
             slice_start: self.ptr,
             row_pos: 0,
             col_pos: 0,
             slice_rows: self.rows,
             slice_cols: self.cols,
-            row_diff: row_diff,
+            row_stride: self.row_stride,
             _marker: PhantomData::<&mut T>,
         }
     }
@@ -338,35 +336,8 @@ pub struct SliceIter<'a, T: 'a> {
     col_pos: usize,
     slice_rows: usize,
     slice_cols: usize,
-    row_diff: isize,
+    row_stride: usize,
     _marker: PhantomData<&'a T>,
-}
-
-/// Iterates over the matrix slice data in row-major order.
-impl<'a, T> Iterator for SliceIter<'a, T> {
-    type Item = &'a T;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        // Set the position of the next element
-        if self.row_pos < self.slice_rows {
-            unsafe {
-                let ret_ptr = self.slice_start;
-                // If end of row, set to start of next row
-                if self.col_pos == self.slice_cols - 1 {
-                    self.row_pos += 1usize;
-                    self.col_pos = 0usize;
-                    self.slice_start = self.slice_start.offset(self.row_diff);
-                } else {
-                    self.col_pos += 1usize;
-                    self.slice_start = self.slice_start.offset(1);
-                }
-
-                Some(mem::transmute(ret_ptr))
-            }
-        } else {
-            None
-        }
-    }
 }
 
 /// Iterator for MatrixSliceMut.
@@ -380,36 +351,42 @@ pub struct SliceIterMut<'a, T: 'a> {
     col_pos: usize,
     slice_rows: usize,
     slice_cols: usize,
-    row_diff: isize,
+    row_stride: usize,
     _marker: PhantomData<&'a mut T>,
 }
 
-
+macro_rules! impl_slice_iter (
+    ($slice_iter:ident, $data_type:ty) => (
 /// Iterates over the matrix slice data in row-major order.
-impl<'a, T> Iterator for SliceIterMut<'a, T> {
-    type Item = &'a mut T;
+impl<'a, T> Iterator for $slice_iter<'a, T> {
+    type Item = $data_type;
 
     fn next(&mut self) -> Option<Self::Item> {
         // Set the position of the next element
         if self.row_pos < self.slice_rows {
             unsafe {
-                let ret_ptr = self.slice_start;
+                let iter_ptr = self.slice_start.offset((self.row_pos * self.row_stride + self.col_pos) as isize);
+                
                 // If end of row, set to start of next row
                 if self.col_pos == self.slice_cols - 1 {
                     self.row_pos += 1usize;
                     self.col_pos = 0usize;
-                    self.slice_start = self.slice_start.offset(self.row_diff);
                 } else {
                     self.col_pos += 1usize;
-                    self.slice_start = self.slice_start.offset(1);
                 }
-                Some(mem::transmute(ret_ptr))
+
+                Some(mem::transmute(iter_ptr))
             }
         } else {
             None
         }
     }
-}
+}        
+    );
+);
+
+impl_slice_iter!(SliceIter, &'a T);
+impl_slice_iter!(SliceIterMut, &'a mut T);
 
 #[cfg(test)]
 mod tests {
@@ -436,7 +413,7 @@ mod tests {
 
     #[test]
     fn reslice() {
-        let mut a = Matrix::new(4,4, (0..16).collect());
+        let mut a = Matrix::new(4,4, (0..16).collect::<Vec<_>>());
         let b = MatrixSlice::from_matrix(&a, [1,1], 3, 3);
         {
             let c = b.reslice([0,1], 2, 2);
