@@ -11,7 +11,6 @@
 
     <link rel="stylesheet" type="text/css" href="../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../main.css">
-    
 
     
     
@@ -44,10 +43,10 @@
 
     <section id='main' class="content fn">
 <h1 class='fqn'><span class='in-band'>Function <a href='index.html'>matrixmultiply</a>::<wbr><a class='fn' href=''>sgemm</a></span><span class='out-of-band'><span id='render-detail'>
-                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                       [<span class='inner'>&#x2212;</span>]
-                   </a>
-               </span><a id='src-83' class='srclink' href='../src/matrixmultiply/gemm.rs.html#37-52' title='goto source code'>[src]</a></span></h1>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-83' class='srclink' href='../src/matrixmultiply/gemm.rs.html#37-52' title='goto source code'>[src]</a></span></h1>
 <pre class='rust fn'>pub unsafe fn sgemm(m: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, k: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, n: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, alpha: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f32.html'>f32</a>, a: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const </a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f32.html'>f32</a>, rsa: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a>, csa: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a>, b: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const </a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f32.html'>f32</a>, rsb: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a>, csb: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a>, beta: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f32.html'>f32</a>, c: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*mut </a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f32.html'>f32</a>, rsc: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a>, csc: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a>)</pre><div class='docblock'><p>General matrix multiplication (f32)</p>
 
 <p>C ← α A B + β C</p>

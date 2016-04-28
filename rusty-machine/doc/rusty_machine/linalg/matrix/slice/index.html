@@ -11,7 +11,6 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
-    
 
     
     
@@ -44,10 +43,10 @@
 
     <section id='main' class="content mod">
 <h1 class='fqn'><span class='in-band'>Module <a href='../../../index.html'>rusty_machine</a>::<wbr><a href='../../index.html'>linalg</a>::<wbr><a href='../index.html'>matrix</a>::<wbr><a class='mod' href=''>slice</a></span><span class='out-of-band'><span id='render-detail'>
-                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                       [<span class='inner'>&#x2212;</span>]
-                   </a>
-               </span><a id='src-1958' class='srclink' href='../../../../src/rusty_machine/src/linalg/matrix/slice.rs.html#1-480' title='goto source code'>[src]</a></span></h1>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-2506' class='srclink' href='../../../../src/rusty_machine/src/linalg/matrix/slice.rs.html#1-457' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Slices for the <code>Matrix</code> struct.</p>
 
 <p>These slices provide a view into the matrix data.
@@ -58,7 +57,7 @@ The view must be a contiguous block of the matrix.</p>
 <span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>linalg</span>::<span class='ident'>matrix</span>::<span class='ident'>MatrixSlice</span>;
 
 <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>,<span class='number'>3</span>, (<span class='number'>0</span>..<span class='number'>9</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>());
- 
+
 <span class='comment'>// Manually create our slice - [[4,5],[7,8]].</span>
 <span class='kw'>let</span> <span class='ident'>mat_slice</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>, [<span class='number'>1</span>,<span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
 
@@ -66,28 +65,31 @@ The view must be a contiguous block of the matrix.</p>
 <span class='kw'>let</span> <span class='ident'>new_mat</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>mat_slice</span> <span class='op'>*</span> <span class='kw-2'>&amp;</span><span class='ident'>mat_slice</span>;</pre>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
-                       <tr class=' module-item'>
-                           <td><a class='struct' href='struct.SliceIter.html'
-                                  title='rusty_machine::linalg::matrix::slice::SliceIter'>SliceIter</a></td>
-                           <td class='docblock short'>
-                                <p>Iterator for the MatrixSlice</p>
-                           </td>
-                       </tr>
-                       <tr class=' module-item'>
-                           <td><a class='struct' href='struct.SliceIterMut.html'
-                                  title='rusty_machine::linalg::matrix::slice::SliceIterMut'>SliceIterMut</a></td>
-                           <td class='docblock short'>
-                                <p>Iterator for MatrixSliceMut.</p>
-                           </td>
-                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.SliceIter.html'
+                               title='rusty_machine::linalg::matrix::slice::SliceIter'>SliceIter</a></td>
+                        <td class='docblock short'>
+                             <p>Iterator for the MatrixSlice</p>
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.SliceIterMut.html'
+                               title='rusty_machine::linalg::matrix::slice::SliceIterMut'>SliceIterMut</a></td>
+                        <td class='docblock short'>
+                             <p>Iterator for MatrixSliceMut.</p>
+                        </td>
+                    </tr>
+                </table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
 <table>
-                       <tr class=' module-item'>
-                           <td><a class='trait' href='trait.BaseSlice.html'
-                                  title='rusty_machine::linalg::matrix::slice::BaseSlice'>BaseSlice</a></td>
-                           <td class='docblock short'>
-                                <p>Trait for Matrix Slices.</p>
-                           </td>
-                       </tr></table></section>
+                    <tr class=' module-item'>
+                        <td><a class='trait' href='trait.BaseSlice.html'
+                               title='rusty_machine::linalg::matrix::slice::BaseSlice'>BaseSlice</a></td>
+                        <td class='docblock short'>
+                             <p>Trait for Matrix Slices.</p>
+                        </td>
+                    </tr>
+                </table></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

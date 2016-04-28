@@ -4,14 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/james/.multirust/toolchains/nightly/cargo/registry/src/github.com-88ac128001ac3a9a/num-0.1.31/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/james/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/num-0.1.32/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
 
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
-    
 
     <link rel="shortcut icon" href="http://rust-num.github.io/num/favicon.ico">
     
@@ -247,14 +246,6 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
 </pre><pre class='rust '>
 <span class='comment'>// Copyright 2014-2016 The Rust Project Developers. See the COPYRIGHT</span>
 <span class='comment'>// file at the top-level directory of this distribution and at</span>
@@ -315,41 +306,41 @@
        <span class='ident'>html_root_url</span> <span class='op'>=</span> <span class='string'>&quot;http://rust-num.github.io/num/&quot;</span>,
        <span class='ident'>html_playground_url</span> <span class='op'>=</span> <span class='string'>&quot;http://play.rust-lang.org/&quot;</span>)]</span>
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rustc-serialize&quot;</span>)]</span>
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rustc_serialize</span>;
+<span class='kw'>pub</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>num_traits</span>;
+<span class='kw'>pub</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>num_integer</span>;
+<span class='kw'>pub</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>num_iter</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;num-complex&quot;</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>num_complex</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;num-bigint&quot;</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>num_bigint</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;num-rational&quot;</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>num_rational</span>;
 
-<span class='comment'>// Some of the tests of non-RNG-based functionality are randomized using the</span>
-<span class='comment'>// RNG-based functionality, so the RNG-based functionality needs to be enabled</span>
-<span class='comment'>// for tests.</span>
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>any</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rand&quot;</span>, <span class='ident'>all</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;bigint&quot;</span>, <span class='ident'>test</span>)))]</span>
-<span class='kw'>extern</span> <span class='kw'>crate</span> <span class='ident'>rand</span>;
-
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;bigint&quot;</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>bigint</span>::{<span class='ident'>BigInt</span>, <span class='ident'>BigUint</span>};
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rational&quot;</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>rational</span>::<span class='ident'>Rational</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rational&quot;</span>, <span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;bigint&quot;</span>))]</span>
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>rational</span>::<span class='ident'>BigRational</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;complex&quot;</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>complex</span>::<span class='ident'>Complex</span>;
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>integer</span>::<span class='ident'>Integer</span>;
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>iter</span>::{<span class='ident'>range</span>, <span class='ident'>range_inclusive</span>, <span class='ident'>range_step</span>, <span class='ident'>range_step_inclusive</span>};
-<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>traits</span>::{<span class='ident'>Num</span>, <span class='ident'>Zero</span>, <span class='ident'>One</span>, <span class='ident'>Signed</span>, <span class='ident'>Unsigned</span>, <span class='ident'>Bounded</span>,
-                 <span class='ident'>Saturating</span>, <span class='ident'>CheckedAdd</span>, <span class='ident'>CheckedSub</span>, <span class='ident'>CheckedMul</span>, <span class='ident'>CheckedDiv</span>,
-                 <span class='ident'>PrimInt</span>, <span class='ident'>Float</span>, <span class='ident'>ToPrimitive</span>, <span class='ident'>FromPrimitive</span>, <span class='ident'>NumCast</span>, <span class='ident'>cast</span>};
-
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span> <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>hash</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;num-bigint&quot;</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>num_bigint</span>::{<span class='ident'>BigInt</span>, <span class='ident'>BigUint</span>};
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;num-rational&quot;</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>num_rational</span>::<span class='ident'>Rational</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>all</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;num-rational&quot;</span>, <span class='ident'>feature</span><span class='op'>=</span><span class='string'>&quot;num-bigint&quot;</span>))]</span>
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>num_rational</span>::<span class='ident'>BigRational</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;num-complex&quot;</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>num_complex</span>::<span class='ident'>Complex</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>num_integer</span>::<span class='ident'>Integer</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>num_iter</span>::{<span class='ident'>range</span>, <span class='ident'>range_inclusive</span>, <span class='ident'>range_step</span>, <span class='ident'>range_step_inclusive</span>};
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>num_traits</span>::{<span class='ident'>Num</span>, <span class='ident'>Zero</span>, <span class='ident'>One</span>, <span class='ident'>Signed</span>, <span class='ident'>Unsigned</span>, <span class='ident'>Bounded</span>,
+                     <span class='ident'>Saturating</span>, <span class='ident'>CheckedAdd</span>, <span class='ident'>CheckedSub</span>, <span class='ident'>CheckedMul</span>, <span class='ident'>CheckedDiv</span>,
+                     <span class='ident'>PrimInt</span>, <span class='ident'>Float</span>, <span class='ident'>ToPrimitive</span>, <span class='ident'>FromPrimitive</span>, <span class='ident'>NumCast</span>, <span class='ident'>cast</span>};
 
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>ops</span>::{<span class='ident'>Mul</span>};
 
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;bigint&quot;</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>bigint</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>complex</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>integer</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>iter</span>;
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>traits</span>;
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;rational&quot;</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>rational</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;num-bigint&quot;</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>num_bigint</span> <span class='kw'>as</span> <span class='ident'>bigint</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;num-complex&quot;</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>num_complex</span> <span class='kw'>as</span> <span class='ident'>complex</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>num_integer</span> <span class='kw'>as</span> <span class='ident'>integer</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>num_iter</span> <span class='kw'>as</span> <span class='ident'>iter</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>num_traits</span> <span class='kw'>as</span> <span class='ident'>traits</span>;
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;num-rational&quot;</span>)]</span>
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='ident'>num_rational</span> <span class='kw'>as</span> <span class='ident'>rational</span>;
 
 <span class='doccomment'>/// Returns the additive identity, `0`.</span>
 <span class='attribute'>#[<span class='ident'>inline</span>(<span class='ident'>always</span>)]</span> <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>zero</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Zero</span><span class='op'>&gt;</span>() <span class='op'>-&gt;</span> <span class='ident'>T</span> { <span class='ident'>Zero</span>::<span class='ident'>zero</span>() }
@@ -460,14 +451,6 @@
         }
     }
     <span class='prelude-val'>Some</span>(<span class='ident'>acc</span>)
-}
-
-<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
-<span class='kw'>fn</span> <span class='ident'>hash</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>hash</span>::<span class='ident'>Hash</span><span class='op'>&gt;</span>(<span class='ident'>x</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='ident'>u64</span> {
-    <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>hash</span>::<span class='ident'>Hasher</span>;
-    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>hasher</span> <span class='op'>=</span> <span class='ident'>hash</span>::<span class='ident'>SipHasher</span>::<span class='ident'>new</span>();
-    <span class='ident'>x</span>.<span class='ident'>hash</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>hasher</span>);
-    <span class='ident'>hasher</span>.<span class='ident'>finish</span>()
 }
 </pre>
 </section>

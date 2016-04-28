@@ -11,7 +11,6 @@
 
     <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../main.css">
-    
 
     <link rel="shortcut icon" href="http://rust-num.github.io/num/favicon.ico">
     
@@ -44,11 +43,11 @@
 
     <section id='main' class="content trait">
 <h1 class='fqn'><span class='in-band'>Trait <a href='../index.html'>num</a>::<wbr><a href='index.html'>integer</a>::<wbr><a class='trait' href=''>Integer</a></span><span class='out-of-band'><span id='render-detail'>
-                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                       [<span class='inner'>&#x2212;</span>]
-                   </a>
-               </span><a id='src-1569' class='srclink' href='../../src/num/integer.rs.html#15-160' title='goto source code'>[src]</a></span></h1>
-<pre class='rust trait'>pub trait Integer: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html' title='core::marker::Sized'>Sized</a> + <a class='trait' href='../../num/traits/trait.Num.html' title='num::traits::Num'>Num</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html' title='core::cmp::PartialOrd'>PartialOrd</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.Ord.html' title='core::cmp::Ord'>Ord</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> {
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-6' class='srclink' href='../../num_integer/trait.Integer.html?gotosrc=6' title='goto source code'>[src]</a></span></h1>
+<pre class='rust trait'>pub trait Integer: <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.Ord.html' title='core::cmp::Ord'>Ord</a> + <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialOrd.html' title='core::cmp::PartialOrd'>PartialOrd</a>&lt;Self&gt; + <a class='trait' href='../../num/traits/trait.Num.html' title='num::traits::Num'>Num</a> {
     fn <a href='#tymethod.div_floor' class='fnname'>div_floor</a>(&amp;self, other: &amp;Self) -&gt; Self;
     fn <a href='#tymethod.mod_floor' class='fnname'>mod_floor</a>(&amp;self, other: &amp;Self) -&gt; Self;
     fn <a href='#tymethod.gcd' class='fnname'>gcd</a>(&amp;self, other: &amp;Self) -&gt; Self;
@@ -68,7 +67,7 @@
 <h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
 <span class='rusttest'>extern crate num;
 fn main() {
-    use num::Integer;
+    use num_integer::Integer;
     assert!(( 8).div_floor(&amp; 3) ==  2);
     assert!(( 8).div_floor(&amp;-3) == -3);
     assert!((-8).div_floor(&amp; 3) == -3);
@@ -92,7 +91,7 @@ fn main() {
 
 <span class='rusttest'>extern crate num;
 fn main() {
-    use num::Integer;
+    use num_integer::Integer;
     let n = 1; let d = 1;
     assert!(n.div_floor(&amp;d) * d + n.mod_floor(&amp;d) == n)
 }</span><pre class='rust rust-example-rendered'>
@@ -101,7 +100,7 @@ fn main() {
 <h1 id='examples-1' class='section-header'><a href='#examples-1'>Examples</a></h1>
 <span class='rusttest'>extern crate num;
 fn main() {
-    use num::Integer;
+    use num_integer::Integer;
     assert!(( 8).mod_floor(&amp; 3) ==  2);
     assert!(( 8).mod_floor(&amp;-3) == -1);
     assert!((-8).mod_floor(&amp; 3) ==  1);
@@ -126,7 +125,7 @@ fn main() {
 <h1 id='examples-2' class='section-header'><a href='#examples-2'>Examples</a></h1>
 <span class='rusttest'>extern crate num;
 fn main() {
-    use num::Integer;
+    use num_integer::Integer;
     assert_eq!(6.gcd(&amp;8), 2);
     assert_eq!(7.gcd(&amp;3), 1);
 }</span><pre class='rust rust-example-rendered'>
@@ -137,7 +136,7 @@ fn main() {
 <h1 id='examples-3' class='section-header'><a href='#examples-3'>Examples</a></h1>
 <span class='rusttest'>extern crate num;
 fn main() {
-    use num::Integer;
+    use num_integer::Integer;
     assert_eq!(7.lcm(&amp;3), 21);
     assert_eq!(2.lcm(&amp;4), 4);
 }</span><pre class='rust rust-example-rendered'>
@@ -149,7 +148,7 @@ fn main() {
 <h1 id='examples-4' class='section-header'><a href='#examples-4'>Examples</a></h1>
 <span class='rusttest'>extern crate num;
 fn main() {
-    use num::Integer;
+    use num_integer::Integer;
     assert_eq!(9.is_multiple_of(&amp;3), true);
     assert_eq!(3.is_multiple_of(&amp;9), false);
 }</span><pre class='rust rust-example-rendered'>
@@ -160,7 +159,7 @@ fn main() {
 <h1 id='examples-5' class='section-header'><a href='#examples-5'>Examples</a></h1>
 <span class='rusttest'>extern crate num;
 fn main() {
-    use num::Integer;
+    use num_integer::Integer;
     assert_eq!(3.is_even(), false);
     assert_eq!(4.is_even(), true);
 }</span><pre class='rust rust-example-rendered'>
@@ -171,7 +170,7 @@ fn main() {
 <h1 id='examples-6' class='section-header'><a href='#examples-6'>Examples</a></h1>
 <span class='rusttest'>extern crate num;
 fn main() {
-    use num::Integer;
+    use num_integer::Integer;
     assert_eq!(3.is_odd(), true);
     assert_eq!(4.is_odd(), false);
 }</span><pre class='rust rust-example-rendered'>
@@ -183,7 +182,7 @@ Returns <code>(quotient, remainder)</code>.</p>
 <h1 id='examples-7' class='section-header'><a href='#examples-7'>Examples</a></h1>
 <span class='rusttest'>extern crate num;
 fn main() {
-    use num::Integer;
+    use num_integer::Integer;
     assert_eq!(( 8).div_rem( &amp;3), ( 2,  2));
     assert_eq!(( 8).div_rem(&amp;-3), (-2,  2));
     assert_eq!((-8).div_rem( &amp;3), (-2, -2));
@@ -212,7 +211,7 @@ Returns <code>(quotient, remainder)</code>.</p>
 <h1 id='examples-8' class='section-header'><a href='#examples-8'>Examples</a></h1>
 <span class='rusttest'>extern crate num;
 fn main() {
-    use num::Integer;
+    use num_integer::Integer;
     assert_eq!(( 8).div_mod_floor( &amp;3), ( 2,  2));
     assert_eq!(( 8).div_mod_floor(&amp;-3), (-3, -1));
     assert_eq!((-8).div_mod_floor( &amp;3), (-3,  1));
@@ -235,19 +234,9 @@ fn main() {
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
-    <li><code>impl <a class='trait' href='../../num/integer/trait.Integer.html' title='num::integer::Integer'>Integer</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i8.html'>i8</a></code></li>
-<li><code>impl <a class='trait' href='../../num/integer/trait.Integer.html' title='num::integer::Integer'>Integer</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a></code></li>
-<li><code>impl <a class='trait' href='../../num/integer/trait.Integer.html' title='num::integer::Integer'>Integer</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code></li>
-<li><code>impl <a class='trait' href='../../num/integer/trait.Integer.html' title='num::integer::Integer'>Integer</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i64.html'>i64</a></code></li>
-<li><code>impl <a class='trait' href='../../num/integer/trait.Integer.html' title='num::integer::Integer'>Integer</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.isize.html'>isize</a></code></li>
-<li><code>impl <a class='trait' href='../../num/integer/trait.Integer.html' title='num::integer::Integer'>Integer</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u8.html'>u8</a></code></li>
-<li><code>impl <a class='trait' href='../../num/integer/trait.Integer.html' title='num::integer::Integer'>Integer</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u16.html'>u16</a></code></li>
-<li><code>impl <a class='trait' href='../../num/integer/trait.Integer.html' title='num::integer::Integer'>Integer</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u32.html'>u32</a></code></li>
-<li><code>impl <a class='trait' href='../../num/integer/trait.Integer.html' title='num::integer::Integer'>Integer</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.u64.html'>u64</a></code></li>
-<li><code>impl <a class='trait' href='../../num/integer/trait.Integer.html' title='num::integer::Integer'>Integer</a> for <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></li>
-</ul><script type="text/javascript" async
-                         src="../../implementors/num/integer/trait.Integer.js">
-                 </script></section>
+    </ul><script type="text/javascript" async
+                              src="../../implementors/num_integer/trait.Integer.js">
+                      </script></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

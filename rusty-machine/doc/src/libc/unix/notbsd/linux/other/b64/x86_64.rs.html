@@ -4,14 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/home/james/.multirust/toolchains/nightly/cargo/registry/src/github.com-88ac128001ac3a9a/libc-0.2.8/src/unix/notbsd/linux/other/b64/x86_64.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/james/.multirust/toolchains/stable/cargo/registry/src/github.com-88ac128001ac3a9a/libc-0.2.10/src/unix/notbsd/linux/other/b64/x86_64.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>x86_64.rs.html -- source</title>
 
     <link rel="stylesheet" type="text/css" href="../../../../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../../../../main.css">
-    
 
     <link rel="shortcut icon" href="https://doc.rust-lang.org/favicon.ico">
     
@@ -150,6 +149,7 @@
 <span id="106">106</span>
 <span id="107">107</span>
 <span id="108">108</span>
+<span id="109">109</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! x86_64-specific definitions for 64-bit linux-like values</span>
 
@@ -249,6 +249,7 @@
 <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>PTRACE_SETREGS</span>: ::<span class='ident'>c_uint</span> <span class='op'>=</span> <span class='number'>13</span>;
 
 <span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>SYS_gettid</span>: ::<span class='ident'>c_long</span> <span class='op'>=</span> <span class='number'>186</span>;
+<span class='kw'>pub</span> <span class='kw'>const</span> <span class='ident'>SYS_perf_event_open</span>: ::<span class='ident'>c_long</span> <span class='op'>=</span> <span class='number'>298</span>;
 
 <span class='kw'>extern</span> {
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>getcontext</span>(<span class='ident'>ucp</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>ucontext_t</span>) <span class='op'>-&gt;</span> ::<span class='ident'>c_int</span>;
