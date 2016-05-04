@@ -501,9 +501,40 @@ impl<T: Copy> Matrix<T> {
 
         self
     }
+
+    /// Tranposes the given matrix
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let mat = Matrix::new(2,3, vec![1.0,2.0,3.0,4.0,5.0,6.0]);
+    ///
+    /// let mt = mat.transpose();
+    /// ```
+    pub fn transpose(&self) -> Matrix<T> {
+        let mut new_data = Vec::with_capacity(self.rows * self.cols);
+
+        unsafe {
+            new_data.set_len(self.rows * self.cols);
+        }
+
+        for i in 0..self.cols {
+            for j in 0..self.rows {
+                new_data[i * self.rows + j] = self.data[j * self.cols + i];
+            }
+        }
+
+        Matrix {
+            cols: self.rows,
+            rows: self.cols,
+            data: new_data,
+        }
+    }
 }
 
-impl<T: Zero + One + Copy> Matrix<T> {
+impl<T: Clone + Zero> Matrix<T> {
     /// Constructs matrix of all zeros.
     ///
     /// Requires both the row and the column dimensions.
@@ -523,6 +554,34 @@ impl<T: Zero + One + Copy> Matrix<T> {
         }
     }
 
+    /// Constructs matrix with given diagonal.
+    ///
+    /// Requires slice of diagonal elements.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let mat = Matrix::from_diag(&vec![1.0,2.0,3.0,4.0]);
+    /// ```
+    pub fn from_diag(diag: &[T]) -> Matrix<T> {
+        let size = diag.len();
+        let mut data = vec![T::zero(); size * size];
+
+        for (i, item) in diag.into_iter().enumerate().take(size) {
+            data[i * (size + 1)] = item.clone();
+        }
+
+        Matrix {
+            cols: size,
+            rows: size,
+            data: data,
+        }
+    }
+}
+
+ impl<T: Clone + One> Matrix<T> {
     /// Constructs matrix of all ones.
     ///
     /// Requires both the row and the column dimensions.
@@ -541,7 +600,9 @@ impl<T: Zero + One + Copy> Matrix<T> {
             data: vec![T::one(); cols*rows],
         }
     }
+}
 
+impl<T: Clone + Zero + One> Matrix<T> {
     /// Constructs the identity matrix.
     ///
     /// Requires the size of the matrix.
@@ -564,58 +625,6 @@ impl<T: Zero + One + Copy> Matrix<T> {
             cols: size,
             rows: size,
             data: data,
-        }
-    }
-
-    /// Constructs matrix with given diagonal.
-    ///
-    /// Requires slice of diagonal elements.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    ///
-    /// let mat = Matrix::from_diag(&vec![1.0,2.0,3.0,4.0]);
-    /// ```
-    pub fn from_diag(diag: &[T]) -> Matrix<T> {
-        let size = diag.len();
-        let mut data = vec![T::zero(); size * size];
-
-        for (i, item) in diag.into_iter().enumerate().take(size) {
-            data[i * (size + 1)] = *item;
-        }
-
-        Matrix {
-            cols: size,
-            rows: size,
-            data: data,
-        }
-    }
-
-    /// Tranposes the given matrix
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    ///
-    /// let mat = Matrix::new(2,3, vec![1.0,2.0,3.0,4.0,5.0,6.0]);
-    ///
-    /// let mt = mat.transpose();
-    /// ```
-    pub fn transpose(&self) -> Matrix<T> {
-        let mut new_data = vec![T::zero(); self.cols * self.rows];
-        for i in 0..self.cols {
-            for j in 0..self.rows {
-                new_data[i * self.rows + j] = self.data[j * self.cols + i];
-            }
-        }
-
-        Matrix {
-            cols: self.rows,
-            rows: self.cols,
-            data: new_data,
         }
     }
 }
@@ -653,7 +662,7 @@ impl<T: Copy + Zero + One + PartialEq> Matrix<T> {
     }
 }
 
-impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
+impl<T: Copy + Zero + Add<T, Output = T>> Matrix<T> {
     /// The sum of the rows of the matrix.
     ///
     /// Returns a Vector equal to the sum of the matrices rows.
@@ -698,8 +707,8 @@ impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
     pub fn sum_cols(&self) -> Vector<T> {
         let mut col_sum = Vec::with_capacity(self.rows);
 
-        for i in 0..self.rows {
-            col_sum.push(utils::unrolled_sum(&self.data[i * self.cols..(i + 1) * self.cols]));
+        for row in self.iter_rows() {
+            col_sum.push(utils::unrolled_sum(row));
         }
         Vector::new(col_sum)
     }
@@ -721,7 +730,7 @@ impl<T: Copy + Zero + One + Add<T, Output = T>> Matrix<T> {
     }
 }
 
-impl<T: Copy + Zero + Mul<T, Output = T>> Matrix<T> {
+impl<T: Copy + Mul<T, Output = T>> Matrix<T> {
     /// The elementwise product of two matrices.
     ///
     /// # Examples
@@ -748,7 +757,7 @@ impl<T: Copy + Zero + Mul<T, Output = T>> Matrix<T> {
     }
 }
 
-impl<T: Copy + Zero + Div<T, Output = T>> Matrix<T> {
+impl<T: Copy + Div<T, Output = T>> Matrix<T> {
     /// The elementwise division of two matrices.
     ///
     /// # Examples
@@ -775,7 +784,7 @@ impl<T: Copy + Zero + Div<T, Output = T>> Matrix<T> {
     }
 }
 
-impl<T: Copy + Zero + Float + FromPrimitive> Matrix<T> {
+impl<T: Float + FromPrimitive> Matrix<T> {
     /// The mean of the matrix along the specified axis.
     ///
     /// Axis 0 - Arithmetic mean of rows.
