@@ -162,6 +162,12 @@ impl<T: Distribution> NaiveBayes<T> {
 
         if let Some(ref mut distr) = self.distr {
             for (idx, c) in class_data.into_iter().enumerate() {
+                //If this class' vector has not been populated, we can safely
+                //skip this iteration, since the user is clearly not interested
+                //in associating features with this class
+                if 0 == c.len() {
+                    continue;
+                }
                 // Update the parameters within this class
                 distr.update_params(inputs.select_rows(&c), idx);
             }
