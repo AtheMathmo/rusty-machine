@@ -116,6 +116,38 @@ impl<T> MatrixSlice<T> {
         }
     }
 
+    /// Creates a matrix slice from raw parts.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::MatrixSlice;
+    ///
+    /// let mut a = vec![4.0; 16];
+    ///
+    /// unsafe {
+    ///     // Create a matrix slice with 3 rows, and 3 cols
+    ///     // The row stride of 4 specifies the distance between the start of each row in the data.
+    ///     let b = MatrixSlice::from_raw_parts(a.as_ptr(), 3, 3, 4);
+    /// }
+    /// ```
+    ///
+    /// # Safety
+    ///
+    /// The pointer must be followed by a contiguous slice of data larger than `row_stride * rows`. If not then
+    /// other operations will produce undefined behaviour.
+    ///
+    /// Additionally `cols` should be less than the `row_stride`. It is possible to use this function safely 
+    /// whilst violating this condition. So long as `max(cols, row_stride) * rows` is less than the data size.
+    pub unsafe fn from_raw_parts(ptr: *const T, rows: usize, cols: usize, row_stride: usize) -> MatrixSlice<T> {
+        MatrixSlice {
+            ptr: ptr,
+            rows: rows,
+            cols: cols,
+            row_stride: row_stride,
+        }
+    }
+
     /// Produce a matrix slice from an existing matrix slice.
     ///
     /// # Examples
@@ -218,6 +250,38 @@ impl<T> MatrixSliceMut<T> {
                 cols: cols,
                 row_stride: mat_cols,
             }
+        }
+    }
+
+    /// Creates a mutable matrix slice from raw parts.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::MatrixSliceMut;
+    ///
+    /// let mut a = vec![4.0; 16];
+    ///
+    /// unsafe {
+    ///     // Create a mutable matrix slice with 3 rows, and 3 cols
+    ///     // The row stride of 4 specifies the distance between the start of each row in the data.
+    ///     let b = MatrixSliceMut::from_raw_parts(a.as_mut_ptr(), 3, 3, 4);
+    /// }
+    /// ```
+    ///
+    /// # Safety
+    ///
+    /// The pointer must be followed by a contiguous slice of data larger than `row_stride * rows`. If not then
+    /// other operations will produce undefined behaviour.
+    ///
+    /// Additionally `cols` should be less than the `row_stride`. It is possible to use this function safely 
+    /// whilst violating this condition. So long as `max(cols, row_stride) * rows` is less than the data size.
+    pub unsafe fn from_raw_parts(ptr: *mut T, rows: usize, cols: usize, row_stride: usize) -> MatrixSliceMut<T> {
+        MatrixSliceMut {
+            ptr: ptr,
+            rows: rows,
+            cols: cols,
+            row_stride: row_stride,
         }
     }
 
