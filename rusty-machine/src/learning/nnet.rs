@@ -327,12 +327,11 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
 
             // Add the regularized gradient
             if self.criterion.is_regularized() {
-                for i in 0..self.layer_sizes.len() - 1 {
-                    let non_bias_weights = self.get_non_bias_weights(weights, i);
-                    let zeros = Matrix::zeros(non_bias_weights.rows(), 1);
+                let layer = self.layer_sizes.len() - 2 - l;
+                let non_bias_weights = self.get_non_bias_weights(weights, layer);
+                let zeros = Matrix::zeros(non_bias_weights.rows(), 1);
 
-                    g += zeros.hcat(&self.criterion.reg_cost_grad(non_bias_weights));
-                }
+                g += zeros.hcat(&self.criterion.reg_cost_grad(non_bias_weights));
             }
 
             capacity += g.cols() * g.rows();
