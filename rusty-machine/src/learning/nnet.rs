@@ -30,12 +30,15 @@
 //! You can define your own criterion by implementing the `Criterion`
 //! trait with a concrete ActivationFunc and CostFunc.
 
-use linalg::matrix::Matrix;
+use linalg::matrix::{Matrix, MatrixSlice};
+use linalg::matrix::slice::BaseSlice;
+
 use learning::SupModel;
 use learning::toolkit::activ_fn;
 use learning::toolkit::activ_fn::ActivationFunc;
 use learning::toolkit::cost_fn;
 use learning::toolkit::cost_fn::CostFunc;
+use learning::toolkit::regularization::Regularization;
 use learning::optim::{Optimizable, OptimAlgorithm};
 use learning::optim::grad_desc::StochasticGD;
 
@@ -133,6 +136,7 @@ impl<'a, T, A> NeuralNet<'a, T, A>
     /// # Examples
     ///
     /// ```
+    /// use rusty_machine::linalg::matrix::slice::BaseSlice;
     /// use rusty_machine::learning::nnet::NeuralNet;
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.
@@ -145,7 +149,7 @@ impl<'a, T, A> NeuralNet<'a, T, A>
     /// assert_eq!(w.rows(), 4);
     /// assert_eq!(w.cols(), 3);
     /// ```
-    pub fn get_net_weights(&self, idx: usize) -> Matrix<f64> {
+    pub fn get_net_weights(&self, idx: usize) -> MatrixSlice<f64> {
         self.base.get_layer_weights(&self.base.weights[..], idx)
     }
 }
@@ -214,8 +218,8 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
     }
 
     /// Gets matrix of weights between specified layer and forward layer for the weights.
-    fn get_layer_weights(&self, weights: &[f64], idx: usize) -> Matrix<f64> {
-        assert!(idx < self.layer_sizes.len() - 1);
+    fn get_layer_weights(&self, weights: &[f64], idx: usize) -> MatrixSlice<f64> {
+        debug_assert!(idx < self.layer_sizes.len() - 1);
 
         // Check that the weights are the right size.
         let mut full_size = 0usize;
@@ -223,7 +227,7 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
             full_size += (self.layer_sizes[l] + 1) * self.layer_sizes[l + 1];
         }
 
-        assert_eq!(full_size, weights.len());
+        debug_assert_eq!(full_size, weights.len());
 
         let mut start = 0usize;
 
@@ -231,47 +235,26 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
             start += (self.layer_sizes[l] + 1) * self.layer_sizes[l + 1]
         }
 
-        let capacity = (self.layer_sizes[idx] + 1) * self.layer_sizes[idx + 1];
-
-        let mut layer_weights = Vec::with_capacity((self.layer_sizes[idx] + 1) *
-                                                   self.layer_sizes[idx + 1]);
         unsafe {
-            for i in start..start + capacity {
-                layer_weights.push(*weights.get_unchecked(i));
-            }
+            MatrixSlice::from_raw_parts(weights.as_ptr().offset(start as isize),
+                                        self.layer_sizes[idx] + 1,
+                                        self.layer_sizes[idx + 1],
+                                        self.layer_sizes[idx + 1])
         }
-
-        Matrix::new(self.layer_sizes[idx] + 1,
-                    self.layer_sizes[idx + 1],
-                    layer_weights)
 
     }
 
     /// Gets matrix of weights between specified layer and forward layer
     /// for the base model.
-    fn get_net_weights(&self, idx: usize) -> Matrix<f64> {
+    fn get_net_weights(&self, idx: usize) -> MatrixSlice<f64> {
         self.get_layer_weights(&self.weights[..], idx)
     }
 
-    // // Get the matrix of weights without the bias terms.
-    // fn get_regular_weights(&self, weights: &[f64]) -> Vec<f64> {
-    //     let mut reg_weights = Vec::new();
-
-    //     // Check that the weights are the right size.
-    //     let mut start = 0usize;
-    //     for l in 0..self.layer_sizes.len() - 1 {
-
-    //         for i in 0..self.layer_sizes[l] {
-    //             for j in 0..self.layer_sizes[l + 1] {
-    //                 reg_weights.push(weights[start + j * (1 + self.layer_sizes[l]) + 1 + i])
-    //             }
-    //         }
-
-    //         start += (self.layer_sizes[l] + 1) * self.layer_sizes[l + 1];
-    //     }
-
-    //     reg_weights
-    // }
+    /// Gets the weights for a layer excluding the bias weights.
+    fn get_non_bias_weights(&self, weights: &[f64], idx: usize) -> MatrixSlice<f64> {
+        let layer_weights = self.get_layer_weights(weights, idx);
+        layer_weights.reslice([0, 1], layer_weights.rows(), layer_weights.cols() - 1)
+    }
 
     /// Compute the gradient using the back propagation algorithm.
     fn compute_grad(&self,
@@ -326,7 +309,8 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
                 z = ones.hcat(&z);
 
                 let g = self.criterion.grad_activ(z);
-                delta = (delta * self.get_layer_weights(weights, l).transpose()).elemul(&g);
+                delta = (delta * self.get_layer_weights(weights, l).into_matrix().transpose())
+                            .elemul(&g);
 
                 let non_one_rows = &(1..delta.cols()).collect::<Vec<usize>>()[..];
                 delta = delta.select_cols(non_one_rows);
@@ -338,7 +322,19 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
         let mut capacity = 0;
 
         for (l, activ_item) in activations.iter().enumerate().take(self.layer_sizes.len() - 1) {
-            let g = deltas[self.layer_sizes.len() - 2 - l].transpose() * activ_item;
+            // Compute the gradient
+            let mut g = deltas[self.layer_sizes.len() - 2 - l].transpose() * activ_item;
+
+            // Add the regularized gradient
+            if self.criterion.is_regularized() {
+                for i in 0..self.layer_sizes.len() - 1 {
+                    let non_bias_weights = self.get_non_bias_weights(weights, i);
+                    let zeros = Matrix::zeros(non_bias_weights.rows(), 1);
+
+                    g += zeros.hcat(&self.criterion.reg_cost_grad(non_bias_weights));
+                }
+            }
+
             capacity += g.cols() * g.rows();
             grad.push(g / (inputs.rows() as f64));
         }
@@ -348,8 +344,18 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
         for g in grad {
             gradients.append(&mut g.into_vec());
         }
-        (self.criterion.cost(&activations[activations.len() - 1], targets),
-         gradients)
+
+        // Compute the cost
+        let mut cost = self.criterion.cost(&activations[activations.len() - 1], targets);
+
+        // Add the regularized cost
+        if self.criterion.is_regularized() {
+            for i in 0..self.layer_sizes.len() - 1 {
+                cost += self.criterion.reg_cost(self.get_non_bias_weights(weights, i));
+            }
+        }
+
+        (cost, gradients)
     }
 
     /// Forward propagation of the model weights to get the outputs.
@@ -419,6 +425,41 @@ pub trait Criterion {
     /// Returns a matrix of cost gradients.
     fn cost_grad(&self, outputs: &Matrix<f64>, targets: &Matrix<f64>) -> Matrix<f64> {
         Self::Cost::grad_cost(outputs, targets)
+    }
+
+    /// Returns the regularization for this criterion.
+    ///
+    /// Will return `Regularization::None` by default.
+    fn regularization(&self) -> Regularization<f64> {
+        Regularization::None
+    }
+
+    /// Checks if the current criterion includes regularization.
+    ///
+    /// Will return `false` by default.
+    fn is_regularized(&self) -> bool {
+        match self.regularization() {
+            Regularization::None => false,
+            _ => true,
+        }
+    }
+
+    /// Returns the regularization cost for the criterion.
+    ///
+    /// Will return `0` by default.
+    ///
+    /// This method will not be invoked by the neural network if there is explicitly no regularization.
+    fn reg_cost(&self, reg_weights: MatrixSlice<f64>) -> f64 {
+        self.regularization().reg_cost(reg_weights)
+    }
+
+    /// Returns the regularization gradient for the criterion.
+    ///
+    /// Will return a matrix of zeros by default.
+    ///
+    /// This method will not be invoked by the neural network if there is explicitly no regularization.
+    fn reg_cost_grad(&self, reg_weights: MatrixSlice<f64>) -> Matrix<f64> {
+        self.regularization().reg_grad(reg_weights)
     }
 }
 
