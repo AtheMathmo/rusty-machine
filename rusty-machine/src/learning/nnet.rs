@@ -5,7 +5,9 @@
 //! # Usage
 //!
 //! ```
-//! use rusty_machine::learning::nnet::NeuralNet;
+//! use rusty_machine::learning::nnet::{NeuralNet, BCECriterion};
+//! use rusty_machine::learning::toolkit::regularization::Regularization;
+//! use rusty_machine::learning::optim::grad_desc::StochasticGD;
 //! use rusty_machine::linalg::matrix::Matrix;
 //! use rusty_machine::learning::SupModel;
 //!
@@ -14,13 +16,21 @@
 //! let targets = Matrix::new(5,3, vec![1.,0.,0.,0.,1.,0.,0.,0.,1.,
 //!                                     0.,0.,1.,0.,0.,1.]);
 //!
+//! // Set the layer sizes - from input to output
 //! let layers = &[3,5,11,7,3];
-//! let mut model = NeuralNet::default(layers);
 //!
+//! // Choose the BCE criterion with L2 regularization (`lambda=0.1`).
+//! let criterion = BCECriterion::new(Regularization::L2(0.1));
+//!
+//! // We will just use the default stochastic gradient descent.
+//! let mut model = NeuralNet::new(layers, criterion, StochasticGD::default());
+//!
+//! // Train the model!
 //! model.train(&inputs, &targets);
 //!
 //! let test_inputs = Matrix::new(2,3, vec![1.5,1.5,1.5,5.1,5.1,5.1]);
-//!
+//! 
+//! // And predict new output from the test inputs
 //! model.predict(&test_inputs);
 //! ```
 //!
@@ -122,7 +132,7 @@ impl<'a, T, A> NeuralNet<'a, T, A>
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.
     /// let layers = &[3; 4];
-    /// let mut net = NeuralNet::new(layers, BCECriterion, StochasticGD::default());
+    /// let mut net = NeuralNet::new(layers, BCECriterion::default(), StochasticGD::default());
     /// ```
     pub fn new(layer_sizes: &'a [usize], criterion: T, alg: A) -> NeuralNet<'a, T, A> {
         NeuralNet {
@@ -171,7 +181,7 @@ impl<'a> BaseNeuralNet<'a, BCECriterion> {
         BaseNeuralNet {
             layer_sizes: layer_sizes,
             weights: BaseNeuralNet::<BCECriterion>::create_weights(layer_sizes),
-            criterion: BCECriterion,
+            criterion: BCECriterion::default(),
         }
     }
 }
@@ -467,11 +477,41 @@ pub trait Criterion {
 /// Uses the Sigmoid activation function and the
 /// cross entropy error.
 #[derive(Clone, Copy, Debug)]
-pub struct BCECriterion;
+pub struct BCECriterion {
+    regularization: Regularization<f64>,
+}
 
 impl Criterion for BCECriterion {
     type ActFunc = activ_fn::Sigmoid;
     type Cost = cost_fn::CrossEntropyError;
+}
+
+/// Creates an MSE Criterion without any regularization.
+impl Default for BCECriterion {
+    fn default() -> Self {
+        BCECriterion {
+            regularization : Regularization::None,
+        }
+    }
+}
+
+impl BCECriterion {
+    /// Constructs a new BCECriterion with the given regularization.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::nnet::BCECriterion;
+    /// use rusty_machine::learning::toolkit::regularization::Regularization;
+    ///
+    /// // Create a new BCE criterion with L2 regularization of 0.3.
+    /// let criterion = BCECriterion::new(Regularization::L2(0.3f64));
+    /// ```
+    pub fn new(regularization: Regularization<f64>) -> Self {
+        BCECriterion {
+            regularization : regularization,
+        }
+    }
 }
 
 /// The mean squared error criterion.
@@ -479,9 +519,39 @@ impl Criterion for BCECriterion {
 /// Uses the Linear activation function and the
 /// mean squared error.
 #[derive(Clone, Copy, Debug)]
-pub struct MSECriterion;
+pub struct MSECriterion {
+    regularization: Regularization<f64>,
+}
 
 impl Criterion for MSECriterion {
     type ActFunc = activ_fn::Linear;
     type Cost = cost_fn::MeanSqError;
+}
+
+/// Creates an MSE Criterion without any regularization.
+impl Default for MSECriterion {
+    fn default() -> Self {
+        MSECriterion {
+            regularization : Regularization::None,
+        }
+    }
+}
+
+impl MSECriterion {
+    /// Constructs a new BCECriterion with the given regularization.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::nnet::MSECriterion;
+    /// use rusty_machine::learning::toolkit::regularization::Regularization;
+    ///
+    /// // Create a new MSE criterion with L2 regularization of 0.3.
+    /// let criterion = MSECriterion::new(Regularization::L2(0.3f64));
+    /// ```
+    pub fn new(regularization: Regularization<f64>) -> Self {
+        MSECriterion {
+            regularization : regularization,
+        }
+    }
 }
