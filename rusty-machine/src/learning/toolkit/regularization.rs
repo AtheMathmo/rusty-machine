@@ -11,8 +11,8 @@ pub enum Regularization<T: Float> {
     L1(T),
     /// L2 Regularization
     L2(T),
-    /// Elastic Net Regularization
-    ElasticNet(T),
+    /// Elastic Net Regularization (L1 and L2)
+    ElasticNet(T, T),
     /// No Regularization
     None,
 }
@@ -23,8 +23,8 @@ impl<T: Float + FromPrimitive> Regularization<T> {
         match self {
             &Regularization::L1(x) => Self::l1_reg_cost(&mat, x),
             &Regularization::L2(x) => Self::l2_reg_cost(&mat, x),
-            &Regularization::ElasticNet(x) => {
-                Self::l1_reg_cost(&mat, x) + Self::l2_reg_cost(&mat, x)
+            &Regularization::ElasticNet(x, y) => {
+                Self::l1_reg_cost(&mat, x) + Self::l2_reg_cost(&mat, y)
             }
             &Regularization::None => T::zero(),
         }
@@ -35,8 +35,8 @@ impl<T: Float + FromPrimitive> Regularization<T> {
         match self {
             &Regularization::L1(x) => Self::l1_reg_grad(&mat, x),
             &Regularization::L2(x) => Self::l2_reg_grad(&mat, x),
-            &Regularization::ElasticNet(x) => {
-                Self::l1_reg_grad(&mat, x) + Self::l2_reg_grad(&mat, x)
+            &Regularization::ElasticNet(x, y) => {
+                Self::l1_reg_grad(&mat, x) + Self::l2_reg_grad(&mat, y)
             }
             &Regularization::None => Matrix::zeros(mat.rows(), mat.cols()),
         }

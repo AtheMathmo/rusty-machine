@@ -263,7 +263,7 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
     /// Gets the weights for a layer excluding the bias weights.
     fn get_non_bias_weights(&self, weights: &[f64], idx: usize) -> MatrixSlice<f64> {
         let layer_weights = self.get_layer_weights(weights, idx);
-        layer_weights.reslice([0, 1], layer_weights.rows(), layer_weights.cols() - 1)
+        layer_weights.reslice([1, 0], layer_weights.rows() - 1, layer_weights.cols())
     }
 
     /// Compute the gradient using the back propagation algorithm.
@@ -337,11 +337,10 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
 
             // Add the regularized gradient
             if self.criterion.is_regularized() {
-                let layer = self.layer_sizes.len() - 2 - l;
+                let layer = l;
                 let non_bias_weights = self.get_non_bias_weights(weights, layer);
-                let zeros = Matrix::zeros(non_bias_weights.rows(), 1);
-
-                g += zeros.hcat(&self.criterion.reg_cost_grad(non_bias_weights));
+                let zeros = Matrix::zeros(1, non_bias_weights.cols());
+                g += zeros.vcat(&self.criterion.reg_cost_grad(non_bias_weights));
             }
 
             capacity += g.cols() * g.rows();
@@ -484,6 +483,10 @@ pub struct BCECriterion {
 impl Criterion for BCECriterion {
     type ActFunc = activ_fn::Sigmoid;
     type Cost = cost_fn::CrossEntropyError;
+
+    fn regularization(&self) -> Regularization<f64> {
+        self.regularization
+    }
 }
 
 /// Creates an MSE Criterion without any regularization.
@@ -526,6 +529,10 @@ pub struct MSECriterion {
 impl Criterion for MSECriterion {
     type ActFunc = activ_fn::Linear;
     type Cost = cost_fn::MeanSqError;
+
+    fn regularization(&self) -> Regularization<f64> {
+        self.regularization
+    }
 }
 
 /// Creates an MSE Criterion without any regularization.
