@@ -1,7 +1,6 @@
 use linalg::Metric;
 use linalg::matrix::{Matrix, MatrixSlice};
 use linalg::matrix::slice::BaseSlice;
-use linalg::utils;
 use libnum::{FromPrimitive, Float};
 
 /// Model Regularization
@@ -43,8 +42,9 @@ impl<T: Float + FromPrimitive> Regularization<T> {
     }
 
     fn l1_reg_cost(mat: &MatrixSlice<T>, x: T) -> T {
-        let l1_norm = mat.iter_rows()
-                         .fold(T::zero(), |acc, row| acc + utils::unrolled_sum(row));
+        // TODO: This won't be regularized. Need to unroll...
+        let l1_norm = mat.iter()
+                         .fold(T::zero(), |acc, y| acc + y.abs());
         l1_norm * x / ((T::one() + T::one()) * FromPrimitive::from_usize(mat.rows()).unwrap())
     }
 
@@ -68,5 +68,97 @@ impl<T: Float + FromPrimitive> Regularization<T> {
 
     fn l2_reg_grad(mat: &MatrixSlice<T>, x: T) -> Matrix<T> {
         mat * (x / FromPrimitive::from_usize(mat.rows()).unwrap())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Regularization;
+    use linalg::matrix::Matrix;
+    use linalg::Metric;
+
+    #[test]
+    fn test_no_reg() {
+        let input_mat = Matrix::new(3, 4, (0..12).map(|x| x as f64).collect::<Vec<_>>());
+        let mat_slice = input_mat.as_slice();
+
+        let no_reg: Regularization<f64> = Regularization::None;
+
+        let a = no_reg.reg_cost(mat_slice);
+        let b = no_reg.reg_grad(mat_slice);
+
+        assert_eq!(a, 0f64);
+        assert_eq!(b, Matrix::zeros(3, 4));
+    }
+
+    #[test]
+    fn test_l1_reg() {
+        let input_mat = Matrix::new(3, 4, (0..12).map(|x| x as f64 - 3f64).collect::<Vec<_>>());
+        let mat_slice = input_mat.as_slice();
+
+        let no_reg: Regularization<f64> = Regularization::L1(0.5);
+
+        let a = no_reg.reg_cost(mat_slice);
+        let b = no_reg.reg_grad(mat_slice);
+
+        assert!((a - (42f64 / 12f64)) < 1e-18);
+
+        let true_grad = vec![-1., -1., -1., 1., 1., 1., 1., 1., 1., 1., 1., 1.]
+                            .into_iter()
+                            .map(|x| x / 12f64)
+                            .collect::<Vec<_>>();
+
+        for eps in (b - Matrix::new(3, 4, true_grad)).into_vec() {
+            assert!(eps < 1e-18);
+        }
+    }
+
+    #[test]
+    fn test_l2_reg() {
+        let input_mat = Matrix::new(3, 4, (0..12).map(|x| x as f64 - 3f64).collect::<Vec<_>>());
+        let mat_slice = input_mat.as_slice();
+
+        let no_reg: Regularization<f64> = Regularization::L2(0.5);
+
+        let a = no_reg.reg_cost(mat_slice);
+        let b = no_reg.reg_grad(mat_slice);
+
+        assert!((a - (input_mat.norm() / 12f64)) < 1e-18);
+
+        let true_grad = input_mat.into_vec()
+                                 .into_iter()
+                                 .map(|x| x / 6f64)
+                                 .collect::<Vec<_>>();
+        for eps in (b - Matrix::new(3, 4, true_grad)).into_vec() {
+            assert!(eps < 1e-18);
+        }
+    }
+
+    #[test]
+    fn test_elastic_net_reg() {
+        let input_mat = Matrix::new(3, 4, (0..12).map(|x| x as f64 - 3f64).collect::<Vec<_>>());
+        let mat_slice = input_mat.as_slice();
+
+        let no_reg: Regularization<f64> = Regularization::ElasticNet(0.5, 0.25);
+
+        let a = no_reg.reg_cost(mat_slice);
+        let b = no_reg.reg_grad(mat_slice);
+
+        assert!(a - ((input_mat.norm() / 24f64) + (42f64 / 12f64)) < 1e-18);
+
+        let l1_true_grad = vec![-1., -1., -1., 1., 1., 1., 1., 1., 1., 1., 1., 1.]
+                               .into_iter()
+                               .map(|x| x / 12f64)
+                               .collect::<Vec<_>>();
+        let l2_true_grad = input_mat.into_vec()
+                                    .into_iter()
+                                    .map(|x| x / 12f64)
+                                    .collect::<Vec<_>>();
+
+        for eps in (b - Matrix::new(3, 4, l1_true_grad) - Matrix::new(3, 4, l2_true_grad))
+                       .into_vec() {
+            // Slightly lower boundary than others - more numerical error as more ops.
+            assert!(eps < 1e-12);
+        }
     }
 }
