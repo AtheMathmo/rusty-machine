@@ -191,6 +191,7 @@ pub mod learning {
         pub mod kernel;
         pub mod cost_fn;
         pub mod rand_utils;
+        pub mod regularization;
     }
 }
 

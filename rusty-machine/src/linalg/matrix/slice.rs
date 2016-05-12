@@ -209,12 +209,7 @@ impl<T> MatrixSlice<T> {
 impl<T: Copy> MatrixSlice<T> {
     /// Convert the matrix slice into a new Matrix.
     pub fn into_matrix(self) -> Matrix<T> {
-        let slice_data = self.iter().map(|v| *v).collect::<Vec<T>>();
-        Matrix {
-            rows: self.rows,
-            cols: self.cols,
-            data: slice_data,
-        }
+        self.iter_rows().collect::<Matrix<T>>()
     }
 }
 

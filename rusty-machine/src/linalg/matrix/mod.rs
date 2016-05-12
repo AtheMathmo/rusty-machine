@@ -1145,8 +1145,58 @@ impl<T: Float> Metric<T> for Matrix<T> {
     /// assert_eq!(c, 5.0);
     /// ```
     fn norm(&self) -> T {
-        let s = utils::dot(&self.data[..], &self.data[..]);
+        let s = utils::dot(&self.data, &self.data);
 
+        s.sqrt()
+    }
+}
+
+impl<T: Float> Metric<T> for MatrixSlice<T> {
+    /// Compute euclidean norm for matrix.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::{Matrix, MatrixSlice};
+    /// use rusty_machine::linalg::Metric;
+    ///
+    /// let a = Matrix::new(2,1, vec![3.0,4.0]);
+    /// let b = MatrixSlice::from_matrix(&a, [0,0], 2, 1);
+    /// let c = b.norm();
+    ///
+    /// assert_eq!(c, 5.0);
+    /// ```
+    fn norm(&self) -> T {
+        let mut s = T::zero();
+
+        for row in self.iter_rows() {
+            s = s + utils::dot(row, row);
+        }
+        s.sqrt()
+    }
+}
+
+impl<T: Float> Metric<T> for MatrixSliceMut<T> {
+    /// Compute euclidean norm for matrix.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::{Matrix, MatrixSliceMut};
+    /// use rusty_machine::linalg::Metric;
+    ///
+    /// let mut a = Matrix::new(2,1, vec![3.0,4.0]);
+    /// let b = MatrixSliceMut::from_matrix(&mut a, [0,0], 2, 1);
+    /// let c = b.norm();
+    ///
+    /// assert_eq!(c, 5.0);
+    /// ```
+    fn norm(&self) -> T {
+        let mut s = T::zero();
+
+        for row in self.iter_rows() {
+            s = s + utils::dot(row, row);
+        }
         s.sqrt()
     }
 }
