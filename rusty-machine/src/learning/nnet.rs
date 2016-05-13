@@ -81,8 +81,7 @@ impl<'a, T, A> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, T, A>
 
     /// Train the model using gradient optimization and back propagation.
     fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) {
-        let start = self.base.weights.clone();
-        let optimal_w = self.alg.optimize(&self.base, &start[..], inputs, targets);
+        let optimal_w = self.alg.optimize(&self.base, &self.base.weights, inputs, targets);
         self.base.weights = optimal_w;
     }
 }
