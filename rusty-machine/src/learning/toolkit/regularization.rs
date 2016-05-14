@@ -125,8 +125,8 @@ mod tests {
 
         assert!((a - (input_mat.norm() / 12f64)) < 1e-18);
 
-        let true_grad = input_mat.into_vec()
-                                 .into_iter()
+        let true_grad = input_mat.data()
+                                 .iter()
                                  .map(|x| x / 6f64)
                                  .collect::<Vec<_>>();
         for eps in (b - Matrix::new(3, 4, true_grad)).into_vec() {
@@ -150,8 +150,8 @@ mod tests {
                                .into_iter()
                                .map(|x| x / 12f64)
                                .collect::<Vec<_>>();
-        let l2_true_grad = input_mat.into_vec()
-                                    .into_iter()
+        let l2_true_grad = input_mat.data()
+                                    .iter()
                                     .map(|x| x / 12f64)
                                     .collect::<Vec<_>>();
 
