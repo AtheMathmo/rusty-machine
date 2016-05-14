@@ -13,38 +13,10 @@ fn same_type<A: Any, B: Any>() -> bool {
     TypeId::of::<A>() == TypeId::of::<B>()
 }
 
-/// Multiplies two matrices together.
-impl<'a, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<Matrix<T>> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, m: Matrix<T>) -> Matrix<T> {
-        (&self) * (&m)
-    }
-}
-
-/// Multiplies two matrices together.
-impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'a Matrix<T>> for Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, m: &Matrix<T>) -> Matrix<T> {
-        (&self) * (m)
-    }
-}
-
-/// Multiplies two matrices together.
-impl<'a, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<Matrix<T>> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, m: Matrix<T>) -> Matrix<T> {
-        (self) * (&m)
-    }
-}
-
-/// Multiplies two matrices together.
-impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'b Matrix<T>> for &'a Matrix<T> {
-    type Output = Matrix<T>;
-
-    fn mul(self, m: &Matrix<T>) -> Matrix<T> {
+macro_rules! mat_mul_general (
+    ($mat:ident) => (
+    
+    fn mul(self, m: &$mat<T>) -> Matrix<T> {
         assert!(self.cols == m.rows, "Matrix dimensions do not agree.");
 
         let p = self.rows;
@@ -123,6 +95,42 @@ impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'b
             }
         }
     }
+    
+    );
+);
+
+/// Multiplies two matrices together.
+impl<'a, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<Matrix<T>> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn mul(self, m: Matrix<T>) -> Matrix<T> {
+        (&self) * (&m)
+    }
+}
+
+/// Multiplies two matrices together.
+impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'a Matrix<T>> for Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn mul(self, m: &Matrix<T>) -> Matrix<T> {
+        (&self) * (m)
+    }
+}
+
+/// Multiplies two matrices together.
+impl<'a, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<Matrix<T>> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    fn mul(self, m: Matrix<T>) -> Matrix<T> {
+        (self) * (&m)
+    }
+}
+
+/// Multiplies two matrices together.
+impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'b Matrix<T>> for &'a Matrix<T> {
+    type Output = Matrix<T>;
+
+    mat_mul_general!(Matrix);
 }
 
 macro_rules! impl_mat_slice_mul (
@@ -159,85 +167,7 @@ impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<$sl
 impl<'a, 'b, 'c, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'c $slice<'a, T>> for &'b Matrix<T> {
     type Output = Matrix<T>;
 
-    fn mul(self, m: &$slice<T>) -> Matrix<T> {
-        assert!(self.cols == m.rows, "Matrix dimensions do not agree.");
-
-        let p = self.rows;
-        let q = self.cols;
-        let r = m.cols;
-
-        if same_type::<T, f32>() {
-            let mut new_data = Vec::with_capacity(p * r);
-            
-            unsafe {
-                new_data.set_len(p * r);
-
-                matrixmultiply::sgemm(
-                    p, q, r,
-                    1f32,
-                    self.as_ptr() as *const _,
-                    self.row_stride() as isize, 1,
-                    m.as_ptr() as *const _,
-                    m.row_stride() as isize, 1,
-                    0f32,
-                    new_data.as_mut_ptr() as *mut _,
-                    r as isize, 1
-                    );
-            }
-
-            Matrix {
-                rows: p,
-                cols: r,
-                data: new_data
-            }
-        } else if same_type::<T, f64>() {
-            let mut new_data = Vec::with_capacity(p * r);
-
-            unsafe {
-                new_data.set_len(p * r);
-
-                matrixmultiply::dgemm(
-                    p, q, r,
-                    1f64,
-                    self.as_ptr() as *const _,
-                    self.row_stride() as isize, 1,
-                    m.as_ptr() as *const _,
-                    m.row_stride() as isize, 1,
-                    0f64,
-                    new_data.as_mut_ptr() as *mut _,
-                    r as isize, 1
-                    );
-            }
-
-            Matrix {
-                rows: p,
-                cols: r,
-                data: new_data
-            }
-
-        } else {
-            let mut new_data = vec![T::zero(); p * r];
-
-            unsafe {
-                for i in 0..p
-                {
-                    for k in 0..q
-                    {
-                        for j in 0..r
-                        {
-                            new_data[i*r + j] = *new_data.get_unchecked(i*r + j) + *self.get_unchecked([i,k]) * *m.get_unchecked([k,j]);
-                        }
-                    }
-                }
-            }
-
-            Matrix {
-                rows: self.rows,
-                cols: m.cols,
-                data: new_data
-            }
-        }
-    }
+    mat_mul_general!($slice);
 }
 
 /// Multiplies two matrices together.
@@ -271,85 +201,7 @@ impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<Mat
 impl<'a, 'b, 'c, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'c Matrix<T>> for &'b $slice<'a, T> {
     type Output = Matrix<T>;
 
-    fn mul(self, m: &Matrix<T>) -> Matrix<T> {
-        assert!(self.cols == m.rows, "Matrix dimensions do not agree.");
-
-        let p = self.rows;
-        let q = self.cols;
-        let r = m.cols;
-
-        if same_type::<T, f32>() {
-            let mut new_data = Vec::with_capacity(p * r);
-            
-            unsafe {
-                new_data.set_len(p * r);
-
-                matrixmultiply::sgemm(
-                    p, q, r,
-                    1f32,
-                    self.as_ptr() as *const _,
-                    self.row_stride() as isize, 1,
-                    m.as_ptr() as *const _,
-                    m.row_stride() as isize, 1,
-                    0f32,
-                    new_data.as_mut_ptr() as *mut _,
-                    r as isize, 1
-                    );
-            }
-
-            Matrix {
-                rows: p,
-                cols: r,
-                data: new_data
-            }
-        } else if same_type::<T, f64>() {
-            let mut new_data = Vec::with_capacity(p * r);
-
-            unsafe {
-                new_data.set_len(p * r);
-
-                matrixmultiply::dgemm(
-                    p, q, r,
-                    1f64,
-                    self.as_ptr() as *const _,
-                    self.row_stride() as isize, 1,
-                    m.as_ptr() as *const _,
-                    m.row_stride() as isize, 1,
-                    0f64,
-                    new_data.as_mut_ptr() as *mut _,
-                    r as isize, 1
-                    );
-            }
-
-            Matrix {
-                rows: p,
-                cols: r,
-                data: new_data
-            }
-
-        } else {
-            let mut new_data = vec![T::zero(); p * r];
-
-            unsafe {
-                for i in 0..p
-                {
-                    for k in 0..q
-                    {
-                        for j in 0..r
-                        {
-                            new_data[i*r + j] = *new_data.get_unchecked(i*r + j) + *self.get_unchecked([i,k]) * *m.get_unchecked([k,j]);
-                        }
-                    }
-                }
-            }
-
-            Matrix {
-                rows: self.rows,
-                cols: m.cols,
-                data: new_data
-            }
-        }
-    }
+    mat_mul_general!(Matrix);
 }
     );
 );
@@ -391,85 +243,7 @@ impl<'a, 'b, 'c, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul
 impl<'a, 'b, 'c, 'd,T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'d $slice_2<'b, T>> for &'c $slice_1<'a, T> {
     type Output = Matrix<T>;
 
-    fn mul(self, m: &$slice_2<T>) -> Matrix<T> {
-        assert!(self.cols == m.rows, "Matrix dimensions do not agree.");
-
-        let p = self.rows;
-        let q = self.cols;
-        let r = m.cols;
-
-        if same_type::<T, f32>() {
-            let mut new_data = Vec::with_capacity(p * r);
-            
-            unsafe {
-                new_data.set_len(p * r);
-
-                matrixmultiply::sgemm(
-                    p, q, r,
-                    1f32,
-                    self.as_ptr() as *const _,
-                    self.row_stride() as isize, 1,
-                    m.as_ptr() as *const _,
-                    m.row_stride() as isize, 1,
-                    0f32,
-                    new_data.as_mut_ptr() as *mut _,
-                    r as isize, 1
-                    );
-            }
-
-            Matrix {
-                rows: p,
-                cols: r,
-                data: new_data
-            }
-        } else if same_type::<T, f64>() {
-            let mut new_data = Vec::with_capacity(p * r);
-
-            unsafe {
-                new_data.set_len(p * r);
-
-                matrixmultiply::dgemm(
-                    p, q, r,
-                    1f64,
-                    self.as_ptr() as *const _,
-                    self.row_stride() as isize, 1,
-                    m.as_ptr() as *const _,
-                    m.row_stride() as isize, 1,
-                    0f64,
-                    new_data.as_mut_ptr() as *mut _,
-                    r as isize, 1
-                    );
-            }
-
-            Matrix {
-                rows: p,
-                cols: r,
-                data: new_data
-            }
-
-        } else {
-            let mut new_data = vec![T::zero(); p * r];
-
-            unsafe {
-                for i in 0..p
-                {
-                    for k in 0..q
-                    {
-                        for j in 0..r
-                        {
-                            new_data[i*r + j] = *new_data.get_unchecked(i*r + j) + *self.get_unchecked([i,k]) * *m.get_unchecked([k,j]);
-                        }
-                    }
-                }
-            }
-
-            Matrix {
-                rows: self.rows,
-                cols: m.cols,
-                data: new_data
-            }
-        }
-    }
+    mat_mul_general!($slice_2);
 }
     );
 );
