@@ -15,7 +15,7 @@ use linalg::utils;
 use libnum::{One, Zero, Float, Signed};
 use libnum::{cast, abs};
 
-impl<T: Any  + Float> Matrix<T> {
+impl<T: Any + Float> Matrix<T> {
     /// Cholesky decomposition
     ///
     /// Returns the cholesky decomposition of a positive definite matrix.
@@ -350,13 +350,13 @@ impl<T: Any + Float + Signed> Matrix<T> {
         // λ² − (a₁₁ + a₂₂)λ + (a₁₁a₂₂ − a₁₂a₂₁);
         // the quadratic formula suffices.
         let tr = self.data[0] + self.data[3];
-        let det = self.data[0]*self.data[3] - self.data[1]*self.data[2];
+        let det = self.data[0] * self.data[3] - self.data[1] * self.data[2];
 
         let two = T::one() + T::one();
         let four = two + two;
 
-        let desc = (tr*tr - four*det).sqrt();
-        vec![(tr-desc)/two, (tr+desc)/two]
+        let desc = (tr * tr - four * det).sqrt();
+        vec![(tr - desc) / two, (tr + desc) / two]
     }
 
     fn francis_shift_eigenvalues(&self) -> Vec<T> {
@@ -492,20 +492,23 @@ impl<T: Any + Float + Signed> Matrix<T> {
         // for this characterization—
         if self.data[2] != T::zero() {
             return (eigenvalues.clone(),
-                    Matrix::new(2, 2, vec![eigenvalues[0]-self.data[3],
-                                           eigenvalues[1]-self.data[3],
-                                           self.data[2],
-                                           self.data[2]]));
+                    Matrix::new(2,
+                                2,
+                                vec![eigenvalues[0] - self.data[3],
+                                     eigenvalues[1] - self.data[3],
+                                     self.data[2],
+                                     self.data[2]]));
         } else if self.data[1] != T::zero() {
             return (eigenvalues.clone(),
-                    Matrix::new(2, 2, vec![self.data[1],
-                                           self.data[1],
-                                           eigenvalues[0]-self.data[0],
-                                           eigenvalues[1]-self.data[0]]));
+                    Matrix::new(2,
+                                2,
+                                vec![self.data[1],
+                                     self.data[1],
+                                     eigenvalues[0] - self.data[0],
+                                     eigenvalues[1] - self.data[0]]));
         } else {
             return (eigenvalues.clone(),
-                    Matrix::new(2, 2, vec![T::one(), T::zero(),
-                                           T::zero(), T::one()]));
+                    Matrix::new(2, 2, vec![T::one(), T::zero(), T::zero(), T::one()]));
         }
     }
 
@@ -660,7 +663,7 @@ impl<T: Any + Float + Signed> Matrix<T> {
         match n {
             1 => (vec![self.data[0]], Matrix::new(1, 1, vec![T::one()])),
             2 => self.direct_2_by_2_eigendecomp(),
-            _ => self.francis_shift_eigendecomp()
+            _ => self.francis_shift_eigendecomp(),
         }
     }
 }
@@ -762,7 +765,7 @@ mod tests {
     fn test_2_by_2_matrix_eigenvalues() {
         let a = Matrix::new(2, 2, vec![1., 2., 3., 4.]);
         // characteristic polynomial is λ² − 5λ − 2
-        assert_eq!(vec![(5.-(33.0f32).sqrt())/2., (5.+(33.0f32).sqrt())/2.],
+        assert_eq!(vec![(5. - (33.0f32).sqrt()) / 2., (5. + (33.0f32).sqrt()) / 2.],
                    a.eigenvalues());
     }
 
@@ -778,8 +781,8 @@ mod tests {
         let v2 = Vector::new(vec![eigenvecs[[0, 1]], eigenvecs[[1, 1]]]);
 
         let epsilon = 0.00001;
-        assert!((&a*&v1 - &v1*lambda_1).into_vec().iter().all(|&c| c < epsilon));
-        assert!((&a*&v2 - &v2*lambda_2).into_vec().iter().all(|&c| c < epsilon));
+        assert!((&a * &v1 - &v1 * lambda_1).into_vec().iter().all(|&c| c < epsilon));
+        assert!((&a * &v2 - &v2 * lambda_2).into_vec().iter().all(|&c| c < epsilon));
     }
 
 }

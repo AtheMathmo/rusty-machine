@@ -41,7 +41,7 @@ pub trait BaseSlice<T> {
     unsafe fn get_unchecked(&self, index: [usize; 2]) -> &T;
 }
 
-impl<T> BaseSlice<T> for MatrixSlice<T> {
+impl<'a, T> BaseSlice<T> for MatrixSlice<'a, T> {
     fn rows(&self) -> usize {
         self.rows
     }
@@ -63,7 +63,7 @@ impl<T> BaseSlice<T> for MatrixSlice<T> {
     }
 }
 
-impl<T> BaseSlice<T> for MatrixSliceMut<T> {
+impl<'a, T> BaseSlice<T> for MatrixSliceMut<'a, T> {
     fn rows(&self) -> usize {
         self.rows
     }
@@ -85,7 +85,7 @@ impl<T> BaseSlice<T> for MatrixSliceMut<T> {
     }
 }
 
-impl<T> MatrixSlice<T> {
+impl<'a, T> MatrixSlice<'a, T> {
     /// Produce a matrix slice from a matrix
     ///
     /// # Examples
@@ -97,7 +97,7 @@ impl<T> MatrixSlice<T> {
     /// let a = Matrix::new(3,3, (0..9).collect::<Vec<usize>>());
     /// let slice = MatrixSlice::from_matrix(&a, [1,1], 2, 2);
     /// ```
-    pub fn from_matrix(mat: &Matrix<T>,
+    pub fn from_matrix(mat: &'a Matrix<T>,
                        start: [usize; 2],
                        rows: usize,
                        cols: usize)
@@ -112,6 +112,7 @@ impl<T> MatrixSlice<T> {
                 rows: rows,
                 cols: cols,
                 row_stride: mat.cols,
+                marker: PhantomData::<&'a T>,
             }
         }
     }
@@ -139,12 +140,17 @@ impl<T> MatrixSlice<T> {
     ///
     /// Additionally `cols` should be less than the `row_stride`. It is possible to use this function safely 
     /// whilst violating this condition. So long as `max(cols, row_stride) * rows` is less than the data size.
-    pub unsafe fn from_raw_parts(ptr: *const T, rows: usize, cols: usize, row_stride: usize) -> MatrixSlice<T> {
+    pub unsafe fn from_raw_parts(ptr: *const T,
+                                 rows: usize,
+                                 cols: usize,
+                                 row_stride: usize)
+                                 -> MatrixSlice<'a, T> {
         MatrixSlice {
             ptr: ptr,
             rows: rows,
             cols: cols,
             row_stride: row_stride,
+            marker: PhantomData::<&'a T>,
         }
     }
 
@@ -160,13 +166,9 @@ impl<T> MatrixSlice<T> {
     /// let slice = MatrixSlice::from_matrix(&a, [1,1], 2, 2);
     /// let new_slice = slice.reslice([0,0], 1, 1);
     /// ```
-    pub fn reslice(mut self,
-                            start: [usize; 2],
-                            rows: usize,
-                            cols: usize)
-                            -> MatrixSlice<T> {
+    pub fn reslice(mut self, start: [usize; 2], rows: usize, cols: usize) -> MatrixSlice<'a, T> {
         assert!(start[0] + rows <= self.rows,
-            "View dimensions exceed matrix dimensions.");
+                "View dimensions exceed matrix dimensions.");
         assert!(start[1] + cols <= self.cols,
                 "View dimensions exceed matrix dimensions.");
 
@@ -201,20 +203,19 @@ impl<T> MatrixSlice<T> {
             slice_rows: self.rows,
             slice_cols: self.cols,
             row_stride: self.row_stride,
-            _marker: PhantomData::<&T>,
+            _marker: PhantomData::<&'a T>,
         }
     }
 }
 
-impl<T: Copy> MatrixSlice<T> {
+impl<'a, T: Copy> MatrixSlice<'a, T> {
     /// Convert the matrix slice into a new Matrix.
     pub fn into_matrix(self) -> Matrix<T> {
         self.iter_rows().collect::<Matrix<T>>()
     }
 }
 
-impl<T> MatrixSliceMut<T> {
-
+impl<'a, T> MatrixSliceMut<'a, T> {
     /// Produce a matrix slice from a matrix
     ///
     /// # Examples
@@ -226,7 +227,7 @@ impl<T> MatrixSliceMut<T> {
     /// let mut a = Matrix::new(3,3, (0..9).collect::<Vec<usize>>());
     /// let slice = MatrixSliceMut::from_matrix(&mut a, [1,1], 2, 2);
     /// ```
-    pub fn from_matrix(mat: &mut Matrix<T>,
+    pub fn from_matrix(mat: &'a mut Matrix<T>,
                        start: [usize; 2],
                        rows: usize,
                        cols: usize)
@@ -244,6 +245,7 @@ impl<T> MatrixSliceMut<T> {
                 rows: rows,
                 cols: cols,
                 row_stride: mat_cols,
+                marker: PhantomData::<&'a mut T>,
             }
         }
     }
@@ -271,12 +273,17 @@ impl<T> MatrixSliceMut<T> {
     ///
     /// Additionally `cols` should be less than the `row_stride`. It is possible to use this function safely 
     /// whilst violating this condition. So long as `max(cols, row_stride) * rows` is less than the data size.
-    pub unsafe fn from_raw_parts(ptr: *mut T, rows: usize, cols: usize, row_stride: usize) -> MatrixSliceMut<T> {
+    pub unsafe fn from_raw_parts(ptr: *mut T,
+                                 rows: usize,
+                                 cols: usize,
+                                 row_stride: usize)
+                                 -> MatrixSliceMut<'a, T> {
         MatrixSliceMut {
             ptr: ptr,
             rows: rows,
             cols: cols,
             row_stride: row_stride,
+            marker: PhantomData::<&'a mut T>,
         }
     }
 
@@ -292,13 +299,9 @@ impl<T> MatrixSliceMut<T> {
     /// let slice = MatrixSliceMut::from_matrix(&mut a, [1,1], 2, 2);
     /// let new_slice = slice.reslice([0,0], 1, 1);
     /// ```
-    pub fn reslice(mut self,
-                            start: [usize; 2],
-                            rows: usize,
-                            cols: usize)
-                            -> MatrixSliceMut<T> {
+    pub fn reslice(mut self, start: [usize; 2], rows: usize, cols: usize) -> MatrixSliceMut<'a, T> {
         assert!(start[0] + rows <= self.rows,
-            "View dimensions exceed matrix dimensions.");
+                "View dimensions exceed matrix dimensions.");
         assert!(start[1] + cols <= self.cols,
                 "View dimensions exceed matrix dimensions.");
 
@@ -372,15 +375,10 @@ impl<T> MatrixSliceMut<T> {
 }
 
 
-impl<T: Copy> MatrixSliceMut<T> {
+impl<'a, T: Copy> MatrixSliceMut<'a, T> {
     /// Convert the matrix slice into a new Matrix.
     pub fn into_matrix(self) -> Matrix<T> {
-        let slice_data = self.iter().map(|v| *v).collect::<Vec<T>>();
-        Matrix {
-            rows: self.rows,
-            cols: self.cols,
-            data: slice_data,
-        }
+        self.iter_rows().collect::<Matrix<T>>()
     }
 }
 
@@ -452,19 +450,19 @@ mod tests {
     use super::BaseSlice;
     use super::super::MatrixSlice;
     use super::super::MatrixSliceMut;
-	use super::super::Matrix;
+    use super::super::Matrix;
 
-	#[test]
-	#[should_panic]
-	fn make_slice_bad_dim() {
-		let a = Matrix::new(3,3, vec![2.0; 9]);
-		let _ = MatrixSlice::from_matrix(&a, [1,1], 3, 2);
-	}
+    #[test]
+    #[should_panic]
+    fn make_slice_bad_dim() {
+        let a = Matrix::new(3, 3, vec![2.0; 9]);
+        let _ = MatrixSlice::from_matrix(&a, [1, 1], 3, 2);
+    }
 
     #[test]
     fn make_slice() {
-        let a = Matrix::new(3,3, vec![2.0; 9]);
-        let b = MatrixSlice::from_matrix(&a, [1,1], 2, 2);
+        let a = Matrix::new(3, 3, vec![2.0; 9]);
+        let b = MatrixSlice::from_matrix(&a, [1, 1], 2, 2);
 
         assert_eq!(b.rows(), 2);
         assert_eq!(b.cols(), 2);
@@ -472,43 +470,46 @@ mod tests {
 
     #[test]
     fn reslice() {
-        let mut a = Matrix::new(4,4, (0..16).collect::<Vec<_>>());
-        let b = MatrixSlice::from_matrix(&a, [1,1], 3, 3);
+        let mut a = Matrix::new(4, 4, (0..16).collect::<Vec<_>>());
+        
         {
-            let c = b.reslice([0,1], 2, 2);
+            let b = MatrixSlice::from_matrix(&a, [1, 1], 3, 3);
+            let c = b.reslice([0, 1], 2, 2);
 
             assert_eq!(c.rows(), 2);
             assert_eq!(c.cols(), 2);
 
-            assert_eq!(c[[0,0]], 6);
-            assert_eq!(c[[0,1]], 7);
-            assert_eq!(c[[1,0]], 10);
-            assert_eq!(c[[1,1]], 11);
+            assert_eq!(c[[0, 0]], 6);
+            assert_eq!(c[[0, 1]], 7);
+            assert_eq!(c[[1, 0]], 10);
+            assert_eq!(c[[1, 1]], 11);
         }
 
-        let b = MatrixSliceMut::from_matrix(&mut a, [1,1], 3, 3);
+        let b = MatrixSliceMut::from_matrix(&mut a, [1, 1], 3, 3);
 
-        let c = b.reslice([0,1], 2, 2);
+        let c = b.reslice([0, 1], 2, 2);
 
         assert_eq!(c.rows(), 2);
         assert_eq!(c.cols(), 2);
 
-        assert_eq!(c[[0,0]], 6);
-        assert_eq!(c[[0,1]], 7);
-        assert_eq!(c[[1,0]], 10);
-        assert_eq!(c[[1,1]], 11);
+        assert_eq!(c[[0, 0]], 6);
+        assert_eq!(c[[0, 1]], 7);
+        assert_eq!(c[[1, 0]], 10);
+        assert_eq!(c[[1, 1]], 11);
     }
 
     #[test]
     fn slice_into_matrix() {
-        let mut a = Matrix::new(3,3, vec![2.0; 9]);
+        let mut a = Matrix::new(3, 3, vec![2.0; 9]);
 
-        let b = MatrixSlice::from_matrix(&a, [1,1], 2, 2);
-        let c = b.into_matrix();
-        assert_eq!(c.rows(), 2);
-        assert_eq!(c.cols(), 2);
+        {
+            let b = MatrixSlice::from_matrix(&a, [1, 1], 2, 2);
+            let c = b.into_matrix();
+            assert_eq!(c.rows(), 2);
+            assert_eq!(c.cols(), 2);
+        }
 
-        let d = MatrixSliceMut::from_matrix(&mut a, [1,1], 2, 2);
+        let d = MatrixSliceMut::from_matrix(&mut a, [1, 1], 2, 2);
         let e = d.into_matrix();
         assert_eq!(e.rows(), 2);
         assert_eq!(e.cols(), 2);

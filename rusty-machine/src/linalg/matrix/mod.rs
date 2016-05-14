@@ -11,6 +11,7 @@ use std::cmp::{PartialEq, min};
 use linalg::Metric;
 use linalg::vector::Vector;
 use linalg::utils;
+use std::marker::PhantomData;
 
 mod decomposition;
 mod impl_ops;
@@ -44,11 +45,12 @@ pub struct Matrix<T> {
 /// The struct contains the upper left point of the slice
 /// and the width and height of the slice.
 #[derive(Debug, Clone, Copy)]
-pub struct MatrixSlice<T> {
+pub struct MatrixSlice<'a, T: 'a> {
     ptr: *const T,
     rows: usize,
     cols: usize,
     row_stride: usize,
+    marker: PhantomData<&'a T>,
 }
 
 /// A mutable MatrixSlice
@@ -58,11 +60,12 @@ pub struct MatrixSlice<T> {
 /// The struct contains the upper left point of the slice
 /// and the width and height of the slice.
 #[derive(Debug)]
-pub struct MatrixSliceMut<T> {
+pub struct MatrixSliceMut<'a, T: 'a> {
     ptr: *mut T,
     rows: usize,
     cols: usize,
     row_stride: usize,
+    marker: PhantomData<&'a mut T>,
 }
 
 impl<T> Matrix<T> {
@@ -154,21 +157,21 @@ impl<T> Matrix<T> {
     /// let (b,c) = a.split_at(1, Axes::Row);
     /// ```
     pub fn split_at(&self, mid: usize, axis: Axes) -> (MatrixSlice<T>, MatrixSlice<T>) {
-        let slice_1 : MatrixSlice<T>;
-        let slice_2 : MatrixSlice<T>;
+        let slice_1: MatrixSlice<T>;
+        let slice_2: MatrixSlice<T>;
 
         match axis {
             Axes::Row => {
                 assert!(mid < self.rows);
 
-                slice_1 = MatrixSlice::from_matrix(self, [0,0], mid, self.cols);
-                slice_2 = MatrixSlice::from_matrix(self, [mid,0], self.rows - mid, self.cols);
-            },
+                slice_1 = MatrixSlice::from_matrix(self, [0, 0], mid, self.cols);
+                slice_2 = MatrixSlice::from_matrix(self, [mid, 0], self.rows - mid, self.cols);
+            }
             Axes::Col => {
                 assert!(mid < self.cols);
 
-                slice_1 = MatrixSlice::from_matrix(self, [0,0], self.rows, mid);
-                slice_2 = MatrixSlice::from_matrix(self, [0,mid], self.rows, self.cols - mid);
+                slice_1 = MatrixSlice::from_matrix(self, [0, 0], self.rows, mid);
+                slice_2 = MatrixSlice::from_matrix(self, [0, mid], self.rows, self.cols - mid);
             }
         }
 
@@ -186,26 +189,46 @@ impl<T> Matrix<T> {
     /// let mut a = Matrix::new(3,3, vec![2.0; 9]);
     /// let (b,c) = a.split_at_mut(1, Axes::Col);
     /// ```
-    pub fn split_at_mut(&mut self, mid: usize, axis: Axes) -> (MatrixSliceMut<T>, MatrixSliceMut<T>) {
+    pub fn split_at_mut(&mut self,
+                        mid: usize,
+                        axis: Axes)
+                        -> (MatrixSliceMut<T>, MatrixSliceMut<T>) {
 
         let mat_cols = self.cols;
         let mat_rows = self.rows;
 
-        let slice_1 : MatrixSliceMut<T>;
-        let slice_2 : MatrixSliceMut<T>;
+        let slice_1: MatrixSliceMut<T>;
+        let slice_2: MatrixSliceMut<T>;
 
         match axis {
             Axes::Row => {
                 assert!(mid < self.rows);
 
-                slice_1 = MatrixSliceMut::from_matrix(self, [0,0], mid, mat_cols);
-                slice_2 = MatrixSliceMut::from_matrix(self, [mid,0], mat_rows - mid, mat_cols);
-            },
+                unsafe {
+                    slice_1 = MatrixSliceMut::from_raw_parts(self.data.as_mut_ptr(),
+                                                             mid,
+                                                             mat_cols,
+                                                             mat_cols);
+                    slice_2 = MatrixSliceMut::from_raw_parts(self.data
+                                                                 .as_mut_ptr()
+                                                                 .offset((mid * mat_cols) as isize),
+                                                             mat_rows - mid,
+                                                             mat_cols,
+                                                             mat_cols);
+                }
+            }
             Axes::Col => {
                 assert!(mid < self.cols);
-
-                slice_1 = MatrixSliceMut::from_matrix(self, [0,0], mat_rows, mid);
-                slice_2 = MatrixSliceMut::from_matrix(self, [0,mid], mat_rows, mat_cols - mid);
+                unsafe {
+                    slice_1 = MatrixSliceMut::from_raw_parts(self.data.as_mut_ptr(),
+                                                             mat_rows,
+                                                             mid,
+                                                             mat_cols);
+                    slice_2 = MatrixSliceMut::from_raw_parts(self.data.as_mut_ptr().offset(mid as isize),
+                                                             mat_rows,
+                                                             mat_cols - mid,
+                                                             mat_cols);
+                }
             }
         }
 
@@ -223,7 +246,7 @@ impl<T> Matrix<T> {
     /// let b = a.as_slice();
     /// ```
     pub fn as_slice(&self) -> MatrixSlice<T> {
-        MatrixSlice::from_matrix(&self, [0,0], self.rows, self.cols)
+        MatrixSlice::from_matrix(&self, [0, 0], self.rows, self.cols)
     }
 
     /// Returns a mutable `MatrixSlice` over the whole matrix.
@@ -239,7 +262,7 @@ impl<T> Matrix<T> {
     pub fn as_mut_slice(&mut self) -> MatrixSliceMut<T> {
         let rows = self.rows;
         let cols = self.cols;
-        MatrixSliceMut::from_matrix(self, [0,0], rows, cols)
+        MatrixSliceMut::from_matrix(self, [0, 0], rows, cols)
     }
 }
 
@@ -286,7 +309,7 @@ impl<T: Copy> Matrix<T> {
         }
 
         for row in rows {
-            mat_vec.extend_from_slice(&self.data[*row * self.cols..(*row+1) * self.cols]);
+            mat_vec.extend_from_slice(&self.data[*row * self.cols..(*row + 1) * self.cols]);
         }
 
         Matrix {
@@ -611,7 +634,7 @@ impl<T: Clone + Zero> Matrix<T> {
     }
 }
 
- impl<T: Clone + One> Matrix<T> {
+impl<T: Clone + One> Matrix<T> {
     /// Constructs matrix of all ones.
     ///
     /// Requires both the row and the column dimensions.
@@ -925,7 +948,7 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
                            Sub<T, Output=T> + Div<T, Output=T> +
                            PartialOrd {
 
-    /// Solves an upper triangular linear system.
+/// Solves an upper triangular linear system.
     fn solve_u_triangular(&self, y: Vector<T>) -> Vector<T> {
         assert!(self.cols == y.size(), "Matrix and Vector dimensions do not agree.");
 
@@ -946,7 +969,7 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
         Vector::new(x)
     }
 
-    /// Solves a lower triangular linear system.
+/// Solves a lower triangular linear system.
     fn solve_l_triangular(&self, y: Vector<T>) -> Vector<T> {
         assert!(self.cols == y.size(), "Matrix and Vector dimensions do not agree.");
 
@@ -967,7 +990,7 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
         Vector::new(x)
     }
 
-    /// Computes the parity of a permutation matrix.
+/// Computes the parity of a permutation matrix.
     fn parity(&self) -> T {
         let mut visited = vec![false; self.rows];
         let mut sgn = T::one();
@@ -991,27 +1014,27 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
         sgn
     }
 
-    /// Solves the equation Ax = y.
-    ///
-    /// Requires a Vector y as input.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::vector::Vector;
-    ///
-    /// let a = Matrix::new(2,2, vec![2.0,3.0,1.0,2.0]);
-    /// let y = Vector::new(vec![13.0,8.0]);
-    ///
-    /// let x = a.solve(y);
-    ///
-    /// assert_eq!(*x.data(), vec![2.0, 3.0]);
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// - The matrix column count and vector size are different.
+/// Solves the equation Ax = y.
+///
+/// Requires a Vector y as input.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::linalg::matrix::Matrix;
+/// use rusty_machine::linalg::vector::Vector;
+///
+/// let a = Matrix::new(2,2, vec![2.0,3.0,1.0,2.0]);
+/// let y = Vector::new(vec![13.0,8.0]);
+///
+/// let x = a.solve(y);
+///
+/// assert_eq!(*x.data(), vec![2.0, 3.0]);
+/// ```
+///
+/// # Panics
+///
+/// - The matrix column count and vector size are different.
     pub fn solve(&self, y: Vector<T>) -> Vector<T> {
         let (l,u,p) = self.lup_decomp();
 
@@ -1019,24 +1042,24 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
         u.solve_u_triangular(b)
     }
 
-    /// Computes the inverse of the matrix.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    ///
-    /// let a = Matrix::new(2,2, vec![2.,3.,1.,2.]);
-    /// let inv = a.inverse();
-    ///
-    /// let I = a * inv;
-    ///
-    /// assert_eq!(*I.data(), vec![1.0,0.0,0.0,1.0]);
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// - The matrix is not square.
+/// Computes the inverse of the matrix.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::linalg::matrix::Matrix;
+///
+/// let a = Matrix::new(2,2, vec![2.,3.,1.,2.]);
+/// let inv = a.inverse();
+///
+/// let I = a * inv;
+///
+/// assert_eq!(*I.data(), vec![1.0,0.0,0.0,1.0]);
+/// ```
+///
+/// # Panics
+///
+/// - The matrix is not square.
     pub fn inverse(&self) -> Matrix<T> {
         assert!(self.rows==self.cols, "Matrix is not square.");
 
@@ -1068,24 +1091,24 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
         Matrix::new(self.rows, self.cols, new_t_data).transpose()
     }
 
-    /// Computes the determinant of the matrix.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    ///
-    /// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
-    ///                               0.0,3.0,4.0,
-    ///                               5.0, 1.0, 2.0]);
-    ///
-    /// let det = a.det();
-    ///
-    /// ```
-    ///
-    /// # Panics
-    ///
-    /// - The matrix is not square.
+/// Computes the determinant of the matrix.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::linalg::matrix::Matrix;
+///
+/// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
+///                               0.0,3.0,4.0,
+///                               5.0, 1.0, 2.0]);
+///
+/// let det = a.det();
+///
+/// ```
+///
+/// # Panics
+///
+/// - The matrix is not square.
     pub fn det(&self) -> T {
         assert!(self.rows==self.cols, "Matrix is not square.");
 
@@ -1151,7 +1174,7 @@ impl<T: Float> Metric<T> for Matrix<T> {
     }
 }
 
-impl<T: Float> Metric<T> for MatrixSlice<T> {
+impl<'a, T: Float> Metric<T> for MatrixSlice<'a, T> {
     /// Compute euclidean norm for matrix.
     ///
     /// # Examples
@@ -1176,7 +1199,7 @@ impl<T: Float> Metric<T> for MatrixSlice<T> {
     }
 }
 
-impl<T: Float> Metric<T> for MatrixSliceMut<T> {
+impl<'a, T: Float> Metric<T> for MatrixSliceMut<'a, T> {
     /// Compute euclidean norm for matrix.
     ///
     /// # Examples
@@ -1208,7 +1231,7 @@ impl<T: fmt::Display> fmt::Display for Matrix<T> {
         for datum in &self.data {
             let datum_width = match f.precision() {
                 Some(places) => format!("{:.1$}", datum, places).len(),
-                None => format!("{}", datum).len()
+                None => format!("{}", datum).len(),
             };
             if datum_width > max_datum_width {
                 max_datum_width = datum_width;
@@ -1216,48 +1239,48 @@ impl<T: fmt::Display> fmt::Display for Matrix<T> {
         }
         let width = max_datum_width;
 
-        fn write_row<T: fmt::Display>(f: &mut fmt::Formatter, row: &[T],
+        fn write_row<T: fmt::Display>(f: &mut fmt::Formatter,
+                                      row: &[T],
                                       left_delimiter: &str,
                                       right_delimiter: &str,
                                       width: usize)
                                       -> Result<(), fmt::Error> {
-                try!(write!(f, "{}", left_delimiter));
-                for (index, datum) in row.iter().enumerate() {
-                    match f.precision() {
-                        Some(places) => {
-                            try!(write!(f, "{:1$.2$}", datum, width, places));
-                        },
-                        None => {
-                            try!(write!(f, "{:1$}", datum, width));
-                        }
+            try!(write!(f, "{}", left_delimiter));
+            for (index, datum) in row.iter().enumerate() {
+                match f.precision() {
+                    Some(places) => {
+                        try!(write!(f, "{:1$.2$}", datum, width, places));
                     }
-                    if index < row.len() - 1 {
-                        try!(write!(f, " "));
+                    None => {
+                        try!(write!(f, "{:1$}", datum, width));
                     }
                 }
+                if index < row.len() - 1 {
+                    try!(write!(f, " "));
+                }
+            }
             write!(f, "{}", right_delimiter)
         }
 
         match self.rows {
             1 => write_row(f, &self.data, "[", "]", width),
             _ => {
-                try!(write_row(f, &self.data[0..self.cols],
+                try!(write_row(f,
+                               &self.data[0..self.cols],
                                "⎡", // \u{23a1} LEFT SQUARE BRACKET UPPER CORNER
                                "⎤", // \u{23a4} RIGHT SQUARE BRACKET UPPER CORNER
                                width));
                 try!(f.write_str("\n"));
-                for row_index in 1..self.rows-1 {
+                for row_index in 1..self.rows - 1 {
                     try!(write_row(f,
-                                   &self.data[row_index*self.cols..
-                                              (row_index+1)*self.cols],
+                                   &self.data[row_index * self.cols..(row_index + 1) * self.cols],
                                    "⎢", // \u{23a2} LEFT SQUARE BRACKET EXTENSION
                                    "⎥", // \u{23a5} RIGHT SQUARE BRACKET EXTENSION
                                    width));
                     try!(f.write_str("\n"));
                 }
                 write_row(f,
-                          &self.data[(self.rows-1)*self.cols..
-                                     self.rows*self.cols],
+                          &self.data[(self.rows - 1) * self.cols..self.rows * self.cols],
                           "⎣", // \u{23a3} LEFT SQUARE BRACKET LOWER CORNER
                           "⎦", // \u{23a6} RIGHT SQUARE BRACKET LOWER CORNER
                           width)
@@ -1294,7 +1317,8 @@ mod tests {
     }
 
     #[test]
-    fn test_equality() { // well, "PartialEq", at least
+    fn test_equality() {
+        // well, "PartialEq", at least
         let a = Matrix::new(2, 3, vec![1., 2., 3., 4., 5., 6.]);
         let a_redux = a.clone();
         assert_eq!(a, a_redux);
@@ -1312,18 +1336,15 @@ mod tests {
     #[test]
     fn test_display_formatting() {
         let first_matrix = Matrix::new(2, 3, vec![1, 2, 3, 4, 5, 6]);
-        let first_expectation = "⎡1 2 3⎤\n\
-                                 ⎣4 5 6⎦";
+        let first_expectation = "⎡1 2 3⎤\n⎣4 5 6⎦";
         assert_eq!(first_expectation, format!("{}", first_matrix));
 
-        let second_matrix = Matrix::new(4, 3, vec![3.14, 2.718, 1.414,
-                                                   2.503, 4.669, 1.202,
-                                                   1.618, 0.5772, 1.3,
-                                                   2.68545, 1.282, 10000.]);
-        let second_expectation = "⎡   3.14   2.718   1.414⎤\n\
-                                  ⎢  2.503   4.669   1.202⎥\n\
-                                  ⎢  1.618  0.5772     1.3⎥\n\
-                                  ⎣2.68545   1.282   10000⎦";
+        let second_matrix = Matrix::new(4,
+                                        3,
+                                        vec![3.14, 2.718, 1.414, 2.503, 4.669, 1.202, 1.618,
+                                             0.5772, 1.3, 2.68545, 1.282, 10000.]);
+        let second_expectation = "⎡   3.14   2.718   1.414⎤\n⎢  2.503   4.669   1.202⎥\n⎢  1.618  \
+                                  0.5772     1.3⎥\n⎣2.68545   1.282   10000⎦";
         assert_eq!(second_expectation, format!("{}", second_matrix));
     }
 
@@ -1335,21 +1356,14 @@ mod tests {
 
     #[test]
     fn test_display_formatting_precision() {
-        let our_matrix = Matrix::new(2, 3, vec![1.2, 1.23, 1.234,
-                                                1.2345, 1.23456, 1.234567]);
-        let expectations = vec![
-            "⎡1.2 1.2 1.2⎤\n\
-             ⎣1.2 1.2 1.2⎦",
+        let our_matrix = Matrix::new(2, 3, vec![1.2, 1.23, 1.234, 1.2345, 1.23456, 1.234567]);
+        let expectations = vec!["⎡1.2 1.2 1.2⎤\n⎣1.2 1.2 1.2⎦",
 
-            "⎡1.20 1.23 1.23⎤\n\
-             ⎣1.23 1.23 1.23⎦",
+                                "⎡1.20 1.23 1.23⎤\n⎣1.23 1.23 1.23⎦",
 
-            "⎡1.200 1.230 1.234⎤\n\
-             ⎣1.234 1.235 1.235⎦",
+                                "⎡1.200 1.230 1.234⎤\n⎣1.234 1.235 1.235⎦",
 
-            "⎡1.2000 1.2300 1.2340⎤\n\
-             ⎣1.2345 1.2346 1.2346⎦"
-        ];
+                                "⎡1.2000 1.2300 1.2340⎤\n⎣1.2345 1.2346 1.2346⎦"];
 
         for (places, &expectation) in (1..5).zip(expectations.iter()) {
             assert_eq!(expectation, format!("{:.1$}", our_matrix, places));
@@ -1360,57 +1374,59 @@ mod tests {
     fn test_split_matrix() {
         let a = Matrix::new(3, 3, (0..9).collect::<Vec<_>>());
 
-        let (b,c) = a.split_at(1, Axes::Row);
+        let (b, c) = a.split_at(1, Axes::Row);
 
         assert_eq!(b.rows(), 1);
         assert_eq!(b.cols(), 3);
         assert_eq!(c.rows(), 2);
         assert_eq!(c.cols(), 3);
 
-        assert_eq!(b[[0,0]], 0);
-        assert_eq!(b[[0,1]], 1);
-        assert_eq!(b[[0,2]], 2);
-        assert_eq!(c[[0,0]], 3);
-        assert_eq!(c[[0,1]], 4);
-        assert_eq!(c[[0,2]], 5);
-        assert_eq!(c[[1,0]], 6);
-        assert_eq!(c[[1,1]], 7);
-        assert_eq!(c[[1,2]], 8);
+        assert_eq!(b[[0, 0]], 0);
+        assert_eq!(b[[0, 1]], 1);
+        assert_eq!(b[[0, 2]], 2);
+        assert_eq!(c[[0, 0]], 3);
+        assert_eq!(c[[0, 1]], 4);
+        assert_eq!(c[[0, 2]], 5);
+        assert_eq!(c[[1, 0]], 6);
+        assert_eq!(c[[1, 1]], 7);
+        assert_eq!(c[[1, 2]], 8);
     }
 
     #[test]
     fn test_split_matrix_mut() {
         let mut a = Matrix::new(3, 3, (0..9).collect::<Vec<_>>());
 
-        let (mut b, mut c) = a.split_at_mut(1, Axes::Row);
+        {
+            let (mut b, mut c) = a.split_at_mut(1, Axes::Row);
 
-        assert_eq!(b.rows(), 1);
-        assert_eq!(b.cols(), 3);
-        assert_eq!(c.rows(), 2);
-        assert_eq!(c.cols(), 3);
+            assert_eq!(b.rows(), 1);
+            assert_eq!(b.cols(), 3);
+            assert_eq!(c.rows(), 2);
+            assert_eq!(c.cols(), 3);
 
-        assert_eq!(b[[0,0]], 0);
-        assert_eq!(b[[0,1]], 1);
-        assert_eq!(b[[0,2]], 2);
-        assert_eq!(c[[0,0]], 3);
-        assert_eq!(c[[0,1]], 4);
-        assert_eq!(c[[0,2]], 5);
-        assert_eq!(c[[1,0]], 6);
-        assert_eq!(c[[1,1]], 7);
-        assert_eq!(c[[1,2]], 8);
+            assert_eq!(b[[0, 0]], 0);
+            assert_eq!(b[[0, 1]], 1);
+            assert_eq!(b[[0, 2]], 2);
+            assert_eq!(c[[0, 0]], 3);
+            assert_eq!(c[[0, 1]], 4);
+            assert_eq!(c[[0, 2]], 5);
+            assert_eq!(c[[1, 0]], 6);
+            assert_eq!(c[[1, 1]], 7);
+            assert_eq!(c[[1, 2]], 8);
 
-        b[[0,0]] = 4;
-        c[[0,0]] = 5;
+            b[[0, 0]] = 4;
+            c[[0, 0]] = 5;
+        }
 
-        assert_eq!(a[[0,0]], 4);
-        assert_eq!(a[[0,1]], 1);
-        assert_eq!(a[[0,2]], 2);
-        assert_eq!(a[[1,0]], 5);
-        assert_eq!(a[[1,1]], 4);
-        assert_eq!(a[[1,2]], 5);
-        assert_eq!(a[[2,0]], 6);
-        assert_eq!(a[[2,1]], 7);
-        assert_eq!(a[[2,2]], 8);
+        assert_eq!(a[[0, 0]], 4);
+        assert_eq!(a[[0, 1]], 1);
+        assert_eq!(a[[0, 2]], 2);
+        assert_eq!(a[[1, 0]], 5);
+        assert_eq!(a[[1, 1]], 4);
+        assert_eq!(a[[1, 2]], 5);
+        assert_eq!(a[[2, 0]], 6);
+        assert_eq!(a[[2, 1]], 7);
+        assert_eq!(a[[2, 2]], 8);
 
     }
 
@@ -1418,40 +1434,40 @@ mod tests {
     fn test_matrix_index_mut() {
         let mut a = Matrix::new(3, 3, vec![2.0; 9]);
 
-        a[[0,0]] = 13.0;
+        a[[0, 0]] = 13.0;
 
         for i in 1..9 {
             assert_eq!(a.data()[i], 2.0);
         }
 
-        assert_eq!(a[[0,0]], 13.0);
+        assert_eq!(a[[0, 0]], 13.0);
     }
 
     #[test]
     fn test_matrix_select_rows() {
-        let a = Matrix::new(4,2, (0..8).collect::<Vec<usize>>());
+        let a = Matrix::new(4, 2, (0..8).collect::<Vec<usize>>());
 
-        let b = a.select_rows(&[0,2,3]);
+        let b = a.select_rows(&[0, 2, 3]);
 
-        assert_eq!(b.into_vec(), vec![0,1,4,5,6,7]);
+        assert_eq!(b.into_vec(), vec![0, 1, 4, 5, 6, 7]);
     }
 
     #[test]
     fn test_matrix_select_cols() {
-        let a = Matrix::new(4,2, (0..8).collect::<Vec<usize>>());
+        let a = Matrix::new(4, 2, (0..8).collect::<Vec<usize>>());
 
         let b = a.select_cols(&[1]);
 
-        assert_eq!(b.into_vec(), vec![1,3,5,7]);
+        assert_eq!(b.into_vec(), vec![1, 3, 5, 7]);
     }
 
     #[test]
     fn test_matrix_select() {
-        let a = Matrix::new(4,2, (0..8).collect::<Vec<usize>>());
+        let a = Matrix::new(4, 2, (0..8).collect::<Vec<usize>>());
 
-        let b = a.select(&[0,2], &[1]);
+        let b = a.select(&[0, 2], &[1]);
 
-        assert_eq!(b.into_vec(), vec![1,5]);
+        assert_eq!(b.into_vec(), vec![1, 5]);
     }
 
     #[test]
@@ -1482,8 +1498,8 @@ mod tests {
 
         let e = Matrix::<f64>::new(5,
                                    5,
-                                   vec![1., 2., 3., 4., 5., 3., 0., 4., 5., 6., 2., 1., 2., 3., 4.,
-                                        0., 0., 0., 6., 5., 0., 0., 0., 5., 6.]);
+                                   vec![1., 2., 3., 4., 5., 3., 0., 4., 5., 6., 2., 1., 2., 3.,
+                                        4., 0., 0., 0., 6., 5., 0., 0., 0., 5., 6.]);
 
         let f = e.det();
 
