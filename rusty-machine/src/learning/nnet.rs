@@ -29,7 +29,7 @@
 //! model.train(&inputs, &targets);
 //!
 //! let test_inputs = Matrix::new(2,3, vec![1.5,1.5,1.5,5.1,5.1,5.1]);
-//! 
+//!
 //! // And predict new output from the test inputs
 //! model.predict(&test_inputs);
 //! ```
@@ -318,7 +318,7 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
                 z = ones.hcat(&z);
 
                 let g = self.criterion.grad_activ(z);
-                delta = (delta * self.get_layer_weights(weights, l).into_matrix().transpose())
+                delta = (delta * Matrix::from(self.get_layer_weights(weights, l)).transpose())
                             .elemul(&g);
 
                 let non_one_rows = &(1..delta.cols()).collect::<Vec<usize>>()[..];
