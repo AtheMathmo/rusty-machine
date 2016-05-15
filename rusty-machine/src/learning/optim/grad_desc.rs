@@ -11,6 +11,9 @@
 use learning::optim::{Optimizable, OptimAlgorithm};
 use linalg::vector::Vector;
 use linalg::matrix::Matrix;
+use linalg::utils;
+
+use learning::toolkit::rand_utils;
 
 /// Batch Gradient Descent algorithm
 #[derive(Clone, Copy, Debug)]
@@ -28,7 +31,6 @@ pub struct GradientDesc {
 /// - alpha = 0.3
 /// - iters = 100
 impl Default for GradientDesc {
-
     fn default() -> GradientDesc {
         GradientDesc {
             alpha: 0.3,
@@ -100,7 +102,6 @@ pub struct StochasticGD {
 /// - mu = 0.1
 /// - iters = 20
 impl Default for StochasticGD {
-
     fn default() -> StochasticGD {
         StochasticGD {
             alpha: 0.1,
@@ -133,24 +134,75 @@ impl StochasticGD {
 }
 
 impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm<M> for StochasticGD {
+    fn optimize(&self,
+                model: &M,
+                start: &[f64],
+                inputs: &M::Inputs,
+                targets: &M::Targets)
+                -> Vec<f64> {
+        let mut optimizing_val = Vector::new(start.to_vec());
+        let mut delta_w = Vector::zeros(start.len());
 
-    fn optimize(&self, model: &M, start: &[f64], inputs: &M::Inputs, targets: &M::Targets) -> Vec<f64> {
-
-        let (_, vec_data) = model.compute_grad(start,
-                                               &inputs.select_rows(&[0]),
-                                               &targets.select_rows(&[0]));
-        let grad = Vector::new(vec_data);
-        let mut delta_w = grad * self.alpha;
-        let mut optimizing_val = Vector::new(start.to_vec()) - &delta_w * self.mu;
+        let mut permutation = (0..inputs.rows()).collect::<Vec<_>>();
 
         for _ in 0..self.iters {
-            for i in 1..inputs.rows() {
-                let (_, vec_data) = model.compute_grad(&optimizing_val.data()[..],
-                                                       &inputs.select_rows(&[i]),
-                                                       &targets.select_rows(&[i]));
+            rand_utils::in_place_fisher_yates(&mut permutation);
+            for i in permutation.iter() {
+                let (_, vec_data) = model.compute_grad(&optimizing_val.data(),
+                                                       &inputs.select_rows(&[*i]),
+                                                       &targets.select_rows(&[*i]));
 
                 delta_w = Vector::new(vec_data) * self.mu + &delta_w * self.alpha;
                 optimizing_val = &optimizing_val - &delta_w * self.mu;
+            }
+        }
+        optimizing_val.into_vec()
+    }
+}
+
+#[derive(Debug)]
+pub struct AdaGrad {
+    alpha: f64,
+    tau: f64,
+    iters: usize,
+}
+
+impl Default for AdaGrad {
+    fn default() -> AdaGrad {
+        AdaGrad {
+            alpha: 1f64,
+            tau: 3f64,
+            iters: 100,
+        }
+    }
+}
+
+impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm<M> for AdaGrad {
+    fn optimize(&self,
+                model: &M,
+                start: &[f64],
+                inputs: &M::Inputs,
+                targets: &M::Targets)
+                -> Vec<f64> {
+
+        let mut ada_s = Vector::zeros(start.len());
+        let mut optimizing_val = Vector::new(start.to_vec());
+
+        let mut permutation = (0..inputs.rows()).collect::<Vec<_>>();
+
+        for _ in 0..self.iters {
+            rand_utils::in_place_fisher_yates(&mut permutation);
+            for i in permutation.iter() {
+                let (_, vec_data) = model.compute_grad(optimizing_val.data(),
+                                                       &inputs.select_rows(&[*i]),
+                                                       &targets.select_rows(&[*i]));
+
+                utils::in_place_vec_bin_op(ada_s.mut_data(), &vec_data, |x, &y| {*x = *x + y*y });
+                let delta_grad = utils::vec_bin_op(&vec_data,
+                                           ada_s.data(),
+                                           |x, y| self.alpha * (x / (self.tau + (y).sqrt())));
+
+                optimizing_val = &optimizing_val - Vector::new(delta_grad);
             }
         }
         optimizing_val.into_vec()

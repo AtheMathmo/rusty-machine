@@ -35,6 +35,37 @@ pub fn reservoir_sample<T: Copy>(pool: &[T], reservoir_size: usize) -> Vec<T> {
 		}
 	}
 	
-
 	res
+}
+
+/// The inside out Fisher-Yates algorithm.
+pub fn fisher_yates<T: Copy>(arr: &[T]) -> Vec<T> {
+	let n = arr.len();
+	let mut rng = thread_rng();
+
+	let mut shuffled_arr = Vec::with_capacity(n);
+
+	for i in 0..n {
+		let j = rng.gen_range(0, i + 1);
+
+		if j != i {
+			let x = shuffled_arr[j];
+			shuffled_arr.push(x);
+		}
+
+		shuffled_arr[j] = arr[i];
+	}
+
+	shuffled_arr
+}
+
+/// The in place Fisher-Yates shuffle.
+pub fn in_place_fisher_yates<T>(arr: &mut [T]) {
+	let n = arr.len();
+	let mut rng = thread_rng();
+
+	for i in 0..n {
+		let j = rng.gen_range(0, n - i);
+		arr.swap(i, i + j);
+	}
 }

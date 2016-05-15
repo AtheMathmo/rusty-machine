@@ -50,6 +50,11 @@ impl<T> Vector<T> {
         &self.data
     }
 
+    /// Returns a mutable slice of the underlying data.
+    pub fn mut_data(&mut self) -> &mut [T] {
+        &mut self.data
+    }
+
     /// Consumes the Vector and returns the Vec of data.
     pub fn into_vec(self) -> Vec<T> {
         self.data
