@@ -21,9 +21,9 @@ const LEARNING_EPS : f64 = 1e-20;
 #[derive(Clone, Copy, Debug)]
 pub struct GradientDesc {
     /// The step-size for the gradient descent steps.
-    pub alpha: f64,
+    alpha: f64,
     /// The number of iterations to run.
-    pub iters: usize,
+    iters: usize,
 }
 
 /// The default gradient descent algorithm.
@@ -55,6 +55,8 @@ impl GradientDesc {
     /// let gd = GradientDesc::new(0.3, 10000);
     /// ```
     pub fn new(alpha: f64, iters: usize) -> GradientDesc {
+        assert!(alpha > 0f64, "The step size (alpha) must be greater than 0.");
+
         GradientDesc {
             alpha: alpha,
             iters: iters,
@@ -70,9 +72,13 @@ impl<M: Optimizable> OptimAlgorithm<M> for GradientDesc {
                 targets: &M::Targets)
                 -> Vec<f64> {
 
+        // Create the initial optimal parameters
         let mut optimizing_val = Vector::new(start.to_vec());
+        // The cost at the start of each iteration
         let mut start_iter_cost = 0f64;
+
         for _ in 0..self.iters {
+            // Compute the cost and gradient for the current parameters
             let (cost, grad) = model.compute_grad(&optimizing_val.data()[..],
                                                             inputs,
                                                             targets);
@@ -81,8 +87,10 @@ impl<M: Optimizable> OptimAlgorithm<M> for GradientDesc {
             if (start_iter_cost - cost).abs() < LEARNING_EPS {
                 break
             } else {
+                // Update the optimal parameters using gradient descent
                 optimizing_val = &optimizing_val -
                                  Vector::new(grad) * self.alpha;
+                // Update the latest cost
                 start_iter_cost = cost;
             }
         }
@@ -96,11 +104,11 @@ impl<M: Optimizable> OptimAlgorithm<M> for GradientDesc {
 #[derive(Clone, Copy, Debug)]
 pub struct StochasticGD {
     /// Controls the momentum of the descent
-    pub alpha: f64,
+    alpha: f64,
     /// The square root of the raw learning rate.
-    pub mu: f64,
+    mu: f64,
     /// The number of passes through the data.
-    pub iters: usize,
+    iters: usize,
 }
 
 /// The default Stochastic GD algorithm.
@@ -134,6 +142,9 @@ impl StochasticGD {
     /// let sgd = StochasticGD::new(0.1, 0.3, 5);
     /// ```
     pub fn new(alpha: f64, mu: f64, iters: usize) -> StochasticGD {
+        assert!(alpha > 0f64, "The momentum (alpha) must be greater than 0.");
+        assert!(mu > 0f64, "The step size (mu) must be greater than 0.");
+
         StochasticGD {
             alpha: alpha,
             mu: mu,
@@ -149,23 +160,33 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
                 inputs: &M::Inputs,
                 targets: &M::Targets)
                 -> Vec<f64> {
+
+        // Create the initial optimal parameters
         let mut optimizing_val = Vector::new(start.to_vec());
+        // Create the momentum based gradient distance
         let mut delta_w = Vector::zeros(start.len());
 
+        // Set up the indices for permutation
         let mut permutation = (0..inputs.rows()).collect::<Vec<_>>();
-
+        // The cost at the start of each iteration
         let mut start_iter_cost = 0f64;
 
         for _ in 0..self.iters {
+            // The cost at the end of each stochastic gd pass
             let mut end_cost = 1f64;
+            // Permute the indices
             rand_utils::in_place_fisher_yates(&mut permutation);
             for i in permutation.iter() {
+                // Compute the cost and gradient for this data pair
                 let (cost, vec_data) = model.compute_grad(&optimizing_val.data(),
                                                        &inputs.select_rows(&[*i]),
                                                        &targets.select_rows(&[*i]));
 
+                // Compute the difference in gradient using momentum
                 delta_w = Vector::new(vec_data) * self.mu + &delta_w * self.alpha;
+                // Update the parameters
                 optimizing_val = &optimizing_val - &delta_w * self.mu;
+                // Set the end cost (this is only used after the last iteration)
                 end_cost = cost;
             }
 
@@ -173,6 +194,7 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
             if (start_iter_cost - end_cost).abs() < LEARNING_EPS {
                 break
             } else {
+                // Update the cost
                 start_iter_cost = end_cost;
             }
         }
@@ -189,6 +211,8 @@ pub struct AdaGrad {
 
 impl AdaGrad {
     pub fn new(alpha: f64, tau: f64, iters: usize) -> AdaGrad {
+        assert!(alpha > 0f64, "The step size (alpha) must be greater than 0.");
+        assert!(tau >= 0f64, "The adaptive constant (tau) cannot be negative.");
         AdaGrad {
             alpha: alpha,
             tau: tau,
@@ -215,27 +239,36 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
                 targets: &M::Targets)
                 -> Vec<f64> {
 
+        // Initialize the adaptive scaling
         let mut ada_s = Vector::zeros(start.len());
+        // Initialize the optimal parameters
         let mut optimizing_val = Vector::new(start.to_vec());
 
+        // Set up the indices for permutation
         let mut permutation = (0..inputs.rows()).collect::<Vec<_>>();
-
+        // The cost at the start of each iteration
         let mut start_iter_cost = 0f64;
 
         for _ in 0..self.iters {
+            // The cost at the end of each stochastic gd pass
             let mut end_cost = 1f64;
+            // Permute the indices
             rand_utils::in_place_fisher_yates(&mut permutation);
             for i in permutation.iter() {
+                // Compute the cost and gradient for this data pair
                 let (cost, vec_data) = model.compute_grad(optimizing_val.data(),
                                                        &inputs.select_rows(&[*i]),
                                                        &targets.select_rows(&[*i]));
-
+                // Update the adaptive scaling by adding the gradient squared
                 utils::in_place_vec_bin_op(ada_s.mut_data(), &vec_data, |x, &y| {*x = *x + y*y });
+
+                // Compute the change in gradient
                 let delta_grad = utils::vec_bin_op(&vec_data,
                                            ada_s.data(),
                                            |x, y| self.alpha * (x / (self.tau + (y).sqrt())));
-
+                // Update the parameters
                 optimizing_val = &optimizing_val - Vector::new(delta_grad);
+                // Set the end cost (this is only used after the last iteration)
                 end_cost = cost;
             }
 
@@ -243,9 +276,47 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
             if (start_iter_cost - end_cost).abs() < LEARNING_EPS {
                 break
             } else {
+                // Update the cost
                 start_iter_cost = end_cost;
             }
         }
         optimizing_val.into_vec()
     }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::{GradientDesc, StochasticGD, AdaGrad};
+
+    #[test]
+    #[should_panic]
+    fn gd_neg_stepsize() {
+        let _ = GradientDesc::new(-0.5, 0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn stochastic_gd_neg_momentum() {
+        let _ = StochasticGD::new(-0.5, 1f64, 0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn stochastic_gd_neg_stepsize() {
+        let _ = StochasticGD::new(0.5, -1f64, 0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn adagrad_neg_stepsize() {
+        let _ = AdaGrad::new(-0.5, 1f64, 0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn adagrad_neg_adaptive_scale() {
+        let _ = AdaGrad::new(0.5, -1f64, 0);
+    }
+
 }
