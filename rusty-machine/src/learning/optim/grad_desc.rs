@@ -15,6 +15,8 @@ use linalg::utils;
 
 use learning::toolkit::rand_utils;
 
+const LEARNING_EPS : f64 = 1e-20;
+
 /// Batch Gradient Descent algorithm
 #[derive(Clone, Copy, Debug)]
 pub struct GradientDesc {
@@ -69,13 +71,20 @@ impl<M: Optimizable> OptimAlgorithm<M> for GradientDesc {
                 -> Vec<f64> {
 
         let mut optimizing_val = Vector::new(start.to_vec());
-
+        let mut start_iter_cost = 0f64;
         for _ in 0..self.iters {
-            optimizing_val = &optimizing_val -
-                             Vector::new(model.compute_grad(&optimizing_val.data()[..],
+            let (cost, grad) = model.compute_grad(&optimizing_val.data()[..],
                                                             inputs,
-                                                            targets)
-                                              .1) * self.alpha;
+                                                            targets);
+
+            // Early stopping
+            if (start_iter_cost - cost).abs() < LEARNING_EPS {
+                break
+            } else {
+                optimizing_val = &optimizing_val -
+                                 Vector::new(grad) * self.alpha;
+                start_iter_cost = cost;
+            }
         }
         optimizing_val.into_vec()
     }
@@ -145,15 +154,26 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
 
         let mut permutation = (0..inputs.rows()).collect::<Vec<_>>();
 
+        let mut start_iter_cost = 0f64;
+
         for _ in 0..self.iters {
+            let mut end_cost = 1f64;
             rand_utils::in_place_fisher_yates(&mut permutation);
             for i in permutation.iter() {
-                let (_, vec_data) = model.compute_grad(&optimizing_val.data(),
+                let (cost, vec_data) = model.compute_grad(&optimizing_val.data(),
                                                        &inputs.select_rows(&[*i]),
                                                        &targets.select_rows(&[*i]));
 
                 delta_w = Vector::new(vec_data) * self.mu + &delta_w * self.alpha;
                 optimizing_val = &optimizing_val - &delta_w * self.mu;
+                end_cost = cost;
+            }
+
+            // Early stopping
+            if (start_iter_cost - end_cost).abs() < LEARNING_EPS {
+                break
+            } else {
+                start_iter_cost = end_cost;
             }
         }
         optimizing_val.into_vec()
@@ -165,6 +185,16 @@ pub struct AdaGrad {
     alpha: f64,
     tau: f64,
     iters: usize,
+}
+
+impl AdaGrad {
+    pub fn new(alpha: f64, tau: f64, iters: usize) -> AdaGrad {
+        AdaGrad {
+            alpha: alpha,
+            tau: tau,
+            iters: iters,
+        }
+    }
 }
 
 impl Default for AdaGrad {
@@ -190,10 +220,13 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
 
         let mut permutation = (0..inputs.rows()).collect::<Vec<_>>();
 
+        let mut start_iter_cost = 0f64;
+
         for _ in 0..self.iters {
+            let mut end_cost = 1f64;
             rand_utils::in_place_fisher_yates(&mut permutation);
             for i in permutation.iter() {
-                let (_, vec_data) = model.compute_grad(optimizing_val.data(),
+                let (cost, vec_data) = model.compute_grad(optimizing_val.data(),
                                                        &inputs.select_rows(&[*i]),
                                                        &targets.select_rows(&[*i]));
 
@@ -203,6 +236,14 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
                                            |x, y| self.alpha * (x / (self.tau + (y).sqrt())));
 
                 optimizing_val = &optimizing_val - Vector::new(delta_grad);
+                end_cost = cost;
+            }
+
+            // Earyl stopping
+            if (start_iter_cost - end_cost).abs() < LEARNING_EPS {
+                break
+            } else {
+                start_iter_cost = end_cost;
             }
         }
         optimizing_val.into_vec()
