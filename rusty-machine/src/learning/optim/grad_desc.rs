@@ -173,7 +173,7 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
 
         for _ in 0..self.iters {
             // The cost at the end of each stochastic gd pass
-            let mut end_cost = 1f64;
+            let mut end_cost = 0f64;
             // Permute the indices
             rand_utils::in_place_fisher_yates(&mut permutation);
             for i in permutation.iter() {
@@ -187,8 +187,10 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
                 // Update the parameters
                 optimizing_val = &optimizing_val - &delta_w * self.mu;
                 // Set the end cost (this is only used after the last iteration)
-                end_cost = cost;
+                end_cost += cost;
             }
+
+            end_cost /= inputs.rows() as f64;
 
             // Early stopping
             if (start_iter_cost - end_cost).abs() < LEARNING_EPS {
@@ -251,30 +253,31 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
 
         for _ in 0..self.iters {
             // The cost at the end of each stochastic gd pass
-            let mut end_cost = 1f64;
+            let mut end_cost = 0f64;
             // Permute the indices
             rand_utils::in_place_fisher_yates(&mut permutation);
             for i in permutation.iter() {
                 // Compute the cost and gradient for this data pair
-                let (cost, vec_data) = model.compute_grad(optimizing_val.data(),
+                let (cost, mut vec_data) = model.compute_grad(optimizing_val.data(),
                                                        &inputs.select_rows(&[*i]),
                                                        &targets.select_rows(&[*i]));
                 // Update the adaptive scaling by adding the gradient squared
                 utils::in_place_vec_bin_op(ada_s.mut_data(), &vec_data, |x, &y| {*x = *x + y*y });
 
                 // Compute the change in gradient
-                let delta_grad = utils::vec_bin_op(&vec_data,
+                utils::in_place_vec_bin_op(&mut vec_data,
                                            ada_s.data(),
-                                           |x, y| self.alpha * (x / (self.tau + (y).sqrt())));
+                                           |x, &y| *x = self.alpha * (*x / (self.tau + (y).sqrt())));
                 // Update the parameters
-                optimizing_val = &optimizing_val - Vector::new(delta_grad);
+                optimizing_val = &optimizing_val - Vector::new(vec_data);
                 // Set the end cost (this is only used after the last iteration)
-                end_cost = cost;
+                end_cost += cost;
             }
+            end_cost /= inputs.rows() as f64;
 
-            // Earyl stopping
+            // Early stopping
             if (start_iter_cost - end_cost).abs() < LEARNING_EPS {
-                break
+               break
             } else {
                 // Update the cost
                 start_iter_cost = end_cost;
