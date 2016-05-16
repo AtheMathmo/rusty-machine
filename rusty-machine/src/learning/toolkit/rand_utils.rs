@@ -1,6 +1,7 @@
-//! Utility functions for random sampling
+//! Utility functions for random functionality.
 //!
-//! Currently this module only includes reservoir sampling.
+//! This module provides sampling and shuffling which are used
+//! within the learning modules.
 
 use rand::{Rng, thread_rng};
 
@@ -102,5 +103,41 @@ pub fn in_place_fisher_yates<T>(arr: &mut [T]) {
 		// Swap i with a random point after it
 		let j = rng.gen_range(0, n - i);
 		arr.swap(i, i + j);
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn test_reservoir_sample() {
+		let a = vec![1, 2, 3, 4, 5, 6, 7];
+
+		let b = reservoir_sample(&a, 3);
+
+		assert_eq!(b.len(), 3);
+	}
+
+	#[test]
+	fn test_fisher_yates() {
+		let a = (0..10).collect::<Vec<_>>();
+
+		let b = fisher_yates(&a);
+
+		for val in a.iter() {
+			assert!(b.contains(val));
+		}
+	}
+
+	#[test]
+	fn test_in_place_fisher_yates() {
+		let mut a = (0..10).collect::<Vec<_>>();
+
+		in_place_fisher_yates(&mut a);
+
+		for val in 0..10 {
+			assert!(a.contains(&val));
+		}
 	}
 }

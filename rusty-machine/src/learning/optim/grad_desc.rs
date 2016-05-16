@@ -204,6 +204,9 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
     }
 }
 
+/// Adaptive Gradient Descent
+///
+/// The adaptive gradient descent algorithm (Duchi et al. 2010).
 #[derive(Debug)]
 pub struct AdaGrad {
     alpha: f64,
@@ -212,6 +215,17 @@ pub struct AdaGrad {
 }
 
 impl AdaGrad {
+    /// Constructs a new AdaGrad algorithm.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::optim::grad_desc::AdaGrad;
+    ///
+    /// // Create a new AdaGrad algorithm with step size 0.5
+    /// // and adaptive scaling constant 1.0
+    /// let gd = AdaGrad::new(0.5, 1.0, 100);
+    /// ```
     pub fn new(alpha: f64, tau: f64, iters: usize) -> AdaGrad {
         assert!(alpha > 0f64, "The step size (alpha) must be greater than 0.");
         assert!(tau >= 0f64, "The adaptive constant (tau) cannot be negative.");
