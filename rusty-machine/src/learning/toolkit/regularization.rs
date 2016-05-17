@@ -1,3 +1,19 @@
+//! Regularization Module
+//!
+//! This module contains some base utility methods for regularization
+//! within machine learning algorithms.
+//!
+//! The module contains a `Regularization` enum which provides access to
+//! L1, L2 and ElasticNet regularization.
+//!
+//! # Examples
+//!
+//! ```
+//! use rusty_machine::learning::toolkit::regularization::Regularization;
+//!
+//! let reg = Regularization::L1(0.5);
+//! ```
+
 use linalg::Metric;
 use linalg::matrix::{Matrix, MatrixSlice};
 use linalg::matrix::slice::BaseSlice;
