@@ -2,6 +2,30 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.3.0
+
+## New Contributors
+
+- [rrichardson](https://github.com/rrichardson)
+
+## Breaking Changes
+
+- All fields on `GradDesc` and `StochasticGD` are now private.
+- Matrix slices now have the same lifetime as their target data.
+
+### Features
+
+- Adding new slice utility methods : `from_raw_parts` for `MatrixSlice`s and `as_slice` methods for `Matrix`.
+- Adding framework for regularization. Implementing regularization for nnets.
+- Adding early stopping to gradient descent algorithms.
+- Adding `AdaGrad` gradient descent algorithm.
+- Implementing `Into` and `From` for `Matrix`, `Vector`, and `MatrixSlice`s.
+
+### Minor Changes
+
+- Bug fixing naive bayes : no longer attempts to update empty class.
+- Removing unneeded trait bounds on `Matrix`/`Vector` implementations.
+
 ## 0.2.8
 
 ### Breaking Changes
