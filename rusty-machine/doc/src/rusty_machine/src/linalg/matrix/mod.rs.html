@@ -1530,6 +1530,111 @@
 <span id="1487">1487</span>
 <span id="1488">1488</span>
 <span id="1489">1489</span>
+<span id="1490">1490</span>
+<span id="1491">1491</span>
+<span id="1492">1492</span>
+<span id="1493">1493</span>
+<span id="1494">1494</span>
+<span id="1495">1495</span>
+<span id="1496">1496</span>
+<span id="1497">1497</span>
+<span id="1498">1498</span>
+<span id="1499">1499</span>
+<span id="1500">1500</span>
+<span id="1501">1501</span>
+<span id="1502">1502</span>
+<span id="1503">1503</span>
+<span id="1504">1504</span>
+<span id="1505">1505</span>
+<span id="1506">1506</span>
+<span id="1507">1507</span>
+<span id="1508">1508</span>
+<span id="1509">1509</span>
+<span id="1510">1510</span>
+<span id="1511">1511</span>
+<span id="1512">1512</span>
+<span id="1513">1513</span>
+<span id="1514">1514</span>
+<span id="1515">1515</span>
+<span id="1516">1516</span>
+<span id="1517">1517</span>
+<span id="1518">1518</span>
+<span id="1519">1519</span>
+<span id="1520">1520</span>
+<span id="1521">1521</span>
+<span id="1522">1522</span>
+<span id="1523">1523</span>
+<span id="1524">1524</span>
+<span id="1525">1525</span>
+<span id="1526">1526</span>
+<span id="1527">1527</span>
+<span id="1528">1528</span>
+<span id="1529">1529</span>
+<span id="1530">1530</span>
+<span id="1531">1531</span>
+<span id="1532">1532</span>
+<span id="1533">1533</span>
+<span id="1534">1534</span>
+<span id="1535">1535</span>
+<span id="1536">1536</span>
+<span id="1537">1537</span>
+<span id="1538">1538</span>
+<span id="1539">1539</span>
+<span id="1540">1540</span>
+<span id="1541">1541</span>
+<span id="1542">1542</span>
+<span id="1543">1543</span>
+<span id="1544">1544</span>
+<span id="1545">1545</span>
+<span id="1546">1546</span>
+<span id="1547">1547</span>
+<span id="1548">1548</span>
+<span id="1549">1549</span>
+<span id="1550">1550</span>
+<span id="1551">1551</span>
+<span id="1552">1552</span>
+<span id="1553">1553</span>
+<span id="1554">1554</span>
+<span id="1555">1555</span>
+<span id="1556">1556</span>
+<span id="1557">1557</span>
+<span id="1558">1558</span>
+<span id="1559">1559</span>
+<span id="1560">1560</span>
+<span id="1561">1561</span>
+<span id="1562">1562</span>
+<span id="1563">1563</span>
+<span id="1564">1564</span>
+<span id="1565">1565</span>
+<span id="1566">1566</span>
+<span id="1567">1567</span>
+<span id="1568">1568</span>
+<span id="1569">1569</span>
+<span id="1570">1570</span>
+<span id="1571">1571</span>
+<span id="1572">1572</span>
+<span id="1573">1573</span>
+<span id="1574">1574</span>
+<span id="1575">1575</span>
+<span id="1576">1576</span>
+<span id="1577">1577</span>
+<span id="1578">1578</span>
+<span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
+<span id="1588">1588</span>
+<span id="1589">1589</span>
+<span id="1590">1590</span>
+<span id="1591">1591</span>
+<span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The matrix module.</span>
 <span class='doccomment'>//!</span>
@@ -1544,6 +1649,7 @@
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>Metric</span>;
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>vector</span>::<span class='ident'>Vector</span>;
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>utils</span>;
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>marker</span>::<span class='ident'>PhantomData</span>;
 
 <span class='kw'>mod</span> <span class='ident'>decomposition</span>;
 <span class='kw'>mod</span> <span class='ident'>impl_ops</span>;
@@ -1577,11 +1683,12 @@
 <span class='doccomment'>/// The struct contains the upper left point of the slice</span>
 <span class='doccomment'>/// and the width and height of the slice.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>, <span class='ident'>Clone</span>, <span class='ident'>Copy</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
     <span class='ident'>ptr</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>T</span>,
     <span class='ident'>rows</span>: <span class='ident'>usize</span>,
     <span class='ident'>cols</span>: <span class='ident'>usize</span>,
     <span class='ident'>row_stride</span>: <span class='ident'>usize</span>,
+    <span class='ident'>marker</span>: <span class='ident'>PhantomData</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span>,
 }
 
 <span class='doccomment'>/// A mutable MatrixSlice</span>
@@ -1591,11 +1698,12 @@
 <span class='doccomment'>/// The struct contains the upper left point of the slice</span>
 <span class='doccomment'>/// and the width and height of the slice.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> {
     <span class='ident'>ptr</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>T</span>,
     <span class='ident'>rows</span>: <span class='ident'>usize</span>,
     <span class='ident'>cols</span>: <span class='ident'>usize</span>,
     <span class='ident'>row_stride</span>: <span class='ident'>usize</span>,
+    <span class='ident'>marker</span>: <span class='ident'>PhantomData</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>T</span><span class='op'>&gt;</span>,
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -1687,21 +1795,21 @@
     <span class='doccomment'>/// let (b,c) = a.split_at(1, Axes::Row);</span>
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>split_at</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>mid</span>: <span class='ident'>usize</span>, <span class='ident'>axis</span>: <span class='ident'>Axes</span>) <span class='op'>-&gt;</span> (<span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) {
-        <span class='kw'>let</span> <span class='ident'>slice_1</span> : <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
-        <span class='kw'>let</span> <span class='ident'>slice_2</span> : <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
+        <span class='kw'>let</span> <span class='ident'>slice_1</span>: <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
+        <span class='kw'>let</span> <span class='ident'>slice_2</span>: <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
         <span class='kw'>match</span> <span class='ident'>axis</span> {
             <span class='ident'>Axes</span>::<span class='ident'>Row</span> <span class='op'>=&gt;</span> {
                 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>mid</span> <span class='op'>&lt;</span> <span class='self'>self</span>.<span class='ident'>rows</span>);
 
-                <span class='ident'>slice_1</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='self'>self</span>, [<span class='number'>0</span>,<span class='number'>0</span>], <span class='ident'>mid</span>, <span class='self'>self</span>.<span class='ident'>cols</span>);
-                <span class='ident'>slice_2</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='self'>self</span>, [<span class='ident'>mid</span>,<span class='number'>0</span>], <span class='self'>self</span>.<span class='ident'>rows</span> <span class='op'>-</span> <span class='ident'>mid</span>, <span class='self'>self</span>.<span class='ident'>cols</span>);
-            },
+                <span class='ident'>slice_1</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='self'>self</span>, [<span class='number'>0</span>, <span class='number'>0</span>], <span class='ident'>mid</span>, <span class='self'>self</span>.<span class='ident'>cols</span>);
+                <span class='ident'>slice_2</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='self'>self</span>, [<span class='ident'>mid</span>, <span class='number'>0</span>], <span class='self'>self</span>.<span class='ident'>rows</span> <span class='op'>-</span> <span class='ident'>mid</span>, <span class='self'>self</span>.<span class='ident'>cols</span>);
+            }
             <span class='ident'>Axes</span>::<span class='ident'>Col</span> <span class='op'>=&gt;</span> {
                 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>mid</span> <span class='op'>&lt;</span> <span class='self'>self</span>.<span class='ident'>cols</span>);
 
-                <span class='ident'>slice_1</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='self'>self</span>, [<span class='number'>0</span>,<span class='number'>0</span>], <span class='self'>self</span>.<span class='ident'>rows</span>, <span class='ident'>mid</span>);
-                <span class='ident'>slice_2</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='self'>self</span>, [<span class='number'>0</span>,<span class='ident'>mid</span>], <span class='self'>self</span>.<span class='ident'>rows</span>, <span class='self'>self</span>.<span class='ident'>cols</span> <span class='op'>-</span> <span class='ident'>mid</span>);
+                <span class='ident'>slice_1</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='self'>self</span>, [<span class='number'>0</span>, <span class='number'>0</span>], <span class='self'>self</span>.<span class='ident'>rows</span>, <span class='ident'>mid</span>);
+                <span class='ident'>slice_2</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='self'>self</span>, [<span class='number'>0</span>, <span class='ident'>mid</span>], <span class='self'>self</span>.<span class='ident'>rows</span>, <span class='self'>self</span>.<span class='ident'>cols</span> <span class='op'>-</span> <span class='ident'>mid</span>);
             }
         }
 
@@ -1719,30 +1827,80 @@
     <span class='doccomment'>/// let mut a = Matrix::new(3,3, vec![2.0; 9]);</span>
     <span class='doccomment'>/// let (b,c) = a.split_at_mut(1, Axes::Col);</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>split_at_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>mid</span>: <span class='ident'>usize</span>, <span class='ident'>axis</span>: <span class='ident'>Axes</span>) <span class='op'>-&gt;</span> (<span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>split_at_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>,
+                        <span class='ident'>mid</span>: <span class='ident'>usize</span>,
+                        <span class='ident'>axis</span>: <span class='ident'>Axes</span>)
+                        <span class='op'>-&gt;</span> (<span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) {
 
         <span class='kw'>let</span> <span class='ident'>mat_cols</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>cols</span>;
         <span class='kw'>let</span> <span class='ident'>mat_rows</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>rows</span>;
 
-        <span class='kw'>let</span> <span class='ident'>slice_1</span> : <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
-        <span class='kw'>let</span> <span class='ident'>slice_2</span> : <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
+        <span class='kw'>let</span> <span class='ident'>slice_1</span>: <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
+        <span class='kw'>let</span> <span class='ident'>slice_2</span>: <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>;
 
         <span class='kw'>match</span> <span class='ident'>axis</span> {
             <span class='ident'>Axes</span>::<span class='ident'>Row</span> <span class='op'>=&gt;</span> {
                 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>mid</span> <span class='op'>&lt;</span> <span class='self'>self</span>.<span class='ident'>rows</span>);
 
-                <span class='ident'>slice_1</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_matrix</span>(<span class='self'>self</span>, [<span class='number'>0</span>,<span class='number'>0</span>], <span class='ident'>mid</span>, <span class='ident'>mat_cols</span>);
-                <span class='ident'>slice_2</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_matrix</span>(<span class='self'>self</span>, [<span class='ident'>mid</span>,<span class='number'>0</span>], <span class='ident'>mat_rows</span> <span class='op'>-</span> <span class='ident'>mid</span>, <span class='ident'>mat_cols</span>);
-            },
+                <span class='kw'>unsafe</span> {
+                    <span class='ident'>slice_1</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_raw_parts</span>(<span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>as_mut_ptr</span>(),
+                                                             <span class='ident'>mid</span>,
+                                                             <span class='ident'>mat_cols</span>,
+                                                             <span class='ident'>mat_cols</span>);
+                    <span class='ident'>slice_2</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_raw_parts</span>(<span class='self'>self</span>.<span class='ident'>data</span>
+                                                                 .<span class='ident'>as_mut_ptr</span>()
+                                                                 .<span class='ident'>offset</span>((<span class='ident'>mid</span> <span class='op'>*</span> <span class='ident'>mat_cols</span>) <span class='kw'>as</span> <span class='ident'>isize</span>),
+                                                             <span class='ident'>mat_rows</span> <span class='op'>-</span> <span class='ident'>mid</span>,
+                                                             <span class='ident'>mat_cols</span>,
+                                                             <span class='ident'>mat_cols</span>);
+                }
+            }
             <span class='ident'>Axes</span>::<span class='ident'>Col</span> <span class='op'>=&gt;</span> {
                 <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>mid</span> <span class='op'>&lt;</span> <span class='self'>self</span>.<span class='ident'>cols</span>);
-
-                <span class='ident'>slice_1</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_matrix</span>(<span class='self'>self</span>, [<span class='number'>0</span>,<span class='number'>0</span>], <span class='ident'>mat_rows</span>, <span class='ident'>mid</span>);
-                <span class='ident'>slice_2</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_matrix</span>(<span class='self'>self</span>, [<span class='number'>0</span>,<span class='ident'>mid</span>], <span class='ident'>mat_rows</span>, <span class='ident'>mat_cols</span> <span class='op'>-</span> <span class='ident'>mid</span>);
+                <span class='kw'>unsafe</span> {
+                    <span class='ident'>slice_1</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_raw_parts</span>(<span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>as_mut_ptr</span>(),
+                                                             <span class='ident'>mat_rows</span>,
+                                                             <span class='ident'>mid</span>,
+                                                             <span class='ident'>mat_cols</span>);
+                    <span class='ident'>slice_2</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_raw_parts</span>(<span class='self'>self</span>.<span class='ident'>data</span>.<span class='ident'>as_mut_ptr</span>().<span class='ident'>offset</span>(<span class='ident'>mid</span> <span class='kw'>as</span> <span class='ident'>isize</span>),
+                                                             <span class='ident'>mat_rows</span>,
+                                                             <span class='ident'>mat_cols</span> <span class='op'>-</span> <span class='ident'>mid</span>,
+                                                             <span class='ident'>mat_cols</span>);
+                }
             }
         }
 
         (<span class='ident'>slice_1</span>, <span class='ident'>slice_2</span>)
+    }
+
+    <span class='doccomment'>/// Returns a `MatrixSlice` over the whole matrix.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::matrix::Matrix;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let a = Matrix::new(3, 3, vec![2.0; 9]);</span>
+    <span class='doccomment'>/// let b = a.as_slice();</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>as_slice</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, [<span class='number'>0</span>, <span class='number'>0</span>], <span class='self'>self</span>.<span class='ident'>rows</span>, <span class='self'>self</span>.<span class='ident'>cols</span>)
+    }
+
+    <span class='doccomment'>/// Returns a mutable `MatrixSlice` over the whole matrix.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::matrix::Matrix;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let mut a = Matrix::new(3, 3, vec![2.0; 9]);</span>
+    <span class='doccomment'>/// let b = a.as_mut_slice();</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>as_mut_slice</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>rows</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>rows</span>;
+        <span class='kw'>let</span> <span class='ident'>cols</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>cols</span>;
+        <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_matrix</span>(<span class='self'>self</span>, [<span class='number'>0</span>, <span class='number'>0</span>], <span class='ident'>rows</span>, <span class='ident'>cols</span>)
     }
 }
 
@@ -1789,7 +1947,7 @@
         }
 
         <span class='kw'>for</span> <span class='ident'>row</span> <span class='kw'>in</span> <span class='ident'>rows</span> {
-            <span class='ident'>mat_vec</span>.<span class='ident'>extend_from_slice</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>[<span class='op'>*</span><span class='ident'>row</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span>..(<span class='op'>*</span><span class='ident'>row</span><span class='op'>+</span><span class='number'>1</span>) <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span>]);
+            <span class='ident'>mat_vec</span>.<span class='ident'>extend_from_slice</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>[<span class='op'>*</span><span class='ident'>row</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span>..(<span class='op'>*</span><span class='ident'>row</span> <span class='op'>+</span> <span class='number'>1</span>) <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span>]);
         }
 
         <span class='ident'>Matrix</span> {
@@ -2034,9 +2192,40 @@
 
         <span class='self'>self</span>
     }
+
+    <span class='doccomment'>/// Tranposes the given matrix</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::matrix::Matrix;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let mat = Matrix::new(2,3, vec![1.0,2.0,3.0,4.0,5.0,6.0]);</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let mt = mat.transpose();</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>transpose</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='self'>self</span>.<span class='ident'>rows</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span>);
+
+        <span class='kw'>unsafe</span> {
+            <span class='ident'>new_data</span>.<span class='ident'>set_len</span>(<span class='self'>self</span>.<span class='ident'>rows</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span>);
+        }
+
+        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>cols</span> {
+            <span class='kw'>for</span> <span class='ident'>j</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>rows</span> {
+                <span class='ident'>new_data</span>[<span class='ident'>i</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>rows</span> <span class='op'>+</span> <span class='ident'>j</span>] <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='ident'>j</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span> <span class='op'>+</span> <span class='ident'>i</span>];
+            }
+        }
+
+        <span class='ident'>Matrix</span> {
+            <span class='ident'>cols</span>: <span class='self'>self</span>.<span class='ident'>rows</span>,
+            <span class='ident'>rows</span>: <span class='self'>self</span>.<span class='ident'>cols</span>,
+            <span class='ident'>data</span>: <span class='ident'>new_data</span>,
+        }
+    }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Copy</span><span class='op'>&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Zero</span><span class='op'>&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Constructs matrix of all zeros.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Requires both the row and the column dimensions.</span>
@@ -2056,6 +2245,34 @@
         }
     }
 
+    <span class='doccomment'>/// Constructs matrix with given diagonal.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Requires slice of diagonal elements.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::matrix::Matrix;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let mat = Matrix::from_diag(&amp;vec![1.0,2.0,3.0,4.0]);</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_diag</span>(<span class='ident'>diag</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>size</span> <span class='op'>=</span> <span class='ident'>diag</span>.<span class='ident'>len</span>();
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>zero</span>(); <span class='ident'>size</span> <span class='op'>*</span> <span class='ident'>size</span>];
+
+        <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>item</span>) <span class='kw'>in</span> <span class='ident'>diag</span>.<span class='ident'>into_iter</span>().<span class='ident'>enumerate</span>().<span class='ident'>take</span>(<span class='ident'>size</span>) {
+            <span class='ident'>data</span>[<span class='ident'>i</span> <span class='op'>*</span> (<span class='ident'>size</span> <span class='op'>+</span> <span class='number'>1</span>)] <span class='op'>=</span> <span class='ident'>item</span>.<span class='ident'>clone</span>();
+        }
+
+        <span class='ident'>Matrix</span> {
+            <span class='ident'>cols</span>: <span class='ident'>size</span>,
+            <span class='ident'>rows</span>: <span class='ident'>size</span>,
+            <span class='ident'>data</span>: <span class='ident'>data</span>,
+        }
+    }
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>One</span><span class='op'>&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Constructs matrix of all ones.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Requires both the row and the column dimensions.</span>
@@ -2074,7 +2291,9 @@
             <span class='ident'>data</span>: <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>one</span>(); <span class='ident'>cols</span><span class='op'>*</span><span class='ident'>rows</span>],
         }
     }
+}
 
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Clone</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>One</span><span class='op'>&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Constructs the identity matrix.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Requires the size of the matrix.</span>
@@ -2097,58 +2316,6 @@
             <span class='ident'>cols</span>: <span class='ident'>size</span>,
             <span class='ident'>rows</span>: <span class='ident'>size</span>,
             <span class='ident'>data</span>: <span class='ident'>data</span>,
-        }
-    }
-
-    <span class='doccomment'>/// Constructs matrix with given diagonal.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Requires slice of diagonal elements.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Examples</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use rusty_machine::linalg::matrix::Matrix;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let mat = Matrix::from_diag(&amp;vec![1.0,2.0,3.0,4.0]);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_diag</span>(<span class='ident'>diag</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>size</span> <span class='op'>=</span> <span class='ident'>diag</span>.<span class='ident'>len</span>();
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>data</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>zero</span>(); <span class='ident'>size</span> <span class='op'>*</span> <span class='ident'>size</span>];
-
-        <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>item</span>) <span class='kw'>in</span> <span class='ident'>diag</span>.<span class='ident'>into_iter</span>().<span class='ident'>enumerate</span>().<span class='ident'>take</span>(<span class='ident'>size</span>) {
-            <span class='ident'>data</span>[<span class='ident'>i</span> <span class='op'>*</span> (<span class='ident'>size</span> <span class='op'>+</span> <span class='number'>1</span>)] <span class='op'>=</span> <span class='op'>*</span><span class='ident'>item</span>;
-        }
-
-        <span class='ident'>Matrix</span> {
-            <span class='ident'>cols</span>: <span class='ident'>size</span>,
-            <span class='ident'>rows</span>: <span class='ident'>size</span>,
-            <span class='ident'>data</span>: <span class='ident'>data</span>,
-        }
-    }
-
-    <span class='doccomment'>/// Tranposes the given matrix</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Examples</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use rusty_machine::linalg::matrix::Matrix;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let mat = Matrix::new(2,3, vec![1.0,2.0,3.0,4.0,5.0,6.0]);</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let mt = mat.transpose();</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>transpose</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>new_data</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>zero</span>(); <span class='self'>self</span>.<span class='ident'>cols</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>rows</span>];
-        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>cols</span> {
-            <span class='kw'>for</span> <span class='ident'>j</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>rows</span> {
-                <span class='ident'>new_data</span>[<span class='ident'>i</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>rows</span> <span class='op'>+</span> <span class='ident'>j</span>] <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='ident'>j</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span> <span class='op'>+</span> <span class='ident'>i</span>];
-            }
-        }
-
-        <span class='ident'>Matrix</span> {
-            <span class='ident'>cols</span>: <span class='self'>self</span>.<span class='ident'>rows</span>,
-            <span class='ident'>rows</span>: <span class='self'>self</span>.<span class='ident'>cols</span>,
-            <span class='ident'>data</span>: <span class='ident'>new_data</span>,
         }
     }
 }
@@ -2186,7 +2353,7 @@
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>One</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Add</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// The sum of the rows of the matrix.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Returns a Vector equal to the sum of the matrices rows.</span>
@@ -2231,8 +2398,8 @@
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>sum_cols</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>col_sum</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='self'>self</span>.<span class='ident'>rows</span>);
 
-        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>rows</span> {
-            <span class='ident'>col_sum</span>.<span class='ident'>push</span>(<span class='ident'>utils</span>::<span class='ident'>unrolled_sum</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>[<span class='ident'>i</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span>..(<span class='ident'>i</span> <span class='op'>+</span> <span class='number'>1</span>) <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span>]));
+        <span class='kw'>for</span> <span class='ident'>row</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>iter_rows</span>() {
+            <span class='ident'>col_sum</span>.<span class='ident'>push</span>(<span class='ident'>utils</span>::<span class='ident'>unrolled_sum</span>(<span class='ident'>row</span>));
         }
         <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>col_sum</span>)
     }
@@ -2254,7 +2421,7 @@
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Mul</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// The elementwise product of two matrices.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Examples</span>
@@ -2281,7 +2448,7 @@
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span> <span class='op'>=</span> <span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// The elementwise division of two matrices.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Examples</span>
@@ -2308,7 +2475,7 @@
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span> <span class='op'>+</span> <span class='ident'>Zero</span> <span class='op'>+</span> <span class='ident'>Float</span> <span class='op'>+</span> <span class='ident'>FromPrimitive</span><span class='op'>&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Float</span> <span class='op'>+</span> <span class='ident'>FromPrimitive</span><span class='op'>&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// The mean of the matrix along the specified axis.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Axis 0 - Arithmetic mean of rows.</span>
@@ -2419,7 +2586,7 @@
                            <span class='ident'>Sub</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='op'>+</span> <span class='ident'>Div</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>Output</span><span class='op'>=</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='op'>+</span>
                            <span class='ident'>PartialOrd</span> {
 
-    <span class='doccomment'>/// Solves an upper triangular linear system.</span>
+<span class='doccomment'>/// Solves an upper triangular linear system.</span>
     <span class='kw'>fn</span> <span class='ident'>solve_u_triangular</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>y</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>cols</span> <span class='op'>==</span> <span class='ident'>y</span>.<span class='ident'>size</span>(), <span class='string'>&quot;Matrix and Vector dimensions do not agree.&quot;</span>);
 
@@ -2440,7 +2607,7 @@
         <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>x</span>)
     }
 
-    <span class='doccomment'>/// Solves a lower triangular linear system.</span>
+<span class='doccomment'>/// Solves a lower triangular linear system.</span>
     <span class='kw'>fn</span> <span class='ident'>solve_l_triangular</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>y</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>cols</span> <span class='op'>==</span> <span class='ident'>y</span>.<span class='ident'>size</span>(), <span class='string'>&quot;Matrix and Vector dimensions do not agree.&quot;</span>);
 
@@ -2461,7 +2628,7 @@
         <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>x</span>)
     }
 
-    <span class='doccomment'>/// Computes the parity of a permutation matrix.</span>
+<span class='doccomment'>/// Computes the parity of a permutation matrix.</span>
     <span class='kw'>fn</span> <span class='ident'>parity</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>visited</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='boolval'>false</span>; <span class='self'>self</span>.<span class='ident'>rows</span>];
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>sgn</span> <span class='op'>=</span> <span class='ident'>T</span>::<span class='ident'>one</span>();
@@ -2485,27 +2652,27 @@
         <span class='ident'>sgn</span>
     }
 
-    <span class='doccomment'>/// Solves the equation Ax = y.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Requires a Vector y as input.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Examples</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use rusty_machine::linalg::matrix::Matrix;</span>
-    <span class='doccomment'>/// use rusty_machine::linalg::vector::Vector;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let a = Matrix::new(2,2, vec![2.0,3.0,1.0,2.0]);</span>
-    <span class='doccomment'>/// let y = Vector::new(vec![13.0,8.0]);</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let x = a.solve(y);</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// assert_eq!(*x.data(), vec![2.0, 3.0]);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Panics</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// - The matrix column count and vector size are different.</span>
+<span class='doccomment'>/// Solves the equation Ax = y.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// Requires a Vector y as input.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// # Examples</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// ```</span>
+<span class='doccomment'>/// use rusty_machine::linalg::matrix::Matrix;</span>
+<span class='doccomment'>/// use rusty_machine::linalg::vector::Vector;</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// let a = Matrix::new(2,2, vec![2.0,3.0,1.0,2.0]);</span>
+<span class='doccomment'>/// let y = Vector::new(vec![13.0,8.0]);</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// let x = a.solve(y);</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// assert_eq!(*x.data(), vec![2.0, 3.0]);</span>
+<span class='doccomment'>/// ```</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// # Panics</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// - The matrix column count and vector size are different.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>solve</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>y</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> (<span class='ident'>l</span>,<span class='ident'>u</span>,<span class='ident'>p</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>lup_decomp</span>();
 
@@ -2513,24 +2680,24 @@
         <span class='ident'>u</span>.<span class='ident'>solve_u_triangular</span>(<span class='ident'>b</span>)
     }
 
-    <span class='doccomment'>/// Computes the inverse of the matrix.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Examples</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use rusty_machine::linalg::matrix::Matrix;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let a = Matrix::new(2,2, vec![2.,3.,1.,2.]);</span>
-    <span class='doccomment'>/// let inv = a.inverse();</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let I = a * inv;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// assert_eq!(*I.data(), vec![1.0,0.0,0.0,1.0]);</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Panics</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// - The matrix is not square.</span>
+<span class='doccomment'>/// Computes the inverse of the matrix.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// # Examples</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// ```</span>
+<span class='doccomment'>/// use rusty_machine::linalg::matrix::Matrix;</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// let a = Matrix::new(2,2, vec![2.,3.,1.,2.]);</span>
+<span class='doccomment'>/// let inv = a.inverse();</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// let I = a * inv;</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// assert_eq!(*I.data(), vec![1.0,0.0,0.0,1.0]);</span>
+<span class='doccomment'>/// ```</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// # Panics</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// - The matrix is not square.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>inverse</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>rows</span><span class='op'>==</span><span class='self'>self</span>.<span class='ident'>cols</span>, <span class='string'>&quot;Matrix is not square.&quot;</span>);
 
@@ -2562,24 +2729,24 @@
         <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='self'>self</span>.<span class='ident'>rows</span>, <span class='self'>self</span>.<span class='ident'>cols</span>, <span class='ident'>new_t_data</span>).<span class='ident'>transpose</span>()
     }
 
-    <span class='doccomment'>/// Computes the determinant of the matrix.</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Examples</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use rusty_machine::linalg::matrix::Matrix;</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,</span>
-    <span class='doccomment'>///                               0.0,3.0,4.0,</span>
-    <span class='doccomment'>///                               5.0, 1.0, 2.0]);</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// let det = a.det();</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// # Panics</span>
-    <span class='doccomment'>///</span>
-    <span class='doccomment'>/// - The matrix is not square.</span>
+<span class='doccomment'>/// Computes the determinant of the matrix.</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// # Examples</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// ```</span>
+<span class='doccomment'>/// use rusty_machine::linalg::matrix::Matrix;</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,</span>
+<span class='doccomment'>///                               0.0,3.0,4.0,</span>
+<span class='doccomment'>///                               5.0, 1.0, 2.0]);</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// let det = a.det();</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// ```</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// # Panics</span>
+<span class='doccomment'>///</span>
+<span class='doccomment'>/// - The matrix is not square.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>det</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span> {
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>rows</span><span class='op'>==</span><span class='self'>self</span>.<span class='ident'>cols</span>, <span class='string'>&quot;Matrix is not square.&quot;</span>);
 
@@ -2639,8 +2806,58 @@
     <span class='doccomment'>/// assert_eq!(c, 5.0);</span>
     <span class='doccomment'>/// ```</span>
     <span class='kw'>fn</span> <span class='ident'>norm</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span> {
-        <span class='kw'>let</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>utils</span>::<span class='ident'>dot</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>[..], <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>[..]);
+        <span class='kw'>let</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>utils</span>::<span class='ident'>dot</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>);
 
+        <span class='ident'>s</span>.<span class='ident'>sqrt</span>()
+    }
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Float</span><span class='op'>&gt;</span> <span class='ident'>Metric</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// Compute euclidean norm for matrix.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::matrix::{Matrix, MatrixSlice};</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::Metric;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let a = Matrix::new(2,1, vec![3.0,4.0]);</span>
+    <span class='doccomment'>/// let b = MatrixSlice::from_matrix(&amp;a, [0,0], 2, 1);</span>
+    <span class='doccomment'>/// let c = b.norm();</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// assert_eq!(c, 5.0);</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>fn</span> <span class='ident'>norm</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>T</span>::<span class='ident'>zero</span>();
+
+        <span class='kw'>for</span> <span class='ident'>row</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>iter_rows</span>() {
+            <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>s</span> <span class='op'>+</span> <span class='ident'>utils</span>::<span class='ident'>dot</span>(<span class='ident'>row</span>, <span class='ident'>row</span>);
+        }
+        <span class='ident'>s</span>.<span class='ident'>sqrt</span>()
+    }
+}
+
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Float</span><span class='op'>&gt;</span> <span class='ident'>Metric</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// Compute euclidean norm for matrix.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::matrix::{Matrix, MatrixSliceMut};</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::Metric;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let mut a = Matrix::new(2,1, vec![3.0,4.0]);</span>
+    <span class='doccomment'>/// let b = MatrixSliceMut::from_matrix(&amp;mut a, [0,0], 2, 1);</span>
+    <span class='doccomment'>/// let c = b.norm();</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// assert_eq!(c, 5.0);</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>fn</span> <span class='ident'>norm</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>T</span> {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>T</span>::<span class='ident'>zero</span>();
+
+        <span class='kw'>for</span> <span class='ident'>row</span> <span class='kw'>in</span> <span class='self'>self</span>.<span class='ident'>iter_rows</span>() {
+            <span class='ident'>s</span> <span class='op'>=</span> <span class='ident'>s</span> <span class='op'>+</span> <span class='ident'>utils</span>::<span class='ident'>dot</span>(<span class='ident'>row</span>, <span class='ident'>row</span>);
+        }
         <span class='ident'>s</span>.<span class='ident'>sqrt</span>()
     }
 }
@@ -2652,7 +2869,7 @@
         <span class='kw'>for</span> <span class='ident'>datum</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span> {
             <span class='kw'>let</span> <span class='ident'>datum_width</span> <span class='op'>=</span> <span class='kw'>match</span> <span class='ident'>f</span>.<span class='ident'>precision</span>() {
                 <span class='prelude-val'>Some</span>(<span class='ident'>places</span>) <span class='op'>=&gt;</span> <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{:.1$}&quot;</span>, <span class='ident'>datum</span>, <span class='ident'>places</span>).<span class='ident'>len</span>(),
-                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>datum</span>).<span class='ident'>len</span>()
+                <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>datum</span>).<span class='ident'>len</span>(),
             };
             <span class='kw'>if</span> <span class='ident'>datum_width</span> <span class='op'>&gt;</span> <span class='ident'>max_datum_width</span> {
                 <span class='ident'>max_datum_width</span> <span class='op'>=</span> <span class='ident'>datum_width</span>;
@@ -2660,48 +2877,48 @@
         }
         <span class='kw'>let</span> <span class='ident'>width</span> <span class='op'>=</span> <span class='ident'>max_datum_width</span>;
 
-        <span class='kw'>fn</span> <span class='ident'>write_row</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>fmt</span>::<span class='ident'>Display</span><span class='op'>&gt;</span>(<span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>, <span class='ident'>row</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>],
+        <span class='kw'>fn</span> <span class='ident'>write_row</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>fmt</span>::<span class='ident'>Display</span><span class='op'>&gt;</span>(<span class='ident'>f</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>fmt</span>::<span class='ident'>Formatter</span>,
+                                      <span class='ident'>row</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>],
                                       <span class='ident'>left_delimiter</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>,
                                       <span class='ident'>right_delimiter</span>: <span class='kw-2'>&amp;</span><span class='ident'>str</span>,
                                       <span class='ident'>width</span>: <span class='ident'>usize</span>)
                                       <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>fmt</span>::<span class='ident'>Error</span><span class='op'>&gt;</span> {
-                <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>left_delimiter</span>));
-                <span class='kw'>for</span> (<span class='ident'>index</span>, <span class='ident'>datum</span>) <span class='kw'>in</span> <span class='ident'>row</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
-                    <span class='kw'>match</span> <span class='ident'>f</span>.<span class='ident'>precision</span>() {
-                        <span class='prelude-val'>Some</span>(<span class='ident'>places</span>) <span class='op'>=&gt;</span> {
-                            <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{:1$.2$}&quot;</span>, <span class='ident'>datum</span>, <span class='ident'>width</span>, <span class='ident'>places</span>));
-                        },
-                        <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {
-                            <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{:1$}&quot;</span>, <span class='ident'>datum</span>, <span class='ident'>width</span>));
-                        }
+            <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>left_delimiter</span>));
+            <span class='kw'>for</span> (<span class='ident'>index</span>, <span class='ident'>datum</span>) <span class='kw'>in</span> <span class='ident'>row</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
+                <span class='kw'>match</span> <span class='ident'>f</span>.<span class='ident'>precision</span>() {
+                    <span class='prelude-val'>Some</span>(<span class='ident'>places</span>) <span class='op'>=&gt;</span> {
+                        <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{:1$.2$}&quot;</span>, <span class='ident'>datum</span>, <span class='ident'>width</span>, <span class='ident'>places</span>));
                     }
-                    <span class='kw'>if</span> <span class='ident'>index</span> <span class='op'>&lt;</span> <span class='ident'>row</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span> {
-                        <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot; &quot;</span>));
+                    <span class='prelude-val'>None</span> <span class='op'>=&gt;</span> {
+                        <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{:1$}&quot;</span>, <span class='ident'>datum</span>, <span class='ident'>width</span>));
                     }
                 }
+                <span class='kw'>if</span> <span class='ident'>index</span> <span class='op'>&lt;</span> <span class='ident'>row</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span> {
+                    <span class='macro'>try</span><span class='macro'>!</span>(<span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot; &quot;</span>));
+                }
+            }
             <span class='macro'>write</span><span class='macro'>!</span>(<span class='ident'>f</span>, <span class='string'>&quot;{}&quot;</span>, <span class='ident'>right_delimiter</span>)
         }
 
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>rows</span> {
             <span class='number'>1</span> <span class='op'>=&gt;</span> <span class='ident'>write_row</span>(<span class='ident'>f</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>, <span class='string'>&quot;[&quot;</span>, <span class='string'>&quot;]&quot;</span>, <span class='ident'>width</span>),
             _ <span class='op'>=&gt;</span> {
-                <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>write_row</span>(<span class='ident'>f</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>cols</span>],
+                <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>write_row</span>(<span class='ident'>f</span>,
+                               <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>cols</span>],
                                <span class='string'>&quot;⎡&quot;</span>, <span class='comment'>// \u{23a1} LEFT SQUARE BRACKET UPPER CORNER</span>
                                <span class='string'>&quot;⎤&quot;</span>, <span class='comment'>// \u{23a4} RIGHT SQUARE BRACKET UPPER CORNER</span>
                                <span class='ident'>width</span>));
                 <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>f</span>.<span class='ident'>write_str</span>(<span class='string'>&quot;\n&quot;</span>));
-                <span class='kw'>for</span> <span class='ident'>row_index</span> <span class='kw'>in</span> <span class='number'>1</span>..<span class='self'>self</span>.<span class='ident'>rows</span><span class='op'>-</span><span class='number'>1</span> {
+                <span class='kw'>for</span> <span class='ident'>row_index</span> <span class='kw'>in</span> <span class='number'>1</span>..<span class='self'>self</span>.<span class='ident'>rows</span> <span class='op'>-</span> <span class='number'>1</span> {
                     <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>write_row</span>(<span class='ident'>f</span>,
-                                   <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>[<span class='ident'>row_index</span><span class='op'>*</span><span class='self'>self</span>.<span class='ident'>cols</span>..
-                                              (<span class='ident'>row_index</span><span class='op'>+</span><span class='number'>1</span>)<span class='op'>*</span><span class='self'>self</span>.<span class='ident'>cols</span>],
+                                   <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>[<span class='ident'>row_index</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span>..(<span class='ident'>row_index</span> <span class='op'>+</span> <span class='number'>1</span>) <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span>],
                                    <span class='string'>&quot;⎢&quot;</span>, <span class='comment'>// \u{23a2} LEFT SQUARE BRACKET EXTENSION</span>
                                    <span class='string'>&quot;⎥&quot;</span>, <span class='comment'>// \u{23a5} RIGHT SQUARE BRACKET EXTENSION</span>
                                    <span class='ident'>width</span>));
                     <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>f</span>.<span class='ident'>write_str</span>(<span class='string'>&quot;\n&quot;</span>));
                 }
                 <span class='ident'>write_row</span>(<span class='ident'>f</span>,
-                          <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>[(<span class='self'>self</span>.<span class='ident'>rows</span><span class='op'>-</span><span class='number'>1</span>)<span class='op'>*</span><span class='self'>self</span>.<span class='ident'>cols</span>..
-                                     <span class='self'>self</span>.<span class='ident'>rows</span><span class='op'>*</span><span class='self'>self</span>.<span class='ident'>cols</span>],
+                          <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>data</span>[(<span class='self'>self</span>.<span class='ident'>rows</span> <span class='op'>-</span> <span class='number'>1</span>) <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span>..<span class='self'>self</span>.<span class='ident'>rows</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>cols</span>],
                           <span class='string'>&quot;⎣&quot;</span>, <span class='comment'>// \u{23a3} LEFT SQUARE BRACKET LOWER CORNER</span>
                           <span class='string'>&quot;⎦&quot;</span>, <span class='comment'>// \u{23a6} RIGHT SQUARE BRACKET LOWER CORNER</span>
                           <span class='ident'>width</span>)
@@ -2738,7 +2955,8 @@
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
-    <span class='kw'>fn</span> <span class='ident'>test_equality</span>() { <span class='comment'>// well, &quot;PartialEq&quot;, at least</span>
+    <span class='kw'>fn</span> <span class='ident'>test_equality</span>() {
+        <span class='comment'>// well, &quot;PartialEq&quot;, at least</span>
         <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>, <span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.</span>, <span class='number'>2.</span>, <span class='number'>3.</span>, <span class='number'>4.</span>, <span class='number'>5.</span>, <span class='number'>6.</span>]);
         <span class='kw'>let</span> <span class='ident'>a_redux</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>clone</span>();
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>, <span class='ident'>a_redux</span>);
@@ -2756,18 +2974,15 @@
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_display_formatting</span>() {
         <span class='kw'>let</span> <span class='ident'>first_matrix</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>, <span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>, <span class='number'>4</span>, <span class='number'>5</span>, <span class='number'>6</span>]);
-        <span class='kw'>let</span> <span class='ident'>first_expectation</span> <span class='op'>=</span> <span class='string'>&quot;⎡1 2 3⎤\n\
-                                 ⎣4 5 6⎦&quot;</span>;
+        <span class='kw'>let</span> <span class='ident'>first_expectation</span> <span class='op'>=</span> <span class='string'>&quot;⎡1 2 3⎤\n⎣4 5 6⎦&quot;</span>;
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>first_expectation</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>first_matrix</span>));
 
-        <span class='kw'>let</span> <span class='ident'>second_matrix</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>4</span>, <span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>3.14</span>, <span class='number'>2.718</span>, <span class='number'>1.414</span>,
-                                                   <span class='number'>2.503</span>, <span class='number'>4.669</span>, <span class='number'>1.202</span>,
-                                                   <span class='number'>1.618</span>, <span class='number'>0.5772</span>, <span class='number'>1.3</span>,
-                                                   <span class='number'>2.68545</span>, <span class='number'>1.282</span>, <span class='number'>10000.</span>]);
-        <span class='kw'>let</span> <span class='ident'>second_expectation</span> <span class='op'>=</span> <span class='string'>&quot;⎡   3.14   2.718   1.414⎤\n\
-                                  ⎢  2.503   4.669   1.202⎥\n\
-                                  ⎢  1.618  0.5772     1.3⎥\n\
-                                  ⎣2.68545   1.282   10000⎦&quot;</span>;
+        <span class='kw'>let</span> <span class='ident'>second_matrix</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>4</span>,
+                                        <span class='number'>3</span>,
+                                        <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>3.14</span>, <span class='number'>2.718</span>, <span class='number'>1.414</span>, <span class='number'>2.503</span>, <span class='number'>4.669</span>, <span class='number'>1.202</span>, <span class='number'>1.618</span>,
+                                             <span class='number'>0.5772</span>, <span class='number'>1.3</span>, <span class='number'>2.68545</span>, <span class='number'>1.282</span>, <span class='number'>10000.</span>]);
+        <span class='kw'>let</span> <span class='ident'>second_expectation</span> <span class='op'>=</span> <span class='string'>&quot;⎡   3.14   2.718   1.414⎤\n⎢  2.503   4.669   1.202⎥\n⎢  1.618  \
+                                  0.5772     1.3⎥\n⎣2.68545   1.282   10000⎦&quot;</span>;
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>second_expectation</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>second_matrix</span>));
     }
 
@@ -2779,21 +2994,14 @@
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_display_formatting_precision</span>() {
-        <span class='kw'>let</span> <span class='ident'>our_matrix</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>, <span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.2</span>, <span class='number'>1.23</span>, <span class='number'>1.234</span>,
-                                                <span class='number'>1.2345</span>, <span class='number'>1.23456</span>, <span class='number'>1.234567</span>]);
-        <span class='kw'>let</span> <span class='ident'>expectations</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[
-            <span class='string'>&quot;⎡1.2 1.2 1.2⎤\n\
-             ⎣1.2 1.2 1.2⎦&quot;</span>,
+        <span class='kw'>let</span> <span class='ident'>our_matrix</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>, <span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.2</span>, <span class='number'>1.23</span>, <span class='number'>1.234</span>, <span class='number'>1.2345</span>, <span class='number'>1.23456</span>, <span class='number'>1.234567</span>]);
+        <span class='kw'>let</span> <span class='ident'>expectations</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='string'>&quot;⎡1.2 1.2 1.2⎤\n⎣1.2 1.2 1.2⎦&quot;</span>,
 
-            <span class='string'>&quot;⎡1.20 1.23 1.23⎤\n\
-             ⎣1.23 1.23 1.23⎦&quot;</span>,
+                                <span class='string'>&quot;⎡1.20 1.23 1.23⎤\n⎣1.23 1.23 1.23⎦&quot;</span>,
 
-            <span class='string'>&quot;⎡1.200 1.230 1.234⎤\n\
-             ⎣1.234 1.235 1.235⎦&quot;</span>,
+                                <span class='string'>&quot;⎡1.200 1.230 1.234⎤\n⎣1.234 1.235 1.235⎦&quot;</span>,
 
-            <span class='string'>&quot;⎡1.2000 1.2300 1.2340⎤\n\
-             ⎣1.2345 1.2346 1.2346⎦&quot;</span>
-        ];
+                                <span class='string'>&quot;⎡1.2000 1.2300 1.2340⎤\n⎣1.2345 1.2346 1.2346⎦&quot;</span>];
 
         <span class='kw'>for</span> (<span class='ident'>places</span>, <span class='kw-2'>&amp;</span><span class='ident'>expectation</span>) <span class='kw'>in</span> (<span class='number'>1</span>..<span class='number'>5</span>).<span class='ident'>zip</span>(<span class='ident'>expectations</span>.<span class='ident'>iter</span>()) {
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>expectation</span>, <span class='macro'>format</span><span class='macro'>!</span>(<span class='string'>&quot;{:.1$}&quot;</span>, <span class='ident'>our_matrix</span>, <span class='ident'>places</span>));
@@ -2804,57 +3012,59 @@
     <span class='kw'>fn</span> <span class='ident'>test_split_matrix</span>() {
         <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>, <span class='number'>3</span>, (<span class='number'>0</span>..<span class='number'>9</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>());
 
-        <span class='kw'>let</span> (<span class='ident'>b</span>,<span class='ident'>c</span>) <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>split_at</span>(<span class='number'>1</span>, <span class='ident'>Axes</span>::<span class='ident'>Row</span>);
+        <span class='kw'>let</span> (<span class='ident'>b</span>, <span class='ident'>c</span>) <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>split_at</span>(<span class='number'>1</span>, <span class='ident'>Axes</span>::<span class='ident'>Row</span>);
 
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>rows</span>(), <span class='number'>1</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>cols</span>(), <span class='number'>3</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>rows</span>(), <span class='number'>2</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>cols</span>(), <span class='number'>3</span>);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>[[<span class='number'>0</span>,<span class='number'>0</span>]], <span class='number'>0</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>[[<span class='number'>0</span>,<span class='number'>1</span>]], <span class='number'>1</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>[[<span class='number'>0</span>,<span class='number'>2</span>]], <span class='number'>2</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>,<span class='number'>0</span>]], <span class='number'>3</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>,<span class='number'>1</span>]], <span class='number'>4</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>,<span class='number'>2</span>]], <span class='number'>5</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>,<span class='number'>0</span>]], <span class='number'>6</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>,<span class='number'>1</span>]], <span class='number'>7</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>,<span class='number'>2</span>]], <span class='number'>8</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>[[<span class='number'>0</span>, <span class='number'>0</span>]], <span class='number'>0</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>[[<span class='number'>0</span>, <span class='number'>1</span>]], <span class='number'>1</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>[[<span class='number'>0</span>, <span class='number'>2</span>]], <span class='number'>2</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>, <span class='number'>0</span>]], <span class='number'>3</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>, <span class='number'>1</span>]], <span class='number'>4</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>, <span class='number'>2</span>]], <span class='number'>5</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>, <span class='number'>0</span>]], <span class='number'>6</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>, <span class='number'>1</span>]], <span class='number'>7</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>, <span class='number'>2</span>]], <span class='number'>8</span>);
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_split_matrix_mut</span>() {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>, <span class='number'>3</span>, (<span class='number'>0</span>..<span class='number'>9</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>());
 
-        <span class='kw'>let</span> (<span class='kw-2'>mut</span> <span class='ident'>b</span>, <span class='kw-2'>mut</span> <span class='ident'>c</span>) <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>split_at_mut</span>(<span class='number'>1</span>, <span class='ident'>Axes</span>::<span class='ident'>Row</span>);
+        {
+            <span class='kw'>let</span> (<span class='kw-2'>mut</span> <span class='ident'>b</span>, <span class='kw-2'>mut</span> <span class='ident'>c</span>) <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>split_at_mut</span>(<span class='number'>1</span>, <span class='ident'>Axes</span>::<span class='ident'>Row</span>);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>rows</span>(), <span class='number'>1</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>cols</span>(), <span class='number'>3</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>rows</span>(), <span class='number'>2</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>cols</span>(), <span class='number'>3</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>rows</span>(), <span class='number'>1</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>cols</span>(), <span class='number'>3</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>rows</span>(), <span class='number'>2</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>cols</span>(), <span class='number'>3</span>);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>[[<span class='number'>0</span>,<span class='number'>0</span>]], <span class='number'>0</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>[[<span class='number'>0</span>,<span class='number'>1</span>]], <span class='number'>1</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>[[<span class='number'>0</span>,<span class='number'>2</span>]], <span class='number'>2</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>,<span class='number'>0</span>]], <span class='number'>3</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>,<span class='number'>1</span>]], <span class='number'>4</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>,<span class='number'>2</span>]], <span class='number'>5</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>,<span class='number'>0</span>]], <span class='number'>6</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>,<span class='number'>1</span>]], <span class='number'>7</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>,<span class='number'>2</span>]], <span class='number'>8</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>[[<span class='number'>0</span>, <span class='number'>0</span>]], <span class='number'>0</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>[[<span class='number'>0</span>, <span class='number'>1</span>]], <span class='number'>1</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>[[<span class='number'>0</span>, <span class='number'>2</span>]], <span class='number'>2</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>, <span class='number'>0</span>]], <span class='number'>3</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>, <span class='number'>1</span>]], <span class='number'>4</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>, <span class='number'>2</span>]], <span class='number'>5</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>, <span class='number'>0</span>]], <span class='number'>6</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>, <span class='number'>1</span>]], <span class='number'>7</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>, <span class='number'>2</span>]], <span class='number'>8</span>);
 
-        <span class='ident'>b</span>[[<span class='number'>0</span>,<span class='number'>0</span>]] <span class='op'>=</span> <span class='number'>4</span>;
-        <span class='ident'>c</span>[[<span class='number'>0</span>,<span class='number'>0</span>]] <span class='op'>=</span> <span class='number'>5</span>;
+            <span class='ident'>b</span>[[<span class='number'>0</span>, <span class='number'>0</span>]] <span class='op'>=</span> <span class='number'>4</span>;
+            <span class='ident'>c</span>[[<span class='number'>0</span>, <span class='number'>0</span>]] <span class='op'>=</span> <span class='number'>5</span>;
+        }
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>0</span>,<span class='number'>0</span>]], <span class='number'>4</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>0</span>,<span class='number'>1</span>]], <span class='number'>1</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>0</span>,<span class='number'>2</span>]], <span class='number'>2</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>1</span>,<span class='number'>0</span>]], <span class='number'>5</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>1</span>,<span class='number'>1</span>]], <span class='number'>4</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>1</span>,<span class='number'>2</span>]], <span class='number'>5</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>2</span>,<span class='number'>0</span>]], <span class='number'>6</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>2</span>,<span class='number'>1</span>]], <span class='number'>7</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>2</span>,<span class='number'>2</span>]], <span class='number'>8</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>0</span>, <span class='number'>0</span>]], <span class='number'>4</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>0</span>, <span class='number'>1</span>]], <span class='number'>1</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>0</span>, <span class='number'>2</span>]], <span class='number'>2</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>1</span>, <span class='number'>0</span>]], <span class='number'>5</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>1</span>, <span class='number'>1</span>]], <span class='number'>4</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>1</span>, <span class='number'>2</span>]], <span class='number'>5</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>2</span>, <span class='number'>0</span>]], <span class='number'>6</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>2</span>, <span class='number'>1</span>]], <span class='number'>7</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>2</span>, <span class='number'>2</span>]], <span class='number'>8</span>);
 
     }
 
@@ -2862,40 +3072,40 @@
     <span class='kw'>fn</span> <span class='ident'>test_matrix_index_mut</span>() {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>, <span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>2.0</span>; <span class='number'>9</span>]);
 
-        <span class='ident'>a</span>[[<span class='number'>0</span>,<span class='number'>0</span>]] <span class='op'>=</span> <span class='number'>13.0</span>;
+        <span class='ident'>a</span>[[<span class='number'>0</span>, <span class='number'>0</span>]] <span class='op'>=</span> <span class='number'>13.0</span>;
 
         <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>1</span>..<span class='number'>9</span> {
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>.<span class='ident'>data</span>()[<span class='ident'>i</span>], <span class='number'>2.0</span>);
         }
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>0</span>,<span class='number'>0</span>]], <span class='number'>13.0</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>[[<span class='number'>0</span>, <span class='number'>0</span>]], <span class='number'>13.0</span>);
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_matrix_select_rows</span>() {
-        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>4</span>,<span class='number'>2</span>, (<span class='number'>0</span>..<span class='number'>8</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>());
+        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>4</span>, <span class='number'>2</span>, (<span class='number'>0</span>..<span class='number'>8</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>());
 
-        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='number'>0</span>,<span class='number'>2</span>,<span class='number'>3</span>]);
+        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='number'>0</span>, <span class='number'>2</span>, <span class='number'>3</span>]);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>into_vec</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0</span>,<span class='number'>1</span>,<span class='number'>4</span>,<span class='number'>5</span>,<span class='number'>6</span>,<span class='number'>7</span>]);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>into_vec</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0</span>, <span class='number'>1</span>, <span class='number'>4</span>, <span class='number'>5</span>, <span class='number'>6</span>, <span class='number'>7</span>]);
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_matrix_select_cols</span>() {
-        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>4</span>,<span class='number'>2</span>, (<span class='number'>0</span>..<span class='number'>8</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>());
+        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>4</span>, <span class='number'>2</span>, (<span class='number'>0</span>..<span class='number'>8</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>());
 
         <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>select_cols</span>(<span class='kw-2'>&amp;</span>[<span class='number'>1</span>]);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>into_vec</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>,<span class='number'>3</span>,<span class='number'>5</span>,<span class='number'>7</span>]);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>into_vec</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>3</span>, <span class='number'>5</span>, <span class='number'>7</span>]);
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_matrix_select</span>() {
-        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>4</span>,<span class='number'>2</span>, (<span class='number'>0</span>..<span class='number'>8</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>());
+        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>4</span>, <span class='number'>2</span>, (<span class='number'>0</span>..<span class='number'>8</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>());
 
-        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>select</span>(<span class='kw-2'>&amp;</span>[<span class='number'>0</span>,<span class='number'>2</span>], <span class='kw-2'>&amp;</span>[<span class='number'>1</span>]);
+        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>a</span>.<span class='ident'>select</span>(<span class='kw-2'>&amp;</span>[<span class='number'>0</span>, <span class='number'>2</span>], <span class='kw-2'>&amp;</span>[<span class='number'>1</span>]);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>into_vec</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>,<span class='number'>5</span>]);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>into_vec</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>5</span>]);
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
@@ -2926,8 +3136,8 @@
 
         <span class='kw'>let</span> <span class='ident'>e</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>::<span class='ident'>new</span>(<span class='number'>5</span>,
                                    <span class='number'>5</span>,
-                                   <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.</span>, <span class='number'>2.</span>, <span class='number'>3.</span>, <span class='number'>4.</span>, <span class='number'>5.</span>, <span class='number'>3.</span>, <span class='number'>0.</span>, <span class='number'>4.</span>, <span class='number'>5.</span>, <span class='number'>6.</span>, <span class='number'>2.</span>, <span class='number'>1.</span>, <span class='number'>2.</span>, <span class='number'>3.</span>, <span class='number'>4.</span>,
-                                        <span class='number'>0.</span>, <span class='number'>0.</span>, <span class='number'>0.</span>, <span class='number'>6.</span>, <span class='number'>5.</span>, <span class='number'>0.</span>, <span class='number'>0.</span>, <span class='number'>0.</span>, <span class='number'>5.</span>, <span class='number'>6.</span>]);
+                                   <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.</span>, <span class='number'>2.</span>, <span class='number'>3.</span>, <span class='number'>4.</span>, <span class='number'>5.</span>, <span class='number'>3.</span>, <span class='number'>0.</span>, <span class='number'>4.</span>, <span class='number'>5.</span>, <span class='number'>6.</span>, <span class='number'>2.</span>, <span class='number'>1.</span>, <span class='number'>2.</span>, <span class='number'>3.</span>,
+                                        <span class='number'>4.</span>, <span class='number'>0.</span>, <span class='number'>0.</span>, <span class='number'>0.</span>, <span class='number'>6.</span>, <span class='number'>5.</span>, <span class='number'>0.</span>, <span class='number'>0.</span>, <span class='number'>0.</span>, <span class='number'>5.</span>, <span class='number'>6.</span>]);
 
         <span class='kw'>let</span> <span class='ident'>f</span> <span class='op'>=</span> <span class='ident'>e</span>.<span class='ident'>det</span>();
 

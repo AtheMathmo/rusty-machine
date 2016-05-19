@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["macros","Macros for the linear algebra modules."],["matrix","The matrix module."],["utils","Linear algebra utils module."],["vector","The vector module."]],"trait":[["Metric","Trait for linear algebra metrics."]]});
+initSidebarItems({"mod":[["convert",""],["macros","Macros for the linear algebra modules."],["matrix","The matrix module."],["utils","Linear algebra utils module."],["vector","The vector module."]],"trait":[["Metric","Trait for linear algebra metrics."]]});

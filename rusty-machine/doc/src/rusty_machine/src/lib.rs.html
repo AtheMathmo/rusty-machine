@@ -244,6 +244,16 @@
 <span id="201">201</span>
 <span id="202">202</span>
 <span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! # The rusty-machine crate.</span>
 <span class='doccomment'>//!</span>
@@ -275,8 +285,8 @@
 <span class='doccomment'>//! ### linalg</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! The linalg module contains all of the linear algebra tools and structures.</span>
-<span class='doccomment'>//! This module is efficient but not state of the art. Development of this module</span>
-<span class='doccomment'>//! is not a key focus as I&#39;m waiting for a clear community winner.</span>
+<span class='doccomment'>//! This module is efficient but not state of the art. In the future this module</span>
+<span class='doccomment'>//! will likely be pulled out of rusty-machine and maintained separately.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ---</span>
 <span class='doccomment'>//!</span>
@@ -302,12 +312,17 @@
 <span class='doccomment'>//! use rusty_machine::learning::toolkit::kernel;</span>
 <span class='doccomment'>//! use rusty_machine::learning::SupModel;</span>
 <span class='doccomment'>//!</span>
+<span class='doccomment'>//! // First we&#39;ll get some data.</span>
+<span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Some example training data.</span>
 <span class='doccomment'>//! let inputs = Matrix::new(3,3,vec![1.,1.,1.,2.,2.,2.,3.,3.,3.]);</span>
 <span class='doccomment'>//! let targets = Vector::new(vec![0.,1.,0.]);</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Some example test data.</span>
 <span class='doccomment'>//! let test_inputs = Matrix::new(2,3, vec![1.5,1.5,1.5,2.5,2.5,2.5]);</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! // Now we&#39;ll set up our model.</span>
+<span class='doccomment'>//! // This is close to the most complicated a model in rusty-machine gets!</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // A squared exponential kernel with lengthscale 2, and amplitude 1.</span>
 <span class='doccomment'>//! let ker = kernel::SquaredExp::new(2., 1.);</span>
@@ -317,6 +332,9 @@
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Construct a GP with the specified kernel, mean, and a noise of 0.5.</span>
 <span class='doccomment'>//! let mut gp = GaussianProcess::new(ker, zero_mean, 0.5);</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! // Now we can train and predict from the model.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Train the model!</span>
 <span class='doccomment'>//! gp.train(&amp;inputs, &amp;targets);</span>
@@ -361,6 +379,7 @@
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>matrix</span>;
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>vector</span>;
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>utils</span>;
+    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>convert</span>;
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>macros</span>;
 }
 
@@ -438,6 +457,7 @@
         <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>kernel</span>;
         <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>cost_fn</span>;
         <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>rand_utils</span>;
+        <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>regularization</span>;
     }
 }
 

@@ -498,6 +498,66 @@
 <span id="455">455</span>
 <span id="456">456</span>
 <span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Slices for the `Matrix` struct.</span>
 <span class='doccomment'>//!</span>
@@ -542,7 +602,7 @@
     <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>get_unchecked</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>index</span>: [<span class='ident'>usize</span>; <span class='number'>2</span>]) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>T</span>;
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>BaseSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>BaseSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>fn</span> <span class='ident'>rows</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
         <span class='self'>self</span>.<span class='ident'>rows</span>
     }
@@ -564,7 +624,7 @@
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>BaseSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>BaseSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>fn</span> <span class='ident'>rows</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
         <span class='self'>self</span>.<span class='ident'>rows</span>
     }
@@ -586,7 +646,7 @@
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Produce a matrix slice from a matrix</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Examples</span>
@@ -598,7 +658,7 @@
     <span class='doccomment'>/// let a = Matrix::new(3,3, (0..9).collect::&lt;Vec&lt;usize&gt;&gt;());</span>
     <span class='doccomment'>/// let slice = MatrixSlice::from_matrix(&amp;a, [1,1], 2, 2);</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_matrix</span>(<span class='ident'>mat</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>,
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_matrix</span>(<span class='ident'>mat</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>,
                        <span class='ident'>start</span>: [<span class='ident'>usize</span>; <span class='number'>2</span>],
                        <span class='ident'>rows</span>: <span class='ident'>usize</span>,
                        <span class='ident'>cols</span>: <span class='ident'>usize</span>)
@@ -613,7 +673,45 @@
                 <span class='ident'>rows</span>: <span class='ident'>rows</span>,
                 <span class='ident'>cols</span>: <span class='ident'>cols</span>,
                 <span class='ident'>row_stride</span>: <span class='ident'>mat</span>.<span class='ident'>cols</span>,
+                <span class='ident'>marker</span>: <span class='ident'>PhantomData</span>::<span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span>,
             }
+        }
+    }
+
+    <span class='doccomment'>/// Creates a matrix slice from raw parts.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::matrix::MatrixSlice;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let mut a = vec![4.0; 16];</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// unsafe {</span>
+    <span class='doccomment'>///     // Create a matrix slice with 3 rows, and 3 cols</span>
+    <span class='doccomment'>///     // The row stride of 4 specifies the distance between the start of each row in the data.</span>
+    <span class='doccomment'>///     let b = MatrixSlice::from_raw_parts(a.as_ptr(), 3, 3, 4);</span>
+    <span class='doccomment'>/// }</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Safety</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// The pointer must be followed by a contiguous slice of data larger than `row_stride * rows`. If not then</span>
+    <span class='doccomment'>/// other operations will produce undefined behaviour.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Additionally `cols` should be less than the `row_stride`. It is possible to use this function safely </span>
+    <span class='doccomment'>/// whilst violating this condition. So long as `max(cols, row_stride) * rows` is less than the data size.</span>
+    <span class='kw'>pub</span> <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>from_raw_parts</span>(<span class='ident'>ptr</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>T</span>,
+                                 <span class='ident'>rows</span>: <span class='ident'>usize</span>,
+                                 <span class='ident'>cols</span>: <span class='ident'>usize</span>,
+                                 <span class='ident'>row_stride</span>: <span class='ident'>usize</span>)
+                                 <span class='op'>-&gt;</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='ident'>MatrixSlice</span> {
+            <span class='ident'>ptr</span>: <span class='ident'>ptr</span>,
+            <span class='ident'>rows</span>: <span class='ident'>rows</span>,
+            <span class='ident'>cols</span>: <span class='ident'>cols</span>,
+            <span class='ident'>row_stride</span>: <span class='ident'>row_stride</span>,
+            <span class='ident'>marker</span>: <span class='ident'>PhantomData</span>::<span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span>,
         }
     }
 
@@ -629,13 +727,9 @@
     <span class='doccomment'>/// let slice = MatrixSlice::from_matrix(&amp;a, [1,1], 2, 2);</span>
     <span class='doccomment'>/// let new_slice = slice.reslice([0,0], 1, 1);</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>reslice</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>,
-                            <span class='ident'>start</span>: [<span class='ident'>usize</span>; <span class='number'>2</span>],
-                            <span class='ident'>rows</span>: <span class='ident'>usize</span>,
-                            <span class='ident'>cols</span>: <span class='ident'>usize</span>)
-                            <span class='op'>-&gt;</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>reslice</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>start</span>: [<span class='ident'>usize</span>; <span class='number'>2</span>], <span class='ident'>rows</span>: <span class='ident'>usize</span>, <span class='ident'>cols</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>start</span>[<span class='number'>0</span>] <span class='op'>+</span> <span class='ident'>rows</span> <span class='op'>&lt;=</span> <span class='self'>self</span>.<span class='ident'>rows</span>,
-            <span class='string'>&quot;View dimensions exceed matrix dimensions.&quot;</span>);
+                <span class='string'>&quot;View dimensions exceed matrix dimensions.&quot;</span>);
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>start</span>[<span class='number'>1</span>] <span class='op'>+</span> <span class='ident'>cols</span> <span class='op'>&lt;=</span> <span class='self'>self</span>.<span class='ident'>cols</span>,
                 <span class='string'>&quot;View dimensions exceed matrix dimensions.&quot;</span>);
 
@@ -670,25 +764,19 @@
             <span class='ident'>slice_rows</span>: <span class='self'>self</span>.<span class='ident'>rows</span>,
             <span class='ident'>slice_cols</span>: <span class='self'>self</span>.<span class='ident'>cols</span>,
             <span class='ident'>row_stride</span>: <span class='self'>self</span>.<span class='ident'>row_stride</span>,
-            <span class='ident'>_marker</span>: <span class='ident'>PhantomData</span>::<span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>T</span><span class='op'>&gt;</span>,
+            <span class='ident'>_marker</span>: <span class='ident'>PhantomData</span>::<span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span>,
         }
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span><span class='op'>&gt;</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span><span class='op'>&gt;</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Convert the matrix slice into a new Matrix.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>into_matrix</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>slice_data</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>v</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span>();
-        <span class='ident'>Matrix</span> {
-            <span class='ident'>rows</span>: <span class='self'>self</span>.<span class='ident'>rows</span>,
-            <span class='ident'>cols</span>: <span class='self'>self</span>.<span class='ident'>cols</span>,
-            <span class='ident'>data</span>: <span class='ident'>slice_data</span>,
-        }
+        <span class='self'>self</span>.<span class='ident'>iter_rows</span>().<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span>()
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Produce a matrix slice from a matrix</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Examples</span>
@@ -700,7 +788,7 @@
     <span class='doccomment'>/// let mut a = Matrix::new(3,3, (0..9).collect::&lt;Vec&lt;usize&gt;&gt;());</span>
     <span class='doccomment'>/// let slice = MatrixSliceMut::from_matrix(&amp;mut a, [1,1], 2, 2);</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_matrix</span>(<span class='ident'>mat</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>,
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>from_matrix</span>(<span class='ident'>mat</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>,
                        <span class='ident'>start</span>: [<span class='ident'>usize</span>; <span class='number'>2</span>],
                        <span class='ident'>rows</span>: <span class='ident'>usize</span>,
                        <span class='ident'>cols</span>: <span class='ident'>usize</span>)
@@ -718,7 +806,45 @@
                 <span class='ident'>rows</span>: <span class='ident'>rows</span>,
                 <span class='ident'>cols</span>: <span class='ident'>cols</span>,
                 <span class='ident'>row_stride</span>: <span class='ident'>mat_cols</span>,
+                <span class='ident'>marker</span>: <span class='ident'>PhantomData</span>::<span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>T</span><span class='op'>&gt;</span>,
             }
+        }
+    }
+
+    <span class='doccomment'>/// Creates a mutable matrix slice from raw parts.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::matrix::MatrixSliceMut;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let mut a = vec![4.0; 16];</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// unsafe {</span>
+    <span class='doccomment'>///     // Create a mutable matrix slice with 3 rows, and 3 cols</span>
+    <span class='doccomment'>///     // The row stride of 4 specifies the distance between the start of each row in the data.</span>
+    <span class='doccomment'>///     let b = MatrixSliceMut::from_raw_parts(a.as_mut_ptr(), 3, 3, 4);</span>
+    <span class='doccomment'>/// }</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Safety</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// The pointer must be followed by a contiguous slice of data larger than `row_stride * rows`. If not then</span>
+    <span class='doccomment'>/// other operations will produce undefined behaviour.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Additionally `cols` should be less than the `row_stride`. It is possible to use this function safely </span>
+    <span class='doccomment'>/// whilst violating this condition. So long as `max(cols, row_stride) * rows` is less than the data size.</span>
+    <span class='kw'>pub</span> <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>from_raw_parts</span>(<span class='ident'>ptr</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>T</span>,
+                                 <span class='ident'>rows</span>: <span class='ident'>usize</span>,
+                                 <span class='ident'>cols</span>: <span class='ident'>usize</span>,
+                                 <span class='ident'>row_stride</span>: <span class='ident'>usize</span>)
+                                 <span class='op'>-&gt;</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='ident'>MatrixSliceMut</span> {
+            <span class='ident'>ptr</span>: <span class='ident'>ptr</span>,
+            <span class='ident'>rows</span>: <span class='ident'>rows</span>,
+            <span class='ident'>cols</span>: <span class='ident'>cols</span>,
+            <span class='ident'>row_stride</span>: <span class='ident'>row_stride</span>,
+            <span class='ident'>marker</span>: <span class='ident'>PhantomData</span>::<span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>T</span><span class='op'>&gt;</span>,
         }
     }
 
@@ -734,13 +860,9 @@
     <span class='doccomment'>/// let slice = MatrixSliceMut::from_matrix(&amp;mut a, [1,1], 2, 2);</span>
     <span class='doccomment'>/// let new_slice = slice.reslice([0,0], 1, 1);</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>reslice</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>,
-                            <span class='ident'>start</span>: [<span class='ident'>usize</span>; <span class='number'>2</span>],
-                            <span class='ident'>rows</span>: <span class='ident'>usize</span>,
-                            <span class='ident'>cols</span>: <span class='ident'>usize</span>)
-                            <span class='op'>-&gt;</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>reslice</span>(<span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>start</span>: [<span class='ident'>usize</span>; <span class='number'>2</span>], <span class='ident'>rows</span>: <span class='ident'>usize</span>, <span class='ident'>cols</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>start</span>[<span class='number'>0</span>] <span class='op'>+</span> <span class='ident'>rows</span> <span class='op'>&lt;=</span> <span class='self'>self</span>.<span class='ident'>rows</span>,
-            <span class='string'>&quot;View dimensions exceed matrix dimensions.&quot;</span>);
+                <span class='string'>&quot;View dimensions exceed matrix dimensions.&quot;</span>);
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>start</span>[<span class='number'>1</span>] <span class='op'>+</span> <span class='ident'>cols</span> <span class='op'>&lt;=</span> <span class='self'>self</span>.<span class='ident'>cols</span>,
                 <span class='string'>&quot;View dimensions exceed matrix dimensions.&quot;</span>);
 
@@ -814,15 +936,10 @@
 }
 
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span><span class='op'>&gt;</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span><span class='op'>&gt;</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Convert the matrix slice into a new Matrix.</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>into_matrix</span>(<span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>slice_data</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>v</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>v</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span>();
-        <span class='ident'>Matrix</span> {
-            <span class='ident'>rows</span>: <span class='self'>self</span>.<span class='ident'>rows</span>,
-            <span class='ident'>cols</span>: <span class='self'>self</span>.<span class='ident'>cols</span>,
-            <span class='ident'>data</span>: <span class='ident'>slice_data</span>,
-        }
+        <span class='self'>self</span>.<span class='ident'>iter_rows</span>().<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span>()
     }
 }
 
@@ -894,19 +1011,19 @@
     <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>BaseSlice</span>;
     <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>super</span>::<span class='ident'>MatrixSlice</span>;
     <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>super</span>::<span class='ident'>MatrixSliceMut</span>;
-	<span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>super</span>::<span class='ident'>Matrix</span>;
+    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>super</span>::<span class='ident'>Matrix</span>;
 
-	<span class='attribute'>#[<span class='ident'>test</span>]</span>
-	<span class='attribute'>#[<span class='ident'>should_panic</span>]</span>
-	<span class='kw'>fn</span> <span class='ident'>make_slice_bad_dim</span>() {
-		<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>,<span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>2.0</span>; <span class='number'>9</span>]);
-		<span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>, [<span class='number'>1</span>,<span class='number'>1</span>], <span class='number'>3</span>, <span class='number'>2</span>);
-	}
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='attribute'>#[<span class='ident'>should_panic</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>make_slice_bad_dim</span>() {
+        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>, <span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>2.0</span>; <span class='number'>9</span>]);
+        <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>, [<span class='number'>1</span>, <span class='number'>1</span>], <span class='number'>3</span>, <span class='number'>2</span>);
+    }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>make_slice</span>() {
-        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>,<span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>2.0</span>; <span class='number'>9</span>]);
-        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>, [<span class='number'>1</span>,<span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
+        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>, <span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>2.0</span>; <span class='number'>9</span>]);
+        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>, [<span class='number'>1</span>, <span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
 
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>rows</span>(), <span class='number'>2</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>cols</span>(), <span class='number'>2</span>);
@@ -914,43 +1031,46 @@
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>reslice</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>4</span>,<span class='number'>4</span>, (<span class='number'>0</span>..<span class='number'>16</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>());
-        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>, [<span class='number'>1</span>,<span class='number'>1</span>], <span class='number'>3</span>, <span class='number'>3</span>);
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>4</span>, <span class='number'>4</span>, (<span class='number'>0</span>..<span class='number'>16</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>());
+        
         {
-            <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>b</span>.<span class='ident'>reslice</span>([<span class='number'>0</span>,<span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
+            <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>, [<span class='number'>1</span>, <span class='number'>1</span>], <span class='number'>3</span>, <span class='number'>3</span>);
+            <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>b</span>.<span class='ident'>reslice</span>([<span class='number'>0</span>, <span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
 
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>rows</span>(), <span class='number'>2</span>);
             <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>cols</span>(), <span class='number'>2</span>);
 
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>,<span class='number'>0</span>]], <span class='number'>6</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>,<span class='number'>1</span>]], <span class='number'>7</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>,<span class='number'>0</span>]], <span class='number'>10</span>);
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>,<span class='number'>1</span>]], <span class='number'>11</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>, <span class='number'>0</span>]], <span class='number'>6</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>, <span class='number'>1</span>]], <span class='number'>7</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>, <span class='number'>0</span>]], <span class='number'>10</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>, <span class='number'>1</span>]], <span class='number'>11</span>);
         }
 
-        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>a</span>, [<span class='number'>1</span>,<span class='number'>1</span>], <span class='number'>3</span>, <span class='number'>3</span>);
+        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>a</span>, [<span class='number'>1</span>, <span class='number'>1</span>], <span class='number'>3</span>, <span class='number'>3</span>);
 
-        <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>b</span>.<span class='ident'>reslice</span>([<span class='number'>0</span>,<span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
+        <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>b</span>.<span class='ident'>reslice</span>([<span class='number'>0</span>, <span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
 
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>rows</span>(), <span class='number'>2</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>cols</span>(), <span class='number'>2</span>);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>,<span class='number'>0</span>]], <span class='number'>6</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>,<span class='number'>1</span>]], <span class='number'>7</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>,<span class='number'>0</span>]], <span class='number'>10</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>,<span class='number'>1</span>]], <span class='number'>11</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>, <span class='number'>0</span>]], <span class='number'>6</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>0</span>, <span class='number'>1</span>]], <span class='number'>7</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>, <span class='number'>0</span>]], <span class='number'>10</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>[[<span class='number'>1</span>, <span class='number'>1</span>]], <span class='number'>11</span>);
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>slice_into_matrix</span>() {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>,<span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>2.0</span>; <span class='number'>9</span>]);
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>, <span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>2.0</span>; <span class='number'>9</span>]);
 
-        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>, [<span class='number'>1</span>,<span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
-        <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>b</span>.<span class='ident'>into_matrix</span>();
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>rows</span>(), <span class='number'>2</span>);
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>cols</span>(), <span class='number'>2</span>);
+        {
+            <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>, [<span class='number'>1</span>, <span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
+            <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>b</span>.<span class='ident'>into_matrix</span>();
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>rows</span>(), <span class='number'>2</span>);
+            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>c</span>.<span class='ident'>cols</span>(), <span class='number'>2</span>);
+        }
 
-        <span class='kw'>let</span> <span class='ident'>d</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>a</span>, [<span class='number'>1</span>,<span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
+        <span class='kw'>let</span> <span class='ident'>d</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>a</span>, [<span class='number'>1</span>, <span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
         <span class='kw'>let</span> <span class='ident'>e</span> <span class='op'>=</span> <span class='ident'>d</span>.<span class='ident'>into_matrix</span>();
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>e</span>.<span class='ident'>rows</span>(), <span class='number'>2</span>);
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>e</span>.<span class='ident'>cols</span>(), <span class='number'>2</span>);

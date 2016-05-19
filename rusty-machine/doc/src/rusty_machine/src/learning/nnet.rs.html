@@ -488,6 +488,122 @@
 <span id="445">445</span>
 <span id="446">446</span>
 <span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Neural Network module</span>
 <span class='doccomment'>//!</span>
@@ -496,7 +612,9 @@
 <span class='doccomment'>//! # Usage</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ```</span>
-<span class='doccomment'>//! use rusty_machine::learning::nnet::NeuralNet;</span>
+<span class='doccomment'>//! use rusty_machine::learning::nnet::{NeuralNet, BCECriterion};</span>
+<span class='doccomment'>//! use rusty_machine::learning::toolkit::regularization::Regularization;</span>
+<span class='doccomment'>//! use rusty_machine::learning::optim::grad_desc::StochasticGD;</span>
 <span class='doccomment'>//! use rusty_machine::linalg::matrix::Matrix;</span>
 <span class='doccomment'>//! use rusty_machine::learning::SupModel;</span>
 <span class='doccomment'>//!</span>
@@ -505,13 +623,21 @@
 <span class='doccomment'>//! let targets = Matrix::new(5,3, vec![1.,0.,0.,0.,1.,0.,0.,0.,1.,</span>
 <span class='doccomment'>//!                                     0.,0.,1.,0.,0.,1.]);</span>
 <span class='doccomment'>//!</span>
+<span class='doccomment'>//! // Set the layer sizes - from input to output</span>
 <span class='doccomment'>//! let layers = &amp;[3,5,11,7,3];</span>
-<span class='doccomment'>//! let mut model = NeuralNet::default(layers);</span>
 <span class='doccomment'>//!</span>
+<span class='doccomment'>//! // Choose the BCE criterion with L2 regularization (`lambda=0.1`).</span>
+<span class='doccomment'>//! let criterion = BCECriterion::new(Regularization::L2(0.1));</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! // We will just use the default stochastic gradient descent.</span>
+<span class='doccomment'>//! let mut model = NeuralNet::new(layers, criterion, StochasticGD::default());</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! // Train the model!</span>
 <span class='doccomment'>//! model.train(&amp;inputs, &amp;targets);</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! let test_inputs = Matrix::new(2,3, vec![1.5,1.5,1.5,5.1,5.1,5.1]);</span>
 <span class='doccomment'>//!</span>
+<span class='doccomment'>//! // And predict new output from the test inputs</span>
 <span class='doccomment'>//! model.predict(&amp;test_inputs);</span>
 <span class='doccomment'>//! ```</span>
 <span class='doccomment'>//!</span>
@@ -521,12 +647,15 @@
 <span class='doccomment'>//! You can define your own criterion by implementing the `Criterion`</span>
 <span class='doccomment'>//! trait with a concrete ActivationFunc and CostFunc.</span>
 
-<span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>matrix</span>::<span class='ident'>Matrix</span>;
+<span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>matrix</span>::{<span class='ident'>Matrix</span>, <span class='ident'>MatrixSlice</span>};
+<span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>matrix</span>::<span class='ident'>slice</span>::<span class='ident'>BaseSlice</span>;
+
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>SupModel</span>;
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>activ_fn</span>;
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>activ_fn</span>::<span class='ident'>ActivationFunc</span>;
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>cost_fn</span>;
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>cost_fn</span>::<span class='ident'>CostFunc</span>;
+<span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>regularization</span>::<span class='ident'>Regularization</span>;
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>optim</span>::{<span class='ident'>Optimizable</span>, <span class='ident'>OptimAlgorithm</span>};
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>optim</span>::<span class='ident'>grad_desc</span>::<span class='ident'>StochasticGD</span>;
 
@@ -559,8 +688,7 @@
 
     <span class='doccomment'>/// Train the model using gradient optimization and back propagation.</span>
     <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
-        <span class='kw'>let</span> <span class='ident'>start</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>weights</span>.<span class='ident'>clone</span>();
-        <span class='kw'>let</span> <span class='ident'>optimal_w</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>alg</span>.<span class='ident'>optimize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>base</span>, <span class='kw-2'>&amp;</span><span class='ident'>start</span>[..], <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
+        <span class='kw'>let</span> <span class='ident'>optimal_w</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>alg</span>.<span class='ident'>optimize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>base</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>weights</span>, <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
         <span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>weights</span> <span class='op'>=</span> <span class='ident'>optimal_w</span>;
     }
 }
@@ -610,7 +738,7 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// // Create a neural net with 4 layers, 3 neurons in each.</span>
     <span class='doccomment'>/// let layers = &amp;[3; 4];</span>
-    <span class='doccomment'>/// let mut net = NeuralNet::new(layers, BCECriterion, StochasticGD::default());</span>
+    <span class='doccomment'>/// let mut net = NeuralNet::new(layers, BCECriterion::default(), StochasticGD::default());</span>
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>layer_sizes</span>: <span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> [<span class='ident'>usize</span>], <span class='ident'>criterion</span>: <span class='ident'>T</span>, <span class='ident'>alg</span>: <span class='ident'>A</span>) <span class='op'>-&gt;</span> <span class='ident'>NeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>, <span class='ident'>A</span><span class='op'>&gt;</span> {
         <span class='ident'>NeuralNet</span> {
@@ -624,6 +752,7 @@
     <span class='doccomment'>/// # Examples</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::matrix::slice::BaseSlice;</span>
     <span class='doccomment'>/// use rusty_machine::learning::nnet::NeuralNet;</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// // Create a neural net with 4 layers, 3 neurons in each.</span>
@@ -636,7 +765,7 @@
     <span class='doccomment'>/// assert_eq!(w.rows(), 4);</span>
     <span class='doccomment'>/// assert_eq!(w.cols(), 3);</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_net_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>idx</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_net_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>idx</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>get_layer_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>weights</span>[..], <span class='ident'>idx</span>)
     }
 }
@@ -658,7 +787,7 @@
         <span class='ident'>BaseNeuralNet</span> {
             <span class='ident'>layer_sizes</span>: <span class='ident'>layer_sizes</span>,
             <span class='ident'>weights</span>: <span class='ident'>BaseNeuralNet</span>::<span class='op'>&lt;</span><span class='ident'>BCECriterion</span><span class='op'>&gt;</span>::<span class='ident'>create_weights</span>(<span class='ident'>layer_sizes</span>),
-            <span class='ident'>criterion</span>: <span class='ident'>BCECriterion</span>,
+            <span class='ident'>criterion</span>: <span class='ident'>BCECriterion</span>::<span class='ident'>default</span>(),
         }
     }
 }
@@ -705,8 +834,8 @@
     }
 
     <span class='doccomment'>/// Gets matrix of weights between specified layer and forward layer for the weights.</span>
-    <span class='kw'>fn</span> <span class='ident'>get_layer_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>weights</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>], <span class='ident'>idx</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>idx</span> <span class='op'>&lt;</span> <span class='self'>self</span>.<span class='ident'>layer_sizes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>);
+    <span class='kw'>fn</span> <span class='ident'>get_layer_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>weights</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>], <span class='ident'>idx</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+        <span class='macro'>debug_assert</span><span class='macro'>!</span>(<span class='ident'>idx</span> <span class='op'>&lt;</span> <span class='self'>self</span>.<span class='ident'>layer_sizes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>);
 
         <span class='comment'>// Check that the weights are the right size.</span>
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>full_size</span> <span class='op'>=</span> <span class='number'>0usize</span>;
@@ -714,7 +843,7 @@
             <span class='ident'>full_size</span> <span class='op'>+=</span> (<span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='ident'>l</span>] <span class='op'>+</span> <span class='number'>1</span>) <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='ident'>l</span> <span class='op'>+</span> <span class='number'>1</span>];
         }
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>full_size</span>, <span class='ident'>weights</span>.<span class='ident'>len</span>());
+        <span class='macro'>debug_assert_eq</span><span class='macro'>!</span>(<span class='ident'>full_size</span>, <span class='ident'>weights</span>.<span class='ident'>len</span>());
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>start</span> <span class='op'>=</span> <span class='number'>0usize</span>;
 
@@ -722,47 +851,26 @@
             <span class='ident'>start</span> <span class='op'>+=</span> (<span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='ident'>l</span>] <span class='op'>+</span> <span class='number'>1</span>) <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='ident'>l</span> <span class='op'>+</span> <span class='number'>1</span>]
         }
 
-        <span class='kw'>let</span> <span class='ident'>capacity</span> <span class='op'>=</span> (<span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='ident'>idx</span>] <span class='op'>+</span> <span class='number'>1</span>) <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='ident'>idx</span> <span class='op'>+</span> <span class='number'>1</span>];
-
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>layer_weights</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>((<span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='ident'>idx</span>] <span class='op'>+</span> <span class='number'>1</span>) <span class='op'>*</span>
-                                                   <span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='ident'>idx</span> <span class='op'>+</span> <span class='number'>1</span>]);
         <span class='kw'>unsafe</span> {
-            <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='ident'>start</span>..<span class='ident'>start</span> <span class='op'>+</span> <span class='ident'>capacity</span> {
-                <span class='ident'>layer_weights</span>.<span class='ident'>push</span>(<span class='op'>*</span><span class='ident'>weights</span>.<span class='ident'>get_unchecked</span>(<span class='ident'>i</span>));
-            }
+            <span class='ident'>MatrixSlice</span>::<span class='ident'>from_raw_parts</span>(<span class='ident'>weights</span>.<span class='ident'>as_ptr</span>().<span class='ident'>offset</span>(<span class='ident'>start</span> <span class='kw'>as</span> <span class='ident'>isize</span>),
+                                        <span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='ident'>idx</span>] <span class='op'>+</span> <span class='number'>1</span>,
+                                        <span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='ident'>idx</span> <span class='op'>+</span> <span class='number'>1</span>],
+                                        <span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='ident'>idx</span> <span class='op'>+</span> <span class='number'>1</span>])
         }
-
-        <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='ident'>idx</span>] <span class='op'>+</span> <span class='number'>1</span>,
-                    <span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='ident'>idx</span> <span class='op'>+</span> <span class='number'>1</span>],
-                    <span class='ident'>layer_weights</span>)
 
     }
 
     <span class='doccomment'>/// Gets matrix of weights between specified layer and forward layer</span>
     <span class='doccomment'>/// for the base model.</span>
-    <span class='kw'>fn</span> <span class='ident'>get_net_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>idx</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>get_net_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>idx</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>get_layer_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>weights</span>[..], <span class='ident'>idx</span>)
     }
 
-    <span class='comment'>// // Get the matrix of weights without the bias terms.</span>
-    <span class='comment'>// fn get_regular_weights(&amp;self, weights: &amp;[f64]) -&gt; Vec&lt;f64&gt; {</span>
-    <span class='comment'>//     let mut reg_weights = Vec::new();</span>
-
-    <span class='comment'>//     // Check that the weights are the right size.</span>
-    <span class='comment'>//     let mut start = 0usize;</span>
-    <span class='comment'>//     for l in 0..self.layer_sizes.len() - 1 {</span>
-
-    <span class='comment'>//         for i in 0..self.layer_sizes[l] {</span>
-    <span class='comment'>//             for j in 0..self.layer_sizes[l + 1] {</span>
-    <span class='comment'>//                 reg_weights.push(weights[start + j * (1 + self.layer_sizes[l]) + 1 + i])</span>
-    <span class='comment'>//             }</span>
-    <span class='comment'>//         }</span>
-
-    <span class='comment'>//         start += (self.layer_sizes[l] + 1) * self.layer_sizes[l + 1];</span>
-    <span class='comment'>//     }</span>
-
-    <span class='comment'>//     reg_weights</span>
-    <span class='comment'>// }</span>
+    <span class='doccomment'>/// Gets the weights for a layer excluding the bias weights.</span>
+    <span class='kw'>fn</span> <span class='ident'>get_non_bias_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>weights</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>], <span class='ident'>idx</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>layer_weights</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>get_layer_weights</span>(<span class='ident'>weights</span>, <span class='ident'>idx</span>);
+        <span class='ident'>layer_weights</span>.<span class='ident'>reslice</span>([<span class='number'>1</span>, <span class='number'>0</span>], <span class='ident'>layer_weights</span>.<span class='ident'>rows</span>() <span class='op'>-</span> <span class='number'>1</span>, <span class='ident'>layer_weights</span>.<span class='ident'>cols</span>())
+    }
 
     <span class='doccomment'>/// Compute the gradient using the back propagation algorithm.</span>
     <span class='kw'>fn</span> <span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>,
@@ -817,7 +925,8 @@
                 <span class='ident'>z</span> <span class='op'>=</span> <span class='ident'>ones</span>.<span class='ident'>hcat</span>(<span class='kw-2'>&amp;</span><span class='ident'>z</span>);
 
                 <span class='kw'>let</span> <span class='ident'>g</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>criterion</span>.<span class='ident'>grad_activ</span>(<span class='ident'>z</span>);
-                <span class='ident'>delta</span> <span class='op'>=</span> (<span class='ident'>delta</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>get_layer_weights</span>(<span class='ident'>weights</span>, <span class='ident'>l</span>).<span class='ident'>transpose</span>()).<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>g</span>);
+                <span class='ident'>delta</span> <span class='op'>=</span> (<span class='ident'>delta</span> <span class='op'>*</span> <span class='ident'>Matrix</span>::<span class='ident'>from</span>(<span class='self'>self</span>.<span class='ident'>get_layer_weights</span>(<span class='ident'>weights</span>, <span class='ident'>l</span>)).<span class='ident'>transpose</span>())
+                            .<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>g</span>);
 
                 <span class='kw'>let</span> <span class='ident'>non_one_rows</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span>(<span class='number'>1</span>..<span class='ident'>delta</span>.<span class='ident'>cols</span>()).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>()[..];
                 <span class='ident'>delta</span> <span class='op'>=</span> <span class='ident'>delta</span>.<span class='ident'>select_cols</span>(<span class='ident'>non_one_rows</span>);
@@ -829,7 +938,17 @@
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>capacity</span> <span class='op'>=</span> <span class='number'>0</span>;
 
         <span class='kw'>for</span> (<span class='ident'>l</span>, <span class='ident'>activ_item</span>) <span class='kw'>in</span> <span class='ident'>activations</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>().<span class='ident'>take</span>(<span class='self'>self</span>.<span class='ident'>layer_sizes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>) {
-            <span class='kw'>let</span> <span class='ident'>g</span> <span class='op'>=</span> <span class='ident'>deltas</span>[<span class='self'>self</span>.<span class='ident'>layer_sizes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>2</span> <span class='op'>-</span> <span class='ident'>l</span>].<span class='ident'>transpose</span>() <span class='op'>*</span> <span class='ident'>activ_item</span>;
+            <span class='comment'>// Compute the gradient</span>
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>g</span> <span class='op'>=</span> <span class='ident'>deltas</span>[<span class='self'>self</span>.<span class='ident'>layer_sizes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>2</span> <span class='op'>-</span> <span class='ident'>l</span>].<span class='ident'>transpose</span>() <span class='op'>*</span> <span class='ident'>activ_item</span>;
+
+            <span class='comment'>// Add the regularized gradient</span>
+            <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>criterion</span>.<span class='ident'>is_regularized</span>() {
+                <span class='kw'>let</span> <span class='ident'>layer</span> <span class='op'>=</span> <span class='ident'>l</span>;
+                <span class='kw'>let</span> <span class='ident'>non_bias_weights</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>get_non_bias_weights</span>(<span class='ident'>weights</span>, <span class='ident'>layer</span>);
+                <span class='kw'>let</span> <span class='ident'>zeros</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>zeros</span>(<span class='number'>1</span>, <span class='ident'>non_bias_weights</span>.<span class='ident'>cols</span>());
+                <span class='ident'>g</span> <span class='op'>+=</span> <span class='ident'>zeros</span>.<span class='ident'>vcat</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>criterion</span>.<span class='ident'>reg_cost_grad</span>(<span class='ident'>non_bias_weights</span>));
+            }
+
             <span class='ident'>capacity</span> <span class='op'>+=</span> <span class='ident'>g</span>.<span class='ident'>cols</span>() <span class='op'>*</span> <span class='ident'>g</span>.<span class='ident'>rows</span>();
             <span class='ident'>grad</span>.<span class='ident'>push</span>(<span class='ident'>g</span> <span class='op'>/</span> (<span class='ident'>inputs</span>.<span class='ident'>rows</span>() <span class='kw'>as</span> <span class='ident'>f64</span>));
         }
@@ -839,8 +958,18 @@
         <span class='kw'>for</span> <span class='ident'>g</span> <span class='kw'>in</span> <span class='ident'>grad</span> {
             <span class='ident'>gradients</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>g</span>.<span class='ident'>into_vec</span>());
         }
-        (<span class='self'>self</span>.<span class='ident'>criterion</span>.<span class='ident'>cost</span>(<span class='kw-2'>&amp;</span><span class='ident'>activations</span>[<span class='ident'>activations</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>], <span class='ident'>targets</span>),
-         <span class='ident'>gradients</span>)
+
+        <span class='comment'>// Compute the cost</span>
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>cost</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>criterion</span>.<span class='ident'>cost</span>(<span class='kw-2'>&amp;</span><span class='ident'>activations</span>[<span class='ident'>activations</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>], <span class='ident'>targets</span>);
+
+        <span class='comment'>// Add the regularized cost</span>
+        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>criterion</span>.<span class='ident'>is_regularized</span>() {
+            <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>layer_sizes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span> {
+                <span class='ident'>cost</span> <span class='op'>+=</span> <span class='self'>self</span>.<span class='ident'>criterion</span>.<span class='ident'>reg_cost</span>(<span class='self'>self</span>.<span class='ident'>get_non_bias_weights</span>(<span class='ident'>weights</span>, <span class='ident'>i</span>));
+            }
+        }
+
+        (<span class='ident'>cost</span>, <span class='ident'>gradients</span>)
     }
 
     <span class='doccomment'>/// Forward propagation of the model weights to get the outputs.</span>
@@ -911,6 +1040,41 @@
     <span class='kw'>fn</span> <span class='ident'>cost_grad</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>outputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
         <span class='ident'>Self</span>::<span class='ident'>Cost</span>::<span class='ident'>grad_cost</span>(<span class='ident'>outputs</span>, <span class='ident'>targets</span>)
     }
+
+    <span class='doccomment'>/// Returns the regularization for this criterion.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Will return `Regularization::None` by default.</span>
+    <span class='kw'>fn</span> <span class='ident'>regularization</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Regularization</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+        <span class='ident'>Regularization</span>::<span class='prelude-val'>None</span>
+    }
+
+    <span class='doccomment'>/// Checks if the current criterion includes regularization.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Will return `false` by default.</span>
+    <span class='kw'>fn</span> <span class='ident'>is_regularized</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
+        <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>regularization</span>() {
+            <span class='ident'>Regularization</span>::<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='boolval'>false</span>,
+            _ <span class='op'>=&gt;</span> <span class='boolval'>true</span>,
+        }
+    }
+
+    <span class='doccomment'>/// Returns the regularization cost for the criterion.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Will return `0` by default.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// This method will not be invoked by the neural network if there is explicitly no regularization.</span>
+    <span class='kw'>fn</span> <span class='ident'>reg_cost</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>reg_weights</span>: <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span> {
+        <span class='self'>self</span>.<span class='ident'>regularization</span>().<span class='ident'>reg_cost</span>(<span class='ident'>reg_weights</span>)
+    }
+
+    <span class='doccomment'>/// Returns the regularization gradient for the criterion.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Will return a matrix of zeros by default.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// This method will not be invoked by the neural network if there is explicitly no regularization.</span>
+    <span class='kw'>fn</span> <span class='ident'>reg_cost_grad</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>reg_weights</span>: <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>regularization</span>().<span class='ident'>reg_grad</span>(<span class='ident'>reg_weights</span>)
+    }
 }
 
 <span class='doccomment'>/// The binary cross entropy criterion.</span>
@@ -918,11 +1082,45 @@
 <span class='doccomment'>/// Uses the Sigmoid activation function and the</span>
 <span class='doccomment'>/// cross entropy error.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>BCECriterion</span>;
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>BCECriterion</span> {
+    <span class='ident'>regularization</span>: <span class='ident'>Regularization</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>,
+}
 
 <span class='kw'>impl</span> <span class='ident'>Criterion</span> <span class='kw'>for</span> <span class='ident'>BCECriterion</span> {
     <span class='kw'>type</span> <span class='ident'>ActFunc</span> <span class='op'>=</span> <span class='ident'>activ_fn</span>::<span class='ident'>Sigmoid</span>;
     <span class='kw'>type</span> <span class='ident'>Cost</span> <span class='op'>=</span> <span class='ident'>cost_fn</span>::<span class='ident'>CrossEntropyError</span>;
+
+    <span class='kw'>fn</span> <span class='ident'>regularization</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Regularization</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>regularization</span>
+    }
+}
+
+<span class='doccomment'>/// Creates an MSE Criterion without any regularization.</span>
+<span class='kw'>impl</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>BCECriterion</span> {
+    <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
+        <span class='ident'>BCECriterion</span> {
+            <span class='ident'>regularization</span> : <span class='ident'>Regularization</span>::<span class='prelude-val'>None</span>,
+        }
+    }
+}
+
+<span class='kw'>impl</span> <span class='ident'>BCECriterion</span> {
+    <span class='doccomment'>/// Constructs a new BCECriterion with the given regularization.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::learning::nnet::BCECriterion;</span>
+    <span class='doccomment'>/// use rusty_machine::learning::toolkit::regularization::Regularization;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// // Create a new BCE criterion with L2 regularization of 0.3.</span>
+    <span class='doccomment'>/// let criterion = BCECriterion::new(Regularization::L2(0.3f64));</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>regularization</span>: <span class='ident'>Regularization</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
+        <span class='ident'>BCECriterion</span> {
+            <span class='ident'>regularization</span> : <span class='ident'>regularization</span>,
+        }
+    }
 }
 
 <span class='doccomment'>/// The mean squared error criterion.</span>
@@ -930,11 +1128,45 @@
 <span class='doccomment'>/// Uses the Linear activation function and the</span>
 <span class='doccomment'>/// mean squared error.</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
-<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>MSECriterion</span>;
+<span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>MSECriterion</span> {
+    <span class='ident'>regularization</span>: <span class='ident'>Regularization</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>,
+}
 
 <span class='kw'>impl</span> <span class='ident'>Criterion</span> <span class='kw'>for</span> <span class='ident'>MSECriterion</span> {
     <span class='kw'>type</span> <span class='ident'>ActFunc</span> <span class='op'>=</span> <span class='ident'>activ_fn</span>::<span class='ident'>Linear</span>;
     <span class='kw'>type</span> <span class='ident'>Cost</span> <span class='op'>=</span> <span class='ident'>cost_fn</span>::<span class='ident'>MeanSqError</span>;
+
+    <span class='kw'>fn</span> <span class='ident'>regularization</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Regularization</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>regularization</span>
+    }
+}
+
+<span class='doccomment'>/// Creates an MSE Criterion without any regularization.</span>
+<span class='kw'>impl</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>MSECriterion</span> {
+    <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
+        <span class='ident'>MSECriterion</span> {
+            <span class='ident'>regularization</span> : <span class='ident'>Regularization</span>::<span class='prelude-val'>None</span>,
+        }
+    }
+}
+
+<span class='kw'>impl</span> <span class='ident'>MSECriterion</span> {
+    <span class='doccomment'>/// Constructs a new BCECriterion with the given regularization.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::learning::nnet::MSECriterion;</span>
+    <span class='doccomment'>/// use rusty_machine::learning::toolkit::regularization::Regularization;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// // Create a new MSE criterion with L2 regularization of 0.3.</span>
+    <span class='doccomment'>/// let criterion = MSECriterion::new(Regularization::L2(0.3f64));</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>regularization</span>: <span class='ident'>Regularization</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
+        <span class='ident'>MSECriterion</span> {
+            <span class='ident'>regularization</span> : <span class='ident'>regularization</span>,
+        }
+    }
 }
 </pre>
 </section>

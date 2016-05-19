@@ -523,6 +523,12 @@
 <span id="480">480</span>
 <span id="481">481</span>
 <span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Naive Bayes Classifiers</span>
 <span class='doccomment'>//!</span>
@@ -688,6 +694,12 @@
 
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>distr</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>distr</span> {
             <span class='kw'>for</span> (<span class='ident'>idx</span>, <span class='ident'>c</span>) <span class='kw'>in</span> <span class='ident'>class_data</span>.<span class='ident'>into_iter</span>().<span class='ident'>enumerate</span>() {
+                <span class='comment'>//If this class&#39; vector has not been populated, we can safely</span>
+                <span class='comment'>//skip this iteration, since the user is clearly not interested</span>
+                <span class='comment'>//in associating features with this class</span>
+                <span class='kw'>if</span> <span class='number'>0</span> <span class='op'>==</span> <span class='ident'>c</span>.<span class='ident'>len</span>() {
+                    <span class='kw'>continue</span>;
+                }
                 <span class='comment'>// Update the parameters within this class</span>
                 <span class='ident'>distr</span>.<span class='ident'>update_params</span>(<span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>c</span>), <span class='ident'>idx</span>);
             }
@@ -1005,7 +1017,8 @@
 
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>outputs</span>.<span class='ident'>into_vec</span>(), <span class='ident'>targets</span>.<span class='ident'>into_vec</span>());
     }
-}</pre>
+}
+</pre>
 </section>
     <section id='search' class="content hidden"></section>
 

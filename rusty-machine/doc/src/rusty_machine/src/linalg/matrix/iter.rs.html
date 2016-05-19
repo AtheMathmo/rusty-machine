@@ -497,6 +497,12 @@
 <span id="454">454</span>
 <span id="455">455</span>
 <span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
 </pre><pre class='rust '>
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>iter</span>::{<span class='ident'>ExactSizeIterator</span>, <span class='ident'>FromIterator</span>};
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>marker</span>::<span class='ident'>PhantomData</span>;
@@ -651,7 +657,7 @@
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Iterate over the rows of the matrix slice.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Examples</span>
@@ -674,12 +680,12 @@
             <span class='ident'>slice_rows</span>: <span class='self'>self</span>.<span class='ident'>rows</span>,
             <span class='ident'>slice_cols</span>: <span class='self'>self</span>.<span class='ident'>cols</span>,
             <span class='ident'>row_stride</span>: <span class='self'>self</span>.<span class='ident'>row_stride</span> <span class='kw'>as</span> <span class='ident'>isize</span>,
-            <span class='ident'>_marker</span>: <span class='ident'>PhantomData</span>::<span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>T</span><span class='op'>&gt;</span>,
+            <span class='ident'>_marker</span>: <span class='ident'>PhantomData</span>::<span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span>,
         }
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Iterate over the rows of the mutable matrix slice.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Examples</span>
@@ -702,7 +708,7 @@
             <span class='ident'>slice_rows</span>: <span class='self'>self</span>.<span class='ident'>rows</span>,
             <span class='ident'>slice_cols</span>: <span class='self'>self</span>.<span class='ident'>cols</span>,
             <span class='ident'>row_stride</span>: <span class='self'>self</span>.<span class='ident'>row_stride</span> <span class='kw'>as</span> <span class='ident'>isize</span>,
-            <span class='ident'>_marker</span>: <span class='ident'>PhantomData</span>::<span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>T</span><span class='op'>&gt;</span>,
+            <span class='ident'>_marker</span>: <span class='ident'>PhantomData</span>::<span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span>,
         }
     }
 
@@ -714,11 +720,15 @@
     <span class='doccomment'>/// use rusty_machine::linalg::matrix::{Matrix, MatrixSliceMut};</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// let mut a = Matrix::new(3, 2, (0..6).collect::&lt;Vec&lt;usize&gt;&gt;());</span>
-    <span class='doccomment'>/// let b = MatrixSliceMut::from_matrix(&amp;mut a, [0,0], 2, 2);</span>
+    <span class='doccomment'>/// </span>
+    <span class='doccomment'>/// // New scope (so we can consume `a` after)</span>
+    <span class='doccomment'>/// {</span>
+    <span class='doccomment'>///    let b = MatrixSliceMut::from_matrix(&amp;mut a, [0,0], 2, 2);</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// for row in b.iter_rows_mut() {</span>
-    <span class='doccomment'>///     for r in row {</span>
-    <span class='doccomment'>///         *r = *r + 1;</span>
+    <span class='doccomment'>///     for row in b.iter_rows_mut() {</span>
+    <span class='doccomment'>///         for r in row {</span>
+    <span class='doccomment'>///             *r = *r + 1;</span>
+    <span class='doccomment'>///         }</span>
     <span class='doccomment'>///     }</span>
     <span class='doccomment'>/// }</span>
     <span class='doccomment'>///</span>
@@ -732,7 +742,7 @@
             <span class='ident'>slice_rows</span>: <span class='self'>self</span>.<span class='ident'>rows</span>,
             <span class='ident'>slice_cols</span>: <span class='self'>self</span>.<span class='ident'>cols</span>,
             <span class='ident'>row_stride</span>: <span class='self'>self</span>.<span class='ident'>row_stride</span> <span class='kw'>as</span> <span class='ident'>isize</span>,
-            <span class='ident'>_marker</span>: <span class='ident'>PhantomData</span>::<span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>T</span><span class='op'>&gt;</span>,
+            <span class='ident'>_marker</span>: <span class='ident'>PhantomData</span>::<span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='kw-2'>mut</span> <span class='ident'>T</span><span class='op'>&gt;</span>,
         }
     }
 }
@@ -863,21 +873,23 @@
     <span class='kw'>fn</span> <span class='ident'>test_matrix_slice_mut_rows</span>() {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>, <span class='number'>3</span>, (<span class='number'>0</span>..<span class='number'>9</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>());
 
-        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>a</span>, [<span class='number'>0</span>, <span class='number'>0</span>], <span class='number'>2</span>, <span class='number'>2</span>);
+        {
+            <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>a</span>, [<span class='number'>0</span>, <span class='number'>0</span>], <span class='number'>2</span>, <span class='number'>2</span>);
 
-        <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> [[<span class='number'>0</span>, <span class='number'>1</span>], [<span class='number'>3</span>, <span class='number'>4</span>]];
+            <span class='kw'>let</span> <span class='ident'>data</span> <span class='op'>=</span> [[<span class='number'>0</span>, <span class='number'>1</span>], [<span class='number'>3</span>, <span class='number'>4</span>]];
 
-        <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>row</span>) <span class='kw'>in</span> <span class='ident'>b</span>.<span class='ident'>iter_rows</span>().<span class='ident'>enumerate</span>() {
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>data</span>[<span class='ident'>i</span>], <span class='op'>*</span><span class='ident'>row</span>);
-        }
+            <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>row</span>) <span class='kw'>in</span> <span class='ident'>b</span>.<span class='ident'>iter_rows</span>().<span class='ident'>enumerate</span>() {
+                <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>data</span>[<span class='ident'>i</span>], <span class='op'>*</span><span class='ident'>row</span>);
+            }
 
-        <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>row</span>) <span class='kw'>in</span> <span class='ident'>b</span>.<span class='ident'>iter_rows_mut</span>().<span class='ident'>enumerate</span>() {
-            <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>data</span>[<span class='ident'>i</span>], <span class='op'>*</span><span class='ident'>row</span>);
-        }
+            <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>row</span>) <span class='kw'>in</span> <span class='ident'>b</span>.<span class='ident'>iter_rows_mut</span>().<span class='ident'>enumerate</span>() {
+                <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>data</span>[<span class='ident'>i</span>], <span class='op'>*</span><span class='ident'>row</span>);
+            }
 
-        <span class='kw'>for</span> <span class='ident'>row</span> <span class='kw'>in</span> <span class='ident'>b</span>.<span class='ident'>iter_rows_mut</span>() {
-            <span class='kw'>for</span> <span class='ident'>r</span> <span class='kw'>in</span> <span class='ident'>row</span> {
-                <span class='op'>*</span><span class='ident'>r</span> <span class='op'>=</span> <span class='number'>0</span>;
+            <span class='kw'>for</span> <span class='ident'>row</span> <span class='kw'>in</span> <span class='ident'>b</span>.<span class='ident'>iter_rows_mut</span>() {
+                <span class='kw'>for</span> <span class='ident'>r</span> <span class='kw'>in</span> <span class='ident'>row</span> {
+                    <span class='op'>*</span><span class='ident'>r</span> <span class='op'>=</span> <span class='number'>0</span>;
+                }
             }
         }
 

@@ -826,6 +826,9 @@
 <span id="783">783</span>
 <span id="784">784</span>
 <span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Matrix Decompositions</span>
 <span class='doccomment'>//!</span>
@@ -844,7 +847,7 @@
 <span class='kw'>use</span> <span class='ident'>libnum</span>::{<span class='ident'>One</span>, <span class='ident'>Zero</span>, <span class='ident'>Float</span>, <span class='ident'>Signed</span>};
 <span class='kw'>use</span> <span class='ident'>libnum</span>::{<span class='ident'>cast</span>, <span class='ident'>abs</span>};
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Any</span>  <span class='op'>+</span> <span class='ident'>Float</span><span class='op'>&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Any</span> <span class='op'>+</span> <span class='ident'>Float</span><span class='op'>&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Cholesky decomposition</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Returns the cholesky decomposition of a positive definite matrix.</span>
@@ -1179,13 +1182,13 @@
         <span class='comment'>// λ² − (a₁₁ + a₂₂)λ + (a₁₁a₂₂ − a₁₂a₂₁);</span>
         <span class='comment'>// the quadratic formula suffices.</span>
         <span class='kw'>let</span> <span class='ident'>tr</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>0</span>] <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>3</span>];
-        <span class='kw'>let</span> <span class='ident'>det</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>0</span>]<span class='op'>*</span><span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>3</span>] <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>1</span>]<span class='op'>*</span><span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>2</span>];
+        <span class='kw'>let</span> <span class='ident'>det</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>0</span>] <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>3</span>] <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>1</span>] <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>2</span>];
 
         <span class='kw'>let</span> <span class='ident'>two</span> <span class='op'>=</span> <span class='ident'>T</span>::<span class='ident'>one</span>() <span class='op'>+</span> <span class='ident'>T</span>::<span class='ident'>one</span>();
         <span class='kw'>let</span> <span class='ident'>four</span> <span class='op'>=</span> <span class='ident'>two</span> <span class='op'>+</span> <span class='ident'>two</span>;
 
-        <span class='kw'>let</span> <span class='ident'>desc</span> <span class='op'>=</span> (<span class='ident'>tr</span><span class='op'>*</span><span class='ident'>tr</span> <span class='op'>-</span> <span class='ident'>four</span><span class='op'>*</span><span class='ident'>det</span>).<span class='ident'>sqrt</span>();
-        <span class='macro'>vec</span><span class='macro'>!</span>[(<span class='ident'>tr</span><span class='op'>-</span><span class='ident'>desc</span>)<span class='op'>/</span><span class='ident'>two</span>, (<span class='ident'>tr</span><span class='op'>+</span><span class='ident'>desc</span>)<span class='op'>/</span><span class='ident'>two</span>]
+        <span class='kw'>let</span> <span class='ident'>desc</span> <span class='op'>=</span> (<span class='ident'>tr</span> <span class='op'>*</span> <span class='ident'>tr</span> <span class='op'>-</span> <span class='ident'>four</span> <span class='op'>*</span> <span class='ident'>det</span>).<span class='ident'>sqrt</span>();
+        <span class='macro'>vec</span><span class='macro'>!</span>[(<span class='ident'>tr</span> <span class='op'>-</span> <span class='ident'>desc</span>) <span class='op'>/</span> <span class='ident'>two</span>, (<span class='ident'>tr</span> <span class='op'>+</span> <span class='ident'>desc</span>) <span class='op'>/</span> <span class='ident'>two</span>]
     }
 
     <span class='kw'>fn</span> <span class='ident'>francis_shift_eigenvalues</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
@@ -1321,20 +1324,23 @@
         <span class='comment'>// for this characterization—</span>
         <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>2</span>] <span class='op'>!=</span> <span class='ident'>T</span>::<span class='ident'>zero</span>() {
             <span class='kw'>return</span> (<span class='ident'>eigenvalues</span>.<span class='ident'>clone</span>(),
-                    <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>, <span class='number'>2</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>eigenvalues</span>[<span class='number'>0</span>]<span class='op'>-</span><span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>3</span>],
-                                           <span class='ident'>eigenvalues</span>[<span class='number'>1</span>]<span class='op'>-</span><span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>3</span>],
-                                           <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>2</span>],
-                                           <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>2</span>]]));
+                    <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>,
+                                <span class='number'>2</span>,
+                                <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>eigenvalues</span>[<span class='number'>0</span>] <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>3</span>],
+                                     <span class='ident'>eigenvalues</span>[<span class='number'>1</span>] <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>3</span>],
+                                     <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>2</span>],
+                                     <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>2</span>]]));
         } <span class='kw'>else</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>1</span>] <span class='op'>!=</span> <span class='ident'>T</span>::<span class='ident'>zero</span>() {
             <span class='kw'>return</span> (<span class='ident'>eigenvalues</span>.<span class='ident'>clone</span>(),
-                    <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>, <span class='number'>2</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>1</span>],
-                                           <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>1</span>],
-                                           <span class='ident'>eigenvalues</span>[<span class='number'>0</span>]<span class='op'>-</span><span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>0</span>],
-                                           <span class='ident'>eigenvalues</span>[<span class='number'>1</span>]<span class='op'>-</span><span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>0</span>]]));
+                    <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>,
+                                <span class='number'>2</span>,
+                                <span class='macro'>vec</span><span class='macro'>!</span>[<span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>1</span>],
+                                     <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>1</span>],
+                                     <span class='ident'>eigenvalues</span>[<span class='number'>0</span>] <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>0</span>],
+                                     <span class='ident'>eigenvalues</span>[<span class='number'>1</span>] <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>0</span>]]));
         } <span class='kw'>else</span> {
             <span class='kw'>return</span> (<span class='ident'>eigenvalues</span>.<span class='ident'>clone</span>(),
-                    <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>, <span class='number'>2</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>one</span>(), <span class='ident'>T</span>::<span class='ident'>zero</span>(),
-                                           <span class='ident'>T</span>::<span class='ident'>zero</span>(), <span class='ident'>T</span>::<span class='ident'>one</span>()]));
+                    <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>, <span class='number'>2</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>one</span>(), <span class='ident'>T</span>::<span class='ident'>zero</span>(), <span class='ident'>T</span>::<span class='ident'>zero</span>(), <span class='ident'>T</span>::<span class='ident'>one</span>()]));
         }
     }
 
@@ -1489,7 +1495,7 @@
         <span class='kw'>match</span> <span class='ident'>n</span> {
             <span class='number'>1</span> <span class='op'>=&gt;</span> (<span class='macro'>vec</span><span class='macro'>!</span>[<span class='self'>self</span>.<span class='ident'>data</span>[<span class='number'>0</span>]], <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>1</span>, <span class='number'>1</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>T</span>::<span class='ident'>one</span>()])),
             <span class='number'>2</span> <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>direct_2_by_2_eigendecomp</span>(),
-            _ <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>francis_shift_eigendecomp</span>()
+            _ <span class='op'>=&gt;</span> <span class='self'>self</span>.<span class='ident'>francis_shift_eigendecomp</span>(),
         }
     }
 }
@@ -1591,7 +1597,7 @@
     <span class='kw'>fn</span> <span class='ident'>test_2_by_2_matrix_eigenvalues</span>() {
         <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>, <span class='number'>2</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.</span>, <span class='number'>2.</span>, <span class='number'>3.</span>, <span class='number'>4.</span>]);
         <span class='comment'>// characteristic polynomial is λ² − 5λ − 2</span>
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='macro'>vec</span><span class='macro'>!</span>[(<span class='number'>5.</span><span class='op'>-</span>(<span class='number'>33.0f32</span>).<span class='ident'>sqrt</span>())<span class='op'>/</span><span class='number'>2.</span>, (<span class='number'>5.</span><span class='op'>+</span>(<span class='number'>33.0f32</span>).<span class='ident'>sqrt</span>())<span class='op'>/</span><span class='number'>2.</span>],
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='macro'>vec</span><span class='macro'>!</span>[(<span class='number'>5.</span> <span class='op'>-</span> (<span class='number'>33.0f32</span>).<span class='ident'>sqrt</span>()) <span class='op'>/</span> <span class='number'>2.</span>, (<span class='number'>5.</span> <span class='op'>+</span> (<span class='number'>33.0f32</span>).<span class='ident'>sqrt</span>()) <span class='op'>/</span> <span class='number'>2.</span>],
                    <span class='ident'>a</span>.<span class='ident'>eigenvalues</span>());
     }
 
@@ -1607,8 +1613,8 @@
         <span class='kw'>let</span> <span class='ident'>v2</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>eigenvecs</span>[[<span class='number'>0</span>, <span class='number'>1</span>]], <span class='ident'>eigenvecs</span>[[<span class='number'>1</span>, <span class='number'>1</span>]]]);
 
         <span class='kw'>let</span> <span class='ident'>epsilon</span> <span class='op'>=</span> <span class='number'>0.00001</span>;
-        <span class='macro'>assert</span><span class='macro'>!</span>((<span class='kw-2'>&amp;</span><span class='ident'>a</span><span class='op'>*</span><span class='kw-2'>&amp;</span><span class='ident'>v1</span> <span class='op'>-</span> <span class='kw-2'>&amp;</span><span class='ident'>v1</span><span class='op'>*</span><span class='ident'>lambda_1</span>).<span class='ident'>into_vec</span>().<span class='ident'>iter</span>().<span class='ident'>all</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span><span class='ident'>c</span><span class='op'>|</span> <span class='ident'>c</span> <span class='op'>&lt;</span> <span class='ident'>epsilon</span>));
-        <span class='macro'>assert</span><span class='macro'>!</span>((<span class='kw-2'>&amp;</span><span class='ident'>a</span><span class='op'>*</span><span class='kw-2'>&amp;</span><span class='ident'>v2</span> <span class='op'>-</span> <span class='kw-2'>&amp;</span><span class='ident'>v2</span><span class='op'>*</span><span class='ident'>lambda_2</span>).<span class='ident'>into_vec</span>().<span class='ident'>iter</span>().<span class='ident'>all</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span><span class='ident'>c</span><span class='op'>|</span> <span class='ident'>c</span> <span class='op'>&lt;</span> <span class='ident'>epsilon</span>));
+        <span class='macro'>assert</span><span class='macro'>!</span>((<span class='kw-2'>&amp;</span><span class='ident'>a</span> <span class='op'>*</span> <span class='kw-2'>&amp;</span><span class='ident'>v1</span> <span class='op'>-</span> <span class='kw-2'>&amp;</span><span class='ident'>v1</span> <span class='op'>*</span> <span class='ident'>lambda_1</span>).<span class='ident'>into_vec</span>().<span class='ident'>iter</span>().<span class='ident'>all</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span><span class='ident'>c</span><span class='op'>|</span> <span class='ident'>c</span> <span class='op'>&lt;</span> <span class='ident'>epsilon</span>));
+        <span class='macro'>assert</span><span class='macro'>!</span>((<span class='kw-2'>&amp;</span><span class='ident'>a</span> <span class='op'>*</span> <span class='kw-2'>&amp;</span><span class='ident'>v2</span> <span class='op'>-</span> <span class='kw-2'>&amp;</span><span class='ident'>v2</span> <span class='op'>*</span> <span class='ident'>lambda_2</span>).<span class='ident'>into_vec</span>().<span class='ident'>iter</span>().<span class='ident'>all</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span><span class='ident'>c</span><span class='op'>|</span> <span class='ident'>c</span> <span class='op'>&lt;</span> <span class='ident'>epsilon</span>));
     }
 
 }
