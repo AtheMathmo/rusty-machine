@@ -212,9 +212,9 @@ impl<'a, T: Copy> MatrixSlice<'a, T> {
         self.iter_rows().collect::<Matrix<T>>()
     }
 
-    pub fn split_at(self, mid: usize, axis: Axes) -> (MatrixSlice<T>, MatrixSlice<T>) {
-        let slice_1 : MatrixSlice<T>;
-        let slice_2 : MatrixSlice<T>;
+    pub fn split_at(self, mid: usize, axis: Axes) -> (MatrixSlice<'a, T>, MatrixSlice<'a, T>) {
+        let slice_1: MatrixSlice<T>;
+        let slice_2: MatrixSlice<T>;
 
         let self_cols = self.cols;
         let self_rows = self.rows;
@@ -223,14 +223,14 @@ impl<'a, T: Copy> MatrixSlice<'a, T> {
             Axes::Row => {
                 assert!(mid < self.rows);
 
-                slice_1 = self.reslice([0,0], mid, self_cols);
-                slice_2 = self.reslice([mid,0], self_rows - mid, self_cols);
-            },
+                slice_1 = self.reslice([0, 0], mid, self_cols);
+                slice_2 = self.reslice([mid, 0], self_rows - mid, self_cols);
+            }
             Axes::Col => {
                 assert!(mid < self.cols);
 
-                slice_1 = self.reslice([0,0], self_rows, mid);
-                slice_2 = self.reslice([0,mid], self_rows, self_cols - mid);
+                slice_1 = self.reslice([0, 0], self_rows, mid);
+                slice_2 = self.reslice([0, mid], self_rows, self_cols - mid);
             }
         }
 
@@ -404,9 +404,12 @@ impl<'a, T: Copy> MatrixSliceMut<'a, T> {
         self.iter_rows().collect::<Matrix<T>>()
     }
 
-    pub fn split_at(self, mid: usize, axis: Axes) -> (MatrixSliceMut<T>, MatrixSliceMut<T>) {
-        let slice_1 : MatrixSliceMut<T>;
-        let slice_2 : MatrixSliceMut<T>;
+    pub fn split_at(self,
+                    mid: usize,
+                    axis: Axes)
+                    -> (MatrixSliceMut<'a, T>, MatrixSliceMut<'a, T>) {
+        let slice_1: MatrixSliceMut<T>;
+        let slice_2: MatrixSliceMut<T>;
 
         let self_cols = self.cols;
         let self_rows = self.rows;
@@ -414,15 +417,33 @@ impl<'a, T: Copy> MatrixSliceMut<'a, T> {
         match axis {
             Axes::Row => {
                 assert!(mid < self.rows);
+                unsafe {
+                    let slice_2_ptr = self.ptr.offset((mid * self.cols) as isize);
 
-                slice_1 = self.clone().reslice([0,0], mid, self_cols);
-                slice_2 = self.reslice([mid,0], self_rows - mid, self_cols);
-            },
+                    slice_2 = MatrixSliceMut::from_raw_parts(slice_2_ptr,
+                                                             self_rows - mid,
+                                                             self_cols,
+                                                             self.row_stride);
+                    slice_1 = MatrixSliceMut::from_raw_parts(self.ptr,
+                                                             mid,
+                                                             self_cols,
+                                                             self.row_stride);
+                }
+            }
             Axes::Col => {
                 assert!(mid < self.cols);
+                unsafe {
+                    let slice_2_ptr = self.ptr.offset(mid as isize);
 
-                slice_1 = self.clone().reslice([0,0], self_rows, mid);
-                slice_2 = self.reslice([0,mid], self_rows, self_cols - mid);
+                    slice_2 = MatrixSliceMut::from_raw_parts(slice_2_ptr,
+                                                             self_rows,
+                                                             self_cols - mid,
+                                                             self.row_stride);
+                    slice_1 = MatrixSliceMut::from_raw_parts(self.ptr,
+                                                             self_rows,
+                                                             mid,
+                                                             self.row_stride);
+                }
             }
         }
 
@@ -519,7 +540,7 @@ mod tests {
     #[test]
     fn reslice() {
         let mut a = Matrix::new(4, 4, (0..16).collect::<Vec<_>>());
-        
+
         {
             let b = MatrixSlice::from_matrix(&a, [1, 1], 3, 3);
             let c = b.reslice([0, 1], 2, 2);
