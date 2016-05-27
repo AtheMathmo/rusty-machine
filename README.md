@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/AtheMathmo/rusty-machine](https://badges.gitter.im/AtheMathmo/rusty-machine.svg)](https://gitter.im/AtheMathmo/rusty-machine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/AtheMathmo/rusty-machine.svg?branch=master)](https://travis-ci.org/AtheMathmo/rusty-machine)
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.2.7](https://crates.io/crates/rusty-machine/0.2.7).
+Here is the API documentation for the rust crate. Currently up to date for [version 0.3.0](https://crates.io/crates/rusty-machine/0.3.0).
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
@@ -14,11 +14,11 @@ And here is a document detailing development efforts. Including a projected time
 
 ## Summary
 
-This library is very much in early stages of development. There is a lot of work needing to be done and optimization is needed before this can be used for any serious applications. Despite this, feel free to take a look at the source code and try out the [crate](https://crates.io/crates/rusty-machine).
+Rusty-machine is a general purpose machine learning library implemented entirely in Rust. It aims to combine speed and ease of use - without requiring a huge number of external dependencies.
 
-This project was originally intended to be an implementation of Online Collaborative Filtering in Rust. However, after putting a lot of effort into building the linear algebra library that was needed I decided I shouldn't waste the effort and should make something more general!
+This project began as a way for me to learn Rust and brush up on some less familiar machine learning algorithms and techniques. Now the project aims to provide a complete, easy to use, machine learning library for Rust.
 
-So this project is now going to be a machine learning crate for Rust. I began this project as a fun way to learn Rust and so there will be lots of things that need improving (I'm still not very familiar with LLVM). I hope that this crate will provide a number of standard out-the-box machine learning algorithms.
+This library is still very much in early stages of development. Although there are a good number of algorithms many other things are missing. Rusty-machine is probably not the best choice for any serious projects - but hopefully that can change in the near future!
 
 #### Contributing
 
@@ -30,17 +30,13 @@ I have now created a dedicated page for [contributing](CONTRIBUTING.md). If you'
 
 ## Implementation
 
-This project is implemented using [Rust](https://www.rust-lang.org/).
-
-## Motivation
-
-The key motivation behind this project was for me to learn some systems programming and a new language! I wanted to try implementing a linear algebra library within a systems programming language and then extend this to explore some machine learning algorithms.
+This project is implemented using [Rust](https://www.rust-lang.org/). Currently there are no other dependencies! Though, we are planning on introducing optional BLAS/LAPACK dependencies soon.
 
 ---
 
 ## Current Progress
 
-The linear algebra library is now fairly filled out. But there is still lots of room for optimization (it is almost definitely better to switch to BLAS/LAPACK).
+The linear algebra library is now fairly filled out. But there is still lots of room for optimization and we should provide BLAS/LAPACK support.
 
 There is also a `stats` module behind an optional features flag.
 
@@ -49,7 +45,8 @@ There is also a `stats` module behind an optional features flag.
 - Generic data matrices
 - Concatenation
 - Data manipulation (row and column selection/repetition etc.)
-- Arithmetic
+- Matrix arithmetic
+- Efficient matrix slicing
 
 ### Machine Learning
 
@@ -108,15 +105,6 @@ More detailed coverage can be found in the [API documentation](https://AtheMathm
 
 The learning module contains machine learning models. The machine learning implementations are designed with customizability in mind. This means you can control the optimization algorithms but still retain the ease of using default values. This is an area I am actively trying to improve on!
 
-The current algorithms included are:
+The models all provide `predict` and `train` methods - similar to sklearn](http://scikit-learn.org/stable/).
 
-- Linear Regression
-- Logistic Regression
-- Generalized Linear Models
-- K-Means Clustering
-- Neural Networks
-- Gaussian Process Regression
-- Support Vector Machines
-- Gaussian Mixture Models
-
----
+The models focus on modularity - you can plug in the pieces you want and easily construct new pieces from existing traits.

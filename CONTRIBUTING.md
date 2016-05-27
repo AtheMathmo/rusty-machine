@@ -1,6 +1,6 @@
 # Contributing to rusty-machine
 
-First of all thank you for your interest! I'm very keen to get more contributors onboard and am excited to help out in whichever ways I can.
+First of all thank you for your interest! I'm very keen to get more contributors onboard and am excited to help out in whichever ways I can. This is an early stage, developed-too-fast, library which could really benefit from more contributors.
 
 Contributing can take place in many forms, including but not limited to:
 

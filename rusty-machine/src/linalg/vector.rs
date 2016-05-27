@@ -30,13 +30,13 @@ impl<T> Vector<T> {
     ///
     /// let vec = Vector::new(vec![1.0,2.0,3.0,4.0]);
     /// ```
-    pub fn new(data: Vec<T>) -> Vector<T> {
-
-        let size = data.len();
+    pub fn new<U: Into<Vec<T>>>(data: U) -> Vector<T> {
+        let our_data = data.into();
+        let size = our_data.len();
 
         Vector {
             size: size,
-            data: data,
+            data: our_data,
         }
     }
 
@@ -48,6 +48,11 @@ impl<T> Vector<T> {
     /// Returns a non-mutable reference to the underlying data.
     pub fn data(&self) -> &Vec<T> {
         &self.data
+    }
+
+    /// Returns a mutable slice of the underlying data.
+    pub fn mut_data(&mut self) -> &mut [T] {
+        &mut self.data
     }
 
     /// Consumes the Vector and returns the Vec of data.
@@ -153,7 +158,7 @@ impl<T: Copy + PartialOrd> Vector<T> {
     }
 }
 
-impl<T: Zero + One + Copy> Vector<T> {
+impl<T: Clone + Zero> Vector<T> {
     /// Constructs Vector of all zeros.
     ///
     /// Requires the size of the vector.
@@ -171,6 +176,9 @@ impl<T: Zero + One + Copy> Vector<T> {
             data: vec![T::zero(); size],
         }
     }
+}
+
+impl<T: Clone + One> Vector<T> {
 
     /// Constructs Vector of all ones.
     ///
@@ -191,7 +199,7 @@ impl<T: Zero + One + Copy> Vector<T> {
     }
 }
 
-impl<T: Copy + One + Zero + Mul<T, Output = T> + Add<T, Output = T>> Vector<T> {
+impl<T: Copy + Zero + Mul<T, Output = T> + Add<T, Output = T>> Vector<T> {
     /// Compute dot product with specified Vector.
     ///
     /// # Examples
@@ -230,7 +238,7 @@ impl<T: Copy + Zero + Add<T, Output = T>> Vector<T> {
     }
 }
 
-impl<T: Copy + Zero + Mul<T, Output = T>> Vector<T> {
+impl<T: Copy + Mul<T, Output = T>> Vector<T> {
     /// The elementwise product of two vectors.
     ///
     /// # Examples
@@ -250,7 +258,7 @@ impl<T: Copy + Zero + Mul<T, Output = T>> Vector<T> {
     }
 }
 
-impl<T: Copy + Zero + Div<T, Output = T>> Vector<T> {
+impl<T: Copy + Div<T, Output = T>> Vector<T> {
     /// The elementwise division of two vectors.
     ///
     /// # Examples
@@ -270,7 +278,7 @@ impl<T: Copy + Zero + Div<T, Output = T>> Vector<T> {
     }
 }
 
-impl<T: Copy + Zero + Float + FromPrimitive> Vector<T> {
+impl<T: Float + FromPrimitive> Vector<T> {
     /// The mean of the vector.
     ///
     /// Returns the arithmetic mean of the vector.
@@ -317,7 +325,7 @@ impl<T: Copy + Zero + Float + FromPrimitive> Vector<T> {
 }
 
 /// Multiplies vector by scalar.
-impl<T: Copy + One + Zero + Mul<T, Output = T>> Mul<T> for Vector<T> {
+impl<T: Copy + Mul<T, Output = T>> Mul<T> for Vector<T> {
     type Output = Vector<T>;
 
     fn mul(self, f: T) -> Vector<T> {
@@ -326,7 +334,7 @@ impl<T: Copy + One + Zero + Mul<T, Output = T>> Mul<T> for Vector<T> {
 }
 
 /// Multiplies vector by scalar.
-impl<'a, T: Copy + One + Zero + Mul<T, Output = T>> Mul<T> for &'a Vector<T> {
+impl<'a, T: Copy + Mul<T, Output = T>> Mul<T> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn mul(self, f: T) -> Vector<T> {
@@ -335,7 +343,7 @@ impl<'a, T: Copy + One + Zero + Mul<T, Output = T>> Mul<T> for &'a Vector<T> {
 }
 
 /// Multiplies vector by scalar.
-impl<'a, T: Copy + One + Zero + Mul<T, Output = T>> Mul<&'a T> for Vector<T> {
+impl<'a, T: Copy + Mul<T, Output = T>> Mul<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
     fn mul(mut self, f: &T) -> Vector<T> {
@@ -348,7 +356,7 @@ impl<'a, T: Copy + One + Zero + Mul<T, Output = T>> Mul<&'a T> for Vector<T> {
 }
 
 /// Multiplies vector by scalar.
-impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output = T>> Mul<&'b T> for &'a Vector<T> {
+impl<'a, 'b, T: Copy + Mul<T, Output = T>> Mul<&'b T> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn mul(self, f: &T) -> Vector<T> {
@@ -362,7 +370,7 @@ impl<'a, 'b, T: Copy + One + Zero + Mul<T, Output = T>> Mul<&'b T> for &'a Vecto
 }
 
 /// Divides vector by scalar.
-impl<T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<T> for Vector<T> {
+impl<T: Copy + Zero + PartialEq + Div<T, Output = T>> Div<T> for Vector<T> {
     type Output = Vector<T>;
 
     fn div(self, f: T) -> Vector<T> {
@@ -371,7 +379,7 @@ impl<T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<T> for Vector<T>
 }
 
 /// Divides vector by scalar.
-impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<T> for &'a Vector<T> {
+impl<'a, T: Copy + Zero + PartialEq + Div<T, Output = T>> Div<T> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn div(self, f: T) -> Vector<T> {
@@ -380,10 +388,12 @@ impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<T> for &'a V
 }
 
 /// Divides vector by scalar.
-impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<&'a T> for Vector<T> {
+impl<'a, T: Copy + Zero + PartialEq + Div<T, Output = T>> Div<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
     fn div(mut self, f: &T) -> Vector<T> {
+        assert!(*f != T::zero());
+
         for val in self.data.iter_mut() {
             *val = *val / *f;
         }
@@ -393,7 +403,7 @@ impl<'a, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<&'a T> for V
 }
 
 /// Divides vector by scalar.
-impl<'a, 'b, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<&'b T> for &'a Vector<T> {
+impl<'a, 'b, T: Copy + Zero + PartialEq + Div<T, Output = T>> Div<&'b T> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn div(self, f: &T) -> Vector<T> {
@@ -408,7 +418,7 @@ impl<'a, 'b, T: Copy + One + Zero + PartialEq + Div<T, Output = T>> Div<&'b T> f
 }
 
 /// Adds scalar to vector.
-impl<T: Copy + One + Zero + Add<T, Output = T>> Add<T> for Vector<T> {
+impl<T: Copy + Add<T, Output = T>> Add<T> for Vector<T> {
     type Output = Vector<T>;
 
     fn add(self, f: T) -> Vector<T> {
@@ -417,7 +427,7 @@ impl<T: Copy + One + Zero + Add<T, Output = T>> Add<T> for Vector<T> {
 }
 
 /// Adds scalar to vector.
-impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<T> for &'a Vector<T> {
+impl<'a, T: Copy + Add<T, Output = T>> Add<T> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn add(self, f: T) -> Vector<T> {
@@ -426,7 +436,7 @@ impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<T> for &'a Vector<T> {
 }
 
 /// Adds scalar to vector.
-impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<&'a T> for Vector<T> {
+impl<'a, T: Copy + Add<T, Output = T>> Add<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
     fn add(mut self, f: &T) -> Vector<T> {
@@ -439,7 +449,7 @@ impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<&'a T> for Vector<T> {
 }
 
 /// Adds scalar to vector.
-impl<'a, 'b, T: Copy + One + Zero + Add<T, Output = T>> Add<&'b T> for &'a Vector<T> {
+impl<'a, 'b, T: Copy + Add<T, Output = T>> Add<&'b T> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn add(self, f: &T) -> Vector<T> {
@@ -453,7 +463,7 @@ impl<'a, 'b, T: Copy + One + Zero + Add<T, Output = T>> Add<&'b T> for &'a Vecto
 }
 
 /// Adds vector to vector.
-impl<T: Copy + One + Zero + Add<T, Output = T>> Add<Vector<T>> for Vector<T> {
+impl<T: Copy + Add<T, Output = T>> Add<Vector<T>> for Vector<T> {
     type Output = Vector<T>;
 
     fn add(self, v: Vector<T>) -> Vector<T> {
@@ -462,7 +472,7 @@ impl<T: Copy + One + Zero + Add<T, Output = T>> Add<Vector<T>> for Vector<T> {
 }
 
 /// Adds vector to vector.
-impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<Vector<T>> for &'a Vector<T> {
+impl<'a, T: Copy + Add<T, Output = T>> Add<Vector<T>> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn add(self, v: Vector<T>) -> Vector<T> {
@@ -471,7 +481,7 @@ impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<Vector<T>> for &'a Vecto
 }
 
 /// Adds vector to vector.
-impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<&'a Vector<T>> for Vector<T> {
+impl<'a, T: Copy + Add<T, Output = T>> Add<&'a Vector<T>> for Vector<T> {
     type Output = Vector<T>;
 
     fn add(mut self, v: &Vector<T>) -> Vector<T> {
@@ -482,7 +492,7 @@ impl<'a, T: Copy + One + Zero + Add<T, Output = T>> Add<&'a Vector<T>> for Vecto
 }
 
 /// Adds vector to vector.
-impl<'a, 'b, T: Copy + One + Zero + Add<T, Output = T>> Add<&'b Vector<T>> for &'a Vector<T> {
+impl<'a, 'b, T: Copy + Add<T, Output = T>> Add<&'b Vector<T>> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn add(self, v: &Vector<T>) -> Vector<T> {
@@ -498,7 +508,7 @@ impl<'a, 'b, T: Copy + One + Zero + Add<T, Output = T>> Add<&'b Vector<T>> for &
 }
 
 /// Subtracts scalar from vector.
-impl<T: Copy + One + Zero + Sub<T, Output = T>> Sub<T> for Vector<T> {
+impl<T: Copy + Sub<T, Output = T>> Sub<T> for Vector<T> {
     type Output = Vector<T>;
 
     fn sub(self, f: T) -> Vector<T> {
@@ -507,7 +517,7 @@ impl<T: Copy + One + Zero + Sub<T, Output = T>> Sub<T> for Vector<T> {
 }
 
 /// Subtracts scalar from vector.
-impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<T> for &'a Vector<T> {
+impl<'a, T: Copy + Sub<T, Output = T>> Sub<T> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn sub(self, f: T) -> Vector<T> {
@@ -516,7 +526,7 @@ impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<T> for &'a Vector<T> {
 }
 
 /// Subtracts scalar from vector.
-impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'a T> for Vector<T> {
+impl<'a, T: Copy + Sub<T, Output = T>> Sub<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
     fn sub(mut self, f: &T) -> Vector<T> {
@@ -529,7 +539,7 @@ impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'a T> for Vector<T> {
 }
 
 /// Subtracts scalar from vector.
-impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'b T> for &'a Vector<T> {
+impl<'a, 'b, T: Copy + Sub<T, Output = T>> Sub<&'b T> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn sub(self, f: &T) -> Vector<T> {
@@ -543,7 +553,7 @@ impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'b T> for &'a Vecto
 }
 
 /// Subtracts vector from vector.
-impl<T: Copy + One + Zero + Sub<T, Output = T>> Sub<Vector<T>> for Vector<T> {
+impl<T: Copy + Sub<T, Output = T>> Sub<Vector<T>> for Vector<T> {
     type Output = Vector<T>;
 
     fn sub(self, v: Vector<T>) -> Vector<T> {
@@ -552,7 +562,7 @@ impl<T: Copy + One + Zero + Sub<T, Output = T>> Sub<Vector<T>> for Vector<T> {
 }
 
 /// Subtracts vector from vector.
-impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<Vector<T>> for &'a Vector<T> {
+impl<'a, T: Copy + Sub<T, Output = T>> Sub<Vector<T>> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn sub(self, mut v: Vector<T>) -> Vector<T> {
@@ -563,7 +573,7 @@ impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<Vector<T>> for &'a Vecto
 }
 
 /// Subtracts vector from vector.
-impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'a Vector<T>> for Vector<T> {
+impl<'a, T: Copy + Sub<T, Output = T>> Sub<&'a Vector<T>> for Vector<T> {
     type Output = Vector<T>;
 
     fn sub(mut self, v: &Vector<T>) -> Vector<T> {
@@ -574,7 +584,7 @@ impl<'a, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'a Vector<T>> for Vecto
 }
 
 /// Subtracts vector from vector.
-impl<'a, 'b, T: Copy + One + Zero + Sub<T, Output = T>> Sub<&'b Vector<T>> for &'a Vector<T> {
+impl<'a, 'b, T: Copy + Sub<T, Output = T>> Sub<&'b Vector<T>> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn sub(self, v: &Vector<T>) -> Vector<T> {
@@ -607,7 +617,7 @@ impl<'a, T: Neg<Output = T> + Copy> Neg for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn neg(self) -> Vector<T> {
-        let new_data = self.data.iter().map(|v| -*v).collect();
+        let new_data = self.data.iter().map(|v| -*v).collect::<Vec<_>>();
 
         Vector::new(new_data)
     }
@@ -652,12 +662,267 @@ impl<T: Float> Metric<T> for Vector<T> {
 #[cfg(test)]
 mod tests {
     use super::Vector;
+    use super::super::Metric;
 
     #[test]
     fn test_equality() {
         let v = Vector::new(vec![1, 2, 3, 4]);
         let v_redux = v.clone();
         assert_eq!(v, v_redux);
+    }
+
+    #[test]
+    fn create_vector_new() {
+        let a = Vector::new(vec![1.0; 12]);
+
+        assert_eq!(a.size(), 12);
+
+        for i in 0..12 {
+            assert_eq!(a[i], 1.0);
+        }
+    }
+
+    #[test]
+    fn create_vector_new_from_slice() {
+        let data_vec: Vec<u32> = vec![1, 2, 3];
+        let data_slice: &[u32] = &data_vec[..];
+        let from_vec = Vector::new(data_vec.clone());
+        let from_slice = Vector::new(data_slice);
+        assert_eq!(from_vec, from_slice);
+    }
+
+    #[test]
+    fn create_vector_zeros() {
+        let a = Vector::<f32>::zeros(7);
+
+        assert_eq!(a.size(), 7);
+
+        for i in 0..7 {
+            assert_eq!(a[i], 0.0);
+        }
+    }
+
+    #[test]
+    fn vector_dot_product() {
+        let a = Vector::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        let b = Vector::new(vec![3.0; 6]);
+
+        let c = a.dot(&b);
+
+        assert_eq!(c, 63.0);
+    }
+
+    #[test]
+    fn vector_f32_mul() {
+        let a = Vector::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        let b = 3.0;
+
+        // Allocating new memory
+        let c = &a * &b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], 3.0 * ((i + 1) as f32));
+        }
+
+        // Allocating new memory
+        let c = &a * b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], 3.0 * ((i + 1) as f32));
+        }
+
+        // Reusing memory
+        let c = a.clone() * &b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], 3.0 * ((i + 1) as f32));
+        }
+
+        // Reusing memory
+        let c = a * b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], 3.0 * ((i + 1) as f32));
+        }
+    }
+
+    #[test]
+    fn vector_f32_div() {
+        let a = Vector::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        let b = 3.0;
+
+        // Allocating new memory
+        let c = &a / &b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((i + 1) as f32) / 3.0);
+        }
+
+        // Allocating new memory
+        let c = &a / b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((i + 1) as f32) / 3.0);
+        }
+
+        // Reusing memory
+        let c = a.clone() / &b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((i + 1) as f32) / 3.0);
+        }
+
+        // Reusing memory
+        let c = a / b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((i + 1) as f32) / 3.0);
+        }
+    }
+
+    #[test]
+    fn vector_add() {
+        let a = Vector::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        let b = Vector::new(vec![2.0, 3.0, 4.0, 5.0, 6.0, 7.0]);
+
+        // Allocating new memory
+        let c = &a + &b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((2 * i + 3) as f32));
+        }
+
+        // Reusing memory
+        let c = &a + b.clone();
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((2 * i + 3) as f32));
+        }
+
+        // Reusing memory
+        let c = a.clone() + &b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((2 * i + 3) as f32));
+        }
+
+        // Reusing memory
+        let c = a + b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((2 * i + 3) as f32));
+        }
+    }
+
+    #[test]
+    fn vector_f32_add() {
+        let a = Vector::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        let b = 2.0;
+
+        // Allocating new memory
+        let c = &a + &b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((i + 1) as f32) + 2.0);
+        }
+
+        // Allocating new memory
+        let c = &a + b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((i + 1) as f32) + 2.0);
+        }
+
+        // Reusing memory
+        let c = a.clone() + &b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((i + 1) as f32) + 2.0);
+        }
+
+        // Reusing memory
+        let c = a + b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((i + 1) as f32) + 2.0);
+        }
+    }
+
+    #[test]
+    fn vector_sub() {
+        let a = Vector::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        let b = Vector::new(vec![2.0, 3.0, 4.0, 5.0, 6.0, 7.0]);
+
+        // Allocating new memory
+        let c = &a - &b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], -1.0);
+        }
+
+        // Reusing memory
+        let c = &a - b.clone();
+
+        for i in 0..6 {
+            assert_eq!(c[i], -1.0);
+        }
+
+        // Reusing memory
+        let c = a.clone() - &b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], -1.0);
+        }
+
+        // Reusing memory
+        let c = a - b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], -1.0);
+        }
+    }
+
+    #[test]
+    fn vector_f32_sub() {
+        let a = Vector::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
+        let b = 2.0;
+
+        // Allocating new memory
+        let c = &a - &b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((i + 1) as f32) - 2.0);
+        }
+
+        // Allocating new memory
+        let c = &a - b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((i + 1) as f32) - 2.0);
+        }
+
+        // Reusing memory
+        let c = a.clone() - &b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((i + 1) as f32) - 2.0);
+        }
+
+        // Reusing memory
+        let c = a - b;
+
+        for i in 0..6 {
+            assert_eq!(c[i], ((i + 1) as f32) - 2.0);
+        }
+    }
+
+    #[test]
+    fn vector_norm() {
+        let a = Vector::new(vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
+
+        let b = a.norm();
+
+        assert_eq!(b, (1. + 4. + 9. + 16. + 25. + 36. as f32).sqrt());
     }
 
 }

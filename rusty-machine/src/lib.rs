@@ -28,8 +28,8 @@
 //! ### linalg
 //!
 //! The linalg module contains all of the linear algebra tools and structures.
-//! This module is efficient but not state of the art. Development of this module
-//! is not a key focus as I'm waiting for a clear community winner.
+//! This module is efficient but not state of the art. In the future this module
+//! will likely be pulled out of rusty-machine and maintained separately.
 //!
 //! ---
 //!
@@ -55,12 +55,17 @@
 //! use rusty_machine::learning::toolkit::kernel;
 //! use rusty_machine::learning::SupModel;
 //!
+//! // First we'll get some data.
+//!
 //! // Some example training data.
 //! let inputs = Matrix::new(3,3,vec![1.,1.,1.,2.,2.,2.,3.,3.,3.]);
 //! let targets = Vector::new(vec![0.,1.,0.]);
 //!
 //! // Some example test data.
 //! let test_inputs = Matrix::new(2,3, vec![1.5,1.5,1.5,2.5,2.5,2.5]);
+//!
+//! // Now we'll set up our model.
+//! // This is close to the most complicated a model in rusty-machine gets!
 //!
 //! // A squared exponential kernel with lengthscale 2, and amplitude 1.
 //! let ker = kernel::SquaredExp::new(2., 1.);
@@ -70,6 +75,9 @@
 //!
 //! // Construct a GP with the specified kernel, mean, and a noise of 0.5.
 //! let mut gp = GaussianProcess::new(ker, zero_mean, 0.5);
+//!
+//!
+//! // Now we can train and predict from the model.
 //!
 //! // Train the model!
 //! gp.train(&inputs, &targets);
@@ -115,6 +123,7 @@ pub mod linalg {
     pub mod matrix;
     pub mod vector;
     pub mod utils;
+    pub mod convert;
     pub mod macros;
 }
 
@@ -192,6 +201,7 @@ pub mod learning {
         pub mod kernel;
         pub mod cost_fn;
         pub mod rand_utils;
+        pub mod regularization;
     }
 }
 

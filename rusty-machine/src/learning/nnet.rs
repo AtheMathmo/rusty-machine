@@ -5,7 +5,9 @@
 //! # Usage
 //!
 //! ```
-//! use rusty_machine::learning::nnet::NeuralNet;
+//! use rusty_machine::learning::nnet::{NeuralNet, BCECriterion};
+//! use rusty_machine::learning::toolkit::regularization::Regularization;
+//! use rusty_machine::learning::optim::grad_desc::StochasticGD;
 //! use rusty_machine::linalg::matrix::Matrix;
 //! use rusty_machine::learning::SupModel;
 //!
@@ -14,13 +16,21 @@
 //! let targets = Matrix::new(5,3, vec![1.,0.,0.,0.,1.,0.,0.,0.,1.,
 //!                                     0.,0.,1.,0.,0.,1.]);
 //!
+//! // Set the layer sizes - from input to output
 //! let layers = &[3,5,11,7,3];
-//! let mut model = NeuralNet::default(layers);
 //!
+//! // Choose the BCE criterion with L2 regularization (`lambda=0.1`).
+//! let criterion = BCECriterion::new(Regularization::L2(0.1));
+//!
+//! // We will just use the default stochastic gradient descent.
+//! let mut model = NeuralNet::new(layers, criterion, StochasticGD::default());
+//!
+//! // Train the model!
 //! model.train(&inputs, &targets);
 //!
 //! let test_inputs = Matrix::new(2,3, vec![1.5,1.5,1.5,5.1,5.1,5.1]);
 //!
+//! // And predict new output from the test inputs
 //! model.predict(&test_inputs);
 //! ```
 //!
@@ -30,12 +40,15 @@
 //! You can define your own criterion by implementing the `Criterion`
 //! trait with a concrete ActivationFunc and CostFunc.
 
-use linalg::matrix::Matrix;
+use linalg::matrix::{Matrix, MatrixSlice};
+use linalg::matrix::slice::BaseSlice;
+
 use learning::SupModel;
 use learning::toolkit::activ_fn;
 use learning::toolkit::activ_fn::ActivationFunc;
 use learning::toolkit::cost_fn;
 use learning::toolkit::cost_fn::CostFunc;
+use learning::toolkit::regularization::Regularization;
 use learning::optim::{Optimizable, OptimAlgorithm};
 use learning::optim::grad_desc::StochasticGD;
 
@@ -68,8 +81,7 @@ impl<'a, T, A> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, T, A>
 
     /// Train the model using gradient optimization and back propagation.
     fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) {
-        let start = self.base.weights.clone();
-        let optimal_w = self.alg.optimize(&self.base, &start[..], inputs, targets);
+        let optimal_w = self.alg.optimize(&self.base, &self.base.weights, inputs, targets);
         self.base.weights = optimal_w;
     }
 }
@@ -119,7 +131,7 @@ impl<'a, T, A> NeuralNet<'a, T, A>
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.
     /// let layers = &[3; 4];
-    /// let mut net = NeuralNet::new(layers, BCECriterion, StochasticGD::default());
+    /// let mut net = NeuralNet::new(layers, BCECriterion::default(), StochasticGD::default());
     /// ```
     pub fn new(layer_sizes: &'a [usize], criterion: T, alg: A) -> NeuralNet<'a, T, A> {
         NeuralNet {
@@ -133,6 +145,7 @@ impl<'a, T, A> NeuralNet<'a, T, A>
     /// # Examples
     ///
     /// ```
+    /// use rusty_machine::linalg::matrix::slice::BaseSlice;
     /// use rusty_machine::learning::nnet::NeuralNet;
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.
@@ -145,7 +158,7 @@ impl<'a, T, A> NeuralNet<'a, T, A>
     /// assert_eq!(w.rows(), 4);
     /// assert_eq!(w.cols(), 3);
     /// ```
-    pub fn get_net_weights(&self, idx: usize) -> Matrix<f64> {
+    pub fn get_net_weights(&self, idx: usize) -> MatrixSlice<f64> {
         self.base.get_layer_weights(&self.base.weights[..], idx)
     }
 }
@@ -167,7 +180,7 @@ impl<'a> BaseNeuralNet<'a, BCECriterion> {
         BaseNeuralNet {
             layer_sizes: layer_sizes,
             weights: BaseNeuralNet::<BCECriterion>::create_weights(layer_sizes),
-            criterion: BCECriterion,
+            criterion: BCECriterion::default(),
         }
     }
 }
@@ -214,8 +227,8 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
     }
 
     /// Gets matrix of weights between specified layer and forward layer for the weights.
-    fn get_layer_weights(&self, weights: &[f64], idx: usize) -> Matrix<f64> {
-        assert!(idx < self.layer_sizes.len() - 1);
+    fn get_layer_weights(&self, weights: &[f64], idx: usize) -> MatrixSlice<f64> {
+        debug_assert!(idx < self.layer_sizes.len() - 1);
 
         // Check that the weights are the right size.
         let mut full_size = 0usize;
@@ -223,7 +236,7 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
             full_size += (self.layer_sizes[l] + 1) * self.layer_sizes[l + 1];
         }
 
-        assert_eq!(full_size, weights.len());
+        debug_assert_eq!(full_size, weights.len());
 
         let mut start = 0usize;
 
@@ -231,47 +244,26 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
             start += (self.layer_sizes[l] + 1) * self.layer_sizes[l + 1]
         }
 
-        let capacity = (self.layer_sizes[idx] + 1) * self.layer_sizes[idx + 1];
-
-        let mut layer_weights = Vec::with_capacity((self.layer_sizes[idx] + 1) *
-                                                   self.layer_sizes[idx + 1]);
         unsafe {
-            for i in start..start + capacity {
-                layer_weights.push(*weights.get_unchecked(i));
-            }
+            MatrixSlice::from_raw_parts(weights.as_ptr().offset(start as isize),
+                                        self.layer_sizes[idx] + 1,
+                                        self.layer_sizes[idx + 1],
+                                        self.layer_sizes[idx + 1])
         }
-
-        Matrix::new(self.layer_sizes[idx] + 1,
-                    self.layer_sizes[idx + 1],
-                    layer_weights)
 
     }
 
     /// Gets matrix of weights between specified layer and forward layer
     /// for the base model.
-    fn get_net_weights(&self, idx: usize) -> Matrix<f64> {
+    fn get_net_weights(&self, idx: usize) -> MatrixSlice<f64> {
         self.get_layer_weights(&self.weights[..], idx)
     }
 
-    // // Get the matrix of weights without the bias terms.
-    // fn get_regular_weights(&self, weights: &[f64]) -> Vec<f64> {
-    //     let mut reg_weights = Vec::new();
-
-    //     // Check that the weights are the right size.
-    //     let mut start = 0usize;
-    //     for l in 0..self.layer_sizes.len() - 1 {
-
-    //         for i in 0..self.layer_sizes[l] {
-    //             for j in 0..self.layer_sizes[l + 1] {
-    //                 reg_weights.push(weights[start + j * (1 + self.layer_sizes[l]) + 1 + i])
-    //             }
-    //         }
-
-    //         start += (self.layer_sizes[l] + 1) * self.layer_sizes[l + 1];
-    //     }
-
-    //     reg_weights
-    // }
+    /// Gets the weights for a layer excluding the bias weights.
+    fn get_non_bias_weights(&self, weights: &[f64], idx: usize) -> MatrixSlice<f64> {
+        let layer_weights = self.get_layer_weights(weights, idx);
+        layer_weights.reslice([1, 0], layer_weights.rows() - 1, layer_weights.cols())
+    }
 
     /// Compute the gradient using the back propagation algorithm.
     fn compute_grad(&self,
@@ -326,7 +318,8 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
                 z = ones.hcat(&z);
 
                 let g = self.criterion.grad_activ(z);
-                delta = (delta * self.get_layer_weights(weights, l).transpose()).elemul(&g);
+                delta = (delta * Matrix::from(self.get_layer_weights(weights, l)).transpose())
+                            .elemul(&g);
 
                 let non_one_rows = &(1..delta.cols()).collect::<Vec<usize>>()[..];
                 delta = delta.select_cols(non_one_rows);
@@ -338,7 +331,17 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
         let mut capacity = 0;
 
         for (l, activ_item) in activations.iter().enumerate().take(self.layer_sizes.len() - 1) {
-            let g = deltas[self.layer_sizes.len() - 2 - l].transpose() * activ_item;
+            // Compute the gradient
+            let mut g = deltas[self.layer_sizes.len() - 2 - l].transpose() * activ_item;
+
+            // Add the regularized gradient
+            if self.criterion.is_regularized() {
+                let layer = l;
+                let non_bias_weights = self.get_non_bias_weights(weights, layer);
+                let zeros = Matrix::zeros(1, non_bias_weights.cols());
+                g += zeros.vcat(&self.criterion.reg_cost_grad(non_bias_weights));
+            }
+
             capacity += g.cols() * g.rows();
             grad.push(g / (inputs.rows() as f64));
         }
@@ -348,8 +351,18 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
         for g in grad {
             gradients.append(&mut g.into_vec());
         }
-        (self.criterion.cost(&activations[activations.len() - 1], targets),
-         gradients)
+
+        // Compute the cost
+        let mut cost = self.criterion.cost(&activations[activations.len() - 1], targets);
+
+        // Add the regularized cost
+        if self.criterion.is_regularized() {
+            for i in 0..self.layer_sizes.len() - 1 {
+                cost += self.criterion.reg_cost(self.get_non_bias_weights(weights, i));
+            }
+        }
+
+        (cost, gradients)
     }
 
     /// Forward propagation of the model weights to get the outputs.
@@ -420,6 +433,41 @@ pub trait Criterion {
     fn cost_grad(&self, outputs: &Matrix<f64>, targets: &Matrix<f64>) -> Matrix<f64> {
         Self::Cost::grad_cost(outputs, targets)
     }
+
+    /// Returns the regularization for this criterion.
+    ///
+    /// Will return `Regularization::None` by default.
+    fn regularization(&self) -> Regularization<f64> {
+        Regularization::None
+    }
+
+    /// Checks if the current criterion includes regularization.
+    ///
+    /// Will return `false` by default.
+    fn is_regularized(&self) -> bool {
+        match self.regularization() {
+            Regularization::None => false,
+            _ => true,
+        }
+    }
+
+    /// Returns the regularization cost for the criterion.
+    ///
+    /// Will return `0` by default.
+    ///
+    /// This method will not be invoked by the neural network if there is explicitly no regularization.
+    fn reg_cost(&self, reg_weights: MatrixSlice<f64>) -> f64 {
+        self.regularization().reg_cost(reg_weights)
+    }
+
+    /// Returns the regularization gradient for the criterion.
+    ///
+    /// Will return a matrix of zeros by default.
+    ///
+    /// This method will not be invoked by the neural network if there is explicitly no regularization.
+    fn reg_cost_grad(&self, reg_weights: MatrixSlice<f64>) -> Matrix<f64> {
+        self.regularization().reg_grad(reg_weights)
+    }
 }
 
 /// The binary cross entropy criterion.
@@ -427,11 +475,45 @@ pub trait Criterion {
 /// Uses the Sigmoid activation function and the
 /// cross entropy error.
 #[derive(Clone, Copy, Debug)]
-pub struct BCECriterion;
+pub struct BCECriterion {
+    regularization: Regularization<f64>,
+}
 
 impl Criterion for BCECriterion {
     type ActFunc = activ_fn::Sigmoid;
     type Cost = cost_fn::CrossEntropyError;
+
+    fn regularization(&self) -> Regularization<f64> {
+        self.regularization
+    }
+}
+
+/// Creates an MSE Criterion without any regularization.
+impl Default for BCECriterion {
+    fn default() -> Self {
+        BCECriterion {
+            regularization : Regularization::None,
+        }
+    }
+}
+
+impl BCECriterion {
+    /// Constructs a new BCECriterion with the given regularization.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::nnet::BCECriterion;
+    /// use rusty_machine::learning::toolkit::regularization::Regularization;
+    ///
+    /// // Create a new BCE criterion with L2 regularization of 0.3.
+    /// let criterion = BCECriterion::new(Regularization::L2(0.3f64));
+    /// ```
+    pub fn new(regularization: Regularization<f64>) -> Self {
+        BCECriterion {
+            regularization : regularization,
+        }
+    }
 }
 
 /// The mean squared error criterion.
@@ -439,9 +521,43 @@ impl Criterion for BCECriterion {
 /// Uses the Linear activation function and the
 /// mean squared error.
 #[derive(Clone, Copy, Debug)]
-pub struct MSECriterion;
+pub struct MSECriterion {
+    regularization: Regularization<f64>,
+}
 
 impl Criterion for MSECriterion {
     type ActFunc = activ_fn::Linear;
     type Cost = cost_fn::MeanSqError;
+
+    fn regularization(&self) -> Regularization<f64> {
+        self.regularization
+    }
+}
+
+/// Creates an MSE Criterion without any regularization.
+impl Default for MSECriterion {
+    fn default() -> Self {
+        MSECriterion {
+            regularization : Regularization::None,
+        }
+    }
+}
+
+impl MSECriterion {
+    /// Constructs a new BCECriterion with the given regularization.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::nnet::MSECriterion;
+    /// use rusty_machine::learning::toolkit::regularization::Regularization;
+    ///
+    /// // Create a new MSE criterion with L2 regularization of 0.3.
+    /// let criterion = MSECriterion::new(Regularization::L2(0.3f64));
+    /// ```
+    pub fn new(regularization: Regularization<f64>) -> Self {
+        MSECriterion {
+            regularization : regularization,
+        }
+    }
 }

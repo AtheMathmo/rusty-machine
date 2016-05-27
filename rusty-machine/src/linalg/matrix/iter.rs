@@ -151,7 +151,7 @@ impl<T> Matrix<T> {
     }
 }
 
-impl<T> MatrixSlice<T> {
+impl<'a, T> MatrixSlice<'a, T> {
     /// Iterate over the rows of the matrix slice.
     ///
     /// # Examples
@@ -174,12 +174,12 @@ impl<T> MatrixSlice<T> {
             slice_rows: self.rows,
             slice_cols: self.cols,
             row_stride: self.row_stride as isize,
-            _marker: PhantomData::<&T>,
+            _marker: PhantomData::<&'a T>,
         }
     }
 }
 
-impl<T> MatrixSliceMut<T> {
+impl<'a, T> MatrixSliceMut<'a, T> {
     /// Iterate over the rows of the mutable matrix slice.
     ///
     /// # Examples
@@ -202,7 +202,7 @@ impl<T> MatrixSliceMut<T> {
             slice_rows: self.rows,
             slice_cols: self.cols,
             row_stride: self.row_stride as isize,
-            _marker: PhantomData::<&T>,
+            _marker: PhantomData::<&'a T>,
         }
     }
 
@@ -214,11 +214,15 @@ impl<T> MatrixSliceMut<T> {
     /// use rusty_machine::linalg::matrix::{Matrix, MatrixSliceMut};
     ///
     /// let mut a = Matrix::new(3, 2, (0..6).collect::<Vec<usize>>());
-    /// let b = MatrixSliceMut::from_matrix(&mut a, [0,0], 2, 2);
+    /// 
+    /// // New scope (so we can consume `a` after)
+    /// {
+    ///    let b = MatrixSliceMut::from_matrix(&mut a, [0,0], 2, 2);
     ///
-    /// for row in b.iter_rows_mut() {
-    ///     for r in row {
-    ///         *r = *r + 1;
+    ///     for row in b.iter_rows_mut() {
+    ///         for r in row {
+    ///             *r = *r + 1;
+    ///         }
     ///     }
     /// }
     ///
@@ -232,7 +236,7 @@ impl<T> MatrixSliceMut<T> {
             slice_rows: self.rows,
             slice_cols: self.cols,
             row_stride: self.row_stride as isize,
-            _marker: PhantomData::<&mut T>,
+            _marker: PhantomData::<&'a mut T>,
         }
     }
 }
@@ -363,21 +367,23 @@ mod tests {
     fn test_matrix_slice_mut_rows() {
         let mut a = Matrix::new(3, 3, (0..9).collect::<Vec<usize>>());
 
-        let b = MatrixSliceMut::from_matrix(&mut a, [0, 0], 2, 2);
+        {
+            let b = MatrixSliceMut::from_matrix(&mut a, [0, 0], 2, 2);
 
-        let data = [[0, 1], [3, 4]];
+            let data = [[0, 1], [3, 4]];
 
-        for (i, row) in b.iter_rows().enumerate() {
-            assert_eq!(data[i], *row);
-        }
+            for (i, row) in b.iter_rows().enumerate() {
+                assert_eq!(data[i], *row);
+            }
 
-        for (i, row) in b.iter_rows_mut().enumerate() {
-            assert_eq!(data[i], *row);
-        }
+            for (i, row) in b.iter_rows_mut().enumerate() {
+                assert_eq!(data[i], *row);
+            }
 
-        for row in b.iter_rows_mut() {
-            for r in row {
-                *r = 0;
+            for row in b.iter_rows_mut() {
+                for r in row {
+                    *r = 0;
+                }
             }
         }
 

@@ -3,11 +3,14 @@ extern crate num as libnum;
 
 pub mod linalg {
     mod mat;
-    mod vector;
 }
 
 pub mod learning {
     mod lin_reg;
     mod k_means;
     mod gp;
+
+    pub mod optim {
+    	mod grad_desc;
+    }
 }
