@@ -59,7 +59,7 @@ pub struct MatrixSlice<'a, T: 'a> {
 ///
 /// The struct contains the upper left point of the slice
 /// and the width and height of the slice.
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct MatrixSliceMut<'a, T: 'a> {
     ptr: *mut T,
     rows: usize,

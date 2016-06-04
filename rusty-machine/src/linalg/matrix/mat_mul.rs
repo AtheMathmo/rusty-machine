@@ -83,7 +83,8 @@ macro_rules! mat_mul_general (
                     {
                         for j in 0..r
                         {
-                            new_data[i*r + j] = *new_data.get_unchecked(i*r + j) + *self.get_unchecked([i,k]) * *m.get_unchecked([k,j]);
+                            let mut target_pnt = new_data.get_unchecked_mut(i*r + j);
+                            *target_pnt = *target_pnt + *self.get_unchecked([i,k]) * *m.get_unchecked([k,j]);
                         }
                     }
                 }
@@ -267,14 +268,7 @@ pub trait ParaMul
 impl ParaMul for f32 {}
 impl ParaMul for f64 {}
 
-use std::marker::{Sync, Send};
-
-unsafe impl<'a, T: Send> Send for MatrixSlice<'a, T> {}
-unsafe impl<'a, T: Sync> Sync for MatrixSlice<'a, T> {}
-unsafe impl<'a, T: Send> Send for MatrixSliceMut<'a, T> {}
-unsafe impl<'a, T: Sync> Sync for MatrixSliceMut<'a, T> {}
-
-fn fastmul<T: ParaMul>(a: &MatrixSlice<T>, b: &MatrixSlice<T>, c: MatrixSliceMut<T>) {
+fn fastmul<T: ParaMul>(a: &MatrixSlice<T>, b: &MatrixSlice<T>, c: &mut MatrixSliceMut<T>) {
     let p = a.rows;
     let q = a.cols;
     let r = b.cols;
@@ -334,9 +328,9 @@ impl<T: ParaMul> Matrix<T> {
         // Create mat holding and fill slice
         let mut ret_mat = Matrix::new(self.rows, m.cols, t_vec);
         {
-            let mat_slice = MatrixSliceMut::from_matrix(&mut ret_mat, [0, 0], self.rows, m.cols);
+            let mut mat_slice = MatrixSliceMut::from_matrix(&mut ret_mat, [0, 0], self.rows, m.cols);
 
-            s_1.paramul(&s_2, mat_slice);
+            s_1.paramul(&s_2, &mut mat_slice);
         }
 
         ret_mat
@@ -357,7 +351,7 @@ impl<'a, T: ParaMul> MatrixSlice<'a, T> {
     /// let c = a.paramul(&b);
     /// assert_eq!(c.into_vec(), vec![9.0; 9]);
     /// ```
-    pub fn paramul(&self, m: &MatrixSlice<T>, mut c: MatrixSliceMut<T>) {
+    pub fn paramul(&self, m: &MatrixSlice<T>, mut c: &mut MatrixSliceMut<T>) {
         let n = self.rows();
         let p = self.cols();
         let q = m.cols();
@@ -378,9 +372,10 @@ impl<'a, T: ParaMul> MatrixSlice<'a, T> {
 
             if max_dim == n {
                 let (top, bottom) = self.split_at(split_point, Axes::Row);
-                let (c_top, c_bottom) = c.split_at(split_point, Axes::Row);
+                let (mut c_top, mut c_bottom) = c.split_at(split_point, Axes::Row);
 
-                rayon::join(|| top.paramul(m, c_top), || bottom.paramul(m, c_bottom));
+                rayon::join(|| top.paramul(m, &mut c_top),
+                            || bottom.paramul(m, &mut c_bottom));
             } else if max_dim == p {
                 // Split self vertically and b horizontally
                 let (a_left, a_right) = self.split_at(split_point, Axes::Col);
@@ -393,23 +388,21 @@ impl<'a, T: ParaMul> MatrixSlice<'a, T> {
                 }
                 let mut t_mat = Matrix::new(n, q, t_vec);
                 {
-                    let t_mat_slice = MatrixSliceMut::from_matrix(&mut t_mat, [0, 0], n, q);
+                    let mut t_mat_slice = MatrixSliceMut::from_matrix(&mut t_mat, [0, 0], n, q);
 
-                    rayon::join(|| a_left.paramul(&b_top, c.clone()),
-                                || a_right.paramul(&b_bottom, t_mat_slice));
+                    rayon::join(|| a_left.paramul(&b_top, c),
+                                || a_right.paramul(&b_bottom, &mut t_mat_slice));
                 }
 
                 c += t_mat
-            } else if max_dim == q {
+            } else {
                 // Split m vertically
                 let (left, right) = m.split_at(split_point, Axes::Col);
-                let (c_left, c_right) = c.split_at(split_point, Axes::Col);
+                let (mut c_left, mut c_right) = c.split_at(split_point, Axes::Col);
 
-                rayon::join(|| self.paramul(&left, c_left),
-                            || self.paramul(&right, c_right));
+                rayon::join(|| self.paramul(&left, &mut c_left),
+                            || self.paramul(&right, &mut c_right));
 
-            } else {
-                panic!("Couldn't find the max of the matrix dimensions.");
             }
         }
     }

@@ -581,6 +581,28 @@ impl<'a, 'b, T : Copy + $trt<T, Output=T>> $assign_trt<&'b T> for MatrixSliceMut
         }
     }
 }
+
+/// Performs
+#[doc=$doc]
+/// assignment between a mutable matrix slice and a scalar.
+impl<'a, 'b, 'c, T : Copy + $trt<T, Output=T>> $assign_trt<&'b T> for &'c mut MatrixSliceMut<'a, T> {
+    fn $op_assign(&mut self, _rhs: &T) {
+        for x in self.iter_mut() {
+            *x = (*x).$op(*_rhs)
+        }
+    }
+}
+
+/// Performs
+#[doc=$doc]
+/// assignment between a mutable matrix slice and a scalar.
+impl<'a, 'b, T : Copy + $trt<T, Output=T>> $assign_trt<T> for &'b mut MatrixSliceMut<'a, T> {
+    fn $op_assign(&mut self, _rhs: T) {
+        for x in self.iter_mut() {
+            *x = (*x).$op(_rhs)
+        }
+    }
+}
     );
 );
 
@@ -633,6 +655,28 @@ impl<'a, T : Copy + $trt<T, Output=T>> $assign_trt<Matrix<T>> for MatrixSliceMut
 #[doc=$doc]
 /// assignment between two matrices.
 impl<'a, 'b, T : Copy + $trt<T, Output=T>> $assign_trt<&'b Matrix<T>> for MatrixSliceMut<'a, T> {
+    fn $op_assign(&mut self, _rhs: &Matrix<T>) {
+        for (slice_row, target_row) in self.iter_rows_mut().zip(_rhs.iter_rows()) {
+            utils::in_place_vec_bin_op(slice_row, target_row, |x, &y| {*x = (*x).$op(y) });
+        }
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// assignment between two matrices.
+impl<'a, 'b, T : Copy + $trt<T, Output=T>> $assign_trt<Matrix<T>> for &'b mut MatrixSliceMut<'a, T> {
+    fn $op_assign(&mut self, _rhs: Matrix<T>) {
+        for (slice_row, target_row) in self.iter_rows_mut().zip(_rhs.iter_rows()) {
+            utils::in_place_vec_bin_op(slice_row, target_row, |x, &y| {*x = (*x).$op(y) });
+        }
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// assignment between two matrices.
+impl<'a, 'b, 'c, T : Copy + $trt<T, Output=T>> $assign_trt<&'b Matrix<T>> for &'c mut MatrixSliceMut<'a, T> {
     fn $op_assign(&mut self, _rhs: &Matrix<T>) {
         for (slice_row, target_row) in self.iter_rows_mut().zip(_rhs.iter_rows()) {
             utils::in_place_vec_bin_op(slice_row, target_row, |x, &y| {*x = (*x).$op(y) });

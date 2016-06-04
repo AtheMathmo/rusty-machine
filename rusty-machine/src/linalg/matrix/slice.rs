@@ -20,6 +20,12 @@ use super::{Matrix, MatrixSlice, MatrixSliceMut, Axes};
 
 use std::marker::PhantomData;
 use std::mem;
+use std::marker::{Sync, Send};
+
+unsafe impl<'a, T: Send> Send for MatrixSlice<'a, T> {}
+unsafe impl<'a, T: Sync> Sync for MatrixSlice<'a, T> {}
+unsafe impl<'a, T: Send> Send for MatrixSliceMut<'a, T> {}
+unsafe impl<'a, T: Sync> Sync for MatrixSliceMut<'a, T> {}
 
 /// Trait for Matrix Slices.
 pub trait BaseSlice<T> {
@@ -39,7 +45,10 @@ pub trait BaseSlice<T> {
     unsafe fn get_unchecked(&self, index: [usize; 2]) -> &T;
 }
 
-impl<'a, T> BaseSlice<T> for MatrixSlice<'a, T> {
+macro_rules! impl_base_slice (
+    ($slice:ident) => (
+
+impl<'a, T> BaseSlice<T> for $slice<'a, T> {
     fn rows(&self) -> usize {
         self.rows
     }
@@ -61,27 +70,11 @@ impl<'a, T> BaseSlice<T> for MatrixSlice<'a, T> {
     }
 }
 
-impl<'a, T> BaseSlice<T> for MatrixSliceMut<'a, T> {
-    fn rows(&self) -> usize {
-        self.rows
-    }
+    );
+);
 
-    fn cols(&self) -> usize {
-        self.cols
-    }
-
-    fn row_stride(&self) -> usize {
-        self.row_stride
-    }
-
-    fn as_ptr(&self) -> *const T {
-        self.ptr as *const T
-    }
-
-    unsafe fn get_unchecked(&self, index: [usize; 2]) -> &T {
-        &*(self.ptr.offset((index[0] * self.row_stride + index[1]) as isize))
-    }
-}
+impl_base_slice!(MatrixSlice);
+impl_base_slice!(MatrixSliceMut);
 
 impl<'a, T> MatrixSlice<'a, T> {
     /// Produce a matrix slice from a matrix
@@ -212,10 +205,7 @@ impl<'a, T: Copy> MatrixSlice<'a, T> {
         self.iter_rows().collect::<Matrix<T>>()
     }
 
-    pub fn split_at(self, mid: usize, axis: Axes) -> (MatrixSlice<'a, T>, MatrixSlice<'a, T>) {
-        let slice_1: MatrixSlice<T>;
-        let slice_2: MatrixSlice<T>;
-
+    pub fn split_at(&self, mid: usize, axis: Axes) -> (MatrixSlice<'a, T>, MatrixSlice<'a, T>) {
         let self_cols = self.cols;
         let self_rows = self.rows;
 
@@ -223,18 +213,16 @@ impl<'a, T: Copy> MatrixSlice<'a, T> {
             Axes::Row => {
                 assert!(mid < self.rows);
 
-                slice_1 = self.reslice([0, 0], mid, self_cols);
-                slice_2 = self.reslice([mid, 0], self_rows - mid, self_cols);
+                (self.reslice([0, 0], mid, self_cols),
+                 self.reslice([mid, 0], self_rows - mid, self_cols))
             }
             Axes::Col => {
                 assert!(mid < self.cols);
 
-                slice_1 = self.reslice([0, 0], self_rows, mid);
-                slice_2 = self.reslice([0, mid], self_rows, self_cols - mid);
+                (self.reslice([0, 0], self_rows, mid),
+                 self.reslice([0, mid], self_rows, self_cols - mid))
             }
         }
-
-        (slice_1, slice_2)
     }
 }
 
@@ -404,7 +392,7 @@ impl<'a, T: Copy> MatrixSliceMut<'a, T> {
         self.iter_rows().collect::<Matrix<T>>()
     }
 
-    pub fn split_at(self,
+    pub fn split_at(&mut self,
                     mid: usize,
                     axis: Axes)
                     -> (MatrixSliceMut<'a, T>, MatrixSliceMut<'a, T>) {
