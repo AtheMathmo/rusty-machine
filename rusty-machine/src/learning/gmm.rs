@@ -87,7 +87,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
 
             let (weights, log_lik_1) = self.membership_weights(inputs);
 
-            if (log_lik_1 - log_lik_0).abs() < 1e-10 {
+            if (log_lik_1 - log_lik_0).abs() < 1e-15 {
                 break;
             }
 
@@ -148,6 +148,15 @@ impl GaussianMixtureModel {
     /// the vector is the covariance of one of the Gaussians.
     pub fn covariances(&self) -> &Option<Vec<Matrix<f64>>> {
         &self.model_covars
+    }
+
+    /// The model mixture weights
+    ///
+    /// Returns a reference to the model mixture weights.
+    /// These are the weighted contributions of each underlying
+    /// Gaussian to the model distribution.
+    pub fn mixture_weights(&self) -> &Vector<f64> {
+        &self.mix_weights
     }
 
     /// Sets the max number of iterations for the EM algorithm.
