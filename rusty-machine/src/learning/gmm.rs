@@ -132,6 +132,36 @@ impl GaussianMixtureModel {
         }
     }
 
+    /// Constructs a new GMM with the specified prior mixture weights.
+    ///
+    /// The mixture weights must have the same length as the number of components.
+    /// The sum of the mixture weights must be 1.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::gmm::GaussianMixtureModel;
+    /// use rusty_machine::linalg::vector::Vector;
+    ///
+    /// let mix_weights = Vector::new(vec![0.25, 0.25, 0.5]);
+    ///
+    /// let _ = GaussianMixtureModel::with_weights(3, mix_weights);
+    /// ```
+    pub fn with_weights(k: usize, mixture_weights: Vector<f64>) -> GaussianMixtureModel {
+        assert!(mixture_weights.size() == k, "Mixture weights must have length k.");
+        assert!((mixture_weights.sum() - 1f64).abs() < 1e-12);
+
+        GaussianMixtureModel {
+            comp_count: k,
+            mix_weights: mixture_weights,
+            model_means: None,
+            model_covars: None,
+            log_lik: 0f64,
+            max_iters: 100,
+            cov_option: CovOption::Full,
+        }
+    }
+
     /// The model means
     ///
     /// Returns a reference to the Option<Matrix<f64>>
@@ -261,7 +291,7 @@ impl GaussianMixtureModel {
         match self.cov_option {
             CovOption::Full => (diff.transpose() * diff) * weight,
             CovOption::Regularized(eps) => (diff.transpose() * diff) * weight + eps,
-            CovOption::Diagonal => Matrix::from_diag(&diff.elemul(&diff).into_vec()),
+            CovOption::Diagonal => Matrix::from_diag(&diff.elemul(&diff).into_vec()) * weight,
         }
     }
 }
