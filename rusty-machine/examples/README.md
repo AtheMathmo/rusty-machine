@@ -6,14 +6,14 @@ This directory gathers fully-fledged programs, each using a piece of
 
 ## Overview
 
-* [[SVM]]
-* [[Neural Networks]]
+* [SVM](#svm)
+* [Neural Networks](#neural-networks)
 
 ### SVM
 
-* [Sign learner](rusty-machine/examples/svm-sign_learner.rs): Construct and evaluate a model that learns to recognize the sign of an input number.
+* [Sign learner](svm-sign_learner.rs): Construct and evaluate a model that learns to recognize the sign of an input number.
 
 ### Neural Networks
 
-* [AND gate](rusty-machine/examples/nnet-and_gate.rs): Make an AND gate out of a perceptron.
+* [AND gate](nnet-and_gate.rs): Make an AND gate out of a perceptron.
 
