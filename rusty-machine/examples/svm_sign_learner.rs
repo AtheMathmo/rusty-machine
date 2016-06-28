@@ -8,7 +8,12 @@ use rusty_machine::learning::toolkit::kernel::HyperTan;
 use rusty_machine::linalg::matrix::Matrix;
 use rusty_machine::linalg::vector::Vector;
 
-// Sign learner
+// Sign learner:
+//   * Model input a float number
+//   * Model output: A float representing the input sign.
+//       If the input is positive, the output is close to 1.0.
+//       If the input is negative, the output is close to -1.0.
+//   * Model generated with the SVM API.
 fn main() {
     println!("Sign learner sample:");
 
@@ -31,6 +36,8 @@ fn main() {
     let mut hits = 0;
     let mut misses = 0;
     // Evaluation
+    //   Note: We could pass all input values at once to the `predict` method!
+    //         Here, we use a loop just to count and print logs.
     for n in (-1000..1000).filter(|&x| x % 100 == 0) {
         let nf = n as f64;
         let input = Matrix::new(1, 1, vec![nf]);
