@@ -9,8 +9,8 @@
 //! use rusty_machine::learning::gmm::{CovOption, GaussianMixtureModel};
 //! use rusty_machine::learning::UnSupModel;
 //!
-//! let inputs = Matrix::new(4, 2, vec![1.0, 2.0, 3.0, 3.0, 2.0, 4.0, 5.0, 2.5]);
-//! let test_inputs = Matrix::new(3, 2, vec![1.0, 2.0, 3.0, 2.9, 2.4, 2.5]);
+//! let inputs = Matrix::new(4, 2, vec![1.0, 2.0, -3.0, -3.0, 0.1, 1.5, -5.0, -2.5]);
+//! let test_inputs = Matrix::new(3, 2, vec![1.0, 2.0, 3.0, 2.9, -4.4, -2.5]);
 //!
 //! // Create gmm with k(=2) classes.
 //! let mut model = GaussianMixtureModel::new(2);
@@ -20,9 +20,15 @@
 //! // Where inputs is a Matrix with features in columns.
 //! model.train(&inputs);
 //!
-//! // Where pred_data is a Matrix with features in columns.
-//! let a = model.predict(&test_inputs);
-//! println!("{:?}", a.data());
+//! // Print the means and covariances of the GMM
+//! println!("{:?}", model.means());
+//! println!("{:?}", model.covariances());
+//!
+//! // Where test_inputs is a Matrix with features in columns.
+//! let post_probs = model.predict(&test_inputs);
+//!
+//! // Probabilities that each point comes from each Gaussian.
+//! println!("{:?}", post_probs.data());
 //! ```
 
 use linalg::vector::Vector;
@@ -79,7 +85,6 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
         let random_rows: Vec<usize> = rand_utils::reservoir_sample(&(0..inputs.rows())
                                                                         .collect::<Vec<usize>>(),
                                                                    k);
-
         self.model_means = Some(inputs.select_rows(&random_rows));
 
         for _ in 0..self.max_iters {
@@ -124,6 +129,48 @@ impl GaussianMixtureModel {
         GaussianMixtureModel {
             comp_count: k,
             mix_weights: Vector::ones(k) / (k as f64),
+            model_means: None,
+            model_covars: None,
+            log_lik: 0f64,
+            max_iters: 100,
+            cov_option: CovOption::Full,
+        }
+    }
+
+    /// Constructs a new GMM with the specified prior mixture weights.
+    ///
+    /// The mixture weights must have the same length as the number of components.
+    /// Each element of the mixture weights must be non-negative.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::gmm::GaussianMixtureModel;
+    /// use rusty_machine::linalg::vector::Vector;
+    ///
+    /// let mix_weights = Vector::new(vec![0.25, 0.25, 0.5]);
+    ///
+    /// let _ = GaussianMixtureModel::with_weights(3, mix_weights);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// Panics if either of the following conditions are met:
+    ///
+    /// - Mixture weights do not have length k.
+    /// - Mixture weights have a negative entry.
+    pub fn with_weights(k: usize, mixture_weights: Vector<f64>) -> GaussianMixtureModel {
+        assert!(mixture_weights.size() == k,
+                "Mixture weights must have length k.");
+        assert!(!mixture_weights.data().iter().any(|&x| x < 0f64),
+                "Mixture weights must have only non-negative entries.");
+
+        let sum = mixture_weights.sum();
+        let normalized_weights = mixture_weights / sum;
+
+        GaussianMixtureModel {
+            comp_count: k,
+            mix_weights: normalized_weights,
             model_means: None,
             model_covars: None,
             log_lik: 0f64,
@@ -261,7 +308,7 @@ impl GaussianMixtureModel {
         match self.cov_option {
             CovOption::Full => (diff.transpose() * diff) * weight,
             CovOption::Regularized(eps) => (diff.transpose() * diff) * weight + eps,
-            CovOption::Diagonal => Matrix::from_diag(&diff.elemul(&diff).into_vec()),
+            CovOption::Diagonal => Matrix::from_diag(&diff.elemul(&diff).into_vec()) * weight,
         }
     }
 }
@@ -281,5 +328,23 @@ mod tests {
         let model = GaussianMixtureModel::new(5);
 
         assert_eq!(model.covariances(), &None);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_negative_mixtures() {
+        use linalg::vector::Vector;
+    
+        let mix_weights = Vector::new(vec![-0.25, 0.75, 0.5]);
+        let _ = GaussianMixtureModel::with_weights(3, mix_weights);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_wrong_length_mixtures() {
+        use linalg::vector::Vector;
+    
+        let mix_weights = Vector::new(vec![0.1, 0.25, 0.75, 0.5]);
+        let _ = GaussianMixtureModel::with_weights(3, mix_weights);
     }
 }
