@@ -50,103 +50,7 @@ use learning::error::{Error, ErrorKind};
 use rand::{Rng, thread_rng};
 use libnum::abs;
 
-/// Initialization Algorithm enum.
-#[derive(Clone, Copy, Debug)]
-pub enum InitAlgorithm {
-    /// The Forgy initialization scheme.
-    Forgy,
-    /// The Random Partition initialization scheme.
-    RandomPartition,
-    /// The K-means ++ initialization scheme.
-    KPlusPlus,
-}
-
-/// K-Means Classification Builder.
-#[derive(Debug)]
-pub struct KMeansClassifierBuilder {
-    k: usize,
-    iters: usize,
-    init_algorithm: InitAlgorithm
-}
-
-impl KMeansClassifierBuilder {
-    /// Create a K-Means Classification Builder.
-    ///
-    /// Requires number of classes to be specified.
-    /// Defaults to 100 iterations and kmeans++ initialization.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::learning::k_means::KMeansClassifierBuilder;
-    ///
-    /// // Creates a new KMeansClassifier with 5 clusters
-    /// let model = KMeansClassifierBuilder::new(5).finalize();
-    /// ```
-    pub fn new(k: usize) -> Self {
-        KMeansClassifierBuilder {
-            k: k,
-            iters: 100,
-            init_algorithm: InitAlgorithm::KPlusPlus
-        }
-    }
-
-    /// Changes the number of iterations.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::learning::k_means::KMeansClassifierBuilder;
-    ///
-    /// // Creates a new KMeansClassifier with 5 clusters and 42 iterations
-    /// let model = KMeansClassifierBuilder::new(5).iters(42).finalize();
-    /// ```
-    pub fn iters(&mut self, iters: usize) -> &mut KMeansClassifierBuilder {
-        self.iters = iters;
-        self
-    }
-
-    /// Changes the initialization algorithm.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::learning::k_means::KMeansClassifierBuilder;
-    /// use rusty_machine::learning::k_means::InitAlgorithm;
-    ///
-    /// // Creates a new KMeansClassifier with 5 clusters and uses
-    /// // the Forgy initialization algorithm
-    /// let model = KMeansClassifierBuilder::new(5).init_algorithm(InitAlgorithm::Forgy)
-    ///                                            .finalize();
-    /// ```
-    pub fn init_algorithm(&mut self, init_algorithm: InitAlgorithm) -> &mut KMeansClassifierBuilder {
-        self.init_algorithm = init_algorithm;
-        self
-    }
-
-    /// Returns the KMeansClassifier with the options previously specified.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::learning::k_means::KMeansClassifierBuilder;
-    /// use rusty_machine::learning::k_means::InitAlgorithm;
-    ///
-    /// // Creates a new KMeansClassifier with 5 clusters, 42 iterations
-    /// // using the Forgy initialization algorithm
-    /// let model = KMeansClassifierBuilder::new(5).iters(42)
-    ///                                            .init_algorithm(InitAlgorithm::Forgy)
-    ///                                            .finalize();
-    /// ```
-    pub fn finalize(&self) -> KMeansClassifier {
-        KMeansClassifier {
-            k: self.k,
-            iters: self.iters,
-            centroids: None,
-            init_algorithm: self.init_algorithm
-        }
-    }
-}
+use std::fmt::Debug;
 
 /// K-Means Classification model.
 ///
@@ -162,24 +66,24 @@ impl KMeansClassifierBuilder {
 /// The model will not check to ensure the data coming in is all valid.
 /// This responsibility lies with the user (for now).
 #[derive(Debug)]
-pub struct KMeansClassifier {
+pub struct KMeansClassifier<InitAlg: Initializer> {
     /// Max iterations of algorithm to run.
-    pub iters: usize,
+    iters: usize,
     /// The number of classes.
-    pub k: usize,
+    k: usize,
     /// The fitted centroids .
-    pub centroids: Option<Matrix<f64>>,
+    centroids: Option<Matrix<f64>>,
     /// The initial algorithm to use.
-    pub init_algorithm: InitAlgorithm,
+    init_algorithm: InitAlg,
 }
 
-impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
+impl<InitAlg: Initializer> UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier<InitAlg> {
     /// Predict classes from data.
     ///
     /// Model must be trained.
     fn predict(&self, inputs: &Matrix<f64>) -> Vector<usize> {
         if let Some(ref centroids) = self.centroids {
-            return KMeansClassifier::find_closest_centroids(centroids, inputs).0;
+            return KMeansClassifier::<InitAlg>::find_closest_centroids(centroids, inputs).0;
         } else {
             panic!("Model has not been trained.");
         }
@@ -195,17 +99,17 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
             let (idx, distances) = self.get_closest_centroids(inputs);
             self.update_centroids(inputs, idx);
 
-                let cost_i = distances.sum();
-                if abs(cost - cost_i) < eps {
-                    break;
-                }
+            let cost_i = distances.sum();
+            if abs(cost - cost_i) < eps {
+                break;
+            }
 
             cost = cost_i;
         }
     }
 }
 
-impl KMeansClassifier {
+impl KMeansClassifier<KPlusPlus> {
     /// Constructs untrained k-means classifier model.
     ///
     /// Requires number of classes to be specified.
@@ -218,14 +122,18 @@ impl KMeansClassifier {
     ///
     /// let model = KMeansClassifier::new(5);
     /// ```
-    pub fn new(k: usize) -> KMeansClassifier {
+    pub fn new(k: usize) -> KMeansClassifier<KPlusPlus> {
         KMeansClassifier {
             iters: 100,
             k: k,
             centroids: None,
-            init_algorithm: InitAlgorithm::KPlusPlus,
+            init_algorithm: KPlusPlus,
         }
     }
+}
+
+impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
+    
 
     /// Constructs untrained k-means classifier model.
     ///
@@ -235,13 +143,11 @@ impl KMeansClassifier {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::learning::k_means::KMeansClassifier;
-    /// use rusty_machine::learning::k_means::InitAlgorithm;
+    /// use rusty_machine::learning::k_means::{KMeansClassifier, Forgy};
     ///
-    /// let model = KMeansClassifier::new_specified(5, 42, InitAlgorithm::Forgy);
+    /// let model = KMeansClassifier::new_specified(5, 42, Forgy);
     /// ```
-    pub fn new_specified(k: usize, iters: usize,
-                         algo: InitAlgorithm) -> KMeansClassifier {
+    pub fn new_specified(k: usize, iters: usize, algo: InitAlg) -> KMeansClassifier<InitAlg> {
         KMeansClassifier {
             iters: iters,
             k: k,
@@ -250,19 +156,29 @@ impl KMeansClassifier {
         }
     }
 
-    /// Get the number of classes
+    /// Get the number of classes.
     pub fn k(&self) -> usize {
         self.k
     }
 
-    /// Get the number of iterations
+    /// Get the number of iterations.
     pub fn iters(&self) -> usize {
         self.iters
     }
 
-    /// Get the initialization algorithm
-    pub fn init_algorithm(&self) -> InitAlgorithm {
-        self.init_algorithm
+    /// Get the initialization algorithm.
+    pub fn init_algorithm(&self) -> &InitAlg {
+        &self.init_algorithm
+    }
+
+    /// Get the centroids `Option<Matrix<f64>>`.
+    pub fn centroids(&self) -> &Option<Matrix<f64>> {
+        &self.centroids
+    }
+
+    /// Set the number of iterations.
+    pub fn set_iters(&mut self, iters: usize) {
+        self.iters = iters;
     }
 
     /// Initialize the centroids.
@@ -270,23 +186,16 @@ impl KMeansClassifier {
     /// Used internally within model.
     fn init_centroids(&mut self, inputs: &Matrix<f64>) -> Result<(), Error> {
         if self.k > inputs.rows() {
-            Err(Error::new(ErrorKind::InvalidData, format!("Number of clusters ({0}) exceeds number of data points ({1}).", self.k, inputs.rows())))
+            Err(Error::new(ErrorKind::InvalidData,
+                           format!("Number of clusters ({0}) exceeds number of data points \
+                                    ({1}).",
+                                   self.k,
+                                   inputs.rows())))
         } else {
-           match self.init_algorithm {
-                InitAlgorithm::Forgy => {
-                    self.centroids = Some(try!(KMeansClassifier::forgy_init(self.k, inputs)))
-                }
-                InitAlgorithm::RandomPartition => {
-                    self.centroids = Some(try!(KMeansClassifier::ran_partition_init(self.k, inputs)))
-                }
-                InitAlgorithm::KPlusPlus => {
-                    self.centroids = Some(try!(KMeansClassifier::plusplus_init(self.k, inputs)))
-                }
-            }
-
-            Ok(()) 
+            self.centroids = Some(try!(self.init_algorithm.init_centroids(self.k, inputs)));
+            Ok(())
         }
-        
+
     }
 
     /// Updated the centroids by computing means of assigned classes.
@@ -312,7 +221,7 @@ impl KMeansClassifier {
 
     fn get_closest_centroids(&self, inputs: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
         if let Some(ref c) = self.centroids {
-            return KMeansClassifier::find_closest_centroids(&c, inputs);
+            return KMeansClassifier::<InitAlg>::find_closest_centroids(&c, inputs);
         } else {
             panic!("Centroids not correctly initialized.");
         }
@@ -342,11 +251,19 @@ impl KMeansClassifier {
 
         (Vector::new(idx), Vector::new(distances))
     }
+}
 
-    /// Compute initial centroids using Forgy scheme.
-    ///
-    /// Selects k random points in data for centroids.
-    fn forgy_init(k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error> {
+/// Trait for algorithms initializing the K-means centroids.
+pub trait Initializer : Debug {
+    fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error>;
+}
+
+/// The Forgy initialization scheme.
+#[derive(Debug)]
+pub struct Forgy;
+
+impl Initializer for Forgy {
+    fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error> {
         let mut random_choices = Vec::with_capacity(k);
         let mut rng = thread_rng();
         while random_choices.len() < k {
@@ -359,12 +276,14 @@ impl KMeansClassifier {
 
         Ok(inputs.select_rows(&random_choices))
     }
+}
 
-    /// Compute initial centroids using random partition.
-    ///
-    /// Selects centroids by assigning each point randomly to a class
-    /// and computing the mean of each class.
-    fn ran_partition_init(k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error> {
+/// The Random Partition initialization scheme.
+#[derive(Debug)]
+pub struct RandomPartition;
+
+impl Initializer for RandomPartition {
+    fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error> {
         let mut random_assignments = Vec::with_capacity(inputs.rows());
 
         // Populate so we have something in each class.
@@ -391,14 +310,16 @@ impl KMeansClassifier {
             init_centroids.extend(mat_i.mean(0).into_vec());
         }
 
-        Ok(Matrix::new(k, inputs.cols(), init_centroids))    
+        Ok(Matrix::new(k, inputs.cols(), init_centroids))
     }
+}
 
-    /// Compute initial centroids using k-means++.
-    ///
-    /// Selects centroids using weighted probability from
-    /// distances.
-    fn plusplus_init(k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error> {
+/// The K-means ++ initialization scheme.
+#[derive(Debug)]
+pub struct KPlusPlus;
+
+impl Initializer for KPlusPlus {
+    fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error> {
         let mut rng = thread_rng();
 
         let mut init_centroids = Vec::with_capacity(k * inputs.cols());
@@ -408,12 +329,13 @@ impl KMeansClassifier {
 
         for i in 1..k {
             let temp_centroids = Matrix::new(i, inputs.cols(), init_centroids.clone());
-            let (_, dist) = KMeansClassifier::find_closest_centroids(&temp_centroids, &inputs);
+            let (_, dist) = KMeansClassifier::<KPlusPlus>::find_closest_centroids(&temp_centroids,
+                                                                                 &inputs);
             let next_cen = sample_discretely(dist);
             init_centroids.append(&mut inputs.select_rows(&[next_cen]).into_vec())
         }
 
-        Ok(Matrix::new(k, inputs.cols(), init_centroids))        
+        Ok(Matrix::new(k, inputs.cols(), init_centroids))
     }
 }
 
