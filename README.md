@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/AtheMathmo/rusty-machine](https://badges.gitter.im/AtheMathmo/rusty-machine.svg)](https://gitter.im/AtheMathmo/rusty-machine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/AtheMathmo/rusty-machine.svg?branch=master)](https://travis-ci.org/AtheMathmo/rusty-machine)
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.3.0](https://crates.io/crates/rusty-machine/0.3.0).
+Here is the API documentation for the rust crate. Currently up to date for [version 0.3.1](https://crates.io/crates/rusty-machine/0.3.1).
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
@@ -72,7 +72,7 @@ The library is most easily used with [cargo](http://doc.crates.io/guide.html). S
 
 ```toml
 [dependencies.rusty-machine]
-version="*"
+version="0.3.0"
 ```
 
 And then import the library using:
@@ -105,6 +105,6 @@ More detailed coverage can be found in the [API documentation](https://AtheMathm
 
 The learning module contains machine learning models. The machine learning implementations are designed with customizability in mind. This means you can control the optimization algorithms but still retain the ease of using default values. This is an area I am actively trying to improve on!
 
-The models all provide `predict` and `train` methods - similar to sklearn](http://scikit-learn.org/stable/).
+The models all provide `predict` and `train` methods - similar to [sklearn](http://scikit-learn.org/stable/).
 
 The models focus on modularity - you can plug in the pieces you want and easily construct new pieces from existing traits.

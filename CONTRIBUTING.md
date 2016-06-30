@@ -67,6 +67,8 @@ For now I have no special measures in place to assist with this. Due to this I'm
 
 ### How can I test out this project?
 
+_There will be examples in the repository very soon!_
+
 Where is the test data? How do I know the current algorithms even work? How can I test things I've implemented?
 
 All good questions. At the moment rusty-machine doesn't offer built in support for data loading or vizualisation - though I'm looking to fix this. For now I have been using my own separate project to test the algorithms on some open source data sets. This has been messy on my part but I'd be more than happy to share this if it helps other contributors test out their work (and my work thus far).
