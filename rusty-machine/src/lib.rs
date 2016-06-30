@@ -138,6 +138,8 @@ pub mod learning {
     pub mod svm;
     pub mod naive_bayes;
 
+    pub mod error;
+
     /// Trait for supervised model.
     pub trait SupModel<T,U> {
 

@@ -45,8 +45,9 @@
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
 use learning::UnSupModel;
-use rand::{Rng, thread_rng};
+use learning::error::{Error, ErrorKind};
 
+use rand::{Rng, thread_rng};
 use libnum::abs;
 
 /// Initialization Algorithm enum.
@@ -151,6 +152,15 @@ impl KMeansClassifierBuilder {
 ///
 /// Contains option for centroids.
 /// Specifies iterations and number of classes.
+///
+/// # Usage
+///
+/// This model is used through the `UnSupModel` trait. The model is
+/// trained via the `train` function with a matrix containing rows of
+/// feature vectors.
+///
+/// The model will not check to ensure the data coming in is all valid.
+/// This responsibility lies with the user (for now).
 #[derive(Debug)]
 pub struct KMeansClassifier {
     /// Max iterations of algorithm to run.
@@ -261,13 +271,13 @@ impl KMeansClassifier {
     fn init_centroids(&mut self, inputs: &Matrix<f64>) {
         match self.init_algorithm {
             InitAlgorithm::Forgy => {
-                self.centroids = Some(KMeansClassifier::forgy_init(self.k, inputs))
+                self.centroids = Some(KMeansClassifier::forgy_init(self.k, inputs).unwrap())
             }
             InitAlgorithm::RandomPartition => {
-                self.centroids = Some(KMeansClassifier::ran_partition_init(self.k, inputs))
+                self.centroids = Some(KMeansClassifier::ran_partition_init(self.k, inputs).unwrap())
             }
             InitAlgorithm::KPlusPlus => {
-                self.centroids = Some(KMeansClassifier::plusplus_init(self.k, inputs))
+                self.centroids = Some(KMeansClassifier::plusplus_init(self.k, inputs).unwrap())
             }
         }
     }
@@ -329,88 +339,96 @@ impl KMeansClassifier {
     /// Compute initial centroids using Forgy scheme.
     ///
     /// Selects k random points in data for centroids.
-    fn forgy_init(k: usize, inputs: &Matrix<f64>) -> Matrix<f64> {
-        assert!(k <= inputs.rows());
+    fn forgy_init(k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error> {
+        if k <= inputs.rows() {
+            Err(Error::new(ErrorKind::InvalidData, format!("Number of clusters ({0}) exceeds number of data points ({1}).", k, inputs.rows())))
+        } else {
+            let mut random_choices = Vec::with_capacity(k);
+            let mut rng = thread_rng();
+            while random_choices.len() < k {
+                let r = rng.gen_range(0, inputs.rows());
 
-        let mut random_choices = Vec::with_capacity(k);
-        let mut rng = thread_rng();
-        while random_choices.len() < k {
-            let r = rng.gen_range(0, inputs.rows());
-
-            if !random_choices.contains(&r) {
-                random_choices.push(r);
+                if !random_choices.contains(&r) {
+                    random_choices.push(r);
+                }
             }
-        }
 
-        inputs.select_rows(&random_choices)
+            Ok(inputs.select_rows(&random_choices))
+        }  
     }
 
     /// Compute initial centroids using random partition.
     ///
     /// Selects centroids by assigning each point randomly to a class
     /// and computing the mean of each class.
-    fn ran_partition_init(k: usize, inputs: &Matrix<f64>) -> Matrix<f64> {
-        assert!(k <= inputs.rows());
+    fn ran_partition_init(k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error> {
+        if k <= inputs.rows() {
+            Err(Error::new(ErrorKind::InvalidData, format!("Number of clusters ({0}) exceeds number of data points ({1}).", k, inputs.rows())))
+        } else {
+            let mut random_assignments = Vec::with_capacity(inputs.rows());
 
-        let mut random_assignments = Vec::with_capacity(inputs.rows());
-
-        // Populate so we have something in each class.
-        for i in 0..k {
-            random_assignments.push(i);
-        }
-
-        let mut rng = thread_rng();
-        for _ in k..inputs.rows() {
-            random_assignments.push(rng.gen_range(0, k));
-        }
-
-        let mut init_centroids = Vec::with_capacity(k * inputs.cols());
-        for i in 0..k {
-            let mut vec_i = Vec::new();
-
-            for j in &random_assignments {
-                if *j == i {
-                    vec_i.push(*j);
-                }
+            // Populate so we have something in each class.
+            for i in 0..k {
+                random_assignments.push(i);
             }
 
-            let mat_i = inputs.select_rows(&vec_i);
-            init_centroids.extend(mat_i.mean(0).into_vec());
-        }
+            let mut rng = thread_rng();
+            for _ in k..inputs.rows() {
+                random_assignments.push(rng.gen_range(0, k));
+            }
 
-        Matrix::new(k, inputs.cols(), init_centroids)
+            let mut init_centroids = Vec::with_capacity(k * inputs.cols());
+            for i in 0..k {
+                let mut vec_i = Vec::new();
+
+                for j in &random_assignments {
+                    if *j == i {
+                        vec_i.push(*j);
+                    }
+                }
+
+                let mat_i = inputs.select_rows(&vec_i);
+                init_centroids.extend(mat_i.mean(0).into_vec());
+            }
+
+            Ok(Matrix::new(k, inputs.cols(), init_centroids))
+        }  
     }
 
     /// Compute initial centroids using k-means++.
     ///
     /// Selects centroids using weighted probability from
     /// distances.
-    fn plusplus_init(k: usize, inputs: &Matrix<f64>) -> Matrix<f64> {
-        assert!(k <= inputs.rows());
+    fn plusplus_init(k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error> {
+        if k <= inputs.rows() {
+            Err(Error::new(ErrorKind::InvalidData, format!("Number of clusters ({0}) exceeds number of data points ({1}).", k, inputs.rows())))
+        } else {
+            let mut rng = thread_rng();
 
-        let mut rng = thread_rng();
+            let mut init_centroids = Vec::with_capacity(k * inputs.cols());
+            let first_cen = rng.gen_range(0usize, inputs.rows());
 
-        let mut init_centroids = Vec::with_capacity(k * inputs.cols());
-        let first_cen = rng.gen_range(0usize, inputs.rows());
+            init_centroids.append(&mut inputs.select_rows(&[first_cen]).into_vec());
 
-        init_centroids.append(&mut inputs.select_rows(&[first_cen]).into_vec());
+            for i in 1..k {
+                let temp_centroids = Matrix::new(i, inputs.cols(), init_centroids.clone());
+                let (_, dist) = KMeansClassifier::find_closest_centroids(&temp_centroids, &inputs);
+                let next_cen = sample_discretely(dist);
+                init_centroids.append(&mut inputs.select_rows(&[next_cen]).into_vec())
+            }
 
-        for i in 1..k {
-            let temp_centroids = Matrix::new(i, inputs.cols(), init_centroids.clone());
-            let (_, dist) = KMeansClassifier::find_closest_centroids(&temp_centroids, &inputs);
-            let next_cen = sample_discretely(dist);
-            init_centroids.append(&mut inputs.select_rows(&[next_cen]).into_vec())
+            Ok(Matrix::new(k, inputs.cols(), init_centroids))
         }
 
-        Matrix::new(k, inputs.cols(), init_centroids)
+        
     }
 }
 
 /// Sample from an unnormalized distribution.
 ///
-///
+/// The input to this function is assumed to have all positive entries.
 fn sample_discretely(unnorm_dist: Vector<f64>) -> usize {
-    assert!(unnorm_dist.size() > 0);
+    assert!(unnorm_dist.size() > 0, "No entries in distribution vector.");
 
     let sum = unnorm_dist.sum();
 
