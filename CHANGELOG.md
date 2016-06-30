@@ -2,6 +2,21 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.3.1
+
+## Breaking Changes
+
+- None
+
+### Features
+
+- New helper methods to access GMM distribution parameters.
+- New GMM constructor to choose different prior mixture weights.
+
+### Minor Changes
+
+- Fixed a bug where GMM covariances were incorrectly computed when using diagonal constraint.
+
 ## 0.3.0
 
 ## New Contributors
