@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Gaussian","A Gaussian random variable."]]});

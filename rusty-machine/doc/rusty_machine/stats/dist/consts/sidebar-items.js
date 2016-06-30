@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["LN_2_PI","Ln(2 * pi)"],["SQRT_2_PI","Sqrt(2 * pi)"]]});

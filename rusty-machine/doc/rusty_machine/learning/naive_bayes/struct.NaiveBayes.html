@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
+    
 
     
     
@@ -43,10 +44,10 @@
 
     <section id='main' class="content struct">
 <h1 class='fqn'><span class='in-band'>Struct <a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>learning</a>::<wbr><a href='index.html'>naive_bayes</a>::<wbr><a class='struct' href=''>NaiveBayes</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-5168' class='srclink' href='../../../src/rusty_machine/src/learning/naive_bayes.rs.html#51-56' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-5183' class='srclink' href='../../../src/rusty_machine/src/learning/naive_bayes.rs.html#51-56' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct NaiveBayes&lt;T: <a class='trait' href='../../../rusty_machine/learning/naive_bayes/trait.Distribution.html' title='rusty_machine::learning::naive_bayes::Distribution'>Distribution</a>&gt; {
     // some fields omitted
 }</pre><div class='docblock'><p>The Naive Bayes model.</p>
@@ -79,9 +80,9 @@ distribution.</p>
 <p>The input matrix must be rows made up of features.
 The target matrix should have indicator vectors in each row specifying
 the input class. e.g. [[1,0,0],[0,0,1]] shows class 1 first, then class 3.</p>
-</div><div class='impl-items'><h4 id='method.train' class='method'><code>fn <a href='../../../rusty_machine/learning/trait.SupModel.html#method.train' class='fnname'>train</a>(&amp;mut self, inputs: &amp;<a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;, targets: &amp;<a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;)</code></h4>
-<h4 id='method.predict' class='method'><code>fn <a href='../../../rusty_machine/learning/trait.SupModel.html#method.predict' class='fnname'>predict</a>(&amp;self, inputs: &amp;<a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;) -&gt; <a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;</code></h4>
-</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> + <a class='trait' href='../../../rusty_machine/learning/naive_bayes/trait.Distribution.html' title='rusty_machine::learning::naive_bayes::Distribution'>Distribution</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../../rusty_machine/learning/naive_bayes/struct.NaiveBayes.html' title='rusty_machine::learning::naive_bayes::NaiveBayes'>NaiveBayes</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div><div class='impl-items'><h4 id='method.train' class='method'><code>fn <a href='../../../rusty_machine/learning/trait.SupModel.html#tymethod.train' class='fnname'>train</a>(&amp;mut self, inputs: &amp;<a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;, targets: &amp;<a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;)</code></h4>
+<h4 id='method.predict' class='method'><code>fn <a href='../../../rusty_machine/learning/trait.SupModel.html#tymethod.predict' class='fnname'>predict</a>(&amp;self, inputs: &amp;<a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;) -&gt; <a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;</code></h4>
+</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> + <a class='trait' href='../../../rusty_machine/learning/naive_bayes/trait.Distribution.html' title='rusty_machine::learning::naive_bayes::Distribution'>Distribution</a>&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../../rusty_machine/learning/naive_bayes/struct.NaiveBayes.html' title='rusty_machine::learning::naive_bayes::NaiveBayes'>NaiveBayes</a>&lt;T&gt;</code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
 </div></section>
     <section id='search' class="content hidden"></section>
 

@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../main.css">
+    
 
     
     
@@ -43,10 +44,10 @@
 
     <section id='main' class="content trait">
 <h1 class='fqn'><span class='in-band'>Trait <a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>learning</a>::<wbr><a href='index.html'>optim</a>::<wbr><a class='trait' href=''>OptimAlgorithm</a></span><span class='out-of-band'><span id='render-detail'>
-            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
-                [<span class='inner'>&#x2212;</span>]
-            </a>
-        </span><a id='src-5431' class='srclink' href='../../../src/rusty_machine/src/lib.rs.html#180-191' title='goto source code'>[src]</a></span></h1>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-5446' class='srclink' href='../../../src/rusty_machine/src/lib.rs.html#180-191' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait OptimAlgorithm&lt;M: <a class='trait' href='../../../rusty_machine/learning/optim/trait.Optimizable.html' title='rusty_machine::learning::optim::Optimizable'>Optimizable</a>&gt; {
     fn <a href='#tymethod.optimize' class='fnname'>optimize</a>(&amp;self, model: &amp;M, start: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>, inputs: &amp;M::Inputs, targets: &amp;M::Targets) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;;
 }</pre><div class='docblock'><p>Trait for optimization algorithms.</p>
@@ -64,8 +65,8 @@
 <li><code>impl&lt;M: <a class='trait' href='../../../rusty_machine/learning/optim/trait.Optimizable.html' title='rusty_machine::learning::optim::Optimizable'>Optimizable</a>&lt;Inputs=<a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;, Targets=<a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;&gt;&gt; <a class='trait' href='../../../rusty_machine/learning/optim/trait.OptimAlgorithm.html' title='rusty_machine::learning::optim::OptimAlgorithm'>OptimAlgorithm</a>&lt;M&gt; for <a class='struct' href='../../../rusty_machine/learning/optim/grad_desc/struct.AdaGrad.html' title='rusty_machine::learning::optim::grad_desc::AdaGrad'>AdaGrad</a></code></li>
 <li><code>impl&lt;M: <a class='trait' href='../../../rusty_machine/learning/optim/trait.Optimizable.html' title='rusty_machine::learning::optim::Optimizable'>Optimizable</a>&gt; <a class='trait' href='../../../rusty_machine/learning/optim/trait.OptimAlgorithm.html' title='rusty_machine::learning::optim::OptimAlgorithm'>OptimAlgorithm</a>&lt;M&gt; for <a class='struct' href='../../../rusty_machine/learning/optim/fmincg/struct.ConjugateGD.html' title='rusty_machine::learning::optim::fmincg::ConjugateGD'>ConjugateGD</a></code></li>
 </ul><script type="text/javascript" async
-                              src="../../../implementors/rusty_machine/learning/optim/trait.OptimAlgorithm.js">
-                      </script></section>
+                         src="../../../implementors/rusty_machine/learning/optim/trait.OptimAlgorithm.js">
+                 </script></section>
     <section id='search' class="content hidden"></section>
 
     <section class="footer"></section>

@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
     <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    
 
     
     
@@ -281,6 +282,116 @@
 <span id="238">238</span>
 <span id="239">239</span>
 <span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Gaussian Mixture Models</span>
 <span class='doccomment'>//!</span>
@@ -293,8 +404,8 @@
 <span class='doccomment'>//! use rusty_machine::learning::gmm::{CovOption, GaussianMixtureModel};</span>
 <span class='doccomment'>//! use rusty_machine::learning::UnSupModel;</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! let inputs = Matrix::new(4, 2, vec![1.0, 2.0, 3.0, 3.0, 2.0, 4.0, 5.0, 2.5]);</span>
-<span class='doccomment'>//! let test_inputs = Matrix::new(3, 2, vec![1.0, 2.0, 3.0, 2.9, 2.4, 2.5]);</span>
+<span class='doccomment'>//! let inputs = Matrix::new(4, 2, vec![1.0, 2.0, -3.0, -3.0, 0.1, 1.5, -5.0, -2.5]);</span>
+<span class='doccomment'>//! let test_inputs = Matrix::new(3, 2, vec![1.0, 2.0, 3.0, 2.9, -4.4, -2.5]);</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Create gmm with k(=2) classes.</span>
 <span class='doccomment'>//! let mut model = GaussianMixtureModel::new(2);</span>
@@ -304,9 +415,15 @@
 <span class='doccomment'>//! // Where inputs is a Matrix with features in columns.</span>
 <span class='doccomment'>//! model.train(&amp;inputs);</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! // Where pred_data is a Matrix with features in columns.</span>
-<span class='doccomment'>//! let a = model.predict(&amp;test_inputs);</span>
-<span class='doccomment'>//! println!(&quot;{:?}&quot;, a.data());</span>
+<span class='doccomment'>//! // Print the means and covariances of the GMM</span>
+<span class='doccomment'>//! println!(&quot;{:?}&quot;, model.means());</span>
+<span class='doccomment'>//! println!(&quot;{:?}&quot;, model.covariances());</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! // Where test_inputs is a Matrix with features in columns.</span>
+<span class='doccomment'>//! let post_probs = model.predict(&amp;test_inputs);</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! // Probabilities that each point comes from each Gaussian.</span>
+<span class='doccomment'>//! println!(&quot;{:?}&quot;, post_probs.data());</span>
 <span class='doccomment'>//! ```</span>
 
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>vector</span>::<span class='ident'>Vector</span>;
@@ -363,7 +480,6 @@
         <span class='kw'>let</span> <span class='ident'>random_rows</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>rand_utils</span>::<span class='ident'>reservoir_sample</span>(<span class='kw-2'>&amp;</span>(<span class='number'>0</span>..<span class='ident'>inputs</span>.<span class='ident'>rows</span>())
                                                                         .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>(),
                                                                    <span class='ident'>k</span>);
-
         <span class='self'>self</span>.<span class='ident'>model_means</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>random_rows</span>));
 
         <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>max_iters</span> {
@@ -371,7 +487,7 @@
 
             <span class='kw'>let</span> (<span class='ident'>weights</span>, <span class='ident'>log_lik_1</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>membership_weights</span>(<span class='ident'>inputs</span>);
 
-            <span class='kw'>if</span> (<span class='ident'>log_lik_1</span> <span class='op'>-</span> <span class='ident'>log_lik_0</span>).<span class='ident'>abs</span>() <span class='op'>&lt;</span> <span class='number'>1e-10</span> {
+            <span class='kw'>if</span> (<span class='ident'>log_lik_1</span> <span class='op'>-</span> <span class='ident'>log_lik_0</span>).<span class='ident'>abs</span>() <span class='op'>&lt;</span> <span class='number'>1e-15</span> {
                 <span class='kw'>break</span>;
             }
 
@@ -414,6 +530,75 @@
             <span class='ident'>max_iters</span>: <span class='number'>100</span>,
             <span class='ident'>cov_option</span>: <span class='ident'>CovOption</span>::<span class='ident'>Full</span>,
         }
+    }
+
+    <span class='doccomment'>/// Constructs a new GMM with the specified prior mixture weights.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// The mixture weights must have the same length as the number of components.</span>
+    <span class='doccomment'>/// Each element of the mixture weights must be non-negative.</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Examples</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>/// use rusty_machine::learning::gmm::GaussianMixtureModel;</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::vector::Vector;</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let mix_weights = Vector::new(vec![0.25, 0.25, 0.5]);</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// let _ = GaussianMixtureModel::with_weights(3, mix_weights);</span>
+    <span class='doccomment'>/// ```</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// # Panics</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Panics if either of the following conditions are met:</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// - Mixture weights do not have length k.</span>
+    <span class='doccomment'>/// - Mixture weights have a negative entry.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>with_weights</span>(<span class='ident'>k</span>: <span class='ident'>usize</span>, <span class='ident'>mixture_weights</span>: <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>GaussianMixtureModel</span> {
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>mixture_weights</span>.<span class='ident'>size</span>() <span class='op'>==</span> <span class='ident'>k</span>,
+                <span class='string'>&quot;Mixture weights must have length k.&quot;</span>);
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='op'>!</span><span class='ident'>mixture_weights</span>.<span class='ident'>data</span>().<span class='ident'>iter</span>().<span class='ident'>any</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span> <span class='op'>&lt;</span> <span class='number'>0f64</span>),
+                <span class='string'>&quot;Mixture weights must have only non-negative entries.&quot;</span>);
+
+        <span class='kw'>let</span> <span class='ident'>sum</span> <span class='op'>=</span> <span class='ident'>mixture_weights</span>.<span class='ident'>sum</span>();
+        <span class='kw'>let</span> <span class='ident'>normalized_weights</span> <span class='op'>=</span> <span class='ident'>mixture_weights</span> <span class='op'>/</span> <span class='ident'>sum</span>;
+
+        <span class='ident'>GaussianMixtureModel</span> {
+            <span class='ident'>comp_count</span>: <span class='ident'>k</span>,
+            <span class='ident'>mix_weights</span>: <span class='ident'>normalized_weights</span>,
+            <span class='ident'>model_means</span>: <span class='prelude-val'>None</span>,
+            <span class='ident'>model_covars</span>: <span class='prelude-val'>None</span>,
+            <span class='ident'>log_lik</span>: <span class='number'>0f64</span>,
+            <span class='ident'>max_iters</span>: <span class='number'>100</span>,
+            <span class='ident'>cov_option</span>: <span class='ident'>CovOption</span>::<span class='ident'>Full</span>,
+        }
+    }
+
+    <span class='doccomment'>/// The model means</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Returns a reference to the Option&lt;Matrix&lt;f64&gt;&gt;</span>
+    <span class='doccomment'>/// which contains the model means. Each row represents</span>
+    <span class='doccomment'>/// the mean of one of the Gaussians.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>means</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
+        <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>model_means</span>
+    }
+
+    <span class='doccomment'>/// The model covariances</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Returns a reference to the Option&lt;Vec&lt;Matrix&lt;f64&gt;&gt;&gt;</span>
+    <span class='doccomment'>/// which contains the model covariances. Each Matrix in</span>
+    <span class='doccomment'>/// the vector is the covariance of one of the Gaussians.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>covariances</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span> {
+        <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>model_covars</span>
+    }
+
+    <span class='doccomment'>/// The model mixture weights</span>
+    <span class='doccomment'>///</span>
+    <span class='doccomment'>/// Returns a reference to the model mixture weights.</span>
+    <span class='doccomment'>/// These are the weighted contributions of each underlying</span>
+    <span class='doccomment'>/// Gaussian to the model distribution.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>mixture_weights</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+        <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>mix_weights</span>
     }
 
     <span class='doccomment'>/// Sets the max number of iterations for the EM algorithm.</span>
@@ -518,8 +703,44 @@
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>cov_option</span> {
             <span class='ident'>CovOption</span>::<span class='ident'>Full</span> <span class='op'>=&gt;</span> (<span class='ident'>diff</span>.<span class='ident'>transpose</span>() <span class='op'>*</span> <span class='ident'>diff</span>) <span class='op'>*</span> <span class='ident'>weight</span>,
             <span class='ident'>CovOption</span>::<span class='ident'>Regularized</span>(<span class='ident'>eps</span>) <span class='op'>=&gt;</span> (<span class='ident'>diff</span>.<span class='ident'>transpose</span>() <span class='op'>*</span> <span class='ident'>diff</span>) <span class='op'>*</span> <span class='ident'>weight</span> <span class='op'>+</span> <span class='ident'>eps</span>,
-            <span class='ident'>CovOption</span>::<span class='ident'>Diagonal</span> <span class='op'>=&gt;</span> <span class='ident'>Matrix</span>::<span class='ident'>from_diag</span>(<span class='kw-2'>&amp;</span><span class='ident'>diff</span>.<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>diff</span>).<span class='ident'>into_vec</span>()),
+            <span class='ident'>CovOption</span>::<span class='ident'>Diagonal</span> <span class='op'>=&gt;</span> <span class='ident'>Matrix</span>::<span class='ident'>from_diag</span>(<span class='kw-2'>&amp;</span><span class='ident'>diff</span>.<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>diff</span>).<span class='ident'>into_vec</span>()) <span class='op'>*</span> <span class='ident'>weight</span>,
         }
+    }
+}
+
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
+<span class='kw'>mod</span> <span class='ident'>tests</span> {
+    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='ident'>GaussianMixtureModel</span>;
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_means_none</span>() {
+        <span class='kw'>let</span> <span class='ident'>model</span> <span class='op'>=</span> <span class='ident'>GaussianMixtureModel</span>::<span class='ident'>new</span>(<span class='number'>5</span>);
+
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>model</span>.<span class='ident'>means</span>(), <span class='kw-2'>&amp;</span><span class='prelude-val'>None</span>);
+    }
+
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_covars_none</span>() {
+        <span class='kw'>let</span> <span class='ident'>model</span> <span class='op'>=</span> <span class='ident'>GaussianMixtureModel</span>::<span class='ident'>new</span>(<span class='number'>5</span>);
+
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>model</span>.<span class='ident'>covariances</span>(), <span class='kw-2'>&amp;</span><span class='prelude-val'>None</span>);
+    }
+
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='attribute'>#[<span class='ident'>should_panic</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_negative_mixtures</span>() {
+        <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>vector</span>::<span class='ident'>Vector</span>;
+    
+        <span class='kw'>let</span> <span class='ident'>mix_weights</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='op'>-</span><span class='number'>0.25</span>, <span class='number'>0.75</span>, <span class='number'>0.5</span>]);
+        <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>GaussianMixtureModel</span>::<span class='ident'>with_weights</span>(<span class='number'>3</span>, <span class='ident'>mix_weights</span>);
+    }
+
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='attribute'>#[<span class='ident'>should_panic</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_wrong_length_mixtures</span>() {
+        <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>vector</span>::<span class='ident'>Vector</span>;
+    
+        <span class='kw'>let</span> <span class='ident'>mix_weights</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0.1</span>, <span class='number'>0.25</span>, <span class='number'>0.75</span>, <span class='number'>0.5</span>]);
+        <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>GaussianMixtureModel</span>::<span class='ident'>with_weights</span>(<span class='number'>3</span>, <span class='ident'>mix_weights</span>);
     }
 }
 </pre>
