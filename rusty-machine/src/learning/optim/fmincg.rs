@@ -127,12 +127,11 @@ impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
 
             let (mut f3, mut d3, mut z3) = (f1, d1, -z1);
 
-            let mut m: i32;
-            if length > 0 {
-                m = self.max as i32;
+            let mut m = if length > 0 {
+                self.max as i32
             } else {
-                m = cmp::min(self.max as i32, -length - (i as i32));
-            }
+                cmp::min(self.max as i32, -length - (i as i32))
+            };
 
             let mut success = false;
             let mut limit = -1f64;
@@ -160,15 +159,13 @@ impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
                         if z2 <= (1f64 - self.int) * z3 {
                             z2 = (1f64 - self.int) * z3;
                         }
+                    } else if self.int * z3 <= (1f64 - self.int) * z3 {
+                        z2 = (1f64 - self.int) * z3;
                     } else {
-                        if self.int * z3 <= (1f64 - self.int) * z3 {
-                            z2 = (1f64 - self.int) * z3;
-                        } else {
-                            z2 = self.int * z3;
-                        }
+                        z2 = self.int * z3;
                     }
 
-                    z1 = z1 + z2;
+                    z1 += z2;
                     x = x + &s * z2;
                     let cost_grad = model.compute_grad(&x.data()[..], inputs, targets);
                     f2 = cost_grad.0;
@@ -180,7 +177,7 @@ impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
                     }
 
                     d2 = df2.dot(&s);
-                    z3 = z3 - z2;
+                    z3 -= z2;
                 }
 
                 if f2 > f1 + z1 * self.rho * d1 || d2 > -self.sig * d1 {
@@ -215,7 +212,7 @@ impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
                 f3 = f2;
                 d3 = d2;
                 z3 = -z2;
-                z1 = z1 + z2;
+                z1 += z2;
                 x = x + &s * z2;
 
                 let cost_grad = model.compute_grad(&x.data()[..], inputs, targets);
@@ -245,9 +242,9 @@ impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
 
                 let ratio = d1 / (d2 - f64::MIN_POSITIVE);
                 if self.ratio < ratio {
-                    z1 = z1 * self.ratio;
+                    z1 *= self.ratio;
                 } else {
-                    z1 = z1 * ratio;
+                    z1 *= ratio;
                 }
 
                 d1 = d2;

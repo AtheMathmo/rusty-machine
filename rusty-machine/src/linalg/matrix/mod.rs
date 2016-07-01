@@ -28,7 +28,7 @@ pub enum Axes {
     Col,
 }
 
-/// The Matrix struct.
+/// The `Matrix` struct.
 ///
 /// Can be instantiated with any type.
 #[derive(Debug, PartialEq)]
@@ -38,7 +38,7 @@ pub struct Matrix<T> {
     data: Vec<T>,
 }
 
-/// A MatrixSlice
+/// A `MatrixSlice`
 ///
 /// This struct provides a slice into a matrix.
 ///
@@ -53,7 +53,7 @@ pub struct MatrixSlice<'a, T: 'a> {
     marker: PhantomData<&'a T>,
 }
 
-/// A mutable MatrixSlice
+/// A mutable `MatrixSliceMut`
 ///
 /// This struct provides a mutable slice into a matrix.
 ///
@@ -209,12 +209,13 @@ impl<T> Matrix<T> {
                                                              mid,
                                                              mat_cols,
                                                              mat_cols);
-                    slice_2 = MatrixSliceMut::from_raw_parts(self.data
-                                                                 .as_mut_ptr()
-                                                                 .offset((mid * mat_cols) as isize),
-                                                             mat_rows - mid,
-                                                             mat_cols,
-                                                             mat_cols);
+                    slice_2 =
+                        MatrixSliceMut::from_raw_parts(self.data
+                                                           .as_mut_ptr()
+                                                           .offset((mid * mat_cols) as isize),
+                                                       mat_rows - mid,
+                                                       mat_cols,
+                                                       mat_cols);
                 }
             }
             Axes::Col => {
@@ -224,7 +225,9 @@ impl<T> Matrix<T> {
                                                              mat_rows,
                                                              mid,
                                                              mat_cols);
-                    slice_2 = MatrixSliceMut::from_raw_parts(self.data.as_mut_ptr().offset(mid as isize),
+                    slice_2 = MatrixSliceMut::from_raw_parts(self.data
+                                                                 .as_mut_ptr()
+                                                                 .offset(mid as isize),
                                                              mat_rows,
                                                              mat_cols - mid,
                                                              mat_cols);
@@ -246,7 +249,7 @@ impl<T> Matrix<T> {
     /// let b = a.as_slice();
     /// ```
     pub fn as_slice(&self) -> MatrixSlice<T> {
-        MatrixSlice::from_matrix(&self, [0, 0], self.rows, self.cols)
+        MatrixSlice::from_matrix(self, [0, 0], self.rows, self.cols)
     }
 
     /// Returns a mutable `MatrixSlice` over the whole matrix.
@@ -548,7 +551,7 @@ impl<T: Copy> Matrix<T> {
     /// assert_eq!(*b.data(), vec![2.0; 4]);
     /// ```
     pub fn apply(mut self, f: &Fn(T) -> T) -> Matrix<T> {
-        for val in self.data.iter_mut() {
+        for val in &mut self.data {
             *val = f(*val);
         }
 
@@ -946,7 +949,8 @@ impl<T: Float + FromPrimitive> Matrix<T> {
 impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
                            Add<T, Output=T> + Mul<T, Output=T> +
                            Sub<T, Output=T> + Div<T, Output=T> +
-                           PartialOrd {
+                           PartialOrd
+{
 
 /// Solves an upper triangular linear system.
     fn solve_u_triangular(&self, y: Vector<T>) -> Vector<T> {
@@ -960,7 +964,8 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
             for i in (0..y.size()-1).rev() {
                 let mut holding_u_sum = T::zero();
                 for j in (i+1..y.size()).rev() {
-                    holding_u_sum = holding_u_sum + *self.data.get_unchecked(i * self.cols + j) * x[j];
+                    holding_u_sum = holding_u_sum +
+                                    *self.data.get_unchecked(i * self.cols + j) * x[j];
                 }
                 x[i] = (y[i] - holding_u_sum) / *self.data.get_unchecked(i*(self.cols+1));
             }
@@ -981,7 +986,8 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
             for (i,y_item) in y.data().iter().enumerate().take(y.size()).skip(1) {
                 let mut holding_l_sum = T::zero();
                 for (j, x_item) in x.iter().enumerate().take(i) {
-                    holding_l_sum = holding_l_sum + *self.data.get_unchecked(i * self.cols + j) * *x_item;
+                    holding_l_sum = holding_l_sum +
+                                    *self.data.get_unchecked(i * self.cols + j) * *x_item;
                 }
                 x.push((*y_item - holding_l_sum) / *self.data.get_unchecked(i*(self.cols+1)));
             }
@@ -1131,9 +1137,12 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
         }
 
         if n == 3 {
-            return (self[[0,0]] * self[[1,1]] * self[[2,2]]) + (self[[0,1]] * self[[1,2]] * self[[2,0]])
-                    + (self[[0,2]] * self[[1,0]] * self[[2,1]]) - (self[[0,0]] * self[[1,2]] * self[[2,1]])
-                    - (self[[0,1]] * self[[1,0]] * self[[2,2]]) - (self[[0,2]] * self[[1,1]] * self[[2,0]]);
+            return (self[[0,0]] * self[[1,1]] * self[[2,2]]) +
+                    (self[[0,1]] * self[[1,2]] * self[[2,0]]) +
+                    (self[[0,2]] * self[[1,0]] * self[[2,1]]) -
+                    (self[[0,0]] * self[[1,2]] * self[[2,1]]) -
+                    (self[[0,1]] * self[[1,0]] * self[[2,2]]) -
+                    (self[[0,2]] * self[[1,1]] * self[[2,0]]);
         }
 
         let (l,u,p) = self.lup_decomp();
@@ -1343,9 +1352,9 @@ mod tests {
                                         3,
                                         vec![3.14, 2.718, 1.414, 2.503, 4.669, 1.202, 1.618,
                                              0.5772, 1.3, 2.68545, 1.282, 10000.]);
-        let second_expectation = "⎡   3.14   2.718   1.414⎤\n⎢  2.503   4.669   1.202⎥\n⎢  1.618  \
-                                  0.5772     1.3⎥\n⎣2.68545   1.282   10000⎦";
-        assert_eq!(second_expectation, format!("{}", second_matrix));
+        let second_exp = "⎡   3.14   2.718   1.414⎤\n⎢  2.503   4.669   1.202⎥\n⎢  \
+                        1.618  0.5772     1.3⎥\n⎣2.68545   1.282   10000⎦";
+        assert_eq!(second_exp, format!("{}", second_matrix));
     }
 
     #[test]

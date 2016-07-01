@@ -38,12 +38,14 @@
 //! Specific usage of modules is described within the modules themselves. This section
 //! will focus on the general workflow for this library.
 //!
-//! The models contained within the learning module should implement either SupModel or UnSupModel.
-//! These both provide a `train` and a `predict` function which provide an interface to the model.
+//! The models contained within the learning module should implement either
+//! `SupModel` or `UnSupModel`. These both provide a `train` and a `predict`
+//! function which provide an interface to the model.
 //!
-//! You should instantiate the model, with your chosen options and then train using the training data.
-//! Followed by predicting with your test data. *For now* cross-validation, data handling, and many
-//! other things are left explicitly to the user.
+//! You should instantiate the model, with your chosen options and then train using
+//! the training data. Followed by predicting with your test data. *For now*
+//! cross-validation, data handling, and many other things are left explicitly
+//! to the user.
 //!
 //! Here is an example usage for Gaussian Process Regression:
 //!
@@ -114,7 +116,6 @@ pub mod linalg {
     ///
     /// Currently only implements basic euclidean norm.
     pub trait Metric<T> {
-
         /// Computes the euclidean norm.
         fn norm(&self) -> T;
     }
@@ -139,8 +140,7 @@ pub mod learning {
     pub mod naive_bayes;
 
     /// Trait for supervised model.
-    pub trait SupModel<T,U> {
-
+    pub trait SupModel<T, U> {
         /// Predict output from inputs.
         fn predict(&self, inputs: &T) -> U;
 
@@ -150,7 +150,6 @@ pub mod learning {
 
     /// Trait for unsupervised model.
     pub trait UnSupModel<T, U> {
-
         /// Predict output from inputs.
         fn predict(&self, inputs: &T) -> U;
 
@@ -177,8 +176,7 @@ pub mod learning {
         }
 
         /// Trait for optimization algorithms.
-        pub trait OptimAlgorithm<M : Optimizable> {
-
+        pub trait OptimAlgorithm<M: Optimizable> {
             /// Return the optimized parameter using gradient optimization.
             ///
             /// Takes in a set of starting parameters and related model data.

@@ -89,7 +89,7 @@ impl<T: Copy> Vector<T> {
     /// assert_eq!(b.into_vec(), vec![2.0; 4]);
     /// ```
     pub fn apply(mut self, f: &Fn(T) -> T) -> Vector<T> {
-        for val in self.data.iter_mut(){
+        for val in &mut self.data {
             *val = f(*val);
         }
         self
@@ -179,7 +179,6 @@ impl<T: Clone + Zero> Vector<T> {
 }
 
 impl<T: Clone + One> Vector<T> {
-
     /// Constructs Vector of all ones.
     ///
     /// Requires the size of the vector.
@@ -347,7 +346,7 @@ impl<'a, T: Copy + Mul<T, Output = T>> Mul<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
     fn mul(mut self, f: &T) -> Vector<T> {
-        for val in self.data.iter_mut() {
+        for val in &mut self.data {
             *val = *val * *f;
         }
 
@@ -394,7 +393,7 @@ impl<'a, T: Copy + Zero + PartialEq + Div<T, Output = T>> Div<&'a T> for Vector<
     fn div(mut self, f: &T) -> Vector<T> {
         assert!(*f != T::zero());
 
-        for val in self.data.iter_mut() {
+        for val in &mut self.data {
             *val = *val / *f;
         }
 
@@ -440,7 +439,7 @@ impl<'a, T: Copy + Add<T, Output = T>> Add<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
     fn add(mut self, f: &T) -> Vector<T> {
-        for val in self.data.iter_mut() {
+        for val in &mut self.data {
             *val = *val + *f;
         }
 
@@ -485,7 +484,7 @@ impl<'a, T: Copy + Add<T, Output = T>> Add<&'a Vector<T>> for Vector<T> {
     type Output = Vector<T>;
 
     fn add(mut self, v: &Vector<T>) -> Vector<T> {
-        utils::in_place_vec_bin_op(&mut self.data, &v.data, |x, &y| { *x = *x + y});
+        utils::in_place_vec_bin_op(&mut self.data, &v.data, |x, &y| *x = *x + y);
 
         self
     }
@@ -530,7 +529,7 @@ impl<'a, T: Copy + Sub<T, Output = T>> Sub<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
     fn sub(mut self, f: &T) -> Vector<T> {
-        for val in self.data.iter_mut() {
+        for val in &mut self.data {
             *val = *val - *f;
         }
 
@@ -566,7 +565,7 @@ impl<'a, T: Copy + Sub<T, Output = T>> Sub<Vector<T>> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn sub(self, mut v: Vector<T>) -> Vector<T> {
-        utils::in_place_vec_bin_op(&mut v.data, &self.data, |x, &y| { *x = y - *x});
+        utils::in_place_vec_bin_op(&mut v.data, &self.data, |x, &y| *x = y - *x);
 
         v
     }
@@ -577,7 +576,7 @@ impl<'a, T: Copy + Sub<T, Output = T>> Sub<&'a Vector<T>> for Vector<T> {
     type Output = Vector<T>;
 
     fn sub(mut self, v: &Vector<T>) -> Vector<T> {
-        utils::in_place_vec_bin_op(&mut self.data, &v.data, |x, &y| { *x = *x - y});
+        utils::in_place_vec_bin_op(&mut self.data, &v.data, |x, &y| *x = *x - y);
 
         self
     }
@@ -604,7 +603,7 @@ impl<T: Neg<Output = T> + Copy> Neg for Vector<T> {
     type Output = Vector<T>;
 
     fn neg(mut self) -> Vector<T> {
-        for val in self.data.iter_mut() {
+        for val in &mut self.data {
             *val = -*val;
         }
 
@@ -629,7 +628,7 @@ impl<T> Index<usize> for Vector<T> {
 
     fn index(&self, idx: usize) -> &T {
         assert!(idx < self.size);
-        unsafe { &self.data.get_unchecked(idx) }
+        unsafe { self.data.get_unchecked(idx) }
     }
 }
 

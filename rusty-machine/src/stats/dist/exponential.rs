@@ -21,7 +21,6 @@ pub struct Exponential {
 ///
 /// - lambda = 1
 impl Default for Exponential {
-    
     fn default() -> Exponential {
         Exponential { lambda: 1f64 }
     }

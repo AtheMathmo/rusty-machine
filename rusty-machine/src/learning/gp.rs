@@ -22,7 +22,7 @@
 //!
 //! let outputs = gaussp.predict(&test_data);
 //! ```
-//! Alternatively one could use gaussp.get_posterior() which would return both
+//! Alternatively one could use `gaussp.get_posterior()` which would return both
 //! the predictive mean and covariance. However, this is likely to change in
 //! a future release.
 
@@ -83,7 +83,6 @@ pub struct GaussianProcess<T: Kernel, U: MeanFunc> {
 /// Note that zero noise can often lead to numerical instability.
 /// A small value for the noise may be a better alternative.
 impl Default for GaussianProcess<SquaredExp, ConstMean> {
-
     fn default() -> GaussianProcess<SquaredExp, ConstMean> {
         GaussianProcess {
             ker: SquaredExp::default(),

@@ -23,21 +23,8 @@ pub fn dot<T: Copy + Zero + Add<T, Output = T> + Mul<T, Output = T>>(u: &[T], v:
     let mut ys = &v[..len];
 
     let mut s = T::zero();
-    let (mut p0,
-         mut p1,
-         mut p2,
-         mut p3,
-         mut p4,
-         mut p5,
-         mut p6,
-         mut p7) = (T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero());
+    let (mut p0, mut p1, mut p2, mut p3, mut p4, mut p5, mut p6, mut p7) =
+        (T::zero(), T::zero(), T::zero(), T::zero(), T::zero(), T::zero(), T::zero(), T::zero());
 
     while xs.len() >= 8 {
         p0 = p0 + xs[0] * ys[0];
@@ -64,7 +51,7 @@ pub fn dot<T: Copy + Zero + Add<T, Output = T> + Mul<T, Output = T>>(u: &[T], v:
 }
 
 /// Unrolled sum
-/// 
+///
 /// Computes the sum over the slice consuming it in the process.
 ///
 /// Given graciously by bluss from ndarray!
@@ -74,21 +61,8 @@ pub fn unrolled_sum<T>(mut xs: &[T]) -> T
     // eightfold unrolled so that floating point can be vectorized
     // (even with strict floating point accuracy semantics)
     let mut sum = T::zero();
-    let (mut p0,
-         mut p1,
-         mut p2,
-         mut p3,
-         mut p4,
-         mut p5,
-         mut p6,
-         mut p7) = (T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero(),
-                    T::zero());
+    let (mut p0, mut p1, mut p2, mut p3, mut p4, mut p5, mut p6, mut p7) =
+        (T::zero(), T::zero(), T::zero(), T::zero(), T::zero(), T::zero(), T::zero(), T::zero());
     while xs.len() >= 8 {
         p0 = p0 + xs[0].clone();
         p1 = p1 + xs[1].clone();
@@ -129,16 +103,17 @@ pub fn unrolled_sum<T>(mut xs: &[T]) -> T
 /// println!("{:?}", a);
 /// ```
 pub fn in_place_vec_bin_op<F, T: Copy>(mut u: &mut [T], v: &[T], mut f: F)
-    where F: FnMut(&mut T, &T) {
-        debug_assert_eq!(u.len(), v.len());
-        let len = cmp::min(u.len(), v.len());
-        
-        let ys = &v[..len];
-        let xs = &mut u[..len];
+    where F: FnMut(&mut T, &T)
+{
+    debug_assert_eq!(u.len(), v.len());
+    let len = cmp::min(u.len(), v.len());
 
-        for i in 0..len {
-            f(&mut xs[i], &ys[i])
-        }
+    let ys = &v[..len];
+    let xs = &mut u[..len];
+
+    for i in 0..len {
+        f(&mut xs[i], &ys[i])
+    }
 }
 
 /// Vectorized binary operation applied to two slices.
@@ -157,27 +132,28 @@ pub fn in_place_vec_bin_op<F, T: Copy>(mut u: &mut [T], v: &[T], mut f: F)
 /// println!("{:?}", a);
 /// ```
 pub fn vec_bin_op<F, T: Copy>(u: &[T], v: &[T], f: F) -> Vec<T>
-    where F: Fn(T, T) -> T {
-        debug_assert_eq!(u.len(), v.len());
-        let len = cmp::min(u.len(), v.len());
-        
-        let xs = &u[..len];
-        let ys = &v[..len];
-        
-        let mut out_vec = Vec::with_capacity(len);
-        unsafe {
-            out_vec.set_len(len);
+    where F: Fn(T, T) -> T
+{
+    debug_assert_eq!(u.len(), v.len());
+    let len = cmp::min(u.len(), v.len());
+
+    let xs = &u[..len];
+    let ys = &v[..len];
+
+    let mut out_vec = Vec::with_capacity(len);
+    unsafe {
+        out_vec.set_len(len);
+    }
+
+    {
+        let out_slice = &mut out_vec[..len];
+
+        for i in 0..len {
+            out_slice[i] = f(xs[i], ys[i]);
         }
-        
-        {
-            let out_slice = &mut out_vec[..len];
-            
-            for i in 0..len {
-                out_slice[i] = f(xs[i], ys[i]);
-            }
-        }
-        
-        out_vec
+    }
+
+    out_vec
 }
 
 /// Compute vector sum of two slices.
@@ -194,7 +170,7 @@ pub fn vec_bin_op<F, T: Copy>(u: &[T], v: &[T], f: F) -> Vec<T>
 /// assert_eq!(c, vec![2.0,4.0, 6.0, 8.0]);
 /// ```
 pub fn vec_sum<T: Copy + Add<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
-    vec_bin_op(u, v, |x, y| { x + y })
+    vec_bin_op(u, v, |x, y| x + y)
 }
 
 
@@ -212,7 +188,7 @@ pub fn vec_sum<T: Copy + Add<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
 /// assert_eq!(c, vec![0.0; 4]);
 /// ```
 pub fn vec_sub<T: Copy + Sub<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
-    vec_bin_op(u, v, |x, y| { x - y })
+    vec_bin_op(u, v, |x, y| x - y)
 }
 
 /// Computes elementwise multiplication.
@@ -229,7 +205,7 @@ pub fn vec_sub<T: Copy + Sub<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
 /// assert_eq!(c, vec![1.0,4.0,9.0,16.0]);
 /// ```
 pub fn ele_mul<T: Copy + Mul<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
-    vec_bin_op(u, v, |x, y| { x * y })
+    vec_bin_op(u, v, |x, y| x * y)
 }
 
 /// Computes elementwise division.
@@ -246,7 +222,7 @@ pub fn ele_mul<T: Copy + Mul<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
 /// assert_eq!(c, vec![1.0; 4]);
 /// ```
 pub fn ele_div<T: Copy + Div<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
-    vec_bin_op(u, v, |x, y| { x / y })
+    vec_bin_op(u, v, |x, y| x / y)
 }
 
 

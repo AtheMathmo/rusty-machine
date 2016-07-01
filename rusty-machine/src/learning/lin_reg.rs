@@ -55,7 +55,6 @@ impl Default for LinRegressor {
 }
 
 impl LinRegressor {
-
     /// Get the parameters from the model.
     ///
     /// Returns an option that is None if the model has not been trained.
@@ -103,8 +102,7 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
             let ones = Matrix::<f64>::ones(inputs.rows(), 1);
             let full_inputs = ones.hcat(inputs);
             full_inputs * v
-        }
-        else {
+        } else {
             panic!("Model has not been trained.");
         }
     }
@@ -114,20 +112,23 @@ impl Optimizable for LinRegressor {
     type Inputs = Matrix<f64>;
     type Targets = Vector<f64>;
 
-    fn compute_grad(&self, params: &[f64], inputs: &Matrix<f64>, targets: &Vector<f64>) -> (f64, Vec<f64>) {
+    fn compute_grad(&self,
+                    params: &[f64],
+                    inputs: &Matrix<f64>,
+                    targets: &Vector<f64>)
+                    -> (f64, Vec<f64>) {
 
         let beta_vec = Vector::new(params.to_vec());
         let outputs = inputs * beta_vec;
 
         let cost = MeanSqError::cost(&outputs, targets);
-        let grad = (inputs.transpose() * (outputs-targets)) / (inputs.rows() as f64);
+        let grad = (inputs.transpose() * (outputs - targets)) / (inputs.rows() as f64);
 
         (cost, grad.into_vec())
     }
 }
 
 impl LinRegressor {
-
     /// Train the linear regressor using Gradient Descent.
     ///
     /// # Examples
