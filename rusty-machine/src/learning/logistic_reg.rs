@@ -87,14 +87,16 @@ impl<A: OptimAlgorithm<BaseLogisticRegressor>> LogisticRegressor<A> {
     ///
     /// Returns an option that is None if the model has not been trained.
     pub fn parameters(&self) -> Option<Vector<f64>> {
-        match self.base.parameters() {
-            &Some(ref p) => Some(p.clone()),
-            &None => None,
+        match *self.base.parameters() {
+            Some(ref p) => Some(p.clone()),
+            None => None,
         }
     }
 }
 
-impl<A : OptimAlgorithm<BaseLogisticRegressor>> SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor<A> {
+impl<A> SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor<A>
+    where A: OptimAlgorithm<BaseLogisticRegressor>
+{
     /// Train the logistic regression model.
     ///
     /// Takes training data and output values as input.
@@ -127,7 +129,7 @@ impl<A : OptimAlgorithm<BaseLogisticRegressor>> SupModel<Matrix<f64>, Vector<f64
     ///
     /// Model must be trained before prediction can be made.
     fn predict(&self, inputs: &Matrix<f64>) -> Vector<f64> {
-        if let &Some(ref v) = self.base.parameters() {
+        if let Some(ref v) = *self.base.parameters() {
             let ones = Matrix::<f64>::ones(inputs.rows(), 1);
             let full_inputs = ones.hcat(inputs);
             (full_inputs * v).apply(&Sigmoid::func)
@@ -146,7 +148,6 @@ pub struct BaseLogisticRegressor {
 }
 
 impl BaseLogisticRegressor {
-
     /// Construct a new BaseLogisticRegressor
     /// with parameters set to None.
     fn new() -> BaseLogisticRegressor {
@@ -155,7 +156,6 @@ impl BaseLogisticRegressor {
 }
 
 impl BaseLogisticRegressor {
-
     /// Returns a reference to the parameters.
     fn parameters(&self) -> &Option<Vector<f64>> {
         &self.parameters

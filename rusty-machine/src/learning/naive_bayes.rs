@@ -3,8 +3,8 @@
 //! The classifier supports Gaussian, Bernoulli and Multinomial distributions.
 //!
 //! A naive Bayes classifier works by treating the features of each input as independent
-//! observations. Under this assumption we utilize Bayes' rule to compute the probability that each input belongs
-//! to a given class.
+//! observations. Under this assumption we utilize Bayes' rule to compute the
+//! probability that each input belongs to a given class.
 //!
 //! # Examples
 //!
@@ -162,10 +162,10 @@ impl<T: Distribution> NaiveBayes<T> {
 
         if let Some(ref mut distr) = self.distr {
             for (idx, c) in class_data.into_iter().enumerate() {
-                //If this class' vector has not been populated, we can safely
-                //skip this iteration, since the user is clearly not interested
-                //in associating features with this class
-                if 0 == c.len() {
+                // If this class' vector has not been populated, we can safely
+                // skip this iteration, since the user is clearly not interested
+                // in associating features with this class
+                if c.is_empty() {
                     continue;
                 }
                 // Update the parameters within this class
@@ -227,7 +227,8 @@ pub trait Distribution {
 ///
 /// Defines:
 ///
-///    p(x|C<sub>k</sub>) = ∏<sub>i</sub> N(x<sub>i</sub> ; μ<sub>k</sub>, σ<sup>2</sup><sub>k</sub>)
+/// p(x|C<sub>k</sub>) = ∏<sub>i</sub> N(x<sub>i</sub> ;
+/// μ<sub>k</sub>, σ<sup>2</sup><sub>k</sub>)
 #[derive(Debug)]
 pub struct Gaussian {
     theta: Matrix<f64>,
@@ -275,15 +276,15 @@ impl Distribution for Gaussian {
         let class_count = class_prior.len();
         let mut log_lik = Vec::with_capacity(class_count);
 
-        for i in 0..class_count {
-            let joint_i = class_prior[i].ln();
+        for (i, item) in class_prior.iter().enumerate() {
+            let joint_i = item.ln();
             let n_ij = -0.5 * (self.sigma.select_rows(&[i]) * 2.0 * PI).apply(&|x| x.ln()).sum();
 
             // NOTE: Here we are copying the row data which is inefficient
             let r_ij = (data - self.theta.select_rows(&vec![i; data.rows()]))
-                           .apply(&|x| x * x)
-                           .elediv(&self.sigma.select_rows(&vec![i; data.rows()]))
-                           .sum_cols();
+                .apply(&|x| x * x)
+                .elediv(&self.sigma.select_rows(&vec![i; data.rows()]))
+                .sum_cols();
 
             let res = (-r_ij * 0.5) + n_ij;
 
@@ -299,7 +300,8 @@ impl Distribution for Gaussian {
 ///
 /// Defines:
 ///
-///    p(x|C<sub>k</sub>) = ∏<sub>i</sub> p<sub>k</sub><sup>x<sub>i</sub></sup> (1-p)<sub>k</sub><sup>1-x<sub>i</sub></sup>
+///    p(x|C<sub>k</sub>) = ∏<sub>i</sub> p<sub>k</sub><sup>x<sub>i</sub></sup>
+/// (1-p)<sub>k</sub><sup>1-x<sub>i</sub></sup>
 #[derive(Debug)]
 pub struct Bernoulli {
     log_probs: Matrix<f64>,
@@ -332,8 +334,8 @@ impl Distribution for Bernoulli {
 
         let log_probs = (pseudo_fc.apply(&|x| x.ln()) - pseudo_cc.ln()).into_vec();
 
-        for i in 0..features {
-            self.log_probs[[class, i]] = log_probs[i];
+        for (i, item) in log_probs.iter().enumerate().take(features) {
+            self.log_probs[[class, i]] = *item;
         }
 
     }
@@ -399,8 +401,8 @@ impl Distribution for Multinomial {
 
         let log_probs = (pseudo_fc.apply(&|x| x.ln()) - pseudo_cc.ln()).into_vec();
 
-        for i in 0..features {
-            self.log_probs[[class, i]] = log_probs[i];
+        for (i, item) in log_probs.iter().enumerate().take(features) {
+            self.log_probs[[class, i]] = *item;
         }
 
     }

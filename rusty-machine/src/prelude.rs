@@ -12,10 +12,10 @@ pub use learning::UnSupModel;
 
 #[cfg(test)]
 mod tests {
-	use super::super::prelude::*;
+    use super::super::prelude::*;
 
-	#[test]
-	fn create_mat_from_prelude() {
-		let _ = Matrix::new(2,2, vec![4.0;4]);
-	}
+    #[test]
+    fn create_mat_from_prelude() {
+        let _ = Matrix::new(2, 2, vec![4.0;4]);
+    }
 }

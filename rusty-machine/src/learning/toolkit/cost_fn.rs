@@ -1,12 +1,12 @@
 //! Cost Functions.
 //!
-//! This module contains a number of structs implementing the CostFunc trait.
+//! This module contains a number of structs implementing the `CostFunc` trait.
 //!
 //! These structs are used within Neural Networks and
 //! Generalized Linear Regression (not yet implemented).
 //!
 //! You can also create your own custom cost functions for use in your models.
-//! Just create a struct implementing the CostFunc trait.
+//! Just create a struct implementing the `CostFunc` trait.
 
 use linalg::matrix::Matrix;
 use linalg::vector::Vector;
@@ -42,18 +42,18 @@ impl CostFunc<Matrix<f64>> for MeanSqError {
 }
 
 impl CostFunc<Vector<f64>> for MeanSqError {
-	fn cost(outputs: &Vector<f64>, targets: &Vector<f64>) -> f64 {
-		let diff = outputs - targets;
-		let sq_diff = &diff.elemul(&diff);
+    fn cost(outputs: &Vector<f64>, targets: &Vector<f64>) -> f64 {
+        let diff = outputs - targets;
+        let sq_diff = &diff.elemul(&diff);
 
-		let n = diff.size();
+        let n = diff.size();
 
-		sq_diff.sum() / (2f64 * (n as f64))
-	}
+        sq_diff.sum() / (2f64 * (n as f64))
+    }
 
-	fn grad_cost(outputs: &Vector<f64>, targets: &Vector<f64>) -> Vector<f64> {
-		outputs - targets
-	}
+    fn grad_cost(outputs: &Vector<f64>, targets: &Vector<f64>) -> Vector<f64> {
+        outputs - targets
+    }
 }
 
 /// The cross entropy error cost function.

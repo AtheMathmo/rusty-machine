@@ -8,9 +8,6 @@ use linalg::vector::Vector;
 use linalg::utils;
 use linalg::Metric;
 
-use libnum::Float;
-
-
 /// The Kernel trait
 ///
 /// Requires a function mapping two vectors to a scalar.
