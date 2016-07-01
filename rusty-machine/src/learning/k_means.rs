@@ -42,7 +42,8 @@
 //!
 //! The [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) scheme.
 
-use linalg::matrix::Matrix;
+use linalg::matrix::slice::BaseSlice;
+use linalg::matrix::{Matrix, MatrixSlice};
 use linalg::vector::Vector;
 use learning::UnSupModel;
 use learning::error::{Error, ErrorKind};
@@ -83,7 +84,9 @@ impl<InitAlg: Initializer> UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClas
     /// Model must be trained.
     fn predict(&self, inputs: &Matrix<f64>) -> Vector<usize> {
         if let Some(ref centroids) = self.centroids {
-            return KMeansClassifier::<InitAlg>::find_closest_centroids(centroids, inputs).0;
+            return KMeansClassifier::<InitAlg>::find_closest_centroids(centroids.as_slice(),
+                                                                       inputs)
+                       .0;
         } else {
             panic!("Model has not been trained.");
         }
@@ -133,8 +136,6 @@ impl KMeansClassifier<KPlusPlus> {
 }
 
 impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
-    
-
     /// Constructs untrained k-means classifier model.
     ///
     /// Requires number of classes, number of iterations, and
@@ -204,13 +205,11 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
     fn update_centroids(&mut self, inputs: &Matrix<f64>, classes: Vector<usize>) {
         let mut new_centroids = Vec::with_capacity(self.k * inputs.cols());
         for i in 0..self.k {
-            let mut vec_i = Vec::new();
-
-            for j in classes.data().iter() {
-                if *j == i {
-                    vec_i.push(*j);
-                }
-            }
+            let vec_i: Vec<usize> = classes.data()
+                                           .iter()
+                                           .filter(|&x| *x == i)
+                                           .map(|x| *x)
+                                           .collect();
 
             let mat_i = inputs.select_rows(&vec_i);
             new_centroids.extend(mat_i.mean(0).data());
@@ -221,7 +220,7 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
 
     fn get_closest_centroids(&self, inputs: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
         if let Some(ref c) = self.centroids {
-            return KMeansClassifier::<InitAlg>::find_closest_centroids(&c, inputs);
+            return KMeansClassifier::<InitAlg>::find_closest_centroids(c.as_slice(), inputs);
         } else {
             panic!("Centroids not correctly initialized.");
         }
@@ -231,7 +230,7 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
     ///
     /// Used internally within model.
     /// Returns the index of the closest centroid and the distance to it.
-    fn find_closest_centroids(centroids: &Matrix<f64>,
+    fn find_closest_centroids(centroids: MatrixSlice<f64>,
                               inputs: &Matrix<f64>)
                               -> (Vector<usize>, Vector<f64>) {
         let mut idx = Vec::with_capacity(inputs.rows());
@@ -298,13 +297,10 @@ impl Initializer for RandomPartition {
 
         let mut init_centroids = Vec::with_capacity(k * inputs.cols());
         for i in 0..k {
-            let mut vec_i = Vec::new();
-
-            for j in &random_assignments {
-                if *j == i {
-                    vec_i.push(*j);
-                }
-            }
+            let vec_i: Vec<usize> = random_assignments.iter()
+                                                      .filter(|&x| *x == i)
+                                                      .map(|x| *x)
+                                                      .collect();
 
             let mat_i = inputs.select_rows(&vec_i);
             init_centroids.extend(mat_i.mean(0).into_vec());
@@ -328,11 +324,24 @@ impl Initializer for KPlusPlus {
         init_centroids.append(&mut inputs.select_rows(&[first_cen]).into_vec());
 
         for i in 1..k {
-            let temp_centroids = Matrix::new(i, inputs.cols(), init_centroids.clone());
-            let (_, dist) = KMeansClassifier::<KPlusPlus>::find_closest_centroids(&temp_centroids,
-                                                                                 &inputs);
-            let next_cen = sample_discretely(dist);
-            init_centroids.append(&mut inputs.select_rows(&[next_cen]).into_vec())
+            unsafe {
+                let temp_centroids = MatrixSlice::from_raw_parts(init_centroids.as_ptr(),
+                                                                 i,
+                                                                 inputs.cols(),
+                                                                 inputs.cols());
+                let (_, dist) =
+                    KMeansClassifier::<KPlusPlus>::find_closest_centroids(temp_centroids, &inputs);
+
+                // A relatively cheap way to validate our input data
+                if !dist.data().iter().all(|x| x.is_finite()) {
+                    return Err(Error::new(ErrorKind::InvalidData,
+                                          "Input data led to invalid centroid distances during \
+                                           initialization."));
+                }
+
+                let next_cen = sample_discretely(dist);
+                init_centroids.append(&mut inputs.select_rows(&[next_cen]).into_vec())
+            }
         }
 
         Ok(Matrix::new(k, inputs.cols(), init_centroids))
