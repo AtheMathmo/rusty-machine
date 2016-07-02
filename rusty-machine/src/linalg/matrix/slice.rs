@@ -135,11 +135,12 @@ impl<'a, T> MatrixSlice<'a, T> {
     ///
     /// # Safety
     ///
-    /// The pointer must be followed by a contiguous slice of data larger than `row_stride * rows`. If not then
-    /// other operations will produce undefined behaviour.
+    /// The pointer must be followed by a contiguous slice of data larger than `row_stride * rows`.
+    /// If not then other operations will produce undefined behaviour.
     ///
-    /// Additionally `cols` should be less than the `row_stride`. It is possible to use this function safely 
-    /// whilst violating this condition. So long as `max(cols, row_stride) * rows` is less than the data size.
+    /// Additionally `cols` should be less than the `row_stride`. It is possible to use this
+    /// function safely whilst violating this condition. So long as
+    /// `max(cols, row_stride) * rows` is less than the data size.
     pub unsafe fn from_raw_parts(ptr: *const T,
                                  rows: usize,
                                  cols: usize,
@@ -268,11 +269,12 @@ impl<'a, T> MatrixSliceMut<'a, T> {
     ///
     /// # Safety
     ///
-    /// The pointer must be followed by a contiguous slice of data larger than `row_stride * rows`. If not then
-    /// other operations will produce undefined behaviour.
+    /// The pointer must be followed by a contiguous slice of data larger than `row_stride * rows`.
+    /// If not then other operations will produce undefined behaviour.
     ///
-    /// Additionally `cols` should be less than the `row_stride`. It is possible to use this function safely 
-    /// whilst violating this condition. So long as `max(cols, row_stride) * rows` is less than the data size.
+    /// Additionally `cols` should be less than the `row_stride`. It is possible to use this
+    /// function safely whilst violating this condition. So long as
+    /// `max(cols, row_stride) * rows` is less than the data size.
     pub unsafe fn from_raw_parts(ptr: *mut T,
                                  rows: usize,
                                  cols: usize,
@@ -382,7 +384,7 @@ impl<'a, T: Copy> MatrixSliceMut<'a, T> {
     }
 }
 
-/// Iterator for the MatrixSlice
+/// Iterator for `MatrixSlice`
 ///
 /// Iterates over the underlying slice data
 /// in row-major order.
@@ -397,7 +399,7 @@ pub struct SliceIter<'a, T: 'a> {
     _marker: PhantomData<&'a T>,
 }
 
-/// Iterator for MatrixSliceMut.
+/// Iterator for `MatrixSliceMut`.
 ///
 /// Iterates over the underlying slice data
 /// in row-major order.
@@ -419,12 +421,14 @@ impl<'a, T> Iterator for $slice_iter<'a, T> {
     type Item = $data_type;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // Set the position of the next element
+// Set the position of the next element
         if self.row_pos < self.slice_rows {
             unsafe {
-                let iter_ptr = self.slice_start.offset((self.row_pos * self.row_stride + self.col_pos) as isize);
-                
-                // If end of row, set to start of next row
+                let iter_ptr = self.slice_start.offset((
+                                self.row_pos * self.row_stride + self.col_pos)
+                                as isize);
+
+// If end of row, set to start of next row
                 if self.col_pos == self.slice_cols - 1 {
                     self.row_pos += 1usize;
                     self.col_pos = 0usize;
@@ -438,7 +442,7 @@ impl<'a, T> Iterator for $slice_iter<'a, T> {
             None
         }
     }
-}        
+}
     );
 );
 
@@ -471,7 +475,7 @@ mod tests {
     #[test]
     fn reslice() {
         let mut a = Matrix::new(4, 4, (0..16).collect::<Vec<_>>());
-        
+
         {
             let b = MatrixSlice::from_matrix(&a, [1, 1], 3, 3);
             let c = b.reslice([0, 1], 2, 2);

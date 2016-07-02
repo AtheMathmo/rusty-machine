@@ -34,11 +34,12 @@
 //! model.predict(&test_inputs);
 //! ```
 //!
-//! The neural networks are specified via a criterion - similar to [Torch](https://github.com/torch/nn/blob/master/doc/criterion.md).
+//! The neural networks are specified via a criterion - similar to
+//! [Torch](https://github.com/torch/nn/blob/master/doc/criterion.md).
 //! The criterions combine an activation function and a cost function.
 //!
 //! You can define your own criterion by implementing the `Criterion`
-//! trait with a concrete ActivationFunc and CostFunc.
+//! trait with a concrete `ActivationFunc` and `CostFunc`.
 
 use linalg::matrix::{Matrix, MatrixSlice};
 use linalg::matrix::slice::BaseSlice;
@@ -307,8 +308,8 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
 
             // Take GRAD_cost to compute this delta.
             let mut delta = self.criterion
-                                .cost_grad(&activations[self.layer_sizes.len() - 1], targets)
-                                .elemul(&g);
+                .cost_grad(&activations[self.layer_sizes.len() - 1], targets)
+                .elemul(&g);
 
             deltas.push(delta.clone());
 
@@ -319,7 +320,7 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
 
                 let g = self.criterion.grad_activ(z);
                 delta = (delta * Matrix::from(self.get_layer_weights(weights, l)).transpose())
-                            .elemul(&g);
+                    .elemul(&g);
 
                 let non_one_rows = &(1..delta.cols()).collect::<Vec<usize>>()[..];
                 delta = delta.select_cols(non_one_rows);
@@ -455,7 +456,8 @@ pub trait Criterion {
     ///
     /// Will return `0` by default.
     ///
-    /// This method will not be invoked by the neural network if there is explicitly no regularization.
+    /// This method will not be invoked by the neural network
+    /// if there is explicitly no regularization.
     fn reg_cost(&self, reg_weights: MatrixSlice<f64>) -> f64 {
         self.regularization().reg_cost(reg_weights)
     }
@@ -464,7 +466,8 @@ pub trait Criterion {
     ///
     /// Will return a matrix of zeros by default.
     ///
-    /// This method will not be invoked by the neural network if there is explicitly no regularization.
+    /// This method will not be invoked by the neural network
+    /// if there is explicitly no regularization.
     fn reg_cost_grad(&self, reg_weights: MatrixSlice<f64>) -> Matrix<f64> {
         self.regularization().reg_grad(reg_weights)
     }
@@ -491,9 +494,7 @@ impl Criterion for BCECriterion {
 /// Creates an MSE Criterion without any regularization.
 impl Default for BCECriterion {
     fn default() -> Self {
-        BCECriterion {
-            regularization : Regularization::None,
-        }
+        BCECriterion { regularization: Regularization::None }
     }
 }
 
@@ -510,9 +511,7 @@ impl BCECriterion {
     /// let criterion = BCECriterion::new(Regularization::L2(0.3f64));
     /// ```
     pub fn new(regularization: Regularization<f64>) -> Self {
-        BCECriterion {
-            regularization : regularization,
-        }
+        BCECriterion { regularization: regularization }
     }
 }
 
@@ -537,9 +536,7 @@ impl Criterion for MSECriterion {
 /// Creates an MSE Criterion without any regularization.
 impl Default for MSECriterion {
     fn default() -> Self {
-        MSECriterion {
-            regularization : Regularization::None,
-        }
+        MSECriterion { regularization: Regularization::None }
     }
 }
 
@@ -556,8 +553,6 @@ impl MSECriterion {
     /// let criterion = MSECriterion::new(Regularization::L2(0.3f64));
     /// ```
     pub fn new(regularization: Regularization<f64>) -> Self {
-        MSECriterion {
-            regularization : regularization,
-        }
+        MSECriterion { regularization: regularization }
     }
 }

@@ -82,9 +82,8 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
 
         self.model_covars = Some(cov_vec);
 
-        let random_rows: Vec<usize> = rand_utils::reservoir_sample(&(0..inputs.rows())
-                                                                        .collect::<Vec<usize>>(),
-                                                                   k);
+        let random_rows: Vec<usize> =
+            rand_utils::reservoir_sample(&(0..inputs.rows()).collect::<Vec<usize>>(), k);
         self.model_means = Some(inputs.select_rows(&random_rows));
 
         for _ in 0..self.max_iters {
@@ -253,7 +252,7 @@ impl GaussianMixtureModel {
                     let diff = &x_i - mu_j;
 
                     let pdf = (&diff * &cov_invs[j] * diff.transpose() * -0.5).into_vec()[0]
-                                  .exp() / cov_sqrt_dets[j];
+                        .exp() / cov_sqrt_dets[j];
                     pdfs.push(pdf);
                 }
 
@@ -267,8 +266,7 @@ impl GaussianMixtureModel {
             }
         }
 
-        (Matrix::new(n, self.comp_count, member_weights_data),
-         log_lik)
+        (Matrix::new(n, self.comp_count, member_weights_data), log_lik)
     }
 
     fn update_params(&mut self, inputs: &Matrix<f64>, membership_weights: Matrix<f64>) {
@@ -283,7 +281,7 @@ impl GaussianMixtureModel {
 
         for (idx, mean) in new_means.mut_data().chunks_mut(d).enumerate() {
             for m in mean {
-                *m = *m / sum_weights[idx];
+                *m /= sum_weights[idx];
             }
         }
 
@@ -334,7 +332,7 @@ mod tests {
     #[should_panic]
     fn test_negative_mixtures() {
         use linalg::vector::Vector;
-    
+
         let mix_weights = Vector::new(vec![-0.25, 0.75, 0.5]);
         let _ = GaussianMixtureModel::with_weights(3, mix_weights);
     }
@@ -343,7 +341,7 @@ mod tests {
     #[should_panic]
     fn test_wrong_length_mixtures() {
         use linalg::vector::Vector;
-    
+
         let mix_weights = Vector::new(vec![0.1, 0.25, 0.75, 0.5]);
         let _ = GaussianMixtureModel::with_weights(3, mix_weights);
     }

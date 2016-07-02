@@ -33,7 +33,6 @@ pub struct Gaussian {
 /// - mean = 0
 /// - variance = 1
 impl Default for Gaussian {
-    
     fn default() -> Gaussian {
         Gaussian {
             mean: 0f64,
@@ -70,7 +69,6 @@ impl Gaussian {
 /// Accurately computes the PDF and log PDF.
 /// Estimates the CDF accurate only to 0.003.
 impl Distribution<f64> for Gaussian {
-
     /// The pdf of the normal distribution
     ///
     /// # Examples
@@ -85,7 +83,7 @@ impl Distribution<f64> for Gaussian {
     /// let lpdf_zero = gauss.pdf(0f64);
     ///
     /// // The value should be very close to 1/sqrt(2 * pi)
-    /// assert!((lpdf_zero - (1f64/consts::SQRT_2_PI).abs()) < 1e-20); 
+    /// assert!((lpdf_zero - (1f64/consts::SQRT_2_PI).abs()) < 1e-20);
     /// ```
     fn pdf(&self, x: f64) -> f64 {
         (-(x - self.mean) * (x - self.mean) / (2.0 * self.variance)).exp() /
@@ -106,7 +104,7 @@ impl Distribution<f64> for Gaussian {
     /// let lpdf_zero = gauss.logpdf(0f64);
     ///
     /// // The value should be very close to -0.5*Ln(2 * pi)
-    /// assert!((lpdf_zero + 0.5*consts::LN_2_PI).abs() < 1e-20); 
+    /// assert!((lpdf_zero + 0.5*consts::LN_2_PI).abs() < 1e-20);
     /// ```
     fn logpdf(&self, x: f64) -> f64 {
         -self._std_dev.ln() - (stat_consts::LN_2_PI / 2.0) -
@@ -145,7 +143,7 @@ impl Distribution<f64> for Gaussian {
          (x - self.mean).signum() *
          (1f64 -
           (-float_consts::FRAC_2_PI * (x - self.mean) * (x - self.mean) / self.variance).exp())
-             .sqrt())
+            .sqrt())
     }
 }
 

@@ -1,7 +1,7 @@
 //! Gradient Descent
 //!
 //! Implementation of gradient descent algorithm. Module contains
-//! the struct GradientDesc which is instantiated within models
+//! the struct `GradientDesc` which is instantiated within models
 //! implementing the Optimizable trait.
 //!
 //! Currently standard batch gradient descent is the only implemented
@@ -15,7 +15,7 @@ use linalg::utils;
 
 use learning::toolkit::rand_utils;
 
-const LEARNING_EPS : f64 = 1e-20;
+const LEARNING_EPS: f64 = 1e-20;
 
 /// Batch Gradient Descent algorithm
 #[derive(Clone, Copy, Debug)]
@@ -55,7 +55,8 @@ impl GradientDesc {
     /// let gd = GradientDesc::new(0.3, 10000);
     /// ```
     pub fn new(alpha: f64, iters: usize) -> GradientDesc {
-        assert!(alpha > 0f64, "The step size (alpha) must be greater than 0.");
+        assert!(alpha > 0f64,
+                "The step size (alpha) must be greater than 0.");
 
         GradientDesc {
             alpha: alpha,
@@ -79,17 +80,14 @@ impl<M: Optimizable> OptimAlgorithm<M> for GradientDesc {
 
         for _ in 0..self.iters {
             // Compute the cost and gradient for the current parameters
-            let (cost, grad) = model.compute_grad(&optimizing_val.data()[..],
-                                                            inputs,
-                                                            targets);
+            let (cost, grad) = model.compute_grad(&optimizing_val.data()[..], inputs, targets);
 
             // Early stopping
             if (start_iter_cost - cost).abs() < LEARNING_EPS {
-                break
+                break;
             } else {
                 // Update the optimal parameters using gradient descent
-                optimizing_val = &optimizing_val -
-                                 Vector::new(grad) * self.alpha;
+                optimizing_val = &optimizing_val - Vector::new(grad) * self.alpha;
                 // Update the latest cost
                 start_iter_cost = cost;
             }
@@ -153,7 +151,9 @@ impl StochasticGD {
     }
 }
 
-impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm<M> for StochasticGD {
+impl<M> OptimAlgorithm<M> for StochasticGD
+    where M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>
+{
     fn optimize(&self,
                 model: &M,
                 start: &[f64],
@@ -176,11 +176,11 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
             let mut end_cost = 0f64;
             // Permute the indices
             rand_utils::in_place_fisher_yates(&mut permutation);
-            for i in permutation.iter() {
+            for i in &permutation {
                 // Compute the cost and gradient for this data pair
-                let (cost, vec_data) = model.compute_grad(&optimizing_val.data(),
-                                                       &inputs.select_rows(&[*i]),
-                                                       &targets.select_rows(&[*i]));
+                let (cost, vec_data) = model.compute_grad(optimizing_val.data(),
+                                                          &inputs.select_rows(&[*i]),
+                                                          &targets.select_rows(&[*i]));
 
                 // Compute the difference in gradient using momentum
                 delta_w = Vector::new(vec_data) * self.mu + &delta_w * self.alpha;
@@ -194,7 +194,7 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
 
             // Early stopping
             if (start_iter_cost - end_cost).abs() < LEARNING_EPS {
-                break
+                break;
             } else {
                 // Update the cost
                 start_iter_cost = end_cost;
@@ -227,8 +227,10 @@ impl AdaGrad {
     /// let gd = AdaGrad::new(0.5, 1.0, 100);
     /// ```
     pub fn new(alpha: f64, tau: f64, iters: usize) -> AdaGrad {
-        assert!(alpha > 0f64, "The step size (alpha) must be greater than 0.");
-        assert!(tau >= 0f64, "The adaptive constant (tau) cannot be negative.");
+        assert!(alpha > 0f64,
+                "The step size (alpha) must be greater than 0.");
+        assert!(tau >= 0f64,
+                "The adaptive constant (tau) cannot be negative.");
         AdaGrad {
             alpha: alpha,
             tau: tau,
@@ -270,18 +272,18 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
             let mut end_cost = 0f64;
             // Permute the indices
             rand_utils::in_place_fisher_yates(&mut permutation);
-            for i in permutation.iter() {
+            for i in &permutation {
                 // Compute the cost and gradient for this data pair
                 let (cost, mut vec_data) = model.compute_grad(optimizing_val.data(),
-                                                       &inputs.select_rows(&[*i]),
-                                                       &targets.select_rows(&[*i]));
+                                                              &inputs.select_rows(&[*i]),
+                                                              &targets.select_rows(&[*i]));
                 // Update the adaptive scaling by adding the gradient squared
-                utils::in_place_vec_bin_op(ada_s.mut_data(), &vec_data, |x, &y| {*x = *x + y*y });
+                utils::in_place_vec_bin_op(ada_s.mut_data(), &vec_data, |x, &y| *x += y * y);
 
                 // Compute the change in gradient
-                utils::in_place_vec_bin_op(&mut vec_data,
-                                           ada_s.data(),
-                                           |x, &y| *x = self.alpha * (*x / (self.tau + (y).sqrt())));
+                utils::in_place_vec_bin_op(&mut vec_data, ada_s.data(), |x, &y| {
+                    *x = self.alpha * (*x / (self.tau + (y).sqrt()))
+                });
                 // Update the parameters
                 optimizing_val = &optimizing_val - Vector::new(vec_data);
                 // Set the end cost (this is only used after the last iteration)
@@ -291,7 +293,7 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
 
             // Early stopping
             if (start_iter_cost - end_cost).abs() < LEARNING_EPS {
-               break
+                break;
             } else {
                 // Update the cost
                 start_iter_cost = end_cost;

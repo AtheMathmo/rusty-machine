@@ -1,7 +1,8 @@
 //! Matrix Decompositions
 //!
 //! References:
-//! 1. [On Matrix Balancing and EigenVector computation](http://arxiv.org/pdf/1401.5766v1.pdf), James, Langou and Lowery
+//! 1. [On Matrix Balancing and EigenVector computation]
+//! (http://arxiv.org/pdf/1401.5766v1.pdf), James, Langou and Lowery
 
 use std::ops::{Mul, Add, Div, Sub, Neg};
 use std::cmp;
@@ -203,10 +204,8 @@ impl<T: Any + Float + Signed> Matrix<T> {
             // Reassign block
             for j in i + 1..n {
                 for k in i..n {
-                    dummy.data[j * dummy.cols + k] = reduc_block.data[(j - i - 1) *
-                                                                      reduc_block.cols +
-                                                                      k -
-                                                                      i]
+                    dummy.data[j * dummy.cols + k] =
+                        reduc_block.data[(j - i - 1) * reduc_block.cols + k - i]
                 }
             }
 
@@ -279,10 +278,8 @@ impl<T: Any + Float + Signed> Matrix<T> {
             // Reassign block
             for j in i + 1..n {
                 for k in i + 1..n {
-                    transform.data[j * n + k] = reduc_block.data[(j - i - 1) * reduc_block.cols +
-                                                                 k -
-                                                                 i -
-                                                                 1];
+                    transform.data[j * n + k] =
+                        reduc_block.data[(j - i - 1) * reduc_block.cols + k - i - 1];
                 }
             }
         }
@@ -447,10 +444,10 @@ impl<T: Any + Float + Signed> Matrix<T> {
             // Check for convergence
             if abs(h[[p, q]]) < eps * (abs(h[[q, q]]) + abs(h[[p, p]])) {
                 h.data[p * h.cols + q] = T::zero();
-                p = p - 1;
+                p -= 1;
             } else if abs(h[[p - 1, q - 1]]) < eps * (abs(h[[q - 1, q - 1]]) + abs(h[[q, q]])) {
                 h.data[(p - 1) * h.cols + q - 1] = T::zero();
-                p = p - 2;
+                p -= 2;
             }
         }
 
@@ -491,24 +488,23 @@ impl<T: Any + Float + Signed> Matrix<T> {
         // http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
         // for this characterization—
         if self.data[2] != T::zero() {
-            return (eigenvalues.clone(),
-                    Matrix::new(2,
-                                2,
-                                vec![eigenvalues[0] - self.data[3],
-                                     eigenvalues[1] - self.data[3],
-                                     self.data[2],
-                                     self.data[2]]));
+            (eigenvalues.clone(),
+             Matrix::new(2,
+                         2,
+                         vec![eigenvalues[0] - self.data[3],
+                              eigenvalues[1] - self.data[3],
+                              self.data[2],
+                              self.data[2]]))
         } else if self.data[1] != T::zero() {
-            return (eigenvalues.clone(),
-                    Matrix::new(2,
-                                2,
-                                vec![self.data[1],
-                                     self.data[1],
-                                     eigenvalues[0] - self.data[0],
-                                     eigenvalues[1] - self.data[0]]));
+            (eigenvalues.clone(),
+             Matrix::new(2,
+                         2,
+                         vec![self.data[1],
+                              self.data[1],
+                              eigenvalues[0] - self.data[0],
+                              eigenvalues[1] - self.data[0]]))
         } else {
-            return (eigenvalues.clone(),
-                    Matrix::new(2, 2, vec![T::one(), T::zero(), T::zero(), T::one()]));
+            (eigenvalues.clone(), Matrix::new(2, 2, vec![T::one(), T::zero(), T::zero(), T::one()]))
         }
     }
 
@@ -562,8 +558,8 @@ impl<T: Any + Float + Signed> Matrix<T> {
                 }
 
                 // Update the transformation matrix
-                let trans_block = transformation.select(&(0..n).collect::<Vec<usize>>(),
-                                                        &[k, k + 1, k + 2]);
+                let trans_block =
+                    transformation.select(&(0..n).collect::<Vec<usize>>(), &[k, k + 1, k + 2]);
                 let reduc_block = trans_block * householder.transpose();
 
                 // Reassign the trans block
@@ -625,10 +621,10 @@ impl<T: Any + Float + Signed> Matrix<T> {
             // Check for convergence
             if abs(h[[p, q]]) < eps * (abs(h[[q, q]]) + abs(h[[p, p]])) {
                 h.data[p * h.cols + q] = T::zero();
-                p = p - 1;
+                p -= 1;
             } else if abs(h[[p - 1, q - 1]]) < eps * (abs(h[[q - 1, q - 1]]) + abs(h[[q, q]])) {
                 h.data[(p - 1) * h.cols + q - 1] = T::zero();
-                p = p - 2;
+                p -= 2;
             }
         }
 

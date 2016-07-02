@@ -85,8 +85,7 @@ impl<InitAlg: Initializer> UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClas
     fn predict(&self, inputs: &Matrix<f64>) -> Vector<usize> {
         if let Some(ref centroids) = self.centroids {
             return KMeansClassifier::<InitAlg>::find_closest_centroids(centroids.as_slice(),
-                                                                       inputs)
-                       .0;
+                                                                       inputs).0;
         } else {
             panic!("Model has not been trained.");
         }
