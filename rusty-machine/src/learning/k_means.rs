@@ -207,7 +207,7 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
             let vec_i: Vec<usize> = classes.data()
                                            .iter()
                                            .filter(|&x| *x == i)
-                                           .map(|x| *x)
+                                           .cloned()
                                            .collect();
 
             let mat_i = inputs.select_rows(&vec_i);
@@ -298,7 +298,7 @@ impl Initializer for RandomPartition {
         for i in 0..k {
             let vec_i: Vec<usize> = random_assignments.iter()
                                                       .filter(|&x| *x == i)
-                                                      .map(|x| *x)
+                                                      .cloned()
                                                       .collect();
 
             let mat_i = inputs.select_rows(&vec_i);
