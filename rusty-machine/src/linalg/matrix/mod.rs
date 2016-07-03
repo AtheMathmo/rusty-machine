@@ -843,94 +843,85 @@ impl<T: Copy + Div<T, Output = T>> Matrix<T> {
 impl<T: Float + FromPrimitive> Matrix<T> {
     /// The mean of the matrix along the specified axis.
     ///
-    /// Axis 0 - Arithmetic mean of rows.
-    /// Axis 1 - Arithmetic mean of columns.
+    /// Axis Row - Arithmetic mean of rows.
+    /// Axis Col - Arithmetic mean of columns.
     ///
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::{Matrix, Axes};
     ///
     /// let a = Matrix::<f64>::new(2,2, vec![1.0,2.0,3.0,4.0]);
     ///
-    /// let c = a.mean(0);
+    /// let c = a.mean(Axes::Row);
     /// assert_eq!(*c.data(), vec![2.0, 3.0]);
     ///
-    /// let d = a.mean(1);
+    /// let d = a.mean(Axes::Col);
     /// assert_eq!(*d.data(), vec![1.5, 3.5]);
     /// ```
-    ///
-    /// # Panics
-    ///
-    /// - The specified axis is not 0 or 1.
-    pub fn mean(&self, axis: usize) -> Vector<T> {
+    pub fn mean(&self, axis: Axes) -> Vector<T> {
         let m: Vector<T>;
         let n: T;
         match axis {
-            0 => {
+            Axes::Row => {
                 m = self.sum_rows();
                 n = FromPrimitive::from_usize(self.rows).unwrap();
             }
-            1 => {
+            Axes::Col => {
                 m = self.sum_cols();
                 n = FromPrimitive::from_usize(self.cols).unwrap();
             }
-            _ => panic!("Axis must be 0 or 1."),
         }
         m / n
     }
 
     /// The variance of the matrix along the specified axis.
     ///
-    /// Axis 0 - Sample variance of rows.
-    /// Axis 1 - Sample variance of columns.
+    /// Axis Row - Sample variance of rows.
+    /// Axis Col - Sample variance of columns.
     ///
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::matrix::{Matrix, Axes};
     ///
     /// let a = Matrix::<f32>::new(2,2,vec![1.0,2.0,3.0,4.0]);
     ///
-    /// let c = a.variance(0);
+    /// let c = a.variance(Axes::Row);
     /// assert_eq!(*c.data(), vec![2.0, 2.0]);
     ///
-    /// let d = a.variance(1);
+    /// let d = a.variance(Axes::Col);
     /// assert_eq!(*d.data(), vec![0.5, 0.5]);
     /// ```
-    ///
-    /// # Panics
-    ///
-    /// - The specified axis is not 0 or 1.
-    pub fn variance(&self, axis: usize) -> Vector<T> {
+    pub fn variance(&self, axis: Axes) -> Vector<T> {
         let mean = self.mean(axis);
 
         let n: usize;
         let m: usize;
 
         match axis {
-            0 => {
+            Axes::Row => {
                 n = self.rows;
                 m = self.cols;
             }
-            1 => {
+            Axes::Col => {
                 n = self.cols;
                 m = self.rows;
             }
-            _ => panic!("Axis must be 0 or 1."),
         }
 
-        let mut variance = Vector::new(vec![T::zero(); m]);
+        let mut variance = Vector::zeros(m);
 
         for i in 0..n {
             let mut t = Vec::<T>::with_capacity(m);
 
             unsafe {
+                t.set_len(m);
+                
                 for j in 0..m {
-                    match axis {
-                        0 => t.push(*self.data.get_unchecked(i * m + j)),
-                        1 => t.push(*self.data.get_unchecked(j * n + i)),
-                        _ => panic!("Axis must be 0 or 1."),
+                    t[j] = match axis {
+                        Axes::Row => *self.data.get_unchecked(i * m + j),
+                        Axes::Col => *self.data.get_unchecked(j * n + i),
                     }
 
                 }

@@ -43,7 +43,7 @@
 //! The [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) scheme.
 
 use linalg::matrix::slice::BaseSlice;
-use linalg::matrix::{Matrix, MatrixSlice};
+use linalg::matrix::{Matrix, MatrixSlice, Axes};
 use linalg::vector::Vector;
 use learning::UnSupModel;
 use learning::error::{Error, ErrorKind};
@@ -211,7 +211,7 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
                                            .collect();
 
             let mat_i = inputs.select_rows(&vec_i);
-            new_centroids.extend(mat_i.mean(0).data());
+            new_centroids.extend(mat_i.mean(Axes::Row).data());
         }
 
         self.centroids = Some(Matrix::new(self.k, inputs.cols(), new_centroids));
@@ -302,7 +302,7 @@ impl Initializer for RandomPartition {
                                                       .collect();
 
             let mat_i = inputs.select_rows(&vec_i);
-            init_centroids.extend(mat_i.mean(0).into_vec());
+            init_centroids.extend(mat_i.mean(Axes::Row).into_vec());
         }
 
         Ok(Matrix::new(k, inputs.cols(), init_centroids))
