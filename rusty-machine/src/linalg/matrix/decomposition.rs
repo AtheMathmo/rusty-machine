@@ -72,17 +72,20 @@ impl<T: Any + Float> Matrix<T> {
         }
     }
 
-    fn make_householder(mat: Matrix<T>) -> Matrix<T> {
-        assert!(mat.cols() == 1usize, "Householder matrix has invalid size.");
-        let size = mat.rows();
+    fn make_householder(column: &[T]) -> Matrix<T> {
+        let size = column.len();
 
-        let denom = mat.data()[0] + mat.data()[0].signum() * mat.norm();
+        assert!(size > 0, "Column must have some element \
+                            to do a householder transform.");
+
+        let denom = column[0] + column[0].signum() * utils::dot(column, column).sqrt();
 
         if denom == T::zero() {
             panic!("Matrix can not be decomposed.");
         }
 
-        let mut v = (mat / denom).into_vec();
+        let mut v = column.into_iter().map(|&x| x / denom).collect::<Vec<T>>();
+        // Ensure first element is fixed to 1.
         v[0] = T::one();
         let v = Vector::new(v);
         let v_norm_sq = v.dot(&v);
@@ -92,17 +95,19 @@ impl<T: Any + Float> Matrix<T> {
         Matrix::<T>::identity(size) - (v_vert * v_hor) * ((T::one() + T::one()) / v_norm_sq)
     }
 
-    fn make_householder_vec(mat: Matrix<T>) -> Matrix<T> {
-        assert!(mat.cols() == 1usize, "Householder matrix has invalid size.");
-        let size = mat.rows();
+    fn make_householder_vec(column: &[T]) -> Matrix<T> {
+        let size = column.len();
+        assert!(size > 0, "Column must have some element \
+                            to make a householder vector.");
 
-        let denom = mat.data()[0] + mat.data()[0].signum() * mat.norm();
+        let denom = column[0] + column[0].signum() * utils::dot(column, column).sqrt();
 
         if denom == T::zero() {
             panic!("Matrix can not be decomposed.");
         }
 
-        let mut v = (mat / denom).into_vec();
+        let mut v = column.into_iter().map(|&x| x / denom).collect::<Vec<T>>();
+        // Ensure first element is fixed to 1.
         v[0] = T::one();
         let v = Matrix::new(size, 1, v);
 
@@ -132,7 +137,7 @@ impl<T: Any + Float> Matrix<T> {
         for i in 0..(n - ((m == n) as usize)) {
             let lower_rows = &(i..m).collect::<Vec<usize>>()[..];
             let lower_self = r.select(lower_rows, &[i]);
-            let mut holder_data = Matrix::make_householder(lower_self).into_vec();
+            let mut holder_data = Matrix::make_householder(&lower_self.data).into_vec();
 
             // This bit is inefficient
             // using for now as we'll swap to lapack eventually.
@@ -191,7 +196,7 @@ impl<T: Any + Float + Signed> Matrix<T> {
         for i in 0..n - 2 {
             let lower_rows = &(i + 1..n).collect::<Vec<usize>>()[..];
             let lower_self = dummy.select(lower_rows, &[i]);;
-            let h_holder_vec = Matrix::make_householder_vec(lower_self);
+            let h_holder_vec = Matrix::make_householder_vec(&lower_self.data);
 
             let i_plus_to_n = (i + 1..n).collect::<Vec<usize>>();
 
@@ -268,7 +273,7 @@ impl<T: Any + Float + Signed> Matrix<T> {
         for i in (0..n - 2).rev() {
             let lower_rows = (i + 1..n).collect::<Vec<usize>>();
             let lower_self = self.select(&lower_rows, &[i]);
-            let h_holder_vec = Matrix::make_householder_vec(lower_self);
+            let h_holder_vec = Matrix::make_householder_vec(&lower_self.data);
 
             let trans_block = transform.select(&lower_rows, &lower_rows);
             let reduc_block = &trans_block -
@@ -378,7 +383,7 @@ impl<T: Any + Float + Signed> Matrix<T> {
             for k in 0..p - 1 {
                 let r = cmp::max(1, k) - 1;
 
-                let householder = Matrix::make_householder(Matrix::new(3, 1, vec![x, y, z]));
+                let householder = Matrix::make_householder(&[x, y, z]);
 
                 // Apply householder transformation to block (on the left)
                 let h_block = h.select(&[k, k + 1, k + 2], &(r..n).collect::<Vec<usize>>());
@@ -530,7 +535,7 @@ impl<T: Any + Float + Signed> Matrix<T> {
             for k in 0..p - 1 {
                 let r = cmp::max(1, k) - 1;
 
-                let householder = Matrix::make_householder(Matrix::new(3, 1, vec![x, y, z]));
+                let householder = Matrix::make_householder(&[x, y, z]);
 
                 // Apply householder transformation to block (on the left)
                 let h_block = h.select(&[k, k + 1, k + 2], &(r..n).collect::<Vec<usize>>());
