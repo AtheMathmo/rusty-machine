@@ -42,7 +42,7 @@
 //!
 //! The [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) scheme.
 
-use linalg::matrix::Matrix;
+use linalg::matrix::{Matrix, Axes};
 use linalg::vector::Vector;
 use learning::UnSupModel;
 use rand::{Rng, thread_rng};
@@ -288,7 +288,7 @@ impl KMeansClassifier {
             }
 
             let mat_i = inputs.select_rows(&vec_i);
-            new_centroids.extend(mat_i.mean(0).data());
+            new_centroids.extend(mat_i.mean(Axes::Row).data());
         }
 
         self.centroids = Some(Matrix::new(self.k, inputs.cols(), new_centroids));
@@ -376,7 +376,7 @@ impl KMeansClassifier {
             }
 
             let mat_i = inputs.select_rows(&vec_i);
-            init_centroids.extend(mat_i.mean(0).into_vec());
+            init_centroids.extend(mat_i.mean(Axes::Row).into_vec());
         }
 
         Matrix::new(k, inputs.cols(), init_centroids)

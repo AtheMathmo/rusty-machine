@@ -40,7 +40,7 @@
 //! println!("Final outputs --\n{}", outputs);
 //! ```
 
-use linalg::matrix::Matrix;
+use linalg::matrix::{Matrix, Axes};
 use linalg::utils;
 use learning::SupModel;
 
@@ -261,8 +261,8 @@ impl Distribution for Gaussian {
 
     fn update_params(&mut self, data: Matrix<f64>, class: usize) {
         // Compute mean and sample variance
-        let mean = data.mean(0).into_vec();
-        let var = data.variance(0).into_vec();
+        let mean = data.mean(Axes::Row).into_vec();
+        let var = data.variance(Axes::Row).into_vec();
 
         let features = data.cols();
 
