@@ -916,10 +916,12 @@ impl<T: Float + FromPrimitive> Matrix<T> {
             let mut t = Vec::<T>::with_capacity(m);
 
             unsafe {
+                t.set_len(m);
+                
                 for j in 0..m {
-                    match axis {
-                        Axes::Row => t.push(*self.data.get_unchecked(i * m + j)),
-                        Axes::Col => t.push(*self.data.get_unchecked(j * n + i)),
+                    t[j] = match axis {
+                        Axes::Row => *self.data.get_unchecked(i * m + j),
+                        Axes::Col => *self.data.get_unchecked(j * n + i),
                     }
 
                 }
