@@ -662,7 +662,7 @@ macro_rules! impl_op_assign_vec_scalar (
 
 /// Performs
 #[doc=$doc]
-/// assignment between a matrix and a scalar.
+/// assignment between a vector and a scalar.
 impl<T : Copy + $trt<T, Output=T>> $assign_trt<T> for Vector<T> {
     fn $op_assign(&mut self, _rhs: T) {
         for x in &mut self.data {
@@ -673,7 +673,7 @@ impl<T : Copy + $trt<T, Output=T>> $assign_trt<T> for Vector<T> {
 
 /// Performs
 #[doc=$doc]
-/// assignment between a matrix and a scalar.
+/// assignment between a vector and a scalar.
 impl<'a, T : Copy + $trt<T, Output=T>> $assign_trt<&'a T> for Vector<T> {
     fn $op_assign(&mut self, _rhs: &T) {
         for x in &mut self.data {
@@ -694,7 +694,7 @@ macro_rules! impl_op_assign_vec (
 
 /// Performs elementwise
 #[doc=$doc]
-/// assignment between two matrices.
+/// assignment between two vectors.
 impl<T : Copy + $trt<T, Output=T>> $assign_trt<Vector<T>> for Vector<T> {
     fn $op_assign(&mut self, _rhs: Vector<T>) {
         utils::in_place_vec_bin_op(&mut self.data, &_rhs.data, |x, &y| {*x = (*x).$op(y) });
@@ -703,7 +703,7 @@ impl<T : Copy + $trt<T, Output=T>> $assign_trt<Vector<T>> for Vector<T> {
 
 /// Performs elementwise
 #[doc=$doc]
-/// assignment between two matrices.
+/// assignment between two vectors.
 impl<'a, T : Copy + $trt<T, Output=T>> $assign_trt<&'a Vector<T>> for Vector<T> {
     fn $op_assign(&mut self, _rhs: &Vector<T>) {
         utils::in_place_vec_bin_op(&mut self.data, &_rhs.data, |x, &y| {*x = (*x).$op(y) });
