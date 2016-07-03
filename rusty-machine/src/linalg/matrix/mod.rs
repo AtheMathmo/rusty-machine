@@ -910,7 +910,7 @@ impl<T: Float + FromPrimitive> Matrix<T> {
             }
         }
 
-        let mut variance = Vector::new(vec![T::zero(); m]);
+        let mut variance = Vector::zeros(m);
 
         for i in 0..n {
             let mut t = Vec::<T>::with_capacity(m);
