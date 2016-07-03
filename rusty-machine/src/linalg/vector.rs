@@ -3,7 +3,7 @@
 //! Currently contains all code
 //! relating to the vector linear algebra struct.
 
-use std::ops::{Mul, Add, Div, Sub, Index, Neg};
+use std::ops::{Mul, Add, Div, Sub, Index, Neg, MulAssign, DivAssign, SubAssign, AddAssign};
 use libnum::{One, Zero, Float, FromPrimitive};
 use std::cmp::PartialEq;
 use linalg::Metric;
@@ -657,6 +657,63 @@ impl<T: Float> Metric<T> for Vector<T> {
     }
 }
 
+macro_rules! impl_op_assign_vec_scalar (
+    ($assign_trt:ident, $trt:ident, $op:ident, $op_assign:ident, $doc:expr) => (
+
+/// Performs
+#[doc=$doc]
+/// assignment between a matrix and a scalar.
+impl<T : Copy + $trt<T, Output=T>> $assign_trt<T> for Vector<T> {
+    fn $op_assign(&mut self, _rhs: T) {
+        for x in &mut self.data {
+            *x = (*x).$op(_rhs)
+        }
+    }
+}
+
+/// Performs
+#[doc=$doc]
+/// assignment between a matrix and a scalar.
+impl<'a, T : Copy + $trt<T, Output=T>> $assign_trt<&'a T> for Vector<T> {
+    fn $op_assign(&mut self, _rhs: &T) {
+        for x in &mut self.data {
+            *x = (*x).$op(*_rhs)
+        }
+    }
+}
+    );
+);
+
+impl_op_assign_vec_scalar!(AddAssign, Add, add, add_assign, "addition");
+impl_op_assign_vec_scalar!(SubAssign, Sub, sub, sub_assign, "subtraction");
+impl_op_assign_vec_scalar!(DivAssign, Div, div, div_assign, "division");
+impl_op_assign_vec_scalar!(MulAssign, Mul, mul, mul_assign, "multiplication");
+
+macro_rules! impl_op_assign_vec (
+    ($assign_trt:ident, $trt:ident, $op:ident, $op_assign:ident, $doc:expr) => (
+
+/// Performs elementwise
+#[doc=$doc]
+/// assignment between two matrices.
+impl<T : Copy + $trt<T, Output=T>> $assign_trt<Vector<T>> for Vector<T> {
+    fn $op_assign(&mut self, _rhs: Vector<T>) {
+        utils::in_place_vec_bin_op(&mut self.data, &_rhs.data, |x, &y| {*x = (*x).$op(y) });
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// assignment between two matrices.
+impl<'a, T : Copy + $trt<T, Output=T>> $assign_trt<&'a Vector<T>> for Vector<T> {
+    fn $op_assign(&mut self, _rhs: &Vector<T>) {
+        utils::in_place_vec_bin_op(&mut self.data, &_rhs.data, |x, &y| {*x = (*x).$op(y) });
+    }
+}
+    );
+);
+
+impl_op_assign_vec!(AddAssign, Add, add, add_assign, "addition");
+impl_op_assign_vec!(SubAssign, Sub, sub, sub_assign, "subtraction");
 
 #[cfg(test)]
 mod tests {
@@ -922,6 +979,81 @@ mod tests {
         let b = a.norm();
 
         assert_eq!(b, (1. + 4. + 9. + 16. + 25. + 36. as f32).sqrt());
+    }
+
+    #[test]
+    fn vector_add_assign() {
+        let mut a = Vector::new((0..9).collect::<Vec<_>>());
+
+        a += &2;
+        assert_eq!(a.into_vec(), (2..11).collect::<Vec<_>>());
+        
+        let mut a = Vector::new((0..9).collect::<Vec<_>>());
+
+        a += 2;
+        assert_eq!(a.into_vec(), (2..11).collect::<Vec<_>>());
+
+        let mut a = Vector::new((0..9).collect::<Vec<_>>());
+        let b = Vector::new((0..9).collect::<Vec<_>>());
+
+        a += &b;
+        assert_eq!(a.into_vec(), (0..9).map(|x| 2 * x).collect::<Vec<_>>());
+
+        let mut a = Vector::new((0..9).collect::<Vec<_>>());
+
+        a += b;
+        assert_eq!(a.into_vec(), (0..9).map(|x| 2 * x).collect::<Vec<_>>());
+    }
+    
+    #[test]
+    fn vector_sub_assign() {
+        let mut a = Vector::new((0..9).collect::<Vec<_>>());
+
+        a -= &2;
+        assert_eq!(a.into_vec(), (-2..7).collect::<Vec<_>>());
+
+        let mut a = Vector::new((0..9).collect::<Vec<i32>>());
+        a -= 2;
+        assert_eq!(a.into_vec(), (-2..7).collect::<Vec<_>>());
+
+        let mut a = Vector::new((0..9).collect::<Vec<_>>());
+        let b = Vector::new((0..9).collect::<Vec<_>>());
+
+        a -= &b;
+        assert_eq!(a.into_vec(), vec![0; 9]);
+
+        let mut a = Vector::new((0..9).collect::<Vec<_>>());
+
+        a -= b;
+        assert_eq!(a.into_vec(), vec![0; 9]);
+    }
+    
+    #[test]
+    fn vector_div_assign() {
+        let a_data = vec![1f32, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
+        let res_data = vec![0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5];
+        let mut a = Vector::new(a_data.clone());
+
+        a /= &2f32;
+        assert_eq!(a.into_vec(), res_data.clone());
+
+        let mut a = Vector::new(a_data.clone());
+        a /= 2f32;
+        assert_eq!(a.into_vec(), res_data.clone());
+    }
+
+    #[test]
+    fn vector_mul_assign() {
+        let a_data = vec![1f32, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
+        let res_data = vec![2f32, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0];
+        let mut a = Vector::new(a_data.clone());
+
+        a *= &2f32;
+        assert_eq!(a.into_vec(), res_data.clone());
+
+        let mut a = Vector::new(a_data.clone());
+        a *= 2f32;
+        assert_eq!(a.into_vec(), res_data.clone());
     }
 
 }
