@@ -12,6 +12,7 @@ use linalg::matrix::Matrix;
 use linalg::vector::Vector;
 use linalg::Metric;
 use linalg::utils;
+use linalg::error::{Error, ErrorKind};
 
 use libnum::{One, Zero, Float, Signed};
 use libnum::{cast, abs};
@@ -31,12 +32,14 @@ impl<T: Any + Float> Matrix<T> {
     /// let l = m.cholesky();
     /// ```
     ///
-    /// # Panics
+    /// # Failures
     ///
     /// - Matrix is not square.
-    /// - Matrix is not positive definite. (This should probably be a Failure not a Panic).
-    pub fn cholesky(&self) -> Matrix<T> {
-        assert!(self.rows() == self.cols(), "Matrix is not square.");
+    /// - Matrix is not positive definite.
+    pub fn cholesky(&self) -> Result<Matrix<T>, Error> {
+        if self.rows() != self.cols() {
+            return Err(Error::new(ErrorKind::InvalidArg, "Matrix is not square."));
+        }
 
         let mut new_data = Vec::<T>::with_capacity(self.rows() * self.cols());
 
@@ -59,17 +62,21 @@ impl<T: Any + Float> Matrix<T> {
                 } else {
                     let p = (self[[i, j]] - sum) / new_data[j * self.cols + j];
 
-                    assert!(!p.is_nan(), "Matrix is not positive definite.");
+                    if p.is_nan() {
+                        return Err(Error::new(ErrorKind::DecompFailure, "Matrix is not positive definite."));
+                    } else {
+
+                    }
                     new_data.push(p);
                 }
             }
         }
 
-        Matrix {
+        Ok(Matrix {
             rows: self.rows(),
             cols: self.cols(),
             data: new_data,
-        }
+        })
     }
 
     fn make_householder(column: &[T]) -> Matrix<T> {

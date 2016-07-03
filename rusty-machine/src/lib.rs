@@ -120,6 +120,7 @@ pub mod linalg {
         fn norm(&self) -> T;
     }
 
+    pub mod error;
     pub mod matrix;
     pub mod vector;
     pub mod utils;

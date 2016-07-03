@@ -33,7 +33,9 @@ fn cholesky() {
 
     let l = a.cholesky();
 
-    assert_eq!(*l.data(), vec![5., 0., 0., 3., 3., 0., -1., 1., 3.]);
+    assert!(l.is_ok());
+
+    assert_eq!(*l.unwrap().data(), vec![5., 0., 0., 3., 3., 0., -1., 1., 3.]);
 }
 
 #[test]
