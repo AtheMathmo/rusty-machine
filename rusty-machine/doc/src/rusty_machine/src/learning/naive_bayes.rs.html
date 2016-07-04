@@ -530,14 +530,16 @@
 <span id="486">486</span>
 <span id="487">487</span>
 <span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Naive Bayes Classifiers</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! The classifier supports Gaussian, Bernoulli and Multinomial distributions.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! A naive Bayes classifier works by treating the features of each input as independent</span>
-<span class='doccomment'>//! observations. Under this assumption we utilize Bayes&#39; rule to compute the probability that each input belongs</span>
-<span class='doccomment'>//! to a given class.</span>
+<span class='doccomment'>//! observations. Under this assumption we utilize Bayes&#39; rule to compute the</span>
+<span class='doccomment'>//! probability that each input belongs to a given class.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! # Examples</span>
 <span class='doccomment'>//!</span>
@@ -573,7 +575,7 @@
 <span class='doccomment'>//! println!(&quot;Final outputs --\n{}&quot;, outputs);</span>
 <span class='doccomment'>//! ```</span>
 
-<span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>matrix</span>::<span class='ident'>Matrix</span>;
+<span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>matrix</span>::{<span class='ident'>Matrix</span>, <span class='ident'>Axes</span>};
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>utils</span>;
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>SupModel</span>;
 
@@ -695,10 +697,10 @@
 
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='kw-2'>mut</span> <span class='ident'>distr</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>distr</span> {
             <span class='kw'>for</span> (<span class='ident'>idx</span>, <span class='ident'>c</span>) <span class='kw'>in</span> <span class='ident'>class_data</span>.<span class='ident'>into_iter</span>().<span class='ident'>enumerate</span>() {
-                <span class='comment'>//If this class&#39; vector has not been populated, we can safely</span>
-                <span class='comment'>//skip this iteration, since the user is clearly not interested</span>
-                <span class='comment'>//in associating features with this class</span>
-                <span class='kw'>if</span> <span class='number'>0</span> <span class='op'>==</span> <span class='ident'>c</span>.<span class='ident'>len</span>() {
+                <span class='comment'>// If this class&#39; vector has not been populated, we can safely</span>
+                <span class='comment'>// skip this iteration, since the user is clearly not interested</span>
+                <span class='comment'>// in associating features with this class</span>
+                <span class='kw'>if</span> <span class='ident'>c</span>.<span class='ident'>is_empty</span>() {
                     <span class='kw'>continue</span>;
                 }
                 <span class='comment'>// Update the parameters within this class</span>
@@ -760,7 +762,8 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Defines:</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>///    p(x|C&lt;sub&gt;k&lt;/sub&gt;) = ∏&lt;sub&gt;i&lt;/sub&gt; N(x&lt;sub&gt;i&lt;/sub&gt; ; μ&lt;sub&gt;k&lt;/sub&gt;, σ&lt;sup&gt;2&lt;/sup&gt;&lt;sub&gt;k&lt;/sub&gt;)</span>
+<span class='doccomment'>/// p(x|C&lt;sub&gt;k&lt;/sub&gt;) = ∏&lt;sub&gt;i&lt;/sub&gt; N(x&lt;sub&gt;i&lt;/sub&gt; ;</span>
+<span class='doccomment'>/// μ&lt;sub&gt;k&lt;/sub&gt;, σ&lt;sup&gt;2&lt;/sup&gt;&lt;sub&gt;k&lt;/sub&gt;)</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Gaussian</span> {
     <span class='ident'>theta</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>,
@@ -793,8 +796,8 @@
 
     <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>) {
         <span class='comment'>// Compute mean and sample variance</span>
-        <span class='kw'>let</span> <span class='ident'>mean</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>mean</span>(<span class='number'>0</span>).<span class='ident'>into_vec</span>();
-        <span class='kw'>let</span> <span class='ident'>var</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>variance</span>(<span class='number'>0</span>).<span class='ident'>into_vec</span>();
+        <span class='kw'>let</span> <span class='ident'>mean</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>mean</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>).<span class='ident'>into_vec</span>();
+        <span class='kw'>let</span> <span class='ident'>var</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>variance</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>).<span class='ident'>into_vec</span>();
 
         <span class='kw'>let</span> <span class='ident'>features</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>cols</span>();
 
@@ -808,15 +811,15 @@
         <span class='kw'>let</span> <span class='ident'>class_count</span> <span class='op'>=</span> <span class='ident'>class_prior</span>.<span class='ident'>len</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>log_lik</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>class_count</span>);
 
-        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>class_count</span> {
-            <span class='kw'>let</span> <span class='ident'>joint_i</span> <span class='op'>=</span> <span class='ident'>class_prior</span>[<span class='ident'>i</span>].<span class='ident'>ln</span>();
+        <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>item</span>) <span class='kw'>in</span> <span class='ident'>class_prior</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
+            <span class='kw'>let</span> <span class='ident'>joint_i</span> <span class='op'>=</span> <span class='ident'>item</span>.<span class='ident'>ln</span>();
             <span class='kw'>let</span> <span class='ident'>n_ij</span> <span class='op'>=</span> <span class='op'>-</span><span class='number'>0.5</span> <span class='op'>*</span> (<span class='self'>self</span>.<span class='ident'>sigma</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='ident'>i</span>]) <span class='op'>*</span> <span class='number'>2.0</span> <span class='op'>*</span> <span class='ident'>PI</span>).<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span>.<span class='ident'>ln</span>()).<span class='ident'>sum</span>();
 
             <span class='comment'>// NOTE: Here we are copying the row data which is inefficient</span>
             <span class='kw'>let</span> <span class='ident'>r_ij</span> <span class='op'>=</span> (<span class='ident'>data</span> <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>theta</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>i</span>; <span class='ident'>data</span>.<span class='ident'>rows</span>()]))
-                           .<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span> <span class='op'>*</span> <span class='ident'>x</span>)
-                           .<span class='ident'>elediv</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>sigma</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>i</span>; <span class='ident'>data</span>.<span class='ident'>rows</span>()]))
-                           .<span class='ident'>sum_cols</span>();
+                .<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span> <span class='op'>*</span> <span class='ident'>x</span>)
+                .<span class='ident'>elediv</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>sigma</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>i</span>; <span class='ident'>data</span>.<span class='ident'>rows</span>()]))
+                .<span class='ident'>sum_cols</span>();
 
             <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> (<span class='op'>-</span><span class='ident'>r_ij</span> <span class='op'>*</span> <span class='number'>0.5</span>) <span class='op'>+</span> <span class='ident'>n_ij</span>;
 
@@ -832,7 +835,8 @@
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Defines:</span>
 <span class='doccomment'>///</span>
-<span class='doccomment'>///    p(x|C&lt;sub&gt;k&lt;/sub&gt;) = ∏&lt;sub&gt;i&lt;/sub&gt; p&lt;sub&gt;k&lt;/sub&gt;&lt;sup&gt;x&lt;sub&gt;i&lt;/sub&gt;&lt;/sup&gt; (1-p)&lt;sub&gt;k&lt;/sub&gt;&lt;sup&gt;1-x&lt;sub&gt;i&lt;/sub&gt;&lt;/sup&gt;</span>
+<span class='doccomment'>///    p(x|C&lt;sub&gt;k&lt;/sub&gt;) = ∏&lt;sub&gt;i&lt;/sub&gt; p&lt;sub&gt;k&lt;/sub&gt;&lt;sup&gt;x&lt;sub&gt;i&lt;/sub&gt;&lt;/sup&gt;</span>
+<span class='doccomment'>/// (1-p)&lt;sub&gt;k&lt;/sub&gt;&lt;sup&gt;1-x&lt;sub&gt;i&lt;/sub&gt;&lt;/sup&gt;</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>Bernoulli</span> {
     <span class='ident'>log_probs</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>,
@@ -865,8 +869,8 @@
 
         <span class='kw'>let</span> <span class='ident'>log_probs</span> <span class='op'>=</span> (<span class='ident'>pseudo_fc</span>.<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span>.<span class='ident'>ln</span>()) <span class='op'>-</span> <span class='ident'>pseudo_cc</span>.<span class='ident'>ln</span>()).<span class='ident'>into_vec</span>();
 
-        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>features</span> {
-            <span class='self'>self</span>.<span class='ident'>log_probs</span>[[<span class='ident'>class</span>, <span class='ident'>i</span>]] <span class='op'>=</span> <span class='ident'>log_probs</span>[<span class='ident'>i</span>];
+        <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>item</span>) <span class='kw'>in</span> <span class='ident'>log_probs</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>().<span class='ident'>take</span>(<span class='ident'>features</span>) {
+            <span class='self'>self</span>.<span class='ident'>log_probs</span>[[<span class='ident'>class</span>, <span class='ident'>i</span>]] <span class='op'>=</span> <span class='op'>*</span><span class='ident'>item</span>;
         }
 
     }
@@ -932,8 +936,8 @@
 
         <span class='kw'>let</span> <span class='ident'>log_probs</span> <span class='op'>=</span> (<span class='ident'>pseudo_fc</span>.<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span>.<span class='ident'>ln</span>()) <span class='op'>-</span> <span class='ident'>pseudo_cc</span>.<span class='ident'>ln</span>()).<span class='ident'>into_vec</span>();
 
-        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>features</span> {
-            <span class='self'>self</span>.<span class='ident'>log_probs</span>[[<span class='ident'>class</span>, <span class='ident'>i</span>]] <span class='op'>=</span> <span class='ident'>log_probs</span>[<span class='ident'>i</span>];
+        <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>item</span>) <span class='kw'>in</span> <span class='ident'>log_probs</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>().<span class='ident'>take</span>(<span class='ident'>features</span>) {
+            <span class='self'>self</span>.<span class='ident'>log_probs</span>[[<span class='ident'>class</span>, <span class='ident'>i</span>]] <span class='op'>=</span> <span class='op'>*</span><span class='ident'>item</span>;
         }
 
     }

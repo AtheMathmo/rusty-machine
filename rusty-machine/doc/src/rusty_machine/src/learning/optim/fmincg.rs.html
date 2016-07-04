@@ -314,9 +314,6 @@
 <span id="270">270</span>
 <span id="271">271</span>
 <span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Module for the fmincg optimization algorithm.</span>
 <span class='doccomment'>//!</span>
@@ -447,12 +444,11 @@
 
             <span class='kw'>let</span> (<span class='kw-2'>mut</span> <span class='ident'>f3</span>, <span class='kw-2'>mut</span> <span class='ident'>d3</span>, <span class='kw-2'>mut</span> <span class='ident'>z3</span>) <span class='op'>=</span> (<span class='ident'>f1</span>, <span class='ident'>d1</span>, <span class='op'>-</span><span class='ident'>z1</span>);
 
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>m</span>: <span class='ident'>i32</span>;
-            <span class='kw'>if</span> <span class='ident'>length</span> <span class='op'>&gt;</span> <span class='number'>0</span> {
-                <span class='ident'>m</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>max</span> <span class='kw'>as</span> <span class='ident'>i32</span>;
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>m</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='ident'>length</span> <span class='op'>&gt;</span> <span class='number'>0</span> {
+                <span class='self'>self</span>.<span class='ident'>max</span> <span class='kw'>as</span> <span class='ident'>i32</span>
             } <span class='kw'>else</span> {
-                <span class='ident'>m</span> <span class='op'>=</span> <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='self'>self</span>.<span class='ident'>max</span> <span class='kw'>as</span> <span class='ident'>i32</span>, <span class='op'>-</span><span class='ident'>length</span> <span class='op'>-</span> (<span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>i32</span>));
-            }
+                <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='self'>self</span>.<span class='ident'>max</span> <span class='kw'>as</span> <span class='ident'>i32</span>, <span class='op'>-</span><span class='ident'>length</span> <span class='op'>-</span> (<span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>i32</span>))
+            };
 
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>success</span> <span class='op'>=</span> <span class='boolval'>false</span>;
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>limit</span> <span class='op'>=</span> <span class='op'>-</span><span class='number'>1f64</span>;
@@ -480,15 +476,13 @@
                         <span class='kw'>if</span> <span class='ident'>z2</span> <span class='op'>&lt;=</span> (<span class='number'>1f64</span> <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>int</span>) <span class='op'>*</span> <span class='ident'>z3</span> {
                             <span class='ident'>z2</span> <span class='op'>=</span> (<span class='number'>1f64</span> <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>int</span>) <span class='op'>*</span> <span class='ident'>z3</span>;
                         }
+                    } <span class='kw'>else</span> <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>int</span> <span class='op'>*</span> <span class='ident'>z3</span> <span class='op'>&lt;=</span> (<span class='number'>1f64</span> <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>int</span>) <span class='op'>*</span> <span class='ident'>z3</span> {
+                        <span class='ident'>z2</span> <span class='op'>=</span> (<span class='number'>1f64</span> <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>int</span>) <span class='op'>*</span> <span class='ident'>z3</span>;
                     } <span class='kw'>else</span> {
-                        <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>int</span> <span class='op'>*</span> <span class='ident'>z3</span> <span class='op'>&lt;=</span> (<span class='number'>1f64</span> <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>int</span>) <span class='op'>*</span> <span class='ident'>z3</span> {
-                            <span class='ident'>z2</span> <span class='op'>=</span> (<span class='number'>1f64</span> <span class='op'>-</span> <span class='self'>self</span>.<span class='ident'>int</span>) <span class='op'>*</span> <span class='ident'>z3</span>;
-                        } <span class='kw'>else</span> {
-                            <span class='ident'>z2</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>int</span> <span class='op'>*</span> <span class='ident'>z3</span>;
-                        }
+                        <span class='ident'>z2</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>int</span> <span class='op'>*</span> <span class='ident'>z3</span>;
                     }
 
-                    <span class='ident'>z1</span> <span class='op'>=</span> <span class='ident'>z1</span> <span class='op'>+</span> <span class='ident'>z2</span>;
+                    <span class='ident'>z1</span> <span class='op'>+=</span> <span class='ident'>z2</span>;
                     <span class='ident'>x</span> <span class='op'>=</span> <span class='ident'>x</span> <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>s</span> <span class='op'>*</span> <span class='ident'>z2</span>;
                     <span class='kw'>let</span> <span class='ident'>cost_grad</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='ident'>x</span>.<span class='ident'>data</span>()[..], <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
                     <span class='ident'>f2</span> <span class='op'>=</span> <span class='ident'>cost_grad</span>.<span class='number'>0</span>;
@@ -500,7 +494,7 @@
                     }
 
                     <span class='ident'>d2</span> <span class='op'>=</span> <span class='ident'>df2</span>.<span class='ident'>dot</span>(<span class='kw-2'>&amp;</span><span class='ident'>s</span>);
-                    <span class='ident'>z3</span> <span class='op'>=</span> <span class='ident'>z3</span> <span class='op'>-</span> <span class='ident'>z2</span>;
+                    <span class='ident'>z3</span> <span class='op'>-=</span> <span class='ident'>z2</span>;
                 }
 
                 <span class='kw'>if</span> <span class='ident'>f2</span> <span class='op'>&gt;</span> <span class='ident'>f1</span> <span class='op'>+</span> <span class='ident'>z1</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>rho</span> <span class='op'>*</span> <span class='ident'>d1</span> <span class='op'>||</span> <span class='ident'>d2</span> <span class='op'>&gt;</span> <span class='op'>-</span><span class='self'>self</span>.<span class='ident'>sig</span> <span class='op'>*</span> <span class='ident'>d1</span> {
@@ -535,7 +529,7 @@
                 <span class='ident'>f3</span> <span class='op'>=</span> <span class='ident'>f2</span>;
                 <span class='ident'>d3</span> <span class='op'>=</span> <span class='ident'>d2</span>;
                 <span class='ident'>z3</span> <span class='op'>=</span> <span class='op'>-</span><span class='ident'>z2</span>;
-                <span class='ident'>z1</span> <span class='op'>=</span> <span class='ident'>z1</span> <span class='op'>+</span> <span class='ident'>z2</span>;
+                <span class='ident'>z1</span> <span class='op'>+=</span> <span class='ident'>z2</span>;
                 <span class='ident'>x</span> <span class='op'>=</span> <span class='ident'>x</span> <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>s</span> <span class='op'>*</span> <span class='ident'>z2</span>;
 
                 <span class='kw'>let</span> <span class='ident'>cost_grad</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='ident'>x</span>.<span class='ident'>data</span>()[..], <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
@@ -565,9 +559,9 @@
 
                 <span class='kw'>let</span> <span class='ident'>ratio</span> <span class='op'>=</span> <span class='ident'>d1</span> <span class='op'>/</span> (<span class='ident'>d2</span> <span class='op'>-</span> <span class='ident'>f64</span>::<span class='ident'>MIN_POSITIVE</span>);
                 <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>ratio</span> <span class='op'>&lt;</span> <span class='ident'>ratio</span> {
-                    <span class='ident'>z1</span> <span class='op'>=</span> <span class='ident'>z1</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>ratio</span>;
+                    <span class='ident'>z1</span> <span class='op'>*=</span> <span class='self'>self</span>.<span class='ident'>ratio</span>;
                 } <span class='kw'>else</span> {
-                    <span class='ident'>z1</span> <span class='op'>=</span> <span class='ident'>z1</span> <span class='op'>*</span> <span class='ident'>ratio</span>;
+                    <span class='ident'>z1</span> <span class='op'>*=</span> <span class='ident'>ratio</span>;
                 }
 
                 <span class='ident'>d1</span> <span class='op'>=</span> <span class='ident'>d2</span>;

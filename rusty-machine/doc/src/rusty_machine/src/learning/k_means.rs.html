@@ -471,6 +471,7 @@
 <span id="427">427</span>
 <span id="428">428</span>
 <span id="429">429</span>
+<span id="430">430</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! K-means Classification</span>
 <span class='doccomment'>//!</span>
@@ -516,7 +517,7 @@
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! The [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) scheme.</span>
 
-<span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>matrix</span>::<span class='ident'>Matrix</span>;
+<span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>matrix</span>::{<span class='ident'>Matrix</span>, <span class='ident'>Axes</span>};
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>vector</span>::<span class='ident'>Vector</span>;
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>UnSupModel</span>;
 <span class='kw'>use</span> <span class='ident'>rand</span>::{<span class='ident'>Rng</span>, <span class='ident'>thread_rng</span>};
@@ -539,7 +540,7 @@
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>KMeansClassifierBuilder</span> {
     <span class='ident'>k</span>: <span class='ident'>usize</span>,
     <span class='ident'>iters</span>: <span class='ident'>usize</span>,
-    <span class='ident'>init_algorithm</span>: <span class='ident'>InitAlgorithm</span>
+    <span class='ident'>init_algorithm</span>: <span class='ident'>InitAlgorithm</span>,
 }
 
 <span class='kw'>impl</span> <span class='ident'>KMeansClassifierBuilder</span> {
@@ -560,7 +561,7 @@
         <span class='ident'>KMeansClassifierBuilder</span> {
             <span class='ident'>k</span>: <span class='ident'>k</span>,
             <span class='ident'>iters</span>: <span class='number'>100</span>,
-            <span class='ident'>init_algorithm</span>: <span class='ident'>InitAlgorithm</span>::<span class='ident'>KPlusPlus</span>
+            <span class='ident'>init_algorithm</span>: <span class='ident'>InitAlgorithm</span>::<span class='ident'>KPlusPlus</span>,
         }
     }
 
@@ -592,7 +593,9 @@
     <span class='doccomment'>/// let model = KMeansClassifierBuilder::new(5).init_algorithm(InitAlgorithm::Forgy)</span>
     <span class='doccomment'>///                                            .finalize();</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>init_algorithm</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>init_algorithm</span>: <span class='ident'>InitAlgorithm</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>KMeansClassifierBuilder</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>init_algorithm</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>,
+                          <span class='ident'>init_algorithm</span>: <span class='ident'>InitAlgorithm</span>)
+                          <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>KMeansClassifierBuilder</span> {
         <span class='self'>self</span>.<span class='ident'>init_algorithm</span> <span class='op'>=</span> <span class='ident'>init_algorithm</span>;
         <span class='self'>self</span>
     }
@@ -616,7 +619,7 @@
             <span class='ident'>k</span>: <span class='self'>self</span>.<span class='ident'>k</span>,
             <span class='ident'>iters</span>: <span class='self'>self</span>.<span class='ident'>iters</span>,
             <span class='ident'>centroids</span>: <span class='prelude-val'>None</span>,
-            <span class='ident'>init_algorithm</span>: <span class='self'>self</span>.<span class='ident'>init_algorithm</span>
+            <span class='ident'>init_algorithm</span>: <span class='self'>self</span>.<span class='ident'>init_algorithm</span>,
         }
     }
 }
@@ -659,10 +662,10 @@
             <span class='kw'>let</span> (<span class='ident'>idx</span>, <span class='ident'>distances</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>get_closest_centroids</span>(<span class='ident'>inputs</span>);
             <span class='self'>self</span>.<span class='ident'>update_centroids</span>(<span class='ident'>inputs</span>, <span class='ident'>idx</span>);
 
-                <span class='kw'>let</span> <span class='ident'>cost_i</span> <span class='op'>=</span> <span class='ident'>distances</span>.<span class='ident'>sum</span>();
-                <span class='kw'>if</span> <span class='ident'>abs</span>(<span class='ident'>cost</span> <span class='op'>-</span> <span class='ident'>cost_i</span>) <span class='op'>&lt;</span> <span class='ident'>eps</span> {
-                    <span class='kw'>break</span>;
-                }
+            <span class='kw'>let</span> <span class='ident'>cost_i</span> <span class='op'>=</span> <span class='ident'>distances</span>.<span class='ident'>sum</span>();
+            <span class='kw'>if</span> <span class='ident'>abs</span>(<span class='ident'>cost</span> <span class='op'>-</span> <span class='ident'>cost_i</span>) <span class='op'>&lt;</span> <span class='ident'>eps</span> {
+                <span class='kw'>break</span>;
+            }
 
             <span class='ident'>cost</span> <span class='op'>=</span> <span class='ident'>cost_i</span>;
         }
@@ -704,8 +707,7 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// let model = KMeansClassifier::new_specified(5, 42, InitAlgorithm::Forgy);</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new_specified</span>(<span class='ident'>k</span>: <span class='ident'>usize</span>, <span class='ident'>iters</span>: <span class='ident'>usize</span>,
-                         <span class='ident'>algo</span>: <span class='ident'>InitAlgorithm</span>) <span class='op'>-&gt;</span> <span class='ident'>KMeansClassifier</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new_specified</span>(<span class='ident'>k</span>: <span class='ident'>usize</span>, <span class='ident'>iters</span>: <span class='ident'>usize</span>, <span class='ident'>algo</span>: <span class='ident'>InitAlgorithm</span>) <span class='op'>-&gt;</span> <span class='ident'>KMeansClassifier</span> {
         <span class='ident'>KMeansClassifier</span> {
             <span class='ident'>iters</span>: <span class='ident'>iters</span>,
             <span class='ident'>k</span>: <span class='ident'>k</span>,
@@ -761,7 +763,7 @@
             }
 
             <span class='kw'>let</span> <span class='ident'>mat_i</span> <span class='op'>=</span> <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>vec_i</span>);
-            <span class='ident'>new_centroids</span>.<span class='ident'>extend</span>(<span class='ident'>mat_i</span>.<span class='ident'>mean</span>(<span class='number'>0</span>).<span class='ident'>data</span>());
+            <span class='ident'>new_centroids</span>.<span class='ident'>extend</span>(<span class='ident'>mat_i</span>.<span class='ident'>mean</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>).<span class='ident'>data</span>());
         }
 
         <span class='self'>self</span>.<span class='ident'>centroids</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='self'>self</span>.<span class='ident'>k</span>, <span class='ident'>inputs</span>.<span class='ident'>cols</span>(), <span class='ident'>new_centroids</span>));
@@ -769,7 +771,7 @@
 
     <span class='kw'>fn</span> <span class='ident'>get_closest_centroids</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> (<span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span>, <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>c</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>centroids</span> {
-            <span class='kw'>return</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='kw-2'>&amp;</span><span class='ident'>c</span>, <span class='ident'>inputs</span>);
+            <span class='kw'>return</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='ident'>c</span>, <span class='ident'>inputs</span>);
         } <span class='kw'>else</span> {
             <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Centroids not correctly initialized.&quot;</span>);
         }
@@ -849,7 +851,7 @@
             }
 
             <span class='kw'>let</span> <span class='ident'>mat_i</span> <span class='op'>=</span> <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>vec_i</span>);
-            <span class='ident'>init_centroids</span>.<span class='ident'>extend</span>(<span class='ident'>mat_i</span>.<span class='ident'>mean</span>(<span class='number'>0</span>).<span class='ident'>into_vec</span>());
+            <span class='ident'>init_centroids</span>.<span class='ident'>extend</span>(<span class='ident'>mat_i</span>.<span class='ident'>mean</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>).<span class='ident'>into_vec</span>());
         }
 
         <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>k</span>, <span class='ident'>inputs</span>.<span class='ident'>cols</span>(), <span class='ident'>init_centroids</span>)
@@ -871,7 +873,7 @@
 
         <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>1</span>..<span class='ident'>k</span> {
             <span class='kw'>let</span> <span class='ident'>temp_centroids</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>i</span>, <span class='ident'>inputs</span>.<span class='ident'>cols</span>(), <span class='ident'>init_centroids</span>.<span class='ident'>clone</span>());
-            <span class='kw'>let</span> (_, <span class='ident'>dist</span>) <span class='op'>=</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='kw-2'>&amp;</span><span class='ident'>temp_centroids</span>, <span class='kw-2'>&amp;</span><span class='ident'>inputs</span>);
+            <span class='kw'>let</span> (_, <span class='ident'>dist</span>) <span class='op'>=</span> <span class='ident'>KMeansClassifier</span>::<span class='ident'>find_closest_centroids</span>(<span class='kw-2'>&amp;</span><span class='ident'>temp_centroids</span>, <span class='ident'>inputs</span>);
             <span class='kw'>let</span> <span class='ident'>next_cen</span> <span class='op'>=</span> <span class='ident'>sample_discretely</span>(<span class='ident'>dist</span>);
             <span class='ident'>init_centroids</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='ident'>next_cen</span>]).<span class='ident'>into_vec</span>())
         }

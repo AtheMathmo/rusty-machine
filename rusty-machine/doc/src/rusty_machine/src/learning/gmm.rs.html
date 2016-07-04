@@ -390,8 +390,6 @@
 <span id="346">346</span>
 <span id="347">347</span>
 <span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Gaussian Mixture Models</span>
 <span class='doccomment'>//!</span>
@@ -477,9 +475,8 @@
 
         <span class='self'>self</span>.<span class='ident'>model_covars</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>cov_vec</span>);
 
-        <span class='kw'>let</span> <span class='ident'>random_rows</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>rand_utils</span>::<span class='ident'>reservoir_sample</span>(<span class='kw-2'>&amp;</span>(<span class='number'>0</span>..<span class='ident'>inputs</span>.<span class='ident'>rows</span>())
-                                                                        .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>(),
-                                                                   <span class='ident'>k</span>);
+        <span class='kw'>let</span> <span class='ident'>random_rows</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> <span class='op'>=</span>
+            <span class='ident'>rand_utils</span>::<span class='ident'>reservoir_sample</span>(<span class='kw-2'>&amp;</span>(<span class='number'>0</span>..<span class='ident'>inputs</span>.<span class='ident'>rows</span>()).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>(), <span class='ident'>k</span>);
         <span class='self'>self</span>.<span class='ident'>model_means</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>random_rows</span>));
 
         <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>max_iters</span> {
@@ -648,7 +645,7 @@
                     <span class='kw'>let</span> <span class='ident'>diff</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>x_i</span> <span class='op'>-</span> <span class='ident'>mu_j</span>;
 
                     <span class='kw'>let</span> <span class='ident'>pdf</span> <span class='op'>=</span> (<span class='kw-2'>&amp;</span><span class='ident'>diff</span> <span class='op'>*</span> <span class='kw-2'>&amp;</span><span class='ident'>cov_invs</span>[<span class='ident'>j</span>] <span class='op'>*</span> <span class='ident'>diff</span>.<span class='ident'>transpose</span>() <span class='op'>*</span> <span class='op'>-</span><span class='number'>0.5</span>).<span class='ident'>into_vec</span>()[<span class='number'>0</span>]
-                                  .<span class='ident'>exp</span>() <span class='op'>/</span> <span class='ident'>cov_sqrt_dets</span>[<span class='ident'>j</span>];
+                        .<span class='ident'>exp</span>() <span class='op'>/</span> <span class='ident'>cov_sqrt_dets</span>[<span class='ident'>j</span>];
                     <span class='ident'>pdfs</span>.<span class='ident'>push</span>(<span class='ident'>pdf</span>);
                 }
 
@@ -662,8 +659,7 @@
             }
         }
 
-        (<span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>n</span>, <span class='self'>self</span>.<span class='ident'>comp_count</span>, <span class='ident'>member_weights_data</span>),
-         <span class='ident'>log_lik</span>)
+        (<span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>n</span>, <span class='self'>self</span>.<span class='ident'>comp_count</span>, <span class='ident'>member_weights_data</span>), <span class='ident'>log_lik</span>)
     }
 
     <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>membership_weights</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
@@ -678,7 +674,7 @@
 
         <span class='kw'>for</span> (<span class='ident'>idx</span>, <span class='ident'>mean</span>) <span class='kw'>in</span> <span class='ident'>new_means</span>.<span class='ident'>mut_data</span>().<span class='ident'>chunks_mut</span>(<span class='ident'>d</span>).<span class='ident'>enumerate</span>() {
             <span class='kw'>for</span> <span class='ident'>m</span> <span class='kw'>in</span> <span class='ident'>mean</span> {
-                <span class='op'>*</span><span class='ident'>m</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>m</span> <span class='op'>/</span> <span class='ident'>sum_weights</span>[<span class='ident'>idx</span>];
+                <span class='op'>*</span><span class='ident'>m</span> <span class='op'>/=</span> <span class='ident'>sum_weights</span>[<span class='ident'>idx</span>];
             }
         }
 
@@ -729,7 +725,7 @@
     <span class='attribute'>#[<span class='ident'>should_panic</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_negative_mixtures</span>() {
         <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>vector</span>::<span class='ident'>Vector</span>;
-    
+
         <span class='kw'>let</span> <span class='ident'>mix_weights</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='op'>-</span><span class='number'>0.25</span>, <span class='number'>0.75</span>, <span class='number'>0.5</span>]);
         <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>GaussianMixtureModel</span>::<span class='ident'>with_weights</span>(<span class='number'>3</span>, <span class='ident'>mix_weights</span>);
     }
@@ -738,7 +734,7 @@
     <span class='attribute'>#[<span class='ident'>should_panic</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_wrong_length_mixtures</span>() {
         <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>vector</span>::<span class='ident'>Vector</span>;
-    
+
         <span class='kw'>let</span> <span class='ident'>mix_weights</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0.1</span>, <span class='number'>0.25</span>, <span class='number'>0.75</span>, <span class='number'>0.5</span>]);
         <span class='kw'>let</span> _ <span class='op'>=</span> <span class='ident'>GaussianMixtureModel</span>::<span class='ident'>with_weights</span>(<span class='number'>3</span>, <span class='ident'>mix_weights</span>);
     }

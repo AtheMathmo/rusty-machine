@@ -185,6 +185,7 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
+<span id="144">144</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Utility functions for random functionality.</span>
 <span class='doccomment'>//!</span>
@@ -202,29 +203,30 @@
 <span class='doccomment'>/// println!(&quot;{:?}&quot;, sample);</span>
 <span class='doccomment'>/// ```</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>reservoir_sample</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span><span class='op'>&gt;</span>(<span class='ident'>pool</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>], <span class='ident'>reservoir_size</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-	<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>pool</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='ident'>reservoir_size</span>, <span class='string'>&quot;Sample size is greater than total.&quot;</span>);
-    
-	<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>pool_mut</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>pool</span>[..];
+    <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>pool</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='ident'>reservoir_size</span>,
+            <span class='string'>&quot;Sample size is greater than total.&quot;</span>);
 
-	<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>pool_mut</span>[..<span class='ident'>reservoir_size</span>].<span class='ident'>to_vec</span>();
-	<span class='ident'>pool_mut</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>pool_mut</span>[<span class='ident'>reservoir_size</span>..];
-	
-	<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ele_seen</span> <span class='op'>=</span> <span class='ident'>reservoir_size</span>;
-	<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>rng</span> <span class='op'>=</span> <span class='ident'>thread_rng</span>();
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>pool_mut</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>pool</span>[..];
 
-	<span class='kw'>while</span> <span class='ident'>pool_mut</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='number'>0</span> {
-		<span class='ident'>ele_seen</span> <span class='op'>+=</span> <span class='number'>1</span>;
-		<span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span> <span class='ident'>rng</span>.<span class='ident'>gen_range</span>(<span class='number'>0</span>, <span class='ident'>ele_seen</span>);
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>pool_mut</span>[..<span class='ident'>reservoir_size</span>].<span class='ident'>to_vec</span>();
+    <span class='ident'>pool_mut</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>pool_mut</span>[<span class='ident'>reservoir_size</span>..];
 
-		<span class='kw'>let</span> <span class='ident'>p_0</span> <span class='op'>=</span> <span class='ident'>pool_mut</span>[<span class='number'>0</span>];
-		<span class='ident'>pool_mut</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>pool_mut</span>[<span class='number'>1</span>..];
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ele_seen</span> <span class='op'>=</span> <span class='ident'>reservoir_size</span>;
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>rng</span> <span class='op'>=</span> <span class='ident'>thread_rng</span>();
 
-		<span class='kw'>if</span> <span class='ident'>r</span> <span class='op'>&lt;</span> <span class='ident'>reservoir_size</span> {
-			<span class='ident'>res</span>[<span class='ident'>r</span>] <span class='op'>=</span> <span class='ident'>p_0</span>;
-		}
-	}
-	
-	<span class='ident'>res</span>
+    <span class='kw'>while</span> <span class='ident'>pool_mut</span>.<span class='ident'>len</span>() <span class='op'>&gt;</span> <span class='number'>0</span> {
+        <span class='ident'>ele_seen</span> <span class='op'>+=</span> <span class='number'>1</span>;
+        <span class='kw'>let</span> <span class='ident'>r</span> <span class='op'>=</span> <span class='ident'>rng</span>.<span class='ident'>gen_range</span>(<span class='number'>0</span>, <span class='ident'>ele_seen</span>);
+
+        <span class='kw'>let</span> <span class='ident'>p_0</span> <span class='op'>=</span> <span class='ident'>pool_mut</span>[<span class='number'>0</span>];
+        <span class='ident'>pool_mut</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>pool_mut</span>[<span class='number'>1</span>..];
+
+        <span class='kw'>if</span> <span class='ident'>r</span> <span class='op'>&lt;</span> <span class='ident'>reservoir_size</span> {
+            <span class='ident'>res</span>[<span class='ident'>r</span>] <span class='op'>=</span> <span class='ident'>p_0</span>;
+        }
+    }
+
+    <span class='ident'>res</span>
 }
 
 <span class='doccomment'>/// The inside out Fisher-Yates algorithm.</span>
@@ -241,33 +243,33 @@
 <span class='doccomment'>/// let permutation = rand_utils::fisher_yates(&amp;a);</span>
 <span class='doccomment'>/// ```</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>fisher_yates</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Copy</span><span class='op'>&gt;</span>(<span class='ident'>arr</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>T</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-	<span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='ident'>arr</span>.<span class='ident'>len</span>();
-	<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>rng</span> <span class='op'>=</span> <span class='ident'>thread_rng</span>();
+    <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='ident'>arr</span>.<span class='ident'>len</span>();
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>rng</span> <span class='op'>=</span> <span class='ident'>thread_rng</span>();
 
-	<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>shuffled_arr</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>n</span>);
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>shuffled_arr</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>n</span>);
 
-	<span class='kw'>unsafe</span> {
-		<span class='comment'>// We set the length here</span>
-		<span class='comment'>// We only access data which has been initialized in the algorithm</span>
-		<span class='ident'>shuffled_arr</span>.<span class='ident'>set_len</span>(<span class='ident'>n</span>);
-	}
+    <span class='kw'>unsafe</span> {
+        <span class='comment'>// We set the length here</span>
+        <span class='comment'>// We only access data which has been initialized in the algorithm</span>
+        <span class='ident'>shuffled_arr</span>.<span class='ident'>set_len</span>(<span class='ident'>n</span>);
+    }
 
-	<span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>n</span> {
-		<span class='kw'>let</span> <span class='ident'>j</span> <span class='op'>=</span> <span class='ident'>rng</span>.<span class='ident'>gen_range</span>(<span class='number'>0</span>, <span class='ident'>i</span> <span class='op'>+</span> <span class='number'>1</span>);
+    <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>n</span> {
+        <span class='kw'>let</span> <span class='ident'>j</span> <span class='op'>=</span> <span class='ident'>rng</span>.<span class='ident'>gen_range</span>(<span class='number'>0</span>, <span class='ident'>i</span> <span class='op'>+</span> <span class='number'>1</span>);
 
-		<span class='comment'>// If j isn&#39;t the last point in the active shuffled array</span>
-		<span class='kw'>if</span> <span class='ident'>j</span> <span class='op'>!=</span> <span class='ident'>i</span> {
-			<span class='comment'>// Copy value at position j to the end of the shuffled array</span>
-			<span class='comment'>// This is safe as we only read initialized data (j &lt; i)</span>
-			<span class='kw'>let</span> <span class='ident'>x</span> <span class='op'>=</span> <span class='ident'>shuffled_arr</span>[<span class='ident'>j</span>];
-			<span class='ident'>shuffled_arr</span>[<span class='ident'>i</span>] <span class='op'>=</span> <span class='ident'>x</span>;
-		}
+        <span class='comment'>// If j isn&#39;t the last point in the active shuffled array</span>
+        <span class='kw'>if</span> <span class='ident'>j</span> <span class='op'>!=</span> <span class='ident'>i</span> {
+            <span class='comment'>// Copy value at position j to the end of the shuffled array</span>
+            <span class='comment'>// This is safe as we only read initialized data (j &lt; i)</span>
+            <span class='kw'>let</span> <span class='ident'>x</span> <span class='op'>=</span> <span class='ident'>shuffled_arr</span>[<span class='ident'>j</span>];
+            <span class='ident'>shuffled_arr</span>[<span class='ident'>i</span>] <span class='op'>=</span> <span class='ident'>x</span>;
+        }
 
-		<span class='comment'>// Place value at end of active array into shuffled array</span>
-		<span class='ident'>shuffled_arr</span>[<span class='ident'>j</span>] <span class='op'>=</span> <span class='ident'>arr</span>[<span class='ident'>i</span>];
-	}
+        <span class='comment'>// Place value at end of active array into shuffled array</span>
+        <span class='ident'>shuffled_arr</span>[<span class='ident'>j</span>] <span class='op'>=</span> <span class='ident'>arr</span>[<span class='ident'>i</span>];
+    }
 
-	<span class='ident'>shuffled_arr</span>
+    <span class='ident'>shuffled_arr</span>
 }
 
 <span class='doccomment'>/// The in place Fisher-Yates shuffle.</span>
@@ -284,51 +286,52 @@
 <span class='doccomment'>/// rand_utils::in_place_fisher_yates(&amp;mut a);</span>
 <span class='doccomment'>/// ```</span>
 <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>in_place_fisher_yates</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>(<span class='ident'>arr</span>: <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> [<span class='ident'>T</span>]) {
-	<span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='ident'>arr</span>.<span class='ident'>len</span>();
-	<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>rng</span> <span class='op'>=</span> <span class='ident'>thread_rng</span>();
+    <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='ident'>arr</span>.<span class='ident'>len</span>();
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>rng</span> <span class='op'>=</span> <span class='ident'>thread_rng</span>();
 
-	<span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>n</span> {
-		<span class='comment'>// Swap i with a random point after it</span>
-		<span class='kw'>let</span> <span class='ident'>j</span> <span class='op'>=</span> <span class='ident'>rng</span>.<span class='ident'>gen_range</span>(<span class='number'>0</span>, <span class='ident'>n</span> <span class='op'>-</span> <span class='ident'>i</span>);
-		<span class='ident'>arr</span>.<span class='ident'>swap</span>(<span class='ident'>i</span>, <span class='ident'>i</span> <span class='op'>+</span> <span class='ident'>j</span>);
-	}
+    <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>n</span> {
+        <span class='comment'>// Swap i with a random point after it</span>
+        <span class='kw'>let</span> <span class='ident'>j</span> <span class='op'>=</span> <span class='ident'>rng</span>.<span class='ident'>gen_range</span>(<span class='number'>0</span>, <span class='ident'>n</span> <span class='op'>-</span> <span class='ident'>i</span>);
+        <span class='ident'>arr</span>.<span class='ident'>swap</span>(<span class='ident'>i</span>, <span class='ident'>i</span> <span class='op'>+</span> <span class='ident'>j</span>);
+    }
 }
 
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>tests</span> {
-	<span class='kw'>use</span> <span class='ident'>super</span>::<span class='op'>*</span>;
+    <span class='kw'>use</span> <span class='ident'>super</span>::<span class='op'>*</span>;
 
-	<span class='attribute'>#[<span class='ident'>test</span>]</span>
-	<span class='kw'>fn</span> <span class='ident'>test_reservoir_sample</span>() {
-		<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>, <span class='number'>4</span>, <span class='number'>5</span>, <span class='number'>6</span>, <span class='number'>7</span>];
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_reservoir_sample</span>() {
+        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1</span>, <span class='number'>2</span>, <span class='number'>3</span>, <span class='number'>4</span>, <span class='number'>5</span>, <span class='number'>6</span>, <span class='number'>7</span>];
 
-		<span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>reservoir_sample</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>, <span class='number'>3</span>);
+        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>reservoir_sample</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>, <span class='number'>3</span>);
 
-		<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>len</span>(), <span class='number'>3</span>);
-	}
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>len</span>(), <span class='number'>3</span>);
+    }
 
-	<span class='attribute'>#[<span class='ident'>test</span>]</span>
-	<span class='kw'>fn</span> <span class='ident'>test_fisher_yates</span>() {
-		<span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> (<span class='number'>0</span>..<span class='number'>10</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>();
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_fisher_yates</span>() {
+        <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> (<span class='number'>0</span>..<span class='number'>10</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>();
 
-		<span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>fisher_yates</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>);
+        <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>fisher_yates</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>);
 
-		<span class='kw'>for</span> <span class='ident'>val</span> <span class='kw'>in</span> <span class='ident'>a</span>.<span class='ident'>iter</span>() {
-			<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>contains</span>(<span class='ident'>val</span>));
-		}
-	}
+        <span class='kw'>for</span> <span class='ident'>val</span> <span class='kw'>in</span> <span class='ident'>a</span>.<span class='ident'>iter</span>() {
+            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>b</span>.<span class='ident'>contains</span>(<span class='ident'>val</span>));
+        }
+    }
 
-	<span class='attribute'>#[<span class='ident'>test</span>]</span>
-	<span class='kw'>fn</span> <span class='ident'>test_in_place_fisher_yates</span>() {
-		<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> (<span class='number'>0</span>..<span class='number'>10</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>();
+    <span class='attribute'>#[<span class='ident'>test</span>]</span>
+    <span class='kw'>fn</span> <span class='ident'>test_in_place_fisher_yates</span>() {
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> (<span class='number'>0</span>..<span class='number'>10</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>();
 
-		<span class='ident'>in_place_fisher_yates</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>a</span>);
+        <span class='ident'>in_place_fisher_yates</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>a</span>);
 
-		<span class='kw'>for</span> <span class='ident'>val</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='number'>10</span> {
-			<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>a</span>.<span class='ident'>contains</span>(<span class='kw-2'>&amp;</span><span class='ident'>val</span>));
-		}
-	}
-}</pre>
+        <span class='kw'>for</span> <span class='ident'>val</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='number'>10</span> {
+            <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>a</span>.<span class='ident'>contains</span>(<span class='kw-2'>&amp;</span><span class='ident'>val</span>));
+        }
+    }
+}
+</pre>
 </section>
     <section id='search' class="content hidden"></section>
 

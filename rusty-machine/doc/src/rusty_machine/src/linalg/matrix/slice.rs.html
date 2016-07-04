@@ -559,6 +559,10 @@
 <span id="515">515</span>
 <span id="516">516</span>
 <span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Slices for the `Matrix` struct.</span>
 <span class='doccomment'>//!</span>
@@ -697,11 +701,12 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Safety</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The pointer must be followed by a contiguous slice of data larger than `row_stride * rows`. If not then</span>
-    <span class='doccomment'>/// other operations will produce undefined behaviour.</span>
+    <span class='doccomment'>/// The pointer must be followed by a contiguous slice of data larger than `row_stride * rows`.</span>
+    <span class='doccomment'>/// If not then other operations will produce undefined behaviour.</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Additionally `cols` should be less than the `row_stride`. It is possible to use this function safely </span>
-    <span class='doccomment'>/// whilst violating this condition. So long as `max(cols, row_stride) * rows` is less than the data size.</span>
+    <span class='doccomment'>/// Additionally `cols` should be less than the `row_stride`. It is possible to use this</span>
+    <span class='doccomment'>/// function safely whilst violating this condition. So long as</span>
+    <span class='doccomment'>/// `max(cols, row_stride) * rows` is less than the data size.</span>
     <span class='kw'>pub</span> <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>from_raw_parts</span>(<span class='ident'>ptr</span>: <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>T</span>,
                                  <span class='ident'>rows</span>: <span class='ident'>usize</span>,
                                  <span class='ident'>cols</span>: <span class='ident'>usize</span>,
@@ -830,11 +835,12 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// # Safety</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// The pointer must be followed by a contiguous slice of data larger than `row_stride * rows`. If not then</span>
-    <span class='doccomment'>/// other operations will produce undefined behaviour.</span>
+    <span class='doccomment'>/// The pointer must be followed by a contiguous slice of data larger than `row_stride * rows`.</span>
+    <span class='doccomment'>/// If not then other operations will produce undefined behaviour.</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Additionally `cols` should be less than the `row_stride`. It is possible to use this function safely </span>
-    <span class='doccomment'>/// whilst violating this condition. So long as `max(cols, row_stride) * rows` is less than the data size.</span>
+    <span class='doccomment'>/// Additionally `cols` should be less than the `row_stride`. It is possible to use this</span>
+    <span class='doccomment'>/// function safely whilst violating this condition. So long as</span>
+    <span class='doccomment'>/// `max(cols, row_stride) * rows` is less than the data size.</span>
     <span class='kw'>pub</span> <span class='kw'>unsafe</span> <span class='kw'>fn</span> <span class='ident'>from_raw_parts</span>(<span class='ident'>ptr</span>: <span class='op'>*</span><span class='kw-2'>mut</span> <span class='ident'>T</span>,
                                  <span class='ident'>rows</span>: <span class='ident'>usize</span>,
                                  <span class='ident'>cols</span>: <span class='ident'>usize</span>,
@@ -944,7 +950,7 @@
     }
 }
 
-<span class='doccomment'>/// Iterator for the MatrixSlice</span>
+<span class='doccomment'>/// Iterator for `MatrixSlice`</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Iterates over the underlying slice data</span>
 <span class='doccomment'>/// in row-major order.</span>
@@ -959,7 +965,7 @@
     <span class='ident'>_marker</span>: <span class='ident'>PhantomData</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='lifetime'>&#39;a</span> <span class='ident'>T</span><span class='op'>&gt;</span>,
 }
 
-<span class='doccomment'>/// Iterator for MatrixSliceMut.</span>
+<span class='doccomment'>/// Iterator for `MatrixSliceMut`.</span>
 <span class='doccomment'>///</span>
 <span class='doccomment'>/// Iterates over the underlying slice data</span>
 <span class='doccomment'>/// in row-major order.</span>
@@ -981,12 +987,14 @@
     <span class='kw'>type</span> <span class='ident'>Item</span> <span class='op'>=</span> <span class='macro-nonterminal'>$</span><span class='macro-nonterminal'>data_type</span>;
 
     <span class='kw'>fn</span> <span class='ident'>next</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Self</span>::<span class='ident'>Item</span><span class='op'>&gt;</span> {
-        <span class='comment'>// Set the position of the next element</span>
+<span class='comment'>// Set the position of the next element</span>
         <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>row_pos</span> <span class='op'>&lt;</span> <span class='self'>self</span>.<span class='ident'>slice_rows</span> {
             <span class='kw'>unsafe</span> {
-                <span class='kw'>let</span> <span class='ident'>iter_ptr</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>slice_start</span>.<span class='ident'>offset</span>((<span class='self'>self</span>.<span class='ident'>row_pos</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>row_stride</span> <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>col_pos</span>) <span class='kw'>as</span> <span class='ident'>isize</span>);
-                
-                <span class='comment'>// If end of row, set to start of next row</span>
+                <span class='kw'>let</span> <span class='ident'>iter_ptr</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>slice_start</span>.<span class='ident'>offset</span>((
+                                <span class='self'>self</span>.<span class='ident'>row_pos</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>row_stride</span> <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>col_pos</span>)
+                                <span class='kw'>as</span> <span class='ident'>isize</span>);
+
+<span class='comment'>// If end of row, set to start of next row</span>
                 <span class='kw'>if</span> <span class='self'>self</span>.<span class='ident'>col_pos</span> <span class='op'>==</span> <span class='self'>self</span>.<span class='ident'>slice_cols</span> <span class='op'>-</span> <span class='number'>1</span> {
                     <span class='self'>self</span>.<span class='ident'>row_pos</span> <span class='op'>+=</span> <span class='number'>1usize</span>;
                     <span class='self'>self</span>.<span class='ident'>col_pos</span> <span class='op'>=</span> <span class='number'>0usize</span>;
@@ -1000,7 +1008,7 @@
             <span class='prelude-val'>None</span>
         }
     }
-}        
+}
     );
 );
 
@@ -1033,7 +1041,7 @@
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>reslice</span>() {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>4</span>, <span class='number'>4</span>, (<span class='number'>0</span>..<span class='number'>16</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>());
-        
+
         {
             <span class='kw'>let</span> <span class='ident'>b</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>, [<span class='number'>1</span>, <span class='number'>1</span>], <span class='number'>3</span>, <span class='number'>3</span>);
             <span class='kw'>let</span> <span class='ident'>c</span> <span class='op'>=</span> <span class='ident'>b</span>.<span class='ident'>reslice</span>([<span class='number'>0</span>, <span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);

@@ -381,11 +381,13 @@
 <span id="337">337</span>
 <span id="338">338</span>
 <span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Gradient Descent</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! Implementation of gradient descent algorithm. Module contains</span>
-<span class='doccomment'>//! the struct GradientDesc which is instantiated within models</span>
+<span class='doccomment'>//! the struct `GradientDesc` which is instantiated within models</span>
 <span class='doccomment'>//! implementing the Optimizable trait.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! Currently standard batch gradient descent is the only implemented</span>
@@ -399,7 +401,7 @@
 
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>rand_utils</span>;
 
-<span class='kw'>const</span> <span class='ident'>LEARNING_EPS</span> : <span class='ident'>f64</span> <span class='op'>=</span> <span class='number'>1e-20</span>;
+<span class='kw'>const</span> <span class='ident'>LEARNING_EPS</span>: <span class='ident'>f64</span> <span class='op'>=</span> <span class='number'>1e-20</span>;
 
 <span class='doccomment'>/// Batch Gradient Descent algorithm</span>
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Clone</span>, <span class='ident'>Copy</span>, <span class='ident'>Debug</span>)]</span>
@@ -439,7 +441,8 @@
     <span class='doccomment'>/// let gd = GradientDesc::new(0.3, 10000);</span>
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>alpha</span>: <span class='ident'>f64</span>, <span class='ident'>iters</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>GradientDesc</span> {
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>alpha</span> <span class='op'>&gt;</span> <span class='number'>0f64</span>, <span class='string'>&quot;The step size (alpha) must be greater than 0.&quot;</span>);
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>alpha</span> <span class='op'>&gt;</span> <span class='number'>0f64</span>,
+                <span class='string'>&quot;The step size (alpha) must be greater than 0.&quot;</span>);
 
         <span class='ident'>GradientDesc</span> {
             <span class='ident'>alpha</span>: <span class='ident'>alpha</span>,
@@ -463,17 +466,14 @@
 
         <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>iters</span> {
             <span class='comment'>// Compute the cost and gradient for the current parameters</span>
-            <span class='kw'>let</span> (<span class='ident'>cost</span>, <span class='ident'>grad</span>) <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='ident'>optimizing_val</span>.<span class='ident'>data</span>()[..],
-                                                            <span class='ident'>inputs</span>,
-                                                            <span class='ident'>targets</span>);
+            <span class='kw'>let</span> (<span class='ident'>cost</span>, <span class='ident'>grad</span>) <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='ident'>optimizing_val</span>.<span class='ident'>data</span>()[..], <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
 
             <span class='comment'>// Early stopping</span>
             <span class='kw'>if</span> (<span class='ident'>start_iter_cost</span> <span class='op'>-</span> <span class='ident'>cost</span>).<span class='ident'>abs</span>() <span class='op'>&lt;</span> <span class='ident'>LEARNING_EPS</span> {
-                <span class='kw'>break</span>
+                <span class='kw'>break</span>;
             } <span class='kw'>else</span> {
                 <span class='comment'>// Update the optimal parameters using gradient descent</span>
-                <span class='ident'>optimizing_val</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>optimizing_val</span> <span class='op'>-</span>
-                                 <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>grad</span>) <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>alpha</span>;
+                <span class='ident'>optimizing_val</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>optimizing_val</span> <span class='op'>-</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>grad</span>) <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>alpha</span>;
                 <span class='comment'>// Update the latest cost</span>
                 <span class='ident'>start_iter_cost</span> <span class='op'>=</span> <span class='ident'>cost</span>;
             }
@@ -537,7 +537,9 @@
     }
 }
 
-<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>M</span>: <span class='ident'>Optimizable</span><span class='op'>&lt;</span><span class='ident'>Inputs</span> <span class='op'>=</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>Targets</span> <span class='op'>=</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span> <span class='ident'>OptimAlgorithm</span><span class='op'>&lt;</span><span class='ident'>M</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>StochasticGD</span> {
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>M</span><span class='op'>&gt;</span> <span class='ident'>OptimAlgorithm</span><span class='op'>&lt;</span><span class='ident'>M</span><span class='op'>&gt;</span> <span class='kw'>for</span> <span class='ident'>StochasticGD</span>
+    <span class='kw'>where</span> <span class='ident'>M</span>: <span class='ident'>Optimizable</span><span class='op'>&lt;</span><span class='ident'>Inputs</span> <span class='op'>=</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>Targets</span> <span class='op'>=</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span>
+{
     <span class='kw'>fn</span> <span class='ident'>optimize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>,
                 <span class='ident'>model</span>: <span class='kw-2'>&amp;</span><span class='ident'>M</span>,
                 <span class='ident'>start</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>],
@@ -560,11 +562,11 @@
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>end_cost</span> <span class='op'>=</span> <span class='number'>0f64</span>;
             <span class='comment'>// Permute the indices</span>
             <span class='ident'>rand_utils</span>::<span class='ident'>in_place_fisher_yates</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>permutation</span>);
-            <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='ident'>permutation</span>.<span class='ident'>iter</span>() {
+            <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>permutation</span> {
                 <span class='comment'>// Compute the cost and gradient for this data pair</span>
-                <span class='kw'>let</span> (<span class='ident'>cost</span>, <span class='ident'>vec_data</span>) <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='ident'>optimizing_val</span>.<span class='ident'>data</span>(),
-                                                       <span class='kw-2'>&amp;</span><span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='op'>*</span><span class='ident'>i</span>]),
-                                                       <span class='kw-2'>&amp;</span><span class='ident'>targets</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='op'>*</span><span class='ident'>i</span>]));
+                <span class='kw'>let</span> (<span class='ident'>cost</span>, <span class='ident'>vec_data</span>) <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='ident'>optimizing_val</span>.<span class='ident'>data</span>(),
+                                                          <span class='kw-2'>&amp;</span><span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='op'>*</span><span class='ident'>i</span>]),
+                                                          <span class='kw-2'>&amp;</span><span class='ident'>targets</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='op'>*</span><span class='ident'>i</span>]));
 
                 <span class='comment'>// Compute the difference in gradient using momentum</span>
                 <span class='ident'>delta_w</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>vec_data</span>) <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>mu</span> <span class='op'>+</span> <span class='kw-2'>&amp;</span><span class='ident'>delta_w</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>alpha</span>;
@@ -578,7 +580,7 @@
 
             <span class='comment'>// Early stopping</span>
             <span class='kw'>if</span> (<span class='ident'>start_iter_cost</span> <span class='op'>-</span> <span class='ident'>end_cost</span>).<span class='ident'>abs</span>() <span class='op'>&lt;</span> <span class='ident'>LEARNING_EPS</span> {
-                <span class='kw'>break</span>
+                <span class='kw'>break</span>;
             } <span class='kw'>else</span> {
                 <span class='comment'>// Update the cost</span>
                 <span class='ident'>start_iter_cost</span> <span class='op'>=</span> <span class='ident'>end_cost</span>;
@@ -611,8 +613,10 @@
     <span class='doccomment'>/// let gd = AdaGrad::new(0.5, 1.0, 100);</span>
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>alpha</span>: <span class='ident'>f64</span>, <span class='ident'>tau</span>: <span class='ident'>f64</span>, <span class='ident'>iters</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>AdaGrad</span> {
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>alpha</span> <span class='op'>&gt;</span> <span class='number'>0f64</span>, <span class='string'>&quot;The step size (alpha) must be greater than 0.&quot;</span>);
-        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>tau</span> <span class='op'>&gt;=</span> <span class='number'>0f64</span>, <span class='string'>&quot;The adaptive constant (tau) cannot be negative.&quot;</span>);
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>alpha</span> <span class='op'>&gt;</span> <span class='number'>0f64</span>,
+                <span class='string'>&quot;The step size (alpha) must be greater than 0.&quot;</span>);
+        <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>tau</span> <span class='op'>&gt;=</span> <span class='number'>0f64</span>,
+                <span class='string'>&quot;The adaptive constant (tau) cannot be negative.&quot;</span>);
         <span class='ident'>AdaGrad</span> {
             <span class='ident'>alpha</span>: <span class='ident'>alpha</span>,
             <span class='ident'>tau</span>: <span class='ident'>tau</span>,
@@ -654,18 +658,18 @@
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>end_cost</span> <span class='op'>=</span> <span class='number'>0f64</span>;
             <span class='comment'>// Permute the indices</span>
             <span class='ident'>rand_utils</span>::<span class='ident'>in_place_fisher_yates</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>permutation</span>);
-            <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='ident'>permutation</span>.<span class='ident'>iter</span>() {
+            <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>permutation</span> {
                 <span class='comment'>// Compute the cost and gradient for this data pair</span>
                 <span class='kw'>let</span> (<span class='ident'>cost</span>, <span class='kw-2'>mut</span> <span class='ident'>vec_data</span>) <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='ident'>optimizing_val</span>.<span class='ident'>data</span>(),
-                                                       <span class='kw-2'>&amp;</span><span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='op'>*</span><span class='ident'>i</span>]),
-                                                       <span class='kw-2'>&amp;</span><span class='ident'>targets</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='op'>*</span><span class='ident'>i</span>]));
+                                                              <span class='kw-2'>&amp;</span><span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='op'>*</span><span class='ident'>i</span>]),
+                                                              <span class='kw-2'>&amp;</span><span class='ident'>targets</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='op'>*</span><span class='ident'>i</span>]));
                 <span class='comment'>// Update the adaptive scaling by adding the gradient squared</span>
-                <span class='ident'>utils</span>::<span class='ident'>in_place_vec_bin_op</span>(<span class='ident'>ada_s</span>.<span class='ident'>mut_data</span>(), <span class='kw-2'>&amp;</span><span class='ident'>vec_data</span>, <span class='op'>|</span><span class='ident'>x</span>, <span class='kw-2'>&amp;</span><span class='ident'>y</span><span class='op'>|</span> {<span class='op'>*</span><span class='ident'>x</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>+</span> <span class='ident'>y</span><span class='op'>*</span><span class='ident'>y</span> });
+                <span class='ident'>utils</span>::<span class='ident'>in_place_vec_bin_op</span>(<span class='ident'>ada_s</span>.<span class='ident'>mut_data</span>(), <span class='kw-2'>&amp;</span><span class='ident'>vec_data</span>, <span class='op'>|</span><span class='ident'>x</span>, <span class='kw-2'>&amp;</span><span class='ident'>y</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>+=</span> <span class='ident'>y</span> <span class='op'>*</span> <span class='ident'>y</span>);
 
                 <span class='comment'>// Compute the change in gradient</span>
-                <span class='ident'>utils</span>::<span class='ident'>in_place_vec_bin_op</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>vec_data</span>,
-                                           <span class='ident'>ada_s</span>.<span class='ident'>data</span>(),
-                                           <span class='op'>|</span><span class='ident'>x</span>, <span class='kw-2'>&amp;</span><span class='ident'>y</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>alpha</span> <span class='op'>*</span> (<span class='op'>*</span><span class='ident'>x</span> <span class='op'>/</span> (<span class='self'>self</span>.<span class='ident'>tau</span> <span class='op'>+</span> (<span class='ident'>y</span>).<span class='ident'>sqrt</span>())));
+                <span class='ident'>utils</span>::<span class='ident'>in_place_vec_bin_op</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>vec_data</span>, <span class='ident'>ada_s</span>.<span class='ident'>data</span>(), <span class='op'>|</span><span class='ident'>x</span>, <span class='kw-2'>&amp;</span><span class='ident'>y</span><span class='op'>|</span> {
+                    <span class='op'>*</span><span class='ident'>x</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>alpha</span> <span class='op'>*</span> (<span class='op'>*</span><span class='ident'>x</span> <span class='op'>/</span> (<span class='self'>self</span>.<span class='ident'>tau</span> <span class='op'>+</span> (<span class='ident'>y</span>).<span class='ident'>sqrt</span>()))
+                });
                 <span class='comment'>// Update the parameters</span>
                 <span class='ident'>optimizing_val</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>optimizing_val</span> <span class='op'>-</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>vec_data</span>);
                 <span class='comment'>// Set the end cost (this is only used after the last iteration)</span>
@@ -675,7 +679,7 @@
 
             <span class='comment'>// Early stopping</span>
             <span class='kw'>if</span> (<span class='ident'>start_iter_cost</span> <span class='op'>-</span> <span class='ident'>end_cost</span>).<span class='ident'>abs</span>() <span class='op'>&lt;</span> <span class='ident'>LEARNING_EPS</span> {
-               <span class='kw'>break</span>
+                <span class='kw'>break</span>;
             } <span class='kw'>else</span> {
                 <span class='comment'>// Update the cost</span>
                 <span class='ident'>start_iter_cost</span> <span class='op'>=</span> <span class='ident'>end_cost</span>;

@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-0' class='srclink' href='../src/rusty_machine/src/lib.rs.html#1-213' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-0' class='srclink' href='../src/rusty_machine/src/lib.rs.html#1-211' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'>
 <h1 id='the-rusty-machine-crate' class='section-header'><a href='#the-rusty-machine-crate'>The rusty-machine crate.</a></h1>
 <p>Crate built for machine learning with some linear algebra thrown in.</p>
@@ -86,12 +86,14 @@ will likely be pulled out of rusty-machine and maintained separately.</p>
 <p>Specific usage of modules is described within the modules themselves. This section
 will focus on the general workflow for this library.</p>
 
-<p>The models contained within the learning module should implement either SupModel or UnSupModel.
-These both provide a <code>train</code> and a <code>predict</code> function which provide an interface to the model.</p>
+<p>The models contained within the learning module should implement either
+<code>SupModel</code> or <code>UnSupModel</code>. These both provide a <code>train</code> and a <code>predict</code>
+function which provide an interface to the model.</p>
 
-<p>You should instantiate the model, with your chosen options and then train using the training data.
-Followed by predicting with your test data. <em>For now</em> cross-validation, data handling, and many
-other things are left explicitly to the user.</p>
+<p>You should instantiate the model, with your chosen options and then train using
+the training data. Followed by predicting with your test data. <em>For now</em>
+cross-validation, data handling, and many other things are left explicitly
+to the user.</p>
 
 <p>Here is an example usage for Gaussian Process Regression:</p>
 

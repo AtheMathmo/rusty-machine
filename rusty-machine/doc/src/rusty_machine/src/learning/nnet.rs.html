@@ -600,11 +600,6 @@
 <span id="556">556</span>
 <span id="557">557</span>
 <span id="558">558</span>
-<span id="559">559</span>
-<span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
-<span id="563">563</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Neural Network module</span>
 <span class='doccomment'>//!</span>
@@ -642,11 +637,12 @@
 <span class='doccomment'>//! model.predict(&amp;test_inputs);</span>
 <span class='doccomment'>//! ```</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! The neural networks are specified via a criterion - similar to [Torch](https://github.com/torch/nn/blob/master/doc/criterion.md).</span>
+<span class='doccomment'>//! The neural networks are specified via a criterion - similar to</span>
+<span class='doccomment'>//! [Torch](https://github.com/torch/nn/blob/master/doc/criterion.md).</span>
 <span class='doccomment'>//! The criterions combine an activation function and a cost function.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! You can define your own criterion by implementing the `Criterion`</span>
-<span class='doccomment'>//! trait with a concrete ActivationFunc and CostFunc.</span>
+<span class='doccomment'>//! trait with a concrete `ActivationFunc` and `CostFunc`.</span>
 
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>matrix</span>::{<span class='ident'>Matrix</span>, <span class='ident'>MatrixSlice</span>};
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>matrix</span>::<span class='ident'>slice</span>::<span class='ident'>BaseSlice</span>;
@@ -915,8 +911,8 @@
 
             <span class='comment'>// Take GRAD_cost to compute this delta.</span>
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>delta</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>criterion</span>
-                                .<span class='ident'>cost_grad</span>(<span class='kw-2'>&amp;</span><span class='ident'>activations</span>[<span class='self'>self</span>.<span class='ident'>layer_sizes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>], <span class='ident'>targets</span>)
-                                .<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>g</span>);
+                .<span class='ident'>cost_grad</span>(<span class='kw-2'>&amp;</span><span class='ident'>activations</span>[<span class='self'>self</span>.<span class='ident'>layer_sizes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>], <span class='ident'>targets</span>)
+                .<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>g</span>);
 
             <span class='ident'>deltas</span>.<span class='ident'>push</span>(<span class='ident'>delta</span>.<span class='ident'>clone</span>());
 
@@ -927,7 +923,7 @@
 
                 <span class='kw'>let</span> <span class='ident'>g</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>criterion</span>.<span class='ident'>grad_activ</span>(<span class='ident'>z</span>);
                 <span class='ident'>delta</span> <span class='op'>=</span> (<span class='ident'>delta</span> <span class='op'>*</span> <span class='ident'>Matrix</span>::<span class='ident'>from</span>(<span class='self'>self</span>.<span class='ident'>get_layer_weights</span>(<span class='ident'>weights</span>, <span class='ident'>l</span>)).<span class='ident'>transpose</span>())
-                            .<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>g</span>);
+                    .<span class='ident'>elemul</span>(<span class='kw-2'>&amp;</span><span class='ident'>g</span>);
 
                 <span class='kw'>let</span> <span class='ident'>non_one_rows</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span>(<span class='number'>1</span>..<span class='ident'>delta</span>.<span class='ident'>cols</span>()).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>()[..];
                 <span class='ident'>delta</span> <span class='op'>=</span> <span class='ident'>delta</span>.<span class='ident'>select_cols</span>(<span class='ident'>non_one_rows</span>);
@@ -1063,7 +1059,8 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Will return `0` by default.</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// This method will not be invoked by the neural network if there is explicitly no regularization.</span>
+    <span class='doccomment'>/// This method will not be invoked by the neural network</span>
+    <span class='doccomment'>/// if there is explicitly no regularization.</span>
     <span class='kw'>fn</span> <span class='ident'>reg_cost</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>reg_weights</span>: <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>f64</span> {
         <span class='self'>self</span>.<span class='ident'>regularization</span>().<span class='ident'>reg_cost</span>(<span class='ident'>reg_weights</span>)
     }
@@ -1072,7 +1069,8 @@
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Will return a matrix of zeros by default.</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// This method will not be invoked by the neural network if there is explicitly no regularization.</span>
+    <span class='doccomment'>/// This method will not be invoked by the neural network</span>
+    <span class='doccomment'>/// if there is explicitly no regularization.</span>
     <span class='kw'>fn</span> <span class='ident'>reg_cost_grad</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>reg_weights</span>: <span class='ident'>MatrixSlice</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>regularization</span>().<span class='ident'>reg_grad</span>(<span class='ident'>reg_weights</span>)
     }
@@ -1099,9 +1097,7 @@
 <span class='doccomment'>/// Creates an MSE Criterion without any regularization.</span>
 <span class='kw'>impl</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>BCECriterion</span> {
     <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
-        <span class='ident'>BCECriterion</span> {
-            <span class='ident'>regularization</span> : <span class='ident'>Regularization</span>::<span class='prelude-val'>None</span>,
-        }
+        <span class='ident'>BCECriterion</span> { <span class='ident'>regularization</span>: <span class='ident'>Regularization</span>::<span class='prelude-val'>None</span> }
     }
 }
 
@@ -1118,9 +1114,7 @@
     <span class='doccomment'>/// let criterion = BCECriterion::new(Regularization::L2(0.3f64));</span>
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>regularization</span>: <span class='ident'>Regularization</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
-        <span class='ident'>BCECriterion</span> {
-            <span class='ident'>regularization</span> : <span class='ident'>regularization</span>,
-        }
+        <span class='ident'>BCECriterion</span> { <span class='ident'>regularization</span>: <span class='ident'>regularization</span> }
     }
 }
 
@@ -1145,9 +1139,7 @@
 <span class='doccomment'>/// Creates an MSE Criterion without any regularization.</span>
 <span class='kw'>impl</span> <span class='ident'>Default</span> <span class='kw'>for</span> <span class='ident'>MSECriterion</span> {
     <span class='kw'>fn</span> <span class='ident'>default</span>() <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
-        <span class='ident'>MSECriterion</span> {
-            <span class='ident'>regularization</span> : <span class='ident'>Regularization</span>::<span class='prelude-val'>None</span>,
-        }
+        <span class='ident'>MSECriterion</span> { <span class='ident'>regularization</span>: <span class='ident'>Regularization</span>::<span class='prelude-val'>None</span> }
     }
 }
 
@@ -1164,9 +1156,7 @@
     <span class='doccomment'>/// let criterion = MSECriterion::new(Regularization::L2(0.3f64));</span>
     <span class='doccomment'>/// ```</span>
     <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>new</span>(<span class='ident'>regularization</span>: <span class='ident'>Regularization</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='kw'>Self</span> {
-        <span class='ident'>MSECriterion</span> {
-            <span class='ident'>regularization</span> : <span class='ident'>regularization</span>,
-        }
+        <span class='ident'>MSECriterion</span> { <span class='ident'>regularization</span>: <span class='ident'>regularization</span> }
     }
 }
 </pre>
