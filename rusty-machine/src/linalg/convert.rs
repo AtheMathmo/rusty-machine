@@ -1,6 +1,6 @@
 //! The convert module.
 //!
-//! Contains implementations of std::convert::From
+//! Contains implementations of `std::convert::From`
 //! for Matrix and Vector types.
 
 use std::convert::From;

@@ -34,11 +34,11 @@ impl<'a, T> Iterator for $rows<'a, T> {
     type Item = $row_type;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // Check if we have reached the end
+// Check if we have reached the end
         if self.row_pos < self.slice_rows {
             let row: $row_type;
             unsafe {
-                // Get pointer and create a slice from raw parts
+// Get pointer and create a slice from raw parts
                 let ptr = self.slice_start.offset(self.row_pos as isize * self.row_stride);
                 row = slice::$slice_from_parts(ptr, self.slice_cols);
             }
@@ -51,10 +51,10 @@ impl<'a, T> Iterator for $rows<'a, T> {
     }
 
     fn last(self) -> Option<Self::Item> {
-        // Check if already at the end
+// Check if already at the end
         if self.row_pos < self.slice_rows {
             unsafe {
-                // Get pointer to last row and create a slice from raw parts
+// Get pointer to last row and create a slice from raw parts
                 let ptr = self.slice_start.offset((self.slice_rows - 1) as isize * self.row_stride);
                 Some(slice::$slice_from_parts(ptr, self.slice_cols))
             }
@@ -214,7 +214,7 @@ impl<'a, T> MatrixSliceMut<'a, T> {
     /// use rusty_machine::linalg::matrix::{Matrix, MatrixSliceMut};
     ///
     /// let mut a = Matrix::new(3, 2, (0..6).collect::<Vec<usize>>());
-    /// 
+    ///
     /// // New scope (so we can consume `a` after)
     /// {
     ///    let b = MatrixSliceMut::from_matrix(&mut a, [0,0], 2, 2);
@@ -306,9 +306,9 @@ impl<'a, T: 'a + Copy> FromIterator<&'a [T]> for Matrix<T> {
             }
         }
 
-        while let Some(row) = iterator.next() {
+        for row in iterator {
             assert!(row.len() == cols, "Iterator slice length must be constant.");
-            mat_data.extend(row);
+            mat_data.extend_from_slice(row);
             rows += 1;
         }
 

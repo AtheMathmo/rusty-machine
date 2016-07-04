@@ -14,29 +14,30 @@ use rand::{Rng, thread_rng};
 /// println!("{:?}", sample);
 /// ```
 pub fn reservoir_sample<T: Copy>(pool: &[T], reservoir_size: usize) -> Vec<T> {
-	assert!(pool.len() >= reservoir_size, "Sample size is greater than total.");
-    
-	let mut pool_mut = &pool[..];
+    assert!(pool.len() >= reservoir_size,
+            "Sample size is greater than total.");
 
-	let mut res = pool_mut[..reservoir_size].to_vec();
-	pool_mut = &pool_mut[reservoir_size..];
-	
-	let mut ele_seen = reservoir_size;
-	let mut rng = thread_rng();
+    let mut pool_mut = &pool[..];
 
-	while pool_mut.len() > 0 {
-		ele_seen += 1;
-		let r = rng.gen_range(0, ele_seen);
+    let mut res = pool_mut[..reservoir_size].to_vec();
+    pool_mut = &pool_mut[reservoir_size..];
 
-		let p_0 = pool_mut[0];
-		pool_mut = &pool_mut[1..];
+    let mut ele_seen = reservoir_size;
+    let mut rng = thread_rng();
 
-		if r < reservoir_size {
-			res[r] = p_0;
-		}
-	}
-	
-	res
+    while pool_mut.len() > 0 {
+        ele_seen += 1;
+        let r = rng.gen_range(0, ele_seen);
+
+        let p_0 = pool_mut[0];
+        pool_mut = &pool_mut[1..];
+
+        if r < reservoir_size {
+            res[r] = p_0;
+        }
+    }
+
+    res
 }
 
 /// The inside out Fisher-Yates algorithm.
@@ -53,33 +54,33 @@ pub fn reservoir_sample<T: Copy>(pool: &[T], reservoir_size: usize) -> Vec<T> {
 /// let permutation = rand_utils::fisher_yates(&a);
 /// ```
 pub fn fisher_yates<T: Copy>(arr: &[T]) -> Vec<T> {
-	let n = arr.len();
-	let mut rng = thread_rng();
+    let n = arr.len();
+    let mut rng = thread_rng();
 
-	let mut shuffled_arr = Vec::with_capacity(n);
+    let mut shuffled_arr = Vec::with_capacity(n);
 
-	unsafe {
-		// We set the length here
-		// We only access data which has been initialized in the algorithm
-		shuffled_arr.set_len(n);
-	}
+    unsafe {
+        // We set the length here
+        // We only access data which has been initialized in the algorithm
+        shuffled_arr.set_len(n);
+    }
 
-	for i in 0..n {
-		let j = rng.gen_range(0, i + 1);
+    for i in 0..n {
+        let j = rng.gen_range(0, i + 1);
 
-		// If j isn't the last point in the active shuffled array
-		if j != i {
-			// Copy value at position j to the end of the shuffled array
-			// This is safe as we only read initialized data (j < i)
-			let x = shuffled_arr[j];
-			shuffled_arr[i] = x;
-		}
+        // If j isn't the last point in the active shuffled array
+        if j != i {
+            // Copy value at position j to the end of the shuffled array
+            // This is safe as we only read initialized data (j < i)
+            let x = shuffled_arr[j];
+            shuffled_arr[i] = x;
+        }
 
-		// Place value at end of active array into shuffled array
-		shuffled_arr[j] = arr[i];
-	}
+        // Place value at end of active array into shuffled array
+        shuffled_arr[j] = arr[i];
+    }
 
-	shuffled_arr
+    shuffled_arr
 }
 
 /// The in place Fisher-Yates shuffle.
@@ -96,48 +97,48 @@ pub fn fisher_yates<T: Copy>(arr: &[T]) -> Vec<T> {
 /// rand_utils::in_place_fisher_yates(&mut a);
 /// ```
 pub fn in_place_fisher_yates<T>(arr: &mut [T]) {
-	let n = arr.len();
-	let mut rng = thread_rng();
+    let n = arr.len();
+    let mut rng = thread_rng();
 
-	for i in 0..n {
-		// Swap i with a random point after it
-		let j = rng.gen_range(0, n - i);
-		arr.swap(i, i + j);
-	}
+    for i in 0..n {
+        // Swap i with a random point after it
+        let j = rng.gen_range(0, n - i);
+        arr.swap(i, i + j);
+    }
 }
 
 #[cfg(test)]
 mod tests {
-	use super::*;
+    use super::*;
 
-	#[test]
-	fn test_reservoir_sample() {
-		let a = vec![1, 2, 3, 4, 5, 6, 7];
+    #[test]
+    fn test_reservoir_sample() {
+        let a = vec![1, 2, 3, 4, 5, 6, 7];
 
-		let b = reservoir_sample(&a, 3);
+        let b = reservoir_sample(&a, 3);
 
-		assert_eq!(b.len(), 3);
-	}
+        assert_eq!(b.len(), 3);
+    }
 
-	#[test]
-	fn test_fisher_yates() {
-		let a = (0..10).collect::<Vec<_>>();
+    #[test]
+    fn test_fisher_yates() {
+        let a = (0..10).collect::<Vec<_>>();
 
-		let b = fisher_yates(&a);
+        let b = fisher_yates(&a);
 
-		for val in a.iter() {
-			assert!(b.contains(val));
-		}
-	}
+        for val in a.iter() {
+            assert!(b.contains(val));
+        }
+    }
 
-	#[test]
-	fn test_in_place_fisher_yates() {
-		let mut a = (0..10).collect::<Vec<_>>();
+    #[test]
+    fn test_in_place_fisher_yates() {
+        let mut a = (0..10).collect::<Vec<_>>();
 
-		in_place_fisher_yates(&mut a);
+        in_place_fisher_yates(&mut a);
 
-		for val in 0..10 {
-			assert!(a.contains(&val));
-		}
-	}
+        for val in 0..10 {
+            assert!(a.contains(&val));
+        }
+    }
 }

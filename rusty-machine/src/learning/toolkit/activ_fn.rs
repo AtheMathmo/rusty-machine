@@ -1,12 +1,12 @@
 //! Activation Functions.
 //!
-//! This module contains a number of structs implementing the ActivationFunc trait.
+//! This module contains a number of structs implementing the `ActivationFunc` trait.
 //!
 //! These structs are used within Neural Networks and
 //! Generalized Linear Regression (not yet implemented).
 //!
 //! You can also create your own custom activation Functions for use in your models.
-//! Just create a unit struct implementing the ActivationFunc trait.
+//! Just create a unit struct implementing the `ActivationFunc` trait.
 
 /// Trait for activation functions in models.
 pub trait ActivationFunc {

@@ -3,7 +3,7 @@
 //! Currently contains all code
 //! relating to the vector linear algebra struct.
 
-use std::ops::{Mul, Add, Div, Sub, Index, Neg};
+use std::ops::{Mul, Add, Div, Sub, Index, Neg, MulAssign, DivAssign, SubAssign, AddAssign};
 use libnum::{One, Zero, Float, FromPrimitive};
 use std::cmp::PartialEq;
 use linalg::Metric;
@@ -89,7 +89,7 @@ impl<T: Copy> Vector<T> {
     /// assert_eq!(b.into_vec(), vec![2.0; 4]);
     /// ```
     pub fn apply(mut self, f: &Fn(T) -> T) -> Vector<T> {
-        for val in self.data.iter_mut(){
+        for val in &mut self.data {
             *val = f(*val);
         }
         self
@@ -179,7 +179,6 @@ impl<T: Clone + Zero> Vector<T> {
 }
 
 impl<T: Clone + One> Vector<T> {
-
     /// Constructs Vector of all ones.
     ///
     /// Requires the size of the vector.
@@ -347,7 +346,7 @@ impl<'a, T: Copy + Mul<T, Output = T>> Mul<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
     fn mul(mut self, f: &T) -> Vector<T> {
-        for val in self.data.iter_mut() {
+        for val in &mut self.data {
             *val = *val * *f;
         }
 
@@ -394,7 +393,7 @@ impl<'a, T: Copy + Zero + PartialEq + Div<T, Output = T>> Div<&'a T> for Vector<
     fn div(mut self, f: &T) -> Vector<T> {
         assert!(*f != T::zero());
 
-        for val in self.data.iter_mut() {
+        for val in &mut self.data {
             *val = *val / *f;
         }
 
@@ -440,7 +439,7 @@ impl<'a, T: Copy + Add<T, Output = T>> Add<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
     fn add(mut self, f: &T) -> Vector<T> {
-        for val in self.data.iter_mut() {
+        for val in &mut self.data {
             *val = *val + *f;
         }
 
@@ -485,7 +484,7 @@ impl<'a, T: Copy + Add<T, Output = T>> Add<&'a Vector<T>> for Vector<T> {
     type Output = Vector<T>;
 
     fn add(mut self, v: &Vector<T>) -> Vector<T> {
-        utils::in_place_vec_bin_op(&mut self.data, &v.data, |x, &y| { *x = *x + y});
+        utils::in_place_vec_bin_op(&mut self.data, &v.data, |x, &y| *x = *x + y);
 
         self
     }
@@ -530,7 +529,7 @@ impl<'a, T: Copy + Sub<T, Output = T>> Sub<&'a T> for Vector<T> {
     type Output = Vector<T>;
 
     fn sub(mut self, f: &T) -> Vector<T> {
-        for val in self.data.iter_mut() {
+        for val in &mut self.data {
             *val = *val - *f;
         }
 
@@ -566,7 +565,7 @@ impl<'a, T: Copy + Sub<T, Output = T>> Sub<Vector<T>> for &'a Vector<T> {
     type Output = Vector<T>;
 
     fn sub(self, mut v: Vector<T>) -> Vector<T> {
-        utils::in_place_vec_bin_op(&mut v.data, &self.data, |x, &y| { *x = y - *x});
+        utils::in_place_vec_bin_op(&mut v.data, &self.data, |x, &y| *x = y - *x);
 
         v
     }
@@ -577,7 +576,7 @@ impl<'a, T: Copy + Sub<T, Output = T>> Sub<&'a Vector<T>> for Vector<T> {
     type Output = Vector<T>;
 
     fn sub(mut self, v: &Vector<T>) -> Vector<T> {
-        utils::in_place_vec_bin_op(&mut self.data, &v.data, |x, &y| { *x = *x - y});
+        utils::in_place_vec_bin_op(&mut self.data, &v.data, |x, &y| *x = *x - y);
 
         self
     }
@@ -604,7 +603,7 @@ impl<T: Neg<Output = T> + Copy> Neg for Vector<T> {
     type Output = Vector<T>;
 
     fn neg(mut self) -> Vector<T> {
-        for val in self.data.iter_mut() {
+        for val in &mut self.data {
             *val = -*val;
         }
 
@@ -629,7 +628,7 @@ impl<T> Index<usize> for Vector<T> {
 
     fn index(&self, idx: usize) -> &T {
         assert!(idx < self.size);
-        unsafe { &self.data.get_unchecked(idx) }
+        unsafe { self.data.get_unchecked(idx) }
     }
 }
 
@@ -658,6 +657,63 @@ impl<T: Float> Metric<T> for Vector<T> {
     }
 }
 
+macro_rules! impl_op_assign_vec_scalar (
+    ($assign_trt:ident, $trt:ident, $op:ident, $op_assign:ident, $doc:expr) => (
+
+/// Performs
+#[doc=$doc]
+/// assignment between a vector and a scalar.
+impl<T : Copy + $trt<T, Output=T>> $assign_trt<T> for Vector<T> {
+    fn $op_assign(&mut self, _rhs: T) {
+        for x in &mut self.data {
+            *x = (*x).$op(_rhs)
+        }
+    }
+}
+
+/// Performs
+#[doc=$doc]
+/// assignment between a vector and a scalar.
+impl<'a, T : Copy + $trt<T, Output=T>> $assign_trt<&'a T> for Vector<T> {
+    fn $op_assign(&mut self, _rhs: &T) {
+        for x in &mut self.data {
+            *x = (*x).$op(*_rhs)
+        }
+    }
+}
+    );
+);
+
+impl_op_assign_vec_scalar!(AddAssign, Add, add, add_assign, "addition");
+impl_op_assign_vec_scalar!(SubAssign, Sub, sub, sub_assign, "subtraction");
+impl_op_assign_vec_scalar!(DivAssign, Div, div, div_assign, "division");
+impl_op_assign_vec_scalar!(MulAssign, Mul, mul, mul_assign, "multiplication");
+
+macro_rules! impl_op_assign_vec (
+    ($assign_trt:ident, $trt:ident, $op:ident, $op_assign:ident, $doc:expr) => (
+
+/// Performs elementwise
+#[doc=$doc]
+/// assignment between two vectors.
+impl<T : Copy + $trt<T, Output=T>> $assign_trt<Vector<T>> for Vector<T> {
+    fn $op_assign(&mut self, _rhs: Vector<T>) {
+        utils::in_place_vec_bin_op(&mut self.data, &_rhs.data, |x, &y| {*x = (*x).$op(y) });
+    }
+}
+
+/// Performs elementwise
+#[doc=$doc]
+/// assignment between two vectors.
+impl<'a, T : Copy + $trt<T, Output=T>> $assign_trt<&'a Vector<T>> for Vector<T> {
+    fn $op_assign(&mut self, _rhs: &Vector<T>) {
+        utils::in_place_vec_bin_op(&mut self.data, &_rhs.data, |x, &y| {*x = (*x).$op(y) });
+    }
+}
+    );
+);
+
+impl_op_assign_vec!(AddAssign, Add, add, add_assign, "addition");
+impl_op_assign_vec!(SubAssign, Sub, sub, sub_assign, "subtraction");
 
 #[cfg(test)]
 mod tests {
@@ -923,6 +979,81 @@ mod tests {
         let b = a.norm();
 
         assert_eq!(b, (1. + 4. + 9. + 16. + 25. + 36. as f32).sqrt());
+    }
+
+    #[test]
+    fn vector_add_assign() {
+        let mut a = Vector::new((0..9).collect::<Vec<_>>());
+
+        a += &2;
+        assert_eq!(a.into_vec(), (2..11).collect::<Vec<_>>());
+        
+        let mut a = Vector::new((0..9).collect::<Vec<_>>());
+
+        a += 2;
+        assert_eq!(a.into_vec(), (2..11).collect::<Vec<_>>());
+
+        let mut a = Vector::new((0..9).collect::<Vec<_>>());
+        let b = Vector::new((0..9).collect::<Vec<_>>());
+
+        a += &b;
+        assert_eq!(a.into_vec(), (0..9).map(|x| 2 * x).collect::<Vec<_>>());
+
+        let mut a = Vector::new((0..9).collect::<Vec<_>>());
+
+        a += b;
+        assert_eq!(a.into_vec(), (0..9).map(|x| 2 * x).collect::<Vec<_>>());
+    }
+    
+    #[test]
+    fn vector_sub_assign() {
+        let mut a = Vector::new((0..9).collect::<Vec<_>>());
+
+        a -= &2;
+        assert_eq!(a.into_vec(), (-2..7).collect::<Vec<_>>());
+
+        let mut a = Vector::new((0..9).collect::<Vec<i32>>());
+        a -= 2;
+        assert_eq!(a.into_vec(), (-2..7).collect::<Vec<_>>());
+
+        let mut a = Vector::new((0..9).collect::<Vec<_>>());
+        let b = Vector::new((0..9).collect::<Vec<_>>());
+
+        a -= &b;
+        assert_eq!(a.into_vec(), vec![0; 9]);
+
+        let mut a = Vector::new((0..9).collect::<Vec<_>>());
+
+        a -= b;
+        assert_eq!(a.into_vec(), vec![0; 9]);
+    }
+    
+    #[test]
+    fn vector_div_assign() {
+        let a_data = vec![1f32, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
+        let res_data = vec![0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5];
+        let mut a = Vector::new(a_data.clone());
+
+        a /= &2f32;
+        assert_eq!(a.into_vec(), res_data.clone());
+
+        let mut a = Vector::new(a_data.clone());
+        a /= 2f32;
+        assert_eq!(a.into_vec(), res_data.clone());
+    }
+
+    #[test]
+    fn vector_mul_assign() {
+        let a_data = vec![1f32, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
+        let res_data = vec![2f32, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0];
+        let mut a = Vector::new(a_data.clone());
+
+        a *= &2f32;
+        assert_eq!(a.into_vec(), res_data.clone());
+
+        let mut a = Vector::new(a_data.clone());
+        a *= 2f32;
+        assert_eq!(a.into_vec(), res_data.clone());
     }
 
 }
