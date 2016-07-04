@@ -66,17 +66,9 @@ fn main() {
     let mut misses = 0;
     // Evaluation
     println!("Got\tExpected");
-    //for (idx, prediction) in res.into_vec().iter().enumerate() {
-    //    println!("{:.2}\t{}", prediction, expected[idx]);
-    //    if (prediction - 0.5) * (expected[idx] -0.5) > 0. {
-    //        hits += 1;
-    //    } else {
-    //        misses += 1;
-    //    }
-    //}
     for (idx, prediction) in res.into_vec().iter().enumerate() {
         println!("{:.2}\t{}", prediction, expected[idx]);
-        if (prediction - 0.5) * (expected[idx] -0.5) > 0. {
+        if (prediction - 0.5) * (expected[idx] - 0.5) > 0. {
             hits += 1;
         } else {
             misses += 1;
