@@ -1,7 +1,7 @@
 extern crate rusty_machine;
 extern crate rand;
 
-use rand::{random, Open01};
+use rand::{random, Closed01};
 use std::vec::Vec;
 
 use rusty_machine::learning::nnet::{NeuralNet, BCECriterion};
@@ -24,8 +24,9 @@ fn main() {
     let mut label_data = Vec::with_capacity(SAMPLES);
 
     for _ in 0..SAMPLES {
-        let Open01(left) = random::<Open01<f64>>();
-        let Open01(right) = random::<Open01<f64>>();
+        // The two inputs are "signals" between 0 and 1
+        let Closed01(left) = random::<Closed01<f64>>();
+        let Closed01(right) = random::<Closed01<f64>>();
         input_data.push(left);
         input_data.push(right);
         if left > THRESHOLD && right > THRESHOLD {
