@@ -23,6 +23,9 @@ This marks my intended release goals. I won't estimate the actual dates of relea
     <tr>
         <td>0.3.X</td><td>Linalg Separation</td><td><ul><li>None</li></ul></td>
     </tr>
+    <tr>
+        <td>0.3.X</td><td>Better error handling</td><td><ul><li>None</li></ul></td>
+    </tr>
 </table>
 
 Whilst working on the above there will of course be ongoing development on the existing and new machine learning algorithms.

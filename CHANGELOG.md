@@ -2,9 +2,28 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.3.2
+
+### New Contributors
+
+- [DarkDrek](https://github.com/DarkDrek) (Who is responsible for almost all changes in this release. Thank you!)
+
+### Breaking Changes
+
+- `Matrix`: `mean` and `variance` methods now take `Axes` enum instead of `usize` flag for dimension.
+
+### Features
+
+- Assignment operators (`+=`, `-=`, etc.) now implemented for `Vector`.
+
+### Minor Features
+
+- Some optimizations to `variance` computation for `Matrix`.
+- Some code cleanup - thanks to [clippy](https://github.com/Manishearth/rust-clippy). 
+
 ## 0.3.1
 
-## Breaking Changes
+### Breaking Changes
 
 - None
 
@@ -19,11 +38,11 @@ This document will be used to keep track of changes made between release version
 
 ## 0.3.0
 
-## New Contributors
+### New Contributors
 
 - [rrichardson](https://github.com/rrichardson)
 
-## Breaking Changes
+### Breaking Changes
 
 - All fields on `GradDesc` and `StochasticGD` are now private.
 - Matrix slices now have the same lifetime as their target data.
