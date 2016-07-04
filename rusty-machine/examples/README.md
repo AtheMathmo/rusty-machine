@@ -61,7 +61,7 @@ Accuracy: 100
 
 [AND gate](nnet-and_gate.rs) makes an AND gate out of a perceptron.
 
-The sample code generates random data to learn from. The input data is like an electric signal between 0 and 1, with some jitter that makes it not quite 0 or 1. By default, the code decides that any pair input "above" (0.7, 0.7) is labeled as 1.0 (AND gate passing), otherwise labeled as 0.0 (AND gate blocking). This means that the training set is biased toward learning the passing scenario, but it turns out that it happens 75% of the time on an AND gate...
+The sample code generates random data to learn from. The input data is like an electric signal between 0 and 1, with some jitter that makes it not quite 0 or 1. By default, the code decides that any pair input "above" (0.7, 0.7) is labeled as 1.0 (AND gate passing), otherwise labeled as 0.0 (AND gate blocking). This means that the training set is biased toward learning the passing scenario: An AND gate passes 25% of the time on average, and we'd like it to learn it.
 
 The test data uses only the 4 "perfect" inputs for a gate: (0.0, 0.0), (1.0, 0.0), etc.
 
