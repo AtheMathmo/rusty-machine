@@ -22,7 +22,7 @@ macro_rules! count {
 /// # Current Support
 ///
 /// This macro currently supports the use cases described
-/// by a,b,c in the specification above. 
+/// by a,b,c in the specification above.
 macro_rules! mat {
     ( $( $x:expr ),* ) => { {
         let vec = vec![$($x),*];

@@ -52,7 +52,6 @@ pub struct GenLinearModel<C: Criterion> {
 }
 
 impl<C: Criterion> GenLinearModel<C> {
-
     /// Constructs a new Generalized Linear Model.
     ///
     /// Takes a Criterion which fully specifies the family
@@ -64,12 +63,12 @@ impl<C: Criterion> GenLinearModel<C> {
     ///
     /// let glm = GenLinearModel::new(Bernoulli);
     /// ```
-	pub fn new(criterion: C) -> GenLinearModel<C> {
-		GenLinearModel {
-			parameters: None,
-			criterion: criterion,
-		}
-	}
+    pub fn new(criterion: C) -> GenLinearModel<C> {
+        GenLinearModel {
+            parameters: None,
+            criterion: criterion,
+        }
+    }
 }
 
 /// Supervised model trait for the GLM.
@@ -99,7 +98,7 @@ impl<C: Criterion> SupModel<Matrix<f64>, Vector<f64>> for GenLinearModel<C> {
         // Construct initial estimate for mu
         let mut mu = Vector::new(self.criterion.initialize_mu(targets.data()));
         let mut z = mu.clone();
-        let mut beta : Vector<f64> = Vector::new(vec![0f64; inputs.cols() + 1]);
+        let mut beta: Vector<f64> = Vector::new(vec![0f64; inputs.cols() + 1]);
 
         let ones = Matrix::<f64>::ones(inputs.rows(), 1);
         let full_inputs = ones.hcat(inputs);
@@ -107,8 +106,8 @@ impl<C: Criterion> SupModel<Matrix<f64>, Vector<f64>> for GenLinearModel<C> {
 
         // Iterate to convergence
         for _ in 0..8 {
-            let w_diag = self.criterion.compute_working_weight(&mu.data());
-            let y_bar_data = self.criterion.compute_y_bar(targets.data(), &mu.data());
+            let w_diag = self.criterion.compute_working_weight(mu.data());
+            let y_bar_data = self.criterion.compute_y_bar(targets.data(), mu.data());
 
             let w = Matrix::from_diag(&w_diag);
             let y_bar = Vector::new(y_bar_data);
@@ -116,7 +115,7 @@ impl<C: Criterion> SupModel<Matrix<f64>, Vector<f64>> for GenLinearModel<C> {
             let x_t_w = &x_t * w;
 
             let new_beta = (&x_t_w * &full_inputs).inverse() * x_t_w * z;
-            let diff = (beta-&new_beta).apply(&|x| x.abs()).sum();
+            let diff = (beta - &new_beta).apply(&|x| x.abs()).sum();
             beta = new_beta;
 
             if diff < 1e-10 {
@@ -141,7 +140,7 @@ impl<C: Criterion> SupModel<Matrix<f64>, Vector<f64>> for GenLinearModel<C> {
 /// be specified but can be used to control optimization.
 pub trait Criterion {
     /// The link function of the GLM Criterion.
-	type Link : LinkFunc;
+    type Link: LinkFunc;
 
     /// The variance of the regression family.
     fn model_variance(&self, mu: f64) -> f64;
@@ -194,7 +193,7 @@ pub trait Criterion {
 
     /// Applies the inverse of the link function to a vector.
     fn apply_link_inv(&self, vec: Vector<f64>) -> Vector<f64> {
-    	vec.apply(&Self::Link::func_inv)
+        vec.apply(&Self::Link::func_inv)
     }
 
     /// Computes the gradient of the link function.
@@ -228,7 +227,6 @@ pub struct Logit;
 ///
 /// g(u) = ln(x / (1 - x))
 impl LinkFunc for Logit {
-
     fn func(x: f64) -> f64 {
         (x / (1f64 - x)).ln()
     }
@@ -302,8 +300,7 @@ impl Criterion for Bernoulli {
 
         if var.abs() < 1e-10 {
             1e-10
-        }
-        else {
+        } else {
             var
         }
     }
@@ -312,14 +309,13 @@ impl Criterion for Bernoulli {
         let mut mu_data = Vec::with_capacity(y.len());
 
         for y_val in y {
-            mu_data.push(
-                if *y_val < 1e-10 {
-                    1e-10
-                } else if *y_val > 1f64 - 1e-10 {
-                    1f64 - 1e-10
-                } else {
-                    *y_val
-                });
+            mu_data.push(if *y_val < 1e-10 {
+                1e-10
+            } else if *y_val > 1f64 - 1e-10 {
+                1f64 - 1e-10
+            } else {
+                *y_val
+            });
         }
 
         mu_data
@@ -372,8 +368,7 @@ impl Criterion for Binomial {
 
         if var.abs() < 1e-10 {
             1e-10
-        }
-        else {
+        } else {
             var
         }
 
@@ -383,14 +378,13 @@ impl Criterion for Binomial {
         let mut mu_data = Vec::with_capacity(y.len());
 
         for y_val in y {
-            mu_data.push(
-                if *y_val < 1e-10 {
-                    1e-10
-                } else if *y_val > 1f64 - 1e-10 {
-                    1f64 - 1e-10
-                } else {
-                    *y_val
-                });
+            mu_data.push(if *y_val < 1e-10 {
+                1e-10
+            } else if *y_val > 1f64 - 1e-10 {
+                1f64 - 1e-10
+            } else {
+                *y_val
+            });
         }
 
         mu_data
@@ -458,12 +452,11 @@ impl Criterion for Poisson {
         let mut mu_data = Vec::with_capacity(y.len());
 
         for y_val in y {
-            mu_data.push(
-                if *y_val < 1e-10 {
-                    1e-10
-                } else {
-                    *y_val
-                });
+            mu_data.push(if *y_val < 1e-10 {
+                1e-10
+            } else {
+                *y_val
+            });
         }
 
         mu_data

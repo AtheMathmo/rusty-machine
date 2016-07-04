@@ -7,7 +7,6 @@ use std::ops::{Add, Mul};
 use libnum::Zero;
 use matrixmultiply;
 
-#[inline(always)]
 /// Return `true` if `A` and `B` are the same type
 fn same_type<A: Any, B: Any>() -> bool {
     TypeId::of::<A>() == TypeId::of::<B>()
@@ -15,7 +14,7 @@ fn same_type<A: Any, B: Any>() -> bool {
 
 macro_rules! mat_mul_general (
     ($mat:ident) => (
-    
+
     fn mul(self, m: &$mat<T>) -> Matrix<T> {
         assert!(self.cols == m.rows, "Matrix dimensions do not agree.");
 
@@ -82,7 +81,9 @@ macro_rules! mat_mul_general (
                     {
                         for j in 0..r
                         {
-                            new_data[i*r + j] = *new_data.get_unchecked(i*r + j) + *self.get_unchecked([i,k]) * *m.get_unchecked([k,j]);
+                            new_data[i*r + j] = *new_data.get_unchecked(i*r + j) +
+                                                *self.get_unchecked([i,k]) *
+                                                *m.get_unchecked([k,j]);
                         }
                     }
                 }
@@ -95,7 +96,7 @@ macro_rules! mat_mul_general (
             }
         }
     }
-    
+
     );
 );
 
@@ -109,7 +110,9 @@ impl<'a, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<Matrix<
 }
 
 /// Multiplies two matrices together.
-impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'a Matrix<T>> for Matrix<T> {
+impl<'a, 'b, T> Mul<&'a Matrix<T>> for Matrix<T>
+    where T: Any + Copy + Zero + Add<T, Output = T> + Mul<T, Output = T>
+{
     type Output = Matrix<T>;
 
     fn mul(self, m: &Matrix<T>) -> Matrix<T> {
@@ -118,7 +121,9 @@ impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'a
 }
 
 /// Multiplies two matrices together.
-impl<'a, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<Matrix<T>> for &'a Matrix<T> {
+impl<'a, T> Mul<Matrix<T>> for &'a Matrix<T>
+    where T: Any + Copy + Zero + Add<T, Output = T> + Mul<T, Output = T>
+{
     type Output = Matrix<T>;
 
     fn mul(self, m: Matrix<T>) -> Matrix<T> {
@@ -127,7 +132,9 @@ impl<'a, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<Matrix<
 }
 
 /// Multiplies two matrices together.
-impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'b Matrix<T>> for &'a Matrix<T> {
+impl<'a, 'b, T> Mul<&'b Matrix<T>> for &'a Matrix<T>
+    where T: Any + Copy + Zero + Add<T, Output = T> + Mul<T, Output = T>
+{
     type Output = Matrix<T>;
 
     mat_mul_general!(Matrix);
@@ -137,7 +144,9 @@ macro_rules! impl_mat_slice_mul (
     ($slice:ident) => (
 
 /// Multiplies two matrices together.
-impl<'a, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<$slice<'a, T>> for Matrix<T> {
+impl<'a, T> Mul<$slice<'a, T>> for Matrix<T>
+    where T : Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>
+{
     type Output = Matrix<T>;
 
     fn mul(self, m: $slice<T>) -> Matrix<T> {
@@ -146,7 +155,9 @@ impl<'a, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<$slice<
 }
 
 /// Multiplies two matrices together.
-impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'b $slice<'a, T>> for Matrix<T> {
+impl<'a, 'b, T> Mul<&'b $slice<'a, T>> for Matrix<T>
+    where T : Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>
+{
     type Output = Matrix<T>;
 
     fn mul(self, m: &$slice<T>) -> Matrix<T> {
@@ -155,7 +166,9 @@ impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'b
 }
 
 /// Multiplies two matrices together.
-impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<$slice<'a, T>> for &'b Matrix<T> {
+impl<'a, 'b, T> Mul<$slice<'a, T>> for &'b Matrix<T>
+    where T : Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>
+{
     type Output = Matrix<T>;
 
     fn mul(self, m: $slice<T>) -> Matrix<T> {
@@ -164,14 +177,18 @@ impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<$sl
 }
 
 /// Multiplies two matrices together.
-impl<'a, 'b, 'c, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'c $slice<'a, T>> for &'b Matrix<T> {
+impl<'a, 'b, 'c, T> Mul<&'c $slice<'a, T>> for &'b Matrix<T>
+    where T : Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>
+{
     type Output = Matrix<T>;
 
     mat_mul_general!($slice);
 }
 
 /// Multiplies two matrices together.
-impl<'a, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<Matrix<T>> for $slice<'a, T> {
+impl<'a, T> Mul<Matrix<T>> for $slice<'a, T>
+    where T : Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>
+{
     type Output = Matrix<T>;
 
     fn mul(self, m: Matrix<T>) -> Matrix<T> {
@@ -180,7 +197,9 @@ impl<'a, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<Matrix<
 }
 
 /// Multiplies two matrices together.
-impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'b Matrix<T>> for $slice<'a, T> {
+impl<'a, 'b, T> Mul<&'b Matrix<T>> for $slice<'a, T>
+    where T : Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>
+{
     type Output = Matrix<T>;
 
     fn mul(self, m: &Matrix<T>) -> Matrix<T> {
@@ -189,7 +208,9 @@ impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'b
 }
 
 /// Multiplies two matrices together.
-impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<Matrix<T>> for &'b $slice<'a, T> {
+impl<'a, 'b, T> Mul<Matrix<T>> for &'b $slice<'a, T>
+    where T : Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>
+{
     type Output = Matrix<T>;
 
     fn mul(self, m: Matrix<T>) -> Matrix<T> {
@@ -198,7 +219,9 @@ impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<Mat
 }
 
 /// Multiplies two matrices together.
-impl<'a, 'b, 'c, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'c Matrix<T>> for &'b $slice<'a, T> {
+impl<'a, 'b, 'c, T> Mul<&'c Matrix<T>> for &'b $slice<'a, T>
+    where T : Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>
+{
     type Output = Matrix<T>;
 
     mat_mul_general!(Matrix);
@@ -213,7 +236,9 @@ macro_rules! impl_slice_mul (
     ($slice_1:ident, $slice_2:ident) => (
 
 /// Multiplies two matrices together.
-impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<$slice_2<'b, T>> for $slice_1<'a, T> {
+impl<'a, 'b, T> Mul<$slice_2<'b, T>> for $slice_1<'a, T>
+    where T : Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>
+{
     type Output = Matrix<T>;
 
     fn mul(self, m: $slice_2<T>) -> Matrix<T> {
@@ -222,7 +247,9 @@ impl<'a, 'b, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<$sl
 }
 
 /// Multiplies two matrices together.
-impl<'a, 'b, 'c, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'c $slice_2<'b, T>> for $slice_1<'a, T> {
+impl<'a, 'b, 'c, T> Mul<&'c $slice_2<'b, T>> for $slice_1<'a, T>
+    where T : Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>
+{
     type Output = Matrix<T>;
 
     fn mul(self, m: &$slice_2<T>) -> Matrix<T> {
@@ -231,7 +258,9 @@ impl<'a, 'b, 'c, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul
 }
 
 /// Multiplies two matrices together.
-impl<'a, 'b, 'c, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<$slice_2<'b, T>> for &'c $slice_1<'a, T> {
+impl<'a, 'b, 'c, T> Mul<$slice_2<'b, T>> for &'c $slice_1<'a, T>
+    where T : Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>
+{
     type Output = Matrix<T>;
 
     fn mul(self, m: $slice_2<T>) -> Matrix<T> {
@@ -240,7 +269,9 @@ impl<'a, 'b, 'c, T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul
 }
 
 /// Multiplies two matrices together.
-impl<'a, 'b, 'c, 'd,T: Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>> Mul<&'d $slice_2<'b, T>> for &'c $slice_1<'a, T> {
+impl<'a, 'b, 'c, 'd, T> Mul<&'d $slice_2<'b, T>> for &'c $slice_1<'a, T>
+    where T : Any + Copy + Zero + Add<T, Output=T> + Mul<T, Output=T>
+{
     type Output = Matrix<T>;
 
     mat_mul_general!($slice_2);

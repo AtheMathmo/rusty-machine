@@ -4,7 +4,7 @@
 //! within machine learning algorithms.
 //!
 //! The module contains a `Regularization` enum which provides access to
-//! L1, L2 and ElasticNet regularization.
+//! `L1`, `L2` and `ElasticNet` regularization.
 //!
 //! # Examples
 //!
@@ -35,46 +35,46 @@ pub enum Regularization<T: Float> {
 impl<T: Float + FromPrimitive> Regularization<T> {
     /// Compute the regularization addition to the cost.
     pub fn reg_cost(&self, mat: MatrixSlice<T>) -> T {
-        match self {
-            &Regularization::L1(x) => Self::l1_reg_cost(&mat, x),
-            &Regularization::L2(x) => Self::l2_reg_cost(&mat, x),
-            &Regularization::ElasticNet(x, y) => {
+        match *self {
+            Regularization::L1(x) => Self::l1_reg_cost(&mat, x),
+            Regularization::L2(x) => Self::l2_reg_cost(&mat, x),
+            Regularization::ElasticNet(x, y) => {
                 Self::l1_reg_cost(&mat, x) + Self::l2_reg_cost(&mat, y)
             }
-            &Regularization::None => T::zero(),
+            Regularization::None => T::zero(),
         }
     }
 
     /// Compute the regularization addition to the gradient.
     pub fn reg_grad(&self, mat: MatrixSlice<T>) -> Matrix<T> {
-        match self {
-            &Regularization::L1(x) => Self::l1_reg_grad(&mat, x),
-            &Regularization::L2(x) => Self::l2_reg_grad(&mat, x),
-            &Regularization::ElasticNet(x, y) => {
+        match *self {
+            Regularization::L1(x) => Self::l1_reg_grad(&mat, x),
+            Regularization::L2(x) => Self::l2_reg_grad(&mat, x),
+            Regularization::ElasticNet(x, y) => {
                 Self::l1_reg_grad(&mat, x) + Self::l2_reg_grad(&mat, y)
             }
-            &Regularization::None => Matrix::zeros(mat.rows(), mat.cols()),
+            Regularization::None => Matrix::zeros(mat.rows(), mat.cols()),
         }
     }
 
     fn l1_reg_cost(mat: &MatrixSlice<T>, x: T) -> T {
         // TODO: This won't be regularized. Need to unroll...
         let l1_norm = mat.iter()
-                         .fold(T::zero(), |acc, y| acc + y.abs());
+            .fold(T::zero(), |acc, y| acc + y.abs());
         l1_norm * x / ((T::one() + T::one()) * FromPrimitive::from_usize(mat.rows()).unwrap())
     }
 
     fn l1_reg_grad(mat: &MatrixSlice<T>, x: T) -> Matrix<T> {
         let m_2 = (T::one() + T::one()) * FromPrimitive::from_usize(mat.rows()).unwrap();
         let out_mat_data = mat.iter()
-                              .map(|y| {
-                                  if y.is_sign_negative() {
-                                      -x / m_2
-                                  } else {
-                                      x / m_2
-                                  }
-                              })
-                              .collect::<Vec<_>>();
+            .map(|y| {
+                if y.is_sign_negative() {
+                    -x / m_2
+                } else {
+                    x / m_2
+                }
+            })
+            .collect::<Vec<_>>();
         Matrix::new(mat.rows(), mat.cols(), out_mat_data)
     }
 
@@ -120,9 +120,9 @@ mod tests {
         assert!((a - (42f64 / 12f64)) < 1e-18);
 
         let true_grad = vec![-1., -1., -1., 1., 1., 1., 1., 1., 1., 1., 1., 1.]
-                            .into_iter()
-                            .map(|x| x / 12f64)
-                            .collect::<Vec<_>>();
+            .into_iter()
+            .map(|x| x / 12f64)
+            .collect::<Vec<_>>();
 
         for eps in (b - Matrix::new(3, 4, true_grad)).into_vec() {
             assert!(eps < 1e-18);
@@ -142,9 +142,9 @@ mod tests {
         assert!((a - (input_mat.norm() / 12f64)) < 1e-18);
 
         let true_grad = input_mat.data()
-                                 .iter()
-                                 .map(|x| x / 6f64)
-                                 .collect::<Vec<_>>();
+            .iter()
+            .map(|x| x / 6f64)
+            .collect::<Vec<_>>();
         for eps in (b - Matrix::new(3, 4, true_grad)).into_vec() {
             assert!(eps < 1e-18);
         }
@@ -163,16 +163,16 @@ mod tests {
         assert!(a - ((input_mat.norm() / 24f64) + (42f64 / 12f64)) < 1e-18);
 
         let l1_true_grad = vec![-1., -1., -1., 1., 1., 1., 1., 1., 1., 1., 1., 1.]
-                               .into_iter()
-                               .map(|x| x / 12f64)
-                               .collect::<Vec<_>>();
+            .into_iter()
+            .map(|x| x / 12f64)
+            .collect::<Vec<_>>();
         let l2_true_grad = input_mat.data()
-                                    .iter()
-                                    .map(|x| x / 12f64)
-                                    .collect::<Vec<_>>();
+            .iter()
+            .map(|x| x / 12f64)
+            .collect::<Vec<_>>();
 
         for eps in (b - Matrix::new(3, 4, l1_true_grad) - Matrix::new(3, 4, l2_true_grad))
-                       .into_vec() {
+            .into_vec() {
             // Slightly lower boundary than others - more numerical error as more ops.
             assert!(eps < 1e-12);
         }

@@ -42,7 +42,7 @@
 //!
 //! The [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) scheme.
 
-use linalg::matrix::Matrix;
+use linalg::matrix::{Matrix, Axes};
 use linalg::vector::Vector;
 use learning::UnSupModel;
 use rand::{Rng, thread_rng};
@@ -65,7 +65,7 @@ pub enum InitAlgorithm {
 pub struct KMeansClassifierBuilder {
     k: usize,
     iters: usize,
-    init_algorithm: InitAlgorithm
+    init_algorithm: InitAlgorithm,
 }
 
 impl KMeansClassifierBuilder {
@@ -86,7 +86,7 @@ impl KMeansClassifierBuilder {
         KMeansClassifierBuilder {
             k: k,
             iters: 100,
-            init_algorithm: InitAlgorithm::KPlusPlus
+            init_algorithm: InitAlgorithm::KPlusPlus,
         }
     }
 
@@ -118,7 +118,9 @@ impl KMeansClassifierBuilder {
     /// let model = KMeansClassifierBuilder::new(5).init_algorithm(InitAlgorithm::Forgy)
     ///                                            .finalize();
     /// ```
-    pub fn init_algorithm(&mut self, init_algorithm: InitAlgorithm) -> &mut KMeansClassifierBuilder {
+    pub fn init_algorithm(&mut self,
+                          init_algorithm: InitAlgorithm)
+                          -> &mut KMeansClassifierBuilder {
         self.init_algorithm = init_algorithm;
         self
     }
@@ -142,7 +144,7 @@ impl KMeansClassifierBuilder {
             k: self.k,
             iters: self.iters,
             centroids: None,
-            init_algorithm: self.init_algorithm
+            init_algorithm: self.init_algorithm,
         }
     }
 }
@@ -185,10 +187,10 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClassifier {
             let (idx, distances) = self.get_closest_centroids(inputs);
             self.update_centroids(inputs, idx);
 
-                let cost_i = distances.sum();
-                if abs(cost - cost_i) < eps {
-                    break;
-                }
+            let cost_i = distances.sum();
+            if abs(cost - cost_i) < eps {
+                break;
+            }
 
             cost = cost_i;
         }
@@ -230,8 +232,7 @@ impl KMeansClassifier {
     ///
     /// let model = KMeansClassifier::new_specified(5, 42, InitAlgorithm::Forgy);
     /// ```
-    pub fn new_specified(k: usize, iters: usize,
-                         algo: InitAlgorithm) -> KMeansClassifier {
+    pub fn new_specified(k: usize, iters: usize, algo: InitAlgorithm) -> KMeansClassifier {
         KMeansClassifier {
             iters: iters,
             k: k,
@@ -287,7 +288,7 @@ impl KMeansClassifier {
             }
 
             let mat_i = inputs.select_rows(&vec_i);
-            new_centroids.extend(mat_i.mean(0).data());
+            new_centroids.extend(mat_i.mean(Axes::Row).data());
         }
 
         self.centroids = Some(Matrix::new(self.k, inputs.cols(), new_centroids));
@@ -295,7 +296,7 @@ impl KMeansClassifier {
 
     fn get_closest_centroids(&self, inputs: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
         if let Some(ref c) = self.centroids {
-            return KMeansClassifier::find_closest_centroids(&c, inputs);
+            return KMeansClassifier::find_closest_centroids(c, inputs);
         } else {
             panic!("Centroids not correctly initialized.");
         }
@@ -375,7 +376,7 @@ impl KMeansClassifier {
             }
 
             let mat_i = inputs.select_rows(&vec_i);
-            init_centroids.extend(mat_i.mean(0).into_vec());
+            init_centroids.extend(mat_i.mean(Axes::Row).into_vec());
         }
 
         Matrix::new(k, inputs.cols(), init_centroids)
@@ -397,7 +398,7 @@ impl KMeansClassifier {
 
         for i in 1..k {
             let temp_centroids = Matrix::new(i, inputs.cols(), init_centroids.clone());
-            let (_, dist) = KMeansClassifier::find_closest_centroids(&temp_centroids, &inputs);
+            let (_, dist) = KMeansClassifier::find_closest_centroids(&temp_centroids, inputs);
             let next_cen = sample_discretely(dist);
             init_centroids.append(&mut inputs.select_rows(&[next_cen]).into_vec())
         }
