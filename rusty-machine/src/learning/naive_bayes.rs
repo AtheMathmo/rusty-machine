@@ -79,22 +79,22 @@ impl<T: Distribution> NaiveBayes<T> {
     /// Get the cluster count for this model.
     ///
     /// Returns an option which is `None` until the model has been trained.
-    pub fn cluster_count(&self) -> &Option<usize> {
-        &self.cluster_count
+    pub fn cluster_count(&self) -> Option<&usize> {
+        self.cluster_count.as_ref()
     }
 
     /// Get the class prior distribution for this model.
     ///
     /// Returns an option which is `None` until the model has been trained.
-    pub fn class_prior(&self) -> &Option<Vec<f64>> {
-        &self.class_prior
+    pub fn class_prior(&self) -> Option<&Vec<f64>> {
+        self.class_prior.as_ref()
     }
 
     /// Get the distribution for this model.
     ///
     /// Returns an option which is `None` until the model has been trained.
-    pub fn distr(&self) -> &Option<T> {
-        &self.distr
+    pub fn distr(&self) -> Option<&T> {
+        self.distr.as_ref()
     }
 }
 

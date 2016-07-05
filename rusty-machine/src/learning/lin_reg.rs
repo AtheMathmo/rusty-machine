@@ -58,11 +58,8 @@ impl LinRegressor {
     /// Get the parameters from the model.
     ///
     /// Returns an option that is None if the model has not been trained.
-    pub fn parameters(&self) -> Option<Vector<f64>> {
-        match self.parameters {
-            None => None,
-            Some(ref x) => Some(x.clone()),
-        }
+    pub fn parameters(&self) -> Option<&Vector<f64>> {
+        self.parameters.as_ref()
     }
 }
 
