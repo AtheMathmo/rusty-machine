@@ -42,7 +42,11 @@ fn cholesky() {
 fn qr() {
     let a = Matrix::new(3, 3, vec![12., -51., 4., 6., 167., -68., -4., 24., -41.]);
 
-    let (q, r) = a.qr_decomp();
+    let res = a.qr_decomp();
+
+    assert!(res.is_ok());
+
+    let (q, r) = res.unwrap();
 
     let tol = 1e-6;
 
