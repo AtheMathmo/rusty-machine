@@ -86,11 +86,8 @@ impl<A: OptimAlgorithm<BaseLogisticRegressor>> LogisticRegressor<A> {
     /// Get the parameters from the model.
     ///
     /// Returns an option that is None if the model has not been trained.
-    pub fn parameters(&self) -> Option<Vector<f64>> {
-        match *self.base.parameters() {
-            Some(ref p) => Some(p.clone()),
-            None => None,
-        }
+    pub fn parameters(&self) -> Option<&Vector<f64>> {
+        self.base.parameters()
     }
 }
 
@@ -129,7 +126,7 @@ impl<A> SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor<A>
     ///
     /// Model must be trained before prediction can be made.
     fn predict(&self, inputs: &Matrix<f64>) -> Vector<f64> {
-        if let Some(ref v) = *self.base.parameters() {
+        if let Some(v) = self.base.parameters() {
             let ones = Matrix::<f64>::ones(inputs.rows(), 1);
             let full_inputs = ones.hcat(inputs);
             (full_inputs * v).apply(&Sigmoid::func)
@@ -157,8 +154,8 @@ impl BaseLogisticRegressor {
 
 impl BaseLogisticRegressor {
     /// Returns a reference to the parameters.
-    fn parameters(&self) -> &Option<Vector<f64>> {
-        &self.parameters
+    fn parameters(&self) -> Option<&Vector<f64>> {
+        self.parameters.as_ref()
     }
 
     /// Set the parameters to `Some` vector.

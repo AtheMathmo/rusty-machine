@@ -180,20 +180,20 @@ impl GaussianMixtureModel {
 
     /// The model means
     ///
-    /// Returns a reference to the Option<Matrix<f64>>
-    /// which contains the model means. Each row represents
+    /// Returns an Option<&Matrix<f64>> containing
+    /// the model means. Each row represents
     /// the mean of one of the Gaussians.
-    pub fn means(&self) -> &Option<Matrix<f64>> {
-        &self.model_means
+    pub fn means(&self) -> Option<&Matrix<f64>> {
+        self.model_means.as_ref()
     }
 
     /// The model covariances
     ///
-    /// Returns a reference to the Option<Vec<Matrix<f64>>>
-    /// which contains the model covariances. Each Matrix in
-    /// the vector is the covariance of one of the Gaussians.
-    pub fn covariances(&self) -> &Option<Vec<Matrix<f64>>> {
-        &self.model_covars
+    /// Returns an Option<&Vec<Matrix<f64>>> containing
+    /// the model covariances. Each Matrix in the vector
+    /// is the covariance of one of the Gaussians.
+    pub fn covariances(&self) -> Option<&Vec<Matrix<f64>>> {
+        self.model_covars.as_ref()
     }
 
     /// The model mixture weights
@@ -318,14 +318,14 @@ mod tests {
     fn test_means_none() {
         let model = GaussianMixtureModel::new(5);
 
-        assert_eq!(model.means(), &None);
+        assert_eq!(model.means(), None);
     }
 
     #[test]
     fn test_covars_none() {
         let model = GaussianMixtureModel::new(5);
 
-        assert_eq!(model.covariances(), &None);
+        assert_eq!(model.covariances(), None);
     }
 
     #[test]
