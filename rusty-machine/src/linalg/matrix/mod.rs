@@ -917,7 +917,7 @@ impl<T: Float + FromPrimitive> Matrix<T> {
 
             unsafe {
                 t.set_len(m);
-                
+
                 for j in 0..m {
                     t[j] = match axis {
                         Axes::Row => *self.data.get_unchecked(i * m + j),
@@ -1032,8 +1032,10 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
 /// # Panics
 ///
 /// - The matrix column count and vector size are different.
+/// - The matrix is not square.
+/// - The matrix cannot be decomposed into an LUP form.
     pub fn solve(&self, y: Vector<T>) -> Vector<T> {
-        let (l,u,p) = self.lup_decomp();
+        let (l,u,p) = self.lup_decomp().expect("The matrix could not be LUP decomposed.");
 
         let b = l.solve_l_triangular(p * y);
         u.solve_u_triangular(b)
@@ -1057,11 +1059,13 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
 /// # Panics
 ///
 /// - The matrix is not square.
+/// - The matrix could not be LUP decomposed.
+/// - The matrix has zero determinant.
     pub fn inverse(&self) -> Matrix<T> {
         assert!(self.rows==self.cols, "Matrix is not square.");
 
         let mut new_t_data = Vec::<T>::new();
-        let (l,u,p) = self.lup_decomp();
+        let (l,u,p) = self.lup_decomp().expect("Matrix could not be LUP decomposed.");
 
         let mut d = T::one();
 
@@ -1124,32 +1128,30 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
         }
 
         if n == 2 {
-            return (self[[0,0]] * self[[1,1]]) - (self[[0,1]] * self[[1,0]]);
-        }
+            (self[[0,0]] * self[[1,1]]) - (self[[0,1]] * self[[1,0]])
+        } else if n == 3 {
+            (self[[0,0]] * self[[1,1]] * self[[2,2]]) +
+            (self[[0,1]] * self[[1,2]] * self[[2,0]]) +
+            (self[[0,2]] * self[[1,0]] * self[[2,1]]) -
+            (self[[0,0]] * self[[1,2]] * self[[2,1]]) -
+            (self[[0,1]] * self[[1,0]] * self[[2,2]]) -
+            (self[[0,2]] * self[[1,1]] * self[[2,0]])
+        } else {
+            let (l,u,p) = self.lup_decomp().expect("Could not compute LUP decomposition.");
 
-        if n == 3 {
-            return (self[[0,0]] * self[[1,1]] * self[[2,2]]) +
-                    (self[[0,1]] * self[[1,2]] * self[[2,0]]) +
-                    (self[[0,2]] * self[[1,0]] * self[[2,1]]) -
-                    (self[[0,0]] * self[[1,2]] * self[[2,1]]) -
-                    (self[[0,1]] * self[[1,0]] * self[[2,2]]) -
-                    (self[[0,2]] * self[[1,1]] * self[[2,0]]);
-        }
+            let mut d = T::one();
 
-        let (l,u,p) = self.lup_decomp();
-
-        let mut d = T::one();
-
-        unsafe {
-            for i in 0..l.cols {
-                d = d * *l.data.get_unchecked(i*(l.cols+1));
-                d = d * *u.data.get_unchecked(i*(u.cols+1));
+            unsafe {
+                for i in 0..l.cols {
+                    d = d * *l.data.get_unchecked(i*(l.cols+1));
+                    d = d * *u.data.get_unchecked(i*(u.cols+1));
+                }
             }
+
+            let sgn = p.parity();
+
+            sgn * d
         }
-
-        let sgn = p.parity();
-
-        sgn * d
     }
 }
 

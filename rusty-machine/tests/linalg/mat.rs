@@ -4,7 +4,7 @@ use rm::linalg::matrix::Matrix;
 fn matrix_lup_decomp() {
     let a = Matrix::new(3, 3, vec![1., 3., 5., 2., 4., 7., 1., 1., 0.]);
 
-    let (l, u, p) = a.lup_decomp();
+    let (l, u, p) = a.lup_decomp().expect("Matrix SHOULD be able to be decomposed...");
 
     let l_true = vec![1., 0., 0., 0.5, 1., 0., 0.5, -1., 1.];
     let u_true = vec![2., 4., 7., 0., 1., 1.5, 0., 0., -2.];
@@ -19,7 +19,7 @@ fn matrix_lup_decomp() {
                                vec![1., 2., 3., 4., 5., 3., 0., 4., 5., 6., 2., 1., 2., 3., 4.,
                                     0., 0., 0., 6., 5., 0., 0., 0., 5., 6.]);
 
-    let (l, u, p) = e.lup_decomp();
+    let (l, u, p) = e.lup_decomp().expect("Matrix SHOULD be able to be decomposed...");
     let k = p.transpose() * l * u;
 
     for i in 0..25 {
