@@ -32,14 +32,15 @@ impl<T: Any + Float> Matrix<T> {
     /// let l = m.cholesky();
     /// ```
     ///
+    /// # Panics
+    ///
+    /// - The matrix is not square.
+    ///
     /// # Failures
     ///
-    /// - Matrix is not square.
     /// - Matrix is not positive definite.
     pub fn cholesky(&self) -> Result<Matrix<T>, Error> {
-        if self.rows() != self.cols() {
-            return Err(Error::new(ErrorKind::InvalidArg, "Matrix is not square."));
-        }
+        assert!(self.rows == self.cols, "Matrix must be square for Cholesky decomposition.");
 
         let mut new_data = Vec::<T>::with_capacity(self.rows() * self.cols());
 
@@ -142,8 +143,12 @@ impl<T: Any + Float> Matrix<T> {
     ///
     /// let m = Matrix::new(3,3, vec![1.0,0.5,0.5,0.5,1.0,0.5,0.5,0.5,1.0]);
     ///
-    /// let l = m.qr_decomp();
+    /// let (q, r) = m.qr_decomp().unwrap();
     /// ```
+    ///
+    /// # Failures
+    ///
+    /// - Cannot compute the QR decomposition.
     pub fn qr_decomp(self) -> Result<(Matrix<T>, Matrix<T>), Error> {
         let m = self.rows();
         let n = self.cols();
@@ -210,19 +215,16 @@ impl<T: Any + Float + Signed> Matrix<T> {
     /// println!("{:?}", h.expect("Could not get upper Hessenberg form.").data());
     /// ```
     ///
-    /// # Failures
-    ///
-    /// Fails in the following cases:
+    /// # Panics
     ///
     /// - The matrix is not square.
+    ///
+    /// # Failures
+    ///
     /// - The matrix cannot be reduced to upper hessenberg form.
     pub fn upper_hessenberg(&self) -> Result<Matrix<T>, Error> {
         let n = self.rows;
-
-        if n != self.cols {
-            return Err(Error::new(ErrorKind::InvalidArg,
-                                  "Matrix must be square to produce upper hessenberg."));
-        }
+        assert!(n == self.cols, "Matrix must be square to produce upper hessenberg.");
 
         let mut dummy = self.clone();
 
@@ -287,19 +289,16 @@ impl<T: Any + Float + Signed> Matrix<T> {
     /// println!("Manual hess : {:?}", (u.transpose() * &a * u).data());
     /// ```
     ///
-    /// # Failures
-    ///
-    /// Fails in the following cases:
+    /// # Panics
     ///
     /// - The matrix is not square.
+    ///
+    /// # Failures
+    ///
     /// - The matrix cannot be reduced to upper hessenberg form.
     pub fn upper_hess_decomp(&self) -> Result<(Matrix<T>, Matrix<T>), Error> {
         let n = self.rows;
-
-        if n != self.cols {
-            return Err(Error::new(ErrorKind::InvalidArg,
-                                  "Matrix must be square to produce upper hessenberg."));
-        }
+        assert!(n == self.cols, "Matrix must be square to produce upper hessenberg.");
 
         // First we form the transformation.
         let mut transform = Matrix::identity(n);
@@ -506,11 +505,7 @@ impl<T: Any + Float + Signed> Matrix<T> {
     /// - Eigenvalues cannot be computed.
     pub fn eigenvalues(&self) -> Result<Vec<T>, Error> {
         let n = self.rows();
-
-        if n != self.cols() {
-            return Err(Error::new(ErrorKind::InvalidArg,
-                                  "Matrix must be square for eigendecomp."));
-        }
+        assert!(n == self.cols, "Matrix must be square for eigenvalue computation.");
 
         match n {
             1 => Ok(vec![self.data[0]]),
@@ -659,16 +654,16 @@ impl<T: Any + Float + Signed> Matrix<T> {
     /// println!("{:?}", m.data());
     /// ```
     ///
-    /// # Failures
+    /// # Panics
     ///
     /// - The matrix is not square.
+    ///
+    /// # Failures
+    ///
     /// - The eigen decomposition can not be computed.
     pub fn eigendecomp(&self) -> Result<(Vec<T>, Matrix<T>), Error> {
         let n = self.rows();
-        if n != self.cols() {
-            return Err(Error::new(ErrorKind::InvalidArg,
-                                  "Matrix must be square for eigendecomp."));
-        }
+        assert!(n == self.cols, "Matrix must be square for eigendecomp.");
 
         match n {
             1 => Ok((vec![self.data[0]], Matrix::new(1, 1, vec![T::one()]))),
@@ -699,12 +694,17 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
 ///
 /// let (l,u,p) = a.lup_decomp().expect("This matrix should decompose!");
 /// ```
+///
+/// # Failures
+///
+/// - Matrix cannot be LUP decomposed.
+///
+/// # Panics
+///
+/// - Matrix is not square.
     pub fn lup_decomp(&self) -> Result<(Matrix<T>, Matrix<T>, Matrix<T>), Error> {
         let n = self.cols;
-
-        if self.rows != n {
-            return Err(Error::new(ErrorKind::InvalidArg, "Matrix is not square."));
-        }
+        assert!(self.rows == n, "Matrix must be square for LUP decomposition.");
 
         let mut l = Matrix::<T>::zeros(n, n);
         let mut u = Matrix::<T>::zeros(n, n);
@@ -814,4 +814,51 @@ mod tests {
         assert!((&a * &v2 - &v2 * lambda_2).into_vec().iter().all(|&c| c < epsilon));
     }
 
+    #[test]
+    #[should_panic]
+    fn test_non_square_cholesky() {
+        let a = Matrix::new(2,3, vec![1.0; 6]);
+
+        let _ = a.cholesky();
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_non_square_upper_hessenberg() {
+        let a = Matrix::new(2,3, vec![1.0; 6]);
+
+        let _ = a.upper_hessenberg();
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_non_square_upper_hess_decomp() {
+        let a = Matrix::new(2,3, vec![1.0; 6]);
+
+        let _ = a.upper_hess_decomp();
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_non_square_eigenvalues() {
+        let a = Matrix::new(2,3, vec![1.0; 6]);
+
+        let _ = a.eigenvalues();
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_non_square_eigendecomp() {
+        let a = Matrix::new(2,3, vec![1.0; 6]);
+
+        let _ = a.eigendecomp();
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_non_square_lup_decomp() {
+        let a = Matrix::new(2,3, vec![1.0; 6]);
+
+        let _ = a.lup_decomp();
+    }
 }

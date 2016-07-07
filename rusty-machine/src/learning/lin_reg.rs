@@ -91,7 +91,7 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
 
         let xt = full_inputs.transpose();
 
-        self.parameters = Some(((&xt * full_inputs).inverse() * &xt) * targets);
+        self.parameters = Some(((&xt * full_inputs).inverse().expect("Could not compute (X_T X) inverse.") * &xt) * targets);
     }
 
     /// Predict output value from input data.

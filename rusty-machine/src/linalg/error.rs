@@ -23,6 +23,8 @@ pub enum ErrorKind {
     InvalidArg,
     /// A failure to decompose due to some property of the data.
     DecompFailure,
+    /// A failure due to some algebraic constraints not being met.
+    AlgebraFailure,
 }
 
 impl Error {
