@@ -987,7 +987,7 @@ mod tests {
 
         a += &2;
         assert_eq!(a.into_vec(), (2..11).collect::<Vec<_>>());
-        
+
         let mut a = Vector::new((0..9).collect::<Vec<_>>());
 
         a += 2;
@@ -1004,7 +1004,7 @@ mod tests {
         a += b;
         assert_eq!(a.into_vec(), (0..9).map(|x| 2 * x).collect::<Vec<_>>());
     }
-    
+
     #[test]
     fn vector_sub_assign() {
         let mut a = Vector::new((0..9).collect::<Vec<_>>());
@@ -1027,7 +1027,7 @@ mod tests {
         a -= b;
         assert_eq!(a.into_vec(), vec![0; 9]);
     }
-    
+
     #[test]
     fn vector_div_assign() {
         let a_data = vec![1f32, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];

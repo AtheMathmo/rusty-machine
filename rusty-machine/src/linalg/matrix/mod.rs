@@ -981,7 +981,7 @@ impl<T: Any + Float> Matrix<T> {
                     assert!(*row.get_unchecked(i) == T::zero(),
                             "Matrix is not upper triangular.");
                 }
-                
+
             }
         }
 

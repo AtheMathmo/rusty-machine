@@ -407,8 +407,10 @@ impl<'a, T: Copy> MatrixSliceMut<'a, T> {
     pub fn set_to(self, target: MatrixSlice<T>) {
         // TODO: Should this method take an Into<MatrixSlice> or something similar?
         // So we can use `Matrix` and `MatrixSlice` and `MatrixSliceMut`.
-        assert!(self.rows == target.rows, "Target has different row count to self.");
-        assert!(self.cols == target.cols, "Target has different column count to self.");
+        assert!(self.rows == target.rows,
+                "Target has different row count to self.");
+        assert!(self.cols == target.cols,
+                "Target has different column count to self.");
         for (s, t) in self.iter_rows_mut().zip(target.iter_rows()) {
             // Vectorized assignment per row.
             utils::in_place_vec_bin_op(s, t, |x, &y| *x = y);
