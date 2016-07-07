@@ -407,11 +407,15 @@ impl<T: Any + Float + Signed> Matrix<T> {
 
     fn francis_shift_eigenvalues(&self) -> Result<Vec<T>, Error> {
         let n = self.rows();
+        debug_assert!(n > 2,
+                      "Francis shift only works on matrices greater than 2x2.");
+        debug_assert!(n == self.cols, "Matrix must be square for Francis shift.");
 
         let mut h = try!(self.upper_hessenberg()
             .map_err(|_| Error::new(ErrorKind::DecompFailure, "Could not compute eigenvalues.")));
         h.balance_matrix();
 
+        // The final index of the active matrix
         let mut p = n - 1;
 
         let eps = cast::<f64, T>(1e-20).expect("Failed to cast value for convergence check.");
@@ -461,14 +465,14 @@ impl<T: Any + Float + Signed> Matrix<T> {
 
             {
                 // Apply Givens rotation to the block (on the left)
-                let h_block = MatrixSliceMut::from_matrix(&mut h, [q, p - 2], p + 1 - q, n - p + 2);
+                let h_block = MatrixSliceMut::from_matrix(&mut h, [q, p - 2], 2, n - p + 2);
                 let transformed = &givens_mat * &h_block;
                 h_block.set_to(transformed.as_slice());
             }
 
             {
                 // Apply Givens rotation to block (on the right)
-                let h_block = MatrixSliceMut::from_matrix(&mut h, [0, p - 1], p, 2);
+                let h_block = MatrixSliceMut::from_matrix(&mut h, [0, q], p + 1, 2);
                 let transformed = &h_block * givens_mat.transpose();
                 h_block.set_to(transformed.as_slice());
             }
@@ -542,6 +546,10 @@ impl<T: Any + Float + Signed> Matrix<T> {
 
     fn francis_shift_eigendecomp(&self) -> Result<(Vec<T>, Matrix<T>), Error> {
         let n = self.rows();
+        debug_assert!(n > 2,
+                      "Francis shift only works on matrices greater than 2x2.");
+        debug_assert!(n == self.cols, "Matrix must be square for Francis shift.");
+
         let (u, mut h) = try!(self.upper_hess_decomp().map_err(|_| {
             Error::new(ErrorKind::DecompFailure,
                        "Could not compute eigen decomposition.")
@@ -549,6 +557,7 @@ impl<T: Any + Float + Signed> Matrix<T> {
         h.balance_matrix();
         let mut transformation = Matrix::identity(n);
 
+        // The final index of the active matrix
         let mut p = n - 1;
 
         let eps = cast::<f64, T>(1e-20).expect("Failed to cast value for convergence check.");
@@ -607,14 +616,14 @@ impl<T: Any + Float + Signed> Matrix<T> {
 
             {
                 // Apply Givens rotation to the block (on the left)
-                let h_block = MatrixSliceMut::from_matrix(&mut h, [q, p - 2], p + 1 - q, n - p + 2);
+                let h_block = MatrixSliceMut::from_matrix(&mut h, [q, p - 2], 2, n - p + 2);
                 let transformed = &givens_mat * &h_block;
                 h_block.set_to(transformed.as_slice());
             }
 
             {
                 // Apply Givens rotation to block (on the right)
-                let h_block = MatrixSliceMut::from_matrix(&mut h, [0, p - 1], p, 2);
+                let h_block = MatrixSliceMut::from_matrix(&mut h, [0, q], p + 1, 2);
                 let transformed = &h_block * givens_mat.transpose();
                 h_block.set_to(transformed.as_slice());
             }
@@ -622,7 +631,7 @@ impl<T: Any + Float + Signed> Matrix<T> {
             {
                 // Update the transformation matrix
                 let trans_block =
-                    MatrixSliceMut::from_matrix(&mut transformation, [0, p - 1], n, 2);
+                    MatrixSliceMut::from_matrix(&mut transformation, [0, q], n, 2);
                 let transformed = &trans_block * givens_mat.transpose();
                 trans_block.set_to(transformed.as_slice());
             }
@@ -817,6 +826,44 @@ mod tests {
         let epsilon = 0.00001;
         assert!((&a * &v1 - &v1 * lambda_1).into_vec().iter().all(|&c| c < epsilon));
         assert!((&a * &v2 - &v2 * lambda_2).into_vec().iter().all(|&c| c < epsilon));
+    }
+
+    #[test]
+    fn test_3_by_3_eigenvals() {
+        let a = Matrix::new(3, 3, vec![17f64, 22., 27., 22., 29., 36., 27., 36., 45.]);
+
+        let eigs = a.eigenvalues().unwrap();
+
+        let eig_1 = 90.4026;
+        let eig_2 = 0.5973;
+        let eig_3 = 0.0;
+
+        assert!(eigs.iter().any(|x| (x - eig_1).abs() < 1e-4));
+        assert!(eigs.iter().any(|x| (x - eig_2).abs() < 1e-4));
+        assert!(eigs.iter().any(|x| (x - eig_3).abs() < 1e-4));
+    }
+
+    #[test]
+    fn test_5_by_5_eigenvals() {
+        let a = Matrix::new(5, 5, vec![1f64, 2.0, 3.0, 4.0, 5.0,
+                                    2.0, 4.0, 1.0, 2.0, 1.0,
+                                    3.0, 1.0, 7.0, 1.0, 1.0,
+                                    4.0, 2.0, 1.0, -1.0, 3.0,
+                                    5.0, 1.0, 1.0, 3.0, 2.0]);
+
+        let eigs = a.eigenvalues().unwrap();
+
+        let eig_1 = 12.174;
+        let eig_2 = 5.2681;
+        let eig_3 = -4.4942;
+        let eig_4 = 2.9279;
+        let eig_5 = -2.8758;
+
+        assert!(eigs.iter().any(|x| (x - eig_1).abs() < 1e-4));
+        assert!(eigs.iter().any(|x| (x - eig_2).abs() < 1e-4));
+        assert!(eigs.iter().any(|x| (x - eig_3).abs() < 1e-4));
+        assert!(eigs.iter().any(|x| (x - eig_4).abs() < 1e-4));
+        assert!(eigs.iter().any(|x| (x - eig_5).abs() < 1e-4));
     }
 
     #[test]
