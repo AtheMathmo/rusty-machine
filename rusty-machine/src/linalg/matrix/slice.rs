@@ -196,7 +196,7 @@ impl<'a, T> MatrixSlice<'a, T> {
     /// let slice_data = slice.iter().map(|v| *v).collect::<Vec<usize>>();
     /// assert_eq!(slice_data, vec![4,5,7,8]);
     /// ```
-    pub fn iter(&self) -> SliceIter<T> {
+    pub fn iter<'b>(&self) -> SliceIter<'b, T> {
         SliceIter {
             slice_start: self.ptr,
             row_pos: 0,
@@ -204,7 +204,7 @@ impl<'a, T> MatrixSlice<'a, T> {
             slice_rows: self.rows,
             slice_cols: self.cols,
             row_stride: self.row_stride,
-            _marker: PhantomData::<&'a T>,
+            _marker: PhantomData::<&'b T>,
         }
     }
 }
@@ -213,6 +213,33 @@ impl<'a, T: Copy> MatrixSlice<'a, T> {
     /// Convert the matrix slice into a new Matrix.
     pub fn into_matrix(self) -> Matrix<T> {
         self.iter_rows().collect::<Matrix<T>>()
+    }
+}
+
+impl<'a, T> IntoIterator for MatrixSlice<'a, T> {
+    type Item = &'a T;
+    type IntoIter = SliceIter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a MatrixSlice<'a, T> {
+    type Item = &'a T;
+    type IntoIter = SliceIter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut MatrixSlice<'a, T> {
+    type Item = &'a T;
+    type IntoIter = SliceIter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 
