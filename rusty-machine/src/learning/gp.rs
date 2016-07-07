@@ -163,7 +163,7 @@ impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Vector<f64>> for GaussianProc
 
         let ker_mat = self.ker_mat(inputs, inputs);
 
-        let train_mat = (ker_mat + noise_mat).cholesky().unwrap();
+        let train_mat = (ker_mat + noise_mat).cholesky().expect("Could not compute Cholesky decomposition.");
 
         let x = solve_l_triangular(&train_mat, &(targets - self.mean.func(inputs.clone())));
         let alpha = solve_u_triangular(&train_mat.transpose(), &x);
