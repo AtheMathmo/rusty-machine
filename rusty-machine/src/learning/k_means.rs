@@ -85,7 +85,8 @@ impl<InitAlg: Initializer> UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClas
     fn predict(&self, inputs: &Matrix<f64>) -> Vector<usize> {
         if let Some(ref centroids) = self.centroids {
             return KMeansClassifier::<InitAlg>::find_closest_centroids(centroids.as_slice(),
-                                                                       inputs).0;
+                                                                       inputs)
+                .0;
         } else {
             panic!("Model has not been trained.");
         }
@@ -93,7 +94,7 @@ impl<InitAlg: Initializer> UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClas
 
     /// Train the classifier using input data.
     fn train(&mut self, inputs: &Matrix<f64>) {
-        self.init_centroids(inputs).unwrap();
+        self.init_centroids(inputs).expect("Could not initialize centroids.");
         let mut cost = 0.0;
         let eps = 1e-14;
 
@@ -192,7 +193,12 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
                                    self.k,
                                    inputs.rows())))
         } else {
-            self.centroids = Some(try!(self.init_algorithm.init_centroids(self.k, inputs)));
+            let centroids = try!(self.init_algorithm.init_centroids(self.k, inputs));
+            assert!(centroids.rows() == self.k,
+                    "Initial centroids must have exactly k rows.");
+            assert!(centroids.cols() == inputs.cols(),
+                    "Initial centroids must have the same column count as inputs.");
+            self.centroids = Some(centroids);
             Ok(())
         }
 
@@ -205,10 +211,10 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
         let mut new_centroids = Vec::with_capacity(self.k * inputs.cols());
         for i in 0..self.k {
             let vec_i: Vec<usize> = classes.data()
-                                           .iter()
-                                           .filter(|&x| *x == i)
-                                           .cloned()
-                                           .collect();
+                .iter()
+                .filter(|&x| *x == i)
+                .cloned()
+                .collect();
 
             let mat_i = inputs.select_rows(&vec_i);
             new_centroids.extend(mat_i.mean(Axes::Row).data());
@@ -252,7 +258,10 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
 }
 
 /// Trait for algorithms initializing the K-means centroids.
-pub trait Initializer : Debug {
+pub trait Initializer: Debug {
+    /// Initialize the centroids for the initial state of the K-Means model.
+    ///
+    /// The `Matrix` returned must have `k` rows and the same column count as `inputs`.
     fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error>;
 }
 
@@ -297,9 +306,9 @@ impl Initializer for RandomPartition {
         let mut init_centroids = Vec::with_capacity(k * inputs.cols());
         for i in 0..k {
             let vec_i: Vec<usize> = random_assignments.iter()
-                                                      .filter(|&x| *x == i)
-                                                      .cloned()
-                                                      .collect();
+                .filter(|&x| *x == i)
+                .cloned()
+                .collect();
 
             let mat_i = inputs.select_rows(&vec_i);
             init_centroids.extend(mat_i.mean(Axes::Row).into_vec());
