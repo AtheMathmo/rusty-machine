@@ -196,7 +196,7 @@ impl<'a, T> MatrixSlice<'a, T> {
     /// let slice_data = slice.iter().map(|v| *v).collect::<Vec<usize>>();
     /// assert_eq!(slice_data, vec![4,5,7,8]);
     /// ```
-    pub fn iter(&self) -> SliceIter<T> {
+    pub fn iter(&self) -> SliceIter<'a, T> {
         SliceIter {
             slice_start: self.ptr,
             row_pos: 0,
@@ -330,7 +330,7 @@ impl<'a, T> MatrixSliceMut<'a, T> {
     /// let slice_data = slice.iter().map(|v| *v).collect::<Vec<usize>>();
     /// assert_eq!(slice_data, vec![4,5,7,8]);
     /// ```
-    pub fn iter(&self) -> SliceIter<T> {
+    pub fn iter(&self) -> SliceIter<'a, T> {
         SliceIter {
             slice_start: self.ptr as *const T,
             row_pos: 0,
@@ -363,7 +363,7 @@ impl<'a, T> MatrixSliceMut<'a, T> {
     /// // Only the matrix slice is updated.
     /// assert_eq!(a.into_vec(), vec![0,1,2,3,6,7,6,9,10]);
     /// ```
-    pub fn iter_mut(&mut self) -> SliceIterMut<T> {
+    pub fn iter_mut(&mut self) -> SliceIterMut<'a, T> {
         SliceIterMut {
             slice_start: self.ptr,
             row_pos: 0,
@@ -375,7 +375,6 @@ impl<'a, T> MatrixSliceMut<'a, T> {
         }
     }
 }
-
 
 impl<'a, T: Copy> MatrixSliceMut<'a, T> {
     /// Convert the matrix slice into a new Matrix.
