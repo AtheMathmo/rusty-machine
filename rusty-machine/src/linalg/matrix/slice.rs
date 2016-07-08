@@ -545,4 +545,20 @@ mod tests {
         assert_eq!(e.rows(), 2);
         assert_eq!(e.cols(), 2);
     }
+    
+    #[test]
+    fn into_iter_compile() { 
+        let a = Matrix::new(3, 3, vec![2.0; 9]); 
+        let mut b = MatrixSlice::from_matrix(&a, [1, 1], 2, 2);
+    
+        for v in b { 
+        } 
+    
+        for v in &b { 
+        } 
+    
+        for v in &mut b { 
+        } 
+    } 
+    
 }
