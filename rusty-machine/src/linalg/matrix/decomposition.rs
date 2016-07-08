@@ -504,11 +504,12 @@ impl<T: Any + Float + Signed> Matrix<T> {
     /// println!("{:?}", e);
     /// ```
     ///
-    /// # Failures
-    ///
-    /// Fails in the following cases:
+    /// # Panics
     ///
     /// - The matrix is not square.
+    ///
+    /// # Failures
+    ///
     /// - Eigenvalues cannot be computed.
     pub fn eigenvalues(&self) -> Result<Vec<T>, Error> {
         let n = self.rows();
@@ -708,13 +709,13 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
 /// let (l,u,p) = a.lup_decomp().expect("This matrix should decompose!");
 /// ```
 ///
-/// # Failures
-///
-/// - Matrix cannot be LUP decomposed.
-///
 /// # Panics
 ///
 /// - Matrix is not square.
+///
+/// # Failures
+///
+/// - Matrix cannot be LUP decomposed.
     pub fn lup_decomp(&self) -> Result<(Matrix<T>, Matrix<T>, Matrix<T>), Error> {
         let n = self.cols;
         assert!(self.rows == n, "Matrix must be square for LUP decomposition.");
