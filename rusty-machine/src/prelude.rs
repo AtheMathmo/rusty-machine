@@ -2,10 +2,10 @@
 //!
 //! This module alleviates some common imports used within rusty-machine.
 
-pub use linalg::matrix::Matrix;
-pub use linalg::vector::Vector;
-pub use linalg::matrix::slice::BaseSlice;
-pub use linalg::matrix::Axes;
+pub use linalg::{Matrix, MatrixSlice, MatrixSliceMut};
+pub use linalg::Vector;
+pub use linalg::BaseSlice;
+pub use linalg::Axes;
 
 pub use learning::SupModel;
 pub use learning::UnSupModel;

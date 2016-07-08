@@ -8,11 +8,11 @@ use std::ops::{Mul, Add, Div, Sub, Neg};
 use std::cmp;
 use std::any::Any;
 
-use linalg::matrix::{Matrix, MatrixSlice, MatrixSliceMut};
-use linalg::vector::Vector;
-use linalg::Metric;
-use linalg::utils;
-use linalg::error::{Error, ErrorKind};
+use matrix::{Matrix, MatrixSlice, MatrixSliceMut};
+use vector::Vector;
+use Metric;
+use utils;
+use error::{Error, ErrorKind};
 
 use libnum::{One, Zero, Float, Signed};
 use libnum::{cast, abs};
@@ -25,7 +25,7 @@ impl<T: Any + Float> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let m = Matrix::new(3,3, vec![1.0,0.5,0.5,0.5,1.0,0.5,0.5,0.5,1.0]);
     ///
@@ -140,7 +140,7 @@ impl<T: Any + Float> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let m = Matrix::new(3,3, vec![1.0,0.5,0.5,0.5,1.0,0.5,0.5,0.5,1.0]);
     ///
@@ -208,7 +208,7 @@ impl<T: Any + Float + Signed> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(4,4,vec![2.,0.,1.,1.,2.,0.,1.,2.,1.,2.,0.,0.,2.,0.,1.,1.]);
     /// let h = a.upper_hessenberg();
@@ -280,7 +280,7 @@ impl<T: Any + Float + Signed> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(3,3,vec![1.,2.,3.,4.,5.,6.,7.,8.,9.]);
     ///
@@ -497,7 +497,7 @@ impl<T: Any + Float + Signed> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(4,4, (1..17).map(|v| v as f64).collect::<Vec<f64>>());
     /// let e = a.eigenvalues().expect("We should be able to compute these eigenvalues!");
@@ -658,7 +658,7 @@ impl<T: Any + Float + Signed> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(3,3,vec![3.,2.,4.,2.,0.,2.,4.,2.,3.]);
     ///
@@ -699,7 +699,7 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::linalg::matrix::Matrix;
+/// use rulinalg::matrix::Matrix;
 ///
 /// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
 ///                               0.0,3.0,4.0,
@@ -778,8 +778,8 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
 
 #[cfg(test)]
 mod tests {
-    use linalg::matrix::Matrix;
-    use linalg::vector::Vector;
+    use matrix::Matrix;
+    use vector::Vector;
 
     #[test]
     fn test_1_by_1_matrix_eigenvalues() {

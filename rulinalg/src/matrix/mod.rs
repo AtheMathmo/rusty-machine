@@ -10,10 +10,10 @@ use std::cmp::{PartialEq, min};
 use std::marker::PhantomData;
 use libnum::{One, Zero, Float, FromPrimitive};
 
-use linalg::Metric;
-use linalg::error::{Error, ErrorKind};
-use linalg::utils;
-use linalg::vector::Vector;
+use Metric;
+use error::{Error, ErrorKind};
+use utils;
+use vector::Vector;
 
 mod decomposition;
 mod impl_ops;
@@ -78,7 +78,7 @@ impl<T> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let mat = Matrix::new(2,2, vec![1.0,2.0,3.0,4.0]);
     ///
@@ -152,8 +152,8 @@ impl<T> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::matrix::Axes;
+    /// use rulinalg::matrix::Matrix;
+    /// use rulinalg::matrix::Axes;
     ///
     /// let a = Matrix::new(3,3, vec![2.0; 9]);
     /// let (b,c) = a.split_at(1, Axes::Row);
@@ -185,8 +185,8 @@ impl<T> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::matrix::Axes;
+    /// use rulinalg::matrix::Matrix;
+    /// use rulinalg::matrix::Axes;
     ///
     /// let mut a = Matrix::new(3,3, vec![2.0; 9]);
     /// let (b,c) = a.split_at_mut(1, Axes::Col);
@@ -245,7 +245,7 @@ impl<T> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(3, 3, vec![2.0; 9]);
     /// let b = a.as_slice();
@@ -259,7 +259,7 @@ impl<T> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let mut a = Matrix::new(3, 3, vec![2.0; 9]);
     /// let b = a.as_mut_slice();
@@ -288,7 +288,7 @@ impl<T: Copy> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::<f64>::ones(3,3);
     ///
@@ -329,7 +329,7 @@ impl<T: Copy> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::<f64>::ones(3,3);
     /// let b = &a.select_cols(&[2]);
@@ -373,7 +373,7 @@ impl<T: Copy> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::<f64>::identity(3);
     /// let b = &a.select(&[0,1], &[1,2]);
@@ -423,7 +423,7 @@ impl<T: Copy> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(3,2, vec![1.0,2.0,3.0,4.0,5.0,6.0]);
     /// let b = Matrix::new(3,1, vec![4.0,5.0,6.0]);
@@ -465,7 +465,7 @@ impl<T: Copy> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(2,3, vec![1.0,2.0,3.0,4.0,5.0,6.0]);
     /// let b = Matrix::new(1,3, vec![4.0,5.0,6.0]);
@@ -509,8 +509,8 @@ impl<T: Copy> Matrix<T> {
     /// Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::matrix::Matrix;
+    /// use rulinalg::vector::Vector;
     ///
     /// let a = Matrix::new(3,3,vec![1,2,3,4,5,6,7,8,9]);
     /// let b = Matrix::new(3,2,vec![1,2,3,4,5,6]);
@@ -541,7 +541,7 @@ impl<T: Copy> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     /// fn add_two(a: f64) -> f64 {
     ///     a + 2f64
     /// }
@@ -565,7 +565,7 @@ impl<T: Copy> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let mat = Matrix::new(2,3, vec![1.0,2.0,3.0,4.0,5.0,6.0]);
     ///
@@ -600,7 +600,7 @@ impl<T: Clone + Zero> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let mat = Matrix::<f64>::zeros(2,3);
     /// ```
@@ -619,7 +619,7 @@ impl<T: Clone + Zero> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let mat = Matrix::from_diag(&vec![1.0,2.0,3.0,4.0]);
     /// ```
@@ -647,7 +647,7 @@ impl<T: Clone + One> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let mat = Matrix::<f64>::ones(2,3);
     /// ```
@@ -668,7 +668,7 @@ impl<T: Clone + Zero + One> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let I = Matrix::<f64>::identity(4);
     /// ```
@@ -693,7 +693,7 @@ impl<T: Copy + Zero + One + PartialEq> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(2,2, vec![1.0,0.0,0.0,1.0]);
     /// let a_diag = a.is_diag();
@@ -728,7 +728,7 @@ impl<T: Copy + Zero + Add<T, Output = T>> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
     ///
@@ -755,7 +755,7 @@ impl<T: Copy + Zero + Add<T, Output = T>> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
     ///
@@ -776,7 +776,7 @@ impl<T: Copy + Zero + Add<T, Output = T>> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
     ///
@@ -794,7 +794,7 @@ impl<T: Copy + Mul<T, Output = T>> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
     /// let b = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
@@ -821,7 +821,7 @@ impl<T: Copy + Div<T, Output = T>> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
     /// let b = Matrix::new(2,2,vec![1.0,2.0,3.0,4.0]);
@@ -851,7 +851,7 @@ impl<T: Float + FromPrimitive> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::{Matrix, Axes};
+    /// use rulinalg::matrix::{Matrix, Axes};
     ///
     /// let a = Matrix::<f64>::new(2,2, vec![1.0,2.0,3.0,4.0]);
     ///
@@ -885,7 +885,7 @@ impl<T: Float + FromPrimitive> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::{Matrix, Axes};
+    /// use rulinalg::matrix::{Matrix, Axes};
     ///
     /// let a = Matrix::<f32>::new(2,2,vec![1.0,2.0,3.0,4.0]);
     ///
@@ -948,8 +948,8 @@ impl<T: Any + Float> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::matrix::Matrix;
+    /// use rulinalg::vector::Vector;
     /// use std::f32;
     ///
     /// let u = Matrix::new(2,2, vec![1.0, 2.0, 0.0, 1.0]);
@@ -1020,8 +1020,8 @@ impl<T: Any + Float> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::matrix::Matrix;
+    /// use rulinalg::vector::Vector;
     /// use std::f32;
     ///
     /// let l = Matrix::new(2,2, vec![1.0, 0.0, 2.0, 1.0]);
@@ -1117,8 +1117,8 @@ impl<T: Any + Float> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::matrix::Matrix;
+    /// use rulinalg::vector::Vector;
     ///
     /// let a = Matrix::new(2,2, vec![2.0,3.0,1.0,2.0]);
     /// let y = Vector::new(vec![13.0,8.0]);
@@ -1149,7 +1149,7 @@ impl<T: Any + Float> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(2,2, vec![2.,3.,1.,2.]);
     /// let inv = a.inverse().expect("This matrix should have an inverse!");
@@ -1210,7 +1210,7 @@ impl<T: Any + Float> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
     ///                               0.0,3.0,4.0,
@@ -1274,8 +1274,8 @@ impl<T: Float> Metric<T> for Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::Metric;
+    /// use rulinalg::matrix::Matrix;
+    /// use rulinalg::Metric;
     ///
     /// let a = Matrix::new(2,1, vec![3.0,4.0]);
     /// let c = a.norm();
@@ -1295,8 +1295,8 @@ impl<'a, T: Float> Metric<T> for MatrixSlice<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::{Matrix, MatrixSlice};
-    /// use rusty_machine::linalg::Metric;
+    /// use rulinalg::matrix::{Matrix, MatrixSlice};
+    /// use rulinalg::Metric;
     ///
     /// let a = Matrix::new(2,1, vec![3.0,4.0]);
     /// let b = MatrixSlice::from_matrix(&a, [0,0], 2, 1);
@@ -1320,8 +1320,8 @@ impl<'a, T: Float> Metric<T> for MatrixSliceMut<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::{Matrix, MatrixSliceMut};
-    /// use rusty_machine::linalg::Metric;
+    /// use rulinalg::matrix::{Matrix, MatrixSliceMut};
+    /// use rulinalg::Metric;
     ///
     /// let mut a = Matrix::new(2,1, vec![3.0,4.0]);
     /// let b = MatrixSliceMut::from_matrix(&mut a, [0,0], 2, 1);

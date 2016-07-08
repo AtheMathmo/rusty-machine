@@ -13,8 +13,8 @@
 //! use rusty_machine::learning::svm::SVM;
 //! use rusty_machine::learning::SupModel;
 //!
-//! use rusty_machine::linalg::matrix::Matrix;
-//! use rusty_machine::linalg::vector::Vector;
+//! use rusty_machine::linalg::Matrix;
+//! use rusty_machine::linalg::Vector;
 //!
 //! let inputs = Matrix::new(4,1,vec![1.0,3.0,5.0,7.0]);
 //! let targets = Vector::new(vec![-1.,-1.,1.,1.]);
@@ -33,8 +33,8 @@
 //! ```
 
 
-use linalg::matrix::Matrix;
-use linalg::vector::Vector;
+use linalg::Matrix;
+use linalg::Vector;
 
 use learning::toolkit::kernel::{Kernel, SquaredExp};
 use learning::SupModel;

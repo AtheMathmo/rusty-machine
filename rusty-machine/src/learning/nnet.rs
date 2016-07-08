@@ -8,7 +8,7 @@
 //! use rusty_machine::learning::nnet::{NeuralNet, BCECriterion};
 //! use rusty_machine::learning::toolkit::regularization::Regularization;
 //! use rusty_machine::learning::optim::grad_desc::StochasticGD;
-//! use rusty_machine::linalg::matrix::Matrix;
+//! use rusty_machine::linalg::Matrix;
 //! use rusty_machine::learning::SupModel;
 //!
 //! let inputs = Matrix::new(5,3, vec![1.,1.,1.,2.,2.,2.,3.,3.,3.,
@@ -41,8 +41,8 @@
 //! You can define your own criterion by implementing the `Criterion`
 //! trait with a concrete `ActivationFunc` and `CostFunc`.
 
-use linalg::matrix::{Matrix, MatrixSlice};
-use linalg::matrix::slice::BaseSlice;
+use linalg::{Matrix, MatrixSlice};
+use linalg::BaseSlice;
 
 use learning::SupModel;
 use learning::toolkit::activ_fn;
@@ -146,7 +146,7 @@ impl<'a, T, A> NeuralNet<'a, T, A>
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::slice::BaseSlice;
+    /// use rusty_machine::linalg::BaseSlice;
     /// use rusty_machine::learning::nnet::NeuralNet;
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.

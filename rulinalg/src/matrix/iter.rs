@@ -102,7 +102,7 @@ impl<T> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let a = Matrix::new(3, 2, (0..6).collect::<Vec<usize>>());
     ///
@@ -127,7 +127,7 @@ impl<T> Matrix<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rulinalg::matrix::Matrix;
     ///
     /// let mut a = Matrix::new(3, 2, (0..6).collect::<Vec<usize>>());
     ///
@@ -158,7 +158,7 @@ impl<'a, T> MatrixSlice<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::{Matrix, MatrixSlice};
+    /// use rulinalg::matrix::{Matrix, MatrixSlice};
     ///
     /// let a = Matrix::new(3, 2, (0..6).collect::<Vec<usize>>());
     /// let b = MatrixSlice::from_matrix(&a, [0,0], 2, 2);
@@ -186,7 +186,7 @@ impl<'a, T> MatrixSliceMut<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::{Matrix, MatrixSliceMut};
+    /// use rulinalg::matrix::{Matrix, MatrixSliceMut};
     ///
     /// let mut a = Matrix::new(3 ,2, (0..6).collect::<Vec<usize>>());
     /// let b = MatrixSliceMut::from_matrix(&mut a, [0,0], 2, 2);
@@ -212,7 +212,7 @@ impl<'a, T> MatrixSliceMut<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::{Matrix, MatrixSliceMut};
+    /// use rulinalg::matrix::{Matrix, MatrixSliceMut};
     ///
     /// let mut a = Matrix::new(3, 2, (0..6).collect::<Vec<usize>>());
     ///
@@ -255,7 +255,7 @@ impl<'a, T> MatrixSliceMut<'a, T> {
 /// We can create a new matrix from some data.
 ///
 /// ```
-/// use rusty_machine::linalg::matrix::Matrix;
+/// use rulinalg::matrix::Matrix;
 ///
 /// let a : Matrix<f64> = vec![4f64; 16].chunks(4).collect();
 ///
@@ -266,7 +266,7 @@ impl<'a, T> MatrixSliceMut<'a, T> {
 /// We can also do more interesting things.
 ///
 /// ```
-/// use rusty_machine::linalg::matrix::Matrix;
+/// use rulinalg::matrix::Matrix;
 ///
 /// let a = Matrix::new(4,2, (0..8).collect::<Vec<usize>>());
 ///

@@ -14,8 +14,8 @@
 //! ```
 //! use rusty_machine::learning::glm::{GenLinearModel, Bernoulli};
 //! use rusty_machine::learning::SupModel;
-//! use rusty_machine::linalg::matrix::Matrix;
-//! use rusty_machine::linalg::vector::Vector;
+//! use rusty_machine::linalg::Matrix;
+//! use rusty_machine::linalg::Vector;
 //!
 //! let inputs = Matrix::new(4,1,vec![1.0,3.0,5.0,7.0]);
 //! let targets = Vector::new(vec![0.,0.,1.,1.]);
@@ -35,8 +35,8 @@
 //! assert!(output[0] > 0.5, "Our classifier isn't very good!");
 //! ```
 
-use linalg::vector::Vector;
-use linalg::matrix::Matrix;
+use linalg::Vector;
+use linalg::Matrix;
 
 use learning::SupModel;
 

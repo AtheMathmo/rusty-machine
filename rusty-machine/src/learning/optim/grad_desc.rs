@@ -9,9 +9,9 @@
 //! algorithms and git them into the same scheme easily.
 
 use learning::optim::{Optimizable, OptimAlgorithm};
-use linalg::vector::Vector;
-use linalg::matrix::Matrix;
-use linalg::utils;
+use linalg::Vector;
+use linalg::Matrix;
+use rulinalg::utils;
 
 use learning::toolkit::rand_utils;
 

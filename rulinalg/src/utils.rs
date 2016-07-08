@@ -11,7 +11,7 @@ use std::ops::{Add, Mul, Sub, Div};
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::linalg::utils;
+/// use rulinalg::utils;
 /// let a = vec![1.0,2.0,3.0,4.0];
 /// let b = vec![1.0,2.0,3.0,4.0];
 ///
@@ -92,7 +92,7 @@ pub fn unrolled_sum<T>(mut xs: &[T]) -> T
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::linalg::utils;
+/// use rulinalg::utils;
 ///
 /// let mut a = vec![2.0; 10];
 /// let b = vec![3.0; 10];
@@ -121,7 +121,7 @@ pub fn in_place_vec_bin_op<F, T: Copy>(mut u: &mut [T], v: &[T], mut f: F)
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::linalg::utils;
+/// use rulinalg::utils;
 ///
 /// let mut a = vec![2.0; 10];
 /// let b = vec![3.0; 10];
@@ -161,7 +161,7 @@ pub fn vec_bin_op<F, T: Copy>(u: &[T], v: &[T], f: F) -> Vec<T>
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::linalg::utils;
+/// use rulinalg::utils;
 /// let a = vec![1.0,2.0,3.0,4.0];
 /// let b = vec![1.0,2.0,3.0,4.0];
 ///
@@ -179,7 +179,7 @@ pub fn vec_sum<T: Copy + Add<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::linalg::utils;
+/// use rulinalg::utils;
 /// let a = vec![1.0,2.0,3.0,4.0];
 /// let b = vec![1.0,2.0,3.0,4.0];
 ///
@@ -196,7 +196,7 @@ pub fn vec_sub<T: Copy + Sub<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::linalg::utils;
+/// use rulinalg::utils;
 /// let a = vec![1.0,2.0,3.0,4.0];
 /// let b = vec![1.0,2.0,3.0,4.0];
 ///
@@ -213,7 +213,7 @@ pub fn ele_mul<T: Copy + Mul<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::linalg::utils;
+/// use rulinalg::utils;
 /// let a = vec![1.0,2.0,3.0,4.0];
 /// let b = vec![1.0,2.0,3.0,4.0];
 ///
@@ -233,7 +233,7 @@ pub fn ele_div<T: Copy + Div<T, Output = T>>(u: &[T], v: &[T]) -> Vec<T> {
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::linalg::utils;
+/// use rulinalg::utils;
 /// let a = vec![1.0,2.0,3.0,4.0];
 ///
 /// let c = utils::argmax(&a);
@@ -263,7 +263,7 @@ pub fn argmax<T: Copy + PartialOrd>(u: &[T]) -> (usize, T) {
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::linalg::utils;
+/// use rulinalg::utils;
 /// let a = vec![5.0,2.0,3.0,4.0];
 ///
 /// let c = utils::argmin(&a);
@@ -293,7 +293,7 @@ pub fn argmin<T: Copy + PartialOrd>(u: &[T]) -> (usize, T) {
 /// # Examples
 ///
 /// ```
-/// use rusty_machine::linalg::utils;
+/// use rulinalg::utils;
 /// let a = vec![1.0,2.0,3.0,4.0];
 ///
 /// let c = utils::find(&a, 3.0);

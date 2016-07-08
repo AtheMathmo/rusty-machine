@@ -11,8 +11,8 @@
 //! ```
 //! use rusty_machine::learning::logistic_reg::LogisticRegressor;
 //! use rusty_machine::learning::SupModel;
-//! use rusty_machine::linalg::matrix::Matrix;
-//! use rusty_machine::linalg::vector::Vector;
+//! use rusty_machine::linalg::Matrix;
+//! use rusty_machine::linalg::Vector;
 //!
 //! let inputs = Matrix::new(4,1,vec![1.0,3.0,5.0,7.0]);
 //! let targets = Vector::new(vec![0.,0.,1.,1.]);
@@ -35,8 +35,8 @@
 //! a `GradientDesc` object with custom parameters.
 
 use learning::SupModel;
-use linalg::matrix::Matrix;
-use linalg::vector::Vector;
+use linalg::Matrix;
+use linalg::Vector;
 use learning::toolkit::activ_fn::{ActivationFunc, Sigmoid};
 use learning::toolkit::cost_fn::{CostFunc, CrossEntropyError};
 use learning::optim::grad_desc::GradientDesc;
@@ -102,8 +102,8 @@ impl<A> SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor<A>
     ///
     /// ```
     /// use rusty_machine::learning::logistic_reg::LogisticRegressor;
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rusty_machine::linalg::Matrix;
+    /// use rusty_machine::linalg::Vector;
     /// use rusty_machine::learning::SupModel;
     ///
     /// let mut logistic_mod = LogisticRegressor::default();

@@ -1,4 +1,4 @@
-use rm::linalg::matrix::Matrix;
+use rm::linalg::Matrix;
 use rm::learning::UnSupModel;
 use rm::learning::k_means::KMeansClassifier;
 use rm::learning::k_means::{Forgy, RandomPartition, KPlusPlus};

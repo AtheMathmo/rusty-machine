@@ -3,7 +3,7 @@ use rm::learning::optim::fmincg::ConjugateGD;
 use rm::learning::optim::grad_desc::{GradientDesc, StochasticGD, AdaGrad};
 use rm::learning::optim::OptimAlgorithm;
 
-use rm::linalg::matrix::Matrix;
+use rm::linalg::Matrix;
 
 /// A model which uses the cost function
 /// y = (x - c)^2

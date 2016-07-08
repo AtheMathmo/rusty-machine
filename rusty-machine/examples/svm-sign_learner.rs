@@ -5,8 +5,8 @@ use rusty_machine::learning::svm::SVM;
 use rusty_machine::learning::SupModel;
 use rusty_machine::learning::toolkit::kernel::HyperTan;
 
-use rusty_machine::linalg::matrix::Matrix;
-use rusty_machine::linalg::vector::Vector;
+use rusty_machine::linalg::Matrix;
+use rusty_machine::linalg::Vector;
 
 // Sign learner:
 //   * Model input a float number

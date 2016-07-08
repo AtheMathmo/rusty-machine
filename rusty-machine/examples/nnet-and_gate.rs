@@ -8,7 +8,7 @@ use rusty_machine::learning::nnet::{NeuralNet, BCECriterion};
 use rusty_machine::learning::toolkit::regularization::Regularization;
 use rusty_machine::learning::optim::grad_desc::StochasticGD;
 
-use rusty_machine::linalg::matrix::Matrix;
+use rusty_machine::linalg::Matrix;
 use rusty_machine::learning::SupModel;
 
 // AND gate

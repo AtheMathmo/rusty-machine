@@ -4,8 +4,8 @@
 //! The view must be a contiguous block of the matrix.
 //!
 //! ```
-//! use rusty_machine::linalg::matrix::Matrix;
-//! use rusty_machine::linalg::matrix::MatrixSlice;
+//! use rulinalg::matrix::Matrix;
+//! use rulinalg::matrix::MatrixSlice;
 //!
 //! let a = Matrix::new(3,3, (0..9).collect::<Vec<usize>>());
 //!
@@ -19,7 +19,7 @@
 use super::Matrix;
 use super::MatrixSlice;
 use super::MatrixSliceMut;
-use linalg::utils;
+use utils;
 
 use std::marker::PhantomData;
 use std::mem;
@@ -92,8 +92,8 @@ impl<'a, T> MatrixSlice<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::matrix::MatrixSlice;
+    /// use rulinalg::matrix::Matrix;
+    /// use rulinalg::matrix::MatrixSlice;
     ///
     /// let a = Matrix::new(3,3, (0..9).collect::<Vec<usize>>());
     /// let slice = MatrixSlice::from_matrix(&a, [1,1], 2, 2);
@@ -123,7 +123,7 @@ impl<'a, T> MatrixSlice<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::MatrixSlice;
+    /// use rulinalg::matrix::MatrixSlice;
     ///
     /// let mut a = vec![4.0; 16];
     ///
@@ -161,8 +161,8 @@ impl<'a, T> MatrixSlice<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::matrix::MatrixSlice;
+    /// use rulinalg::matrix::Matrix;
+    /// use rulinalg::matrix::MatrixSlice;
     ///
     /// let a = Matrix::new(3,3, (0..9).collect::<Vec<usize>>());
     /// let slice = MatrixSlice::from_matrix(&a, [1,1], 2, 2);
@@ -188,8 +188,8 @@ impl<'a, T> MatrixSlice<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::matrix::MatrixSlice;
+    /// use rulinalg::matrix::Matrix;
+    /// use rulinalg::matrix::MatrixSlice;
     ///
     /// let a = Matrix::new(3,3, (0..9).collect::<Vec<usize>>());
     /// let slice = MatrixSlice::from_matrix(&a, [1,1], 2, 2);
@@ -223,8 +223,8 @@ impl<'a, T> MatrixSliceMut<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::matrix::MatrixSliceMut;
+    /// use rulinalg::matrix::Matrix;
+    /// use rulinalg::matrix::MatrixSliceMut;
     ///
     /// let mut a = Matrix::new(3,3, (0..9).collect::<Vec<usize>>());
     /// let slice = MatrixSliceMut::from_matrix(&mut a, [1,1], 2, 2);
@@ -257,7 +257,7 @@ impl<'a, T> MatrixSliceMut<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::MatrixSliceMut;
+    /// use rulinalg::matrix::MatrixSliceMut;
     ///
     /// let mut a = vec![4.0; 16];
     ///
@@ -295,8 +295,8 @@ impl<'a, T> MatrixSliceMut<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::matrix::MatrixSliceMut;
+    /// use rulinalg::matrix::Matrix;
+    /// use rulinalg::matrix::MatrixSliceMut;
     ///
     /// let mut a = Matrix::new(3,3, (0..9).collect::<Vec<usize>>());
     /// let slice = MatrixSliceMut::from_matrix(&mut a, [1,1], 2, 2);
@@ -322,8 +322,8 @@ impl<'a, T> MatrixSliceMut<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::matrix::MatrixSliceMut;
+    /// use rulinalg::matrix::Matrix;
+    /// use rulinalg::matrix::MatrixSliceMut;
     ///
     /// let mut a = Matrix::new(3,3, (0..9).collect::<Vec<usize>>());
     /// let slice = MatrixSliceMut::from_matrix(&mut a, [1,1], 2, 2);
@@ -348,8 +348,8 @@ impl<'a, T> MatrixSliceMut<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::Matrix;
-    /// use rusty_machine::linalg::matrix::MatrixSliceMut;
+    /// use rulinalg::matrix::Matrix;
+    /// use rulinalg::matrix::MatrixSliceMut;
     ///
     /// let mut a = Matrix::new(3,3, (0..9).collect::<Vec<usize>>());
     ///
@@ -388,7 +388,7 @@ impl<'a, T: Copy> MatrixSliceMut<'a, T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::matrix::{Matrix, MatrixSliceMut};
+    /// use rulinalg::matrix::{Matrix, MatrixSliceMut};
     ///
     /// let mut mat = Matrix::<f32>::zeros(4,4);
     /// let one_block = Matrix::<f32>::ones(2,2);

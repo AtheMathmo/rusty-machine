@@ -5,7 +5,7 @@
 //! # Usage
 //!
 //! ```
-//! use rusty_machine::linalg::matrix::Matrix;
+//! use rusty_machine::linalg::Matrix;
 //! use rusty_machine::learning::k_means::KMeansClassifier;
 //! use rusty_machine::learning::UnSupModel;
 //!
@@ -42,9 +42,9 @@
 //!
 //! The [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) scheme.
 
-use linalg::matrix::slice::BaseSlice;
-use linalg::matrix::{Matrix, MatrixSlice, Axes};
-use linalg::vector::Vector;
+use linalg::BaseSlice;
+use linalg::{Matrix, MatrixSlice, Axes};
+use linalg::Vector;
 use learning::UnSupModel;
 use learning::error::{Error, ErrorKind};
 

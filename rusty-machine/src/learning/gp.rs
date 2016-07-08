@@ -7,8 +7,8 @@
 //! ```
 //! use rusty_machine::learning::gp;
 //! use rusty_machine::learning::SupModel;
-//! use rusty_machine::linalg::matrix::Matrix;
-//! use rusty_machine::linalg::vector::Vector;
+//! use rusty_machine::linalg::Matrix;
+//! use rusty_machine::linalg::Vector;
 //!
 //! let mut gaussp = gp::GaussianProcess::default();
 //! gaussp.noise = 10f64;
@@ -28,8 +28,8 @@
 
 use learning::toolkit::kernel::{Kernel, SquaredExp};
 use learning::SupModel;
-use linalg::matrix::Matrix;
-use linalg::vector::Vector;
+use linalg::Matrix;
+use linalg::Vector;
 
 /// Trait for GP mean functions.
 pub trait MeanFunc {

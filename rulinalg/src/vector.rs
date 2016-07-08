@@ -6,8 +6,8 @@
 use std::ops::{Mul, Add, Div, Sub, Index, Neg, MulAssign, DivAssign, SubAssign, AddAssign};
 use libnum::{One, Zero, Float, FromPrimitive};
 use std::cmp::PartialEq;
-use linalg::Metric;
-use linalg::utils;
+use Metric;
+use utils;
 
 /// The Vector struct.
 ///
@@ -26,7 +26,7 @@ impl<T> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::vector::Vector;
     ///
     /// let vec = Vector::new(vec![1.0,2.0,3.0,4.0]);
     /// ```
@@ -77,7 +77,7 @@ impl<T: Copy> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::vector::Vector;
     /// fn add_two(a: f64) -> f64 {
     ///     a + 2f64
     /// }
@@ -104,7 +104,7 @@ impl<T: Copy + PartialOrd> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::vector::Vector;
     ///
     /// let a = Vector::new(vec![1.0,2.0,0.0,5.0]);
     /// let b = a.argmax();
@@ -122,7 +122,7 @@ impl<T: Copy + PartialOrd> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::vector::Vector;
     ///
     /// let a = Vector::new(vec![1.0,2.0,0.0,5.0]);
     /// let b = a.argmin();
@@ -138,7 +138,7 @@ impl<T: Copy + PartialOrd> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::vector::Vector;
     ///
     /// let a = Vector::new(vec![1.0,2.0,3.0,4.0,5.0]);
     ///
@@ -166,7 +166,7 @@ impl<T: Clone + Zero> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::vector::Vector;
     ///
     /// let vec = Vector::<f64>::zeros(10);
     /// ```
@@ -186,7 +186,7 @@ impl<T: Clone + One> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::vector::Vector;
     ///
     /// let vec = Vector::<f64>::ones(10);
     /// ```
@@ -204,7 +204,7 @@ impl<T: Copy + Zero + Mul<T, Output = T> + Add<T, Output = T>> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::vector::Vector;
     ///
     /// let a = Vector::new(vec![1.0,2.0,3.0,4.0]);
     /// let b = Vector::new(vec![2.0; 4]);
@@ -225,7 +225,7 @@ impl<T: Copy + Zero + Add<T, Output = T>> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::vector::Vector;
     ///
     /// let a = Vector::new(vec![1.0,2.0,3.0,4.0]);
     ///
@@ -243,7 +243,7 @@ impl<T: Copy + Mul<T, Output = T>> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::vector::Vector;
     ///
     /// let a = Vector::new(vec![1.0,2.0,3.0,4.0]);
     /// let b = Vector::new(vec![1.0,2.0,3.0,4.0]);
@@ -263,7 +263,7 @@ impl<T: Copy + Div<T, Output = T>> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::vector::Vector;
     ///
     /// let a = Vector::new(vec![1.0,2.0,3.0,4.0]);
     /// let b = Vector::new(vec![1.0,2.0,3.0,4.0]);
@@ -285,7 +285,7 @@ impl<T: Float + FromPrimitive> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::vector::Vector;
     ///
     /// let a = Vector::<f32>::new(vec![1.0,2.0,3.0,4.0]);
     ///
@@ -304,7 +304,7 @@ impl<T: Float + FromPrimitive> Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rulinalg::vector::Vector;
     ///
     /// let a = Vector::<f32>::new(vec![1.0,2.0,3.0,4.0]);
     ///
@@ -638,8 +638,8 @@ impl<T: Float> Metric<T> for Vector<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::vector::Vector;
-    /// use rusty_machine::linalg::Metric;
+    /// use rulinalg::vector::Vector;
+    /// use rulinalg::Metric;
     ///
     /// let a = Vector::new(vec![3.0,4.0]);
     /// let c = a.norm();

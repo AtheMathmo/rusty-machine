@@ -5,7 +5,7 @@
 //! # Usage
 //!
 //! ```
-//! use rusty_machine::linalg::matrix::Matrix;
+//! use rusty_machine::linalg::Matrix;
 //! use rusty_machine::learning::gmm::{CovOption, GaussianMixtureModel};
 //! use rusty_machine::learning::UnSupModel;
 //!
@@ -31,9 +31,9 @@
 //! println!("{:?}", post_probs.data());
 //! ```
 
-use linalg::vector::Vector;
-use linalg::matrix::Matrix;
-use linalg::utils;
+use linalg::Vector;
+use linalg::Matrix;
+use rulinalg::utils;
 
 use learning::UnSupModel;
 use learning::toolkit::rand_utils;
@@ -145,7 +145,7 @@ impl GaussianMixtureModel {
     ///
     /// ```
     /// use rusty_machine::learning::gmm::GaussianMixtureModel;
-    /// use rusty_machine::linalg::vector::Vector;
+    /// use rusty_machine::linalg::Vector;
     ///
     /// let mix_weights = Vector::new(vec![0.25, 0.25, 0.5]);
     ///
@@ -314,6 +314,8 @@ impl GaussianMixtureModel {
 #[cfg(test)]
 mod tests {
     use super::GaussianMixtureModel;
+    use linalg::Vector;
+
     #[test]
     fn test_means_none() {
         let model = GaussianMixtureModel::new(5);
@@ -331,8 +333,6 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_negative_mixtures() {
-        use linalg::vector::Vector;
-
         let mix_weights = Vector::new(vec![-0.25, 0.75, 0.5]);
         let _ = GaussianMixtureModel::with_weights(3, mix_weights);
     }
@@ -340,8 +340,6 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_wrong_length_mixtures() {
-        use linalg::vector::Vector;
-
         let mix_weights = Vector::new(vec![0.1, 0.25, 0.75, 0.5]);
         let _ = GaussianMixtureModel::with_weights(3, mix_weights);
     }

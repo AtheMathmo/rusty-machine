@@ -1,6 +1,6 @@
 #![feature(test)]
 
-extern crate rusty_machine as rm;
+extern crate rulinalg;
 extern crate test;
 
 mod linalg {

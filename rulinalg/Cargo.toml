@@ -1,0 +1,15 @@
+[package]
+name = "rulinalg"
+version = "0.0.1"
+authors = ["james <LucasJ94@hotmail.co.uk>"]
+
+description = "A linear algebra library."
+repository = "https://github.com/AtheMathmo/rusty-machine"
+documentation = "https://AtheMathmo.github.io/rusty-machine/"
+keywords = ["linalg","algebra","matrix",]
+readme = "../README.md"
+license = "MIT"
+
+[dependencies]
+num = {version = "0.1.31", default-features = false }
+matrixmultiply = "0.1.8"

@@ -4,9 +4,9 @@
 
 use std::ops::{Add, Mul};
 
-use linalg::vector::Vector;
-use linalg::utils;
+use linalg::Vector;
 use linalg::Metric;
+use rulinalg::utils;
 
 /// The Kernel trait
 ///

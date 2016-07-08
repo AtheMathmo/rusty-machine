@@ -10,7 +10,7 @@
 //!
 //! ```
 //! use rusty_machine::learning::naive_bayes::{NaiveBayes, Gaussian};
-//! use rusty_machine::linalg::matrix::Matrix;
+//! use rusty_machine::linalg::Matrix;
 //! use rusty_machine::learning::SupModel;
 //!
 //! let inputs = Matrix::new(6, 2, vec![1.0, 1.1,
@@ -40,8 +40,8 @@
 //! println!("Final outputs --\n{}", outputs);
 //! ```
 
-use linalg::matrix::{Matrix, Axes};
-use linalg::utils;
+use linalg::{Matrix, Axes};
+use rulinalg::utils;
 use learning::SupModel;
 
 use std::f64::consts::PI;
@@ -430,9 +430,9 @@ mod tests {
     use super::Bernoulli;
     use super::Multinomial;
 
-    use super::super::SupModel;
+    use learning::SupModel;
 
-    use super::super::super::linalg::matrix::Matrix;
+    use linalg::Matrix;
 
     #[test]
     fn test_gaussian() {

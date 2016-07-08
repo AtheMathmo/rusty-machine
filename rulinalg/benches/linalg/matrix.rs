@@ -1,4 +1,4 @@
-use rm::linalg::matrix::Matrix;
+use rulinalg::matrix::Matrix;
 use test::Bencher;
 
 #[bench]

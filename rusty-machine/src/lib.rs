@@ -50,8 +50,8 @@
 //! Here is an example usage for Gaussian Process Regression:
 //!
 //! ```
-//! use rusty_machine::linalg::matrix::Matrix;
-//! use rusty_machine::linalg::vector::Vector;
+//! use rusty_machine::linalg::Matrix;
+//! use rusty_machine::linalg::Vector;
 //! use rusty_machine::learning::gp::GaussianProcess;
 //! use rusty_machine::learning::gp::ConstMean;
 //! use rusty_machine::learning::toolkit::kernel;
@@ -104,29 +104,20 @@
 #![deny(missing_docs)]
 #![warn(missing_debug_implementations)]
 
+extern crate rulinalg;
 extern crate num as libnum;
 extern crate rand;
-extern crate matrixmultiply;
 
 pub mod prelude;
 
-/// Module for linear algebra.
+/// The linear algebra module
+///
+/// This module contains reexports of common tools from the rulinalg crate.
 pub mod linalg {
-
-    /// Trait for linear algebra metrics.
-    ///
-    /// Currently only implements basic euclidean norm.
-    pub trait Metric<T> {
-        /// Computes the euclidean norm.
-        fn norm(&self) -> T;
-    }
-
-    pub mod error;
-    pub mod matrix;
-    pub mod vector;
-    pub mod utils;
-    pub mod convert;
-    pub mod macros;
+    pub use rulinalg::matrix::{Axes, Matrix, MatrixSlice, MatrixSliceMut};
+    pub use rulinalg::matrix::slice::BaseSlice;
+    pub use rulinalg::vector::Vector;
+    pub use rulinalg::Metric;
 }
 
 /// Module for machine learning.
