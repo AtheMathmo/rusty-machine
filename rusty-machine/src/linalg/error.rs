@@ -28,6 +28,7 @@ pub enum ErrorKind {
 }
 
 impl Error {
+    /// Construct a new `Error` of a particular `ErrorKind`.
     pub fn new<E>(kind: ErrorKind, error: E) -> Error
         where E: Into<Box<error::Error + Send + Sync>>
     {
@@ -35,6 +36,11 @@ impl Error {
             kind: kind,
             error: error.into(),
         }
+    }
+
+    /// Get the kind of this `Error`.
+    pub fn kind(&self) -> &ErrorKind {
+        &self.kind
     }
 }
 
