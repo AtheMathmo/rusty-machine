@@ -2,6 +2,24 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.3.3
+
+### New Contributors
+
+- [ic](https://github.com/ic) (Added examples to repo!)
+
+### Breaking Changes
+
+- Parameter methods now return `Option<&Type>` instead of `&Option<Type>`.
+
+### Features
+
+- `MatrixSlice` and `MatrixSliceMut` now have `IntoIterator` methods.
+
+### Minor Changes
+
+- Adding examples to the repository.
+
 ## 0.3.2
 
 ### New Contributors
@@ -16,7 +34,7 @@ This document will be used to keep track of changes made between release version
 
 - Assignment operators (`+=`, `-=`, etc.) now implemented for `Vector`.
 
-### Minor Features
+### Minor Changes
 
 - Some optimizations to `variance` computation for `Matrix`.
 - Some code cleanup - thanks to [clippy](https://github.com/Manishearth/rust-clippy). 
