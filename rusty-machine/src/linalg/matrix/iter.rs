@@ -515,44 +515,44 @@ mod tests {
     }
 
     #[test]
-    #[allow(unused_variables)]
     fn into_iter_compile() { 
         let a = Matrix::new(3, 3, vec![2.0; 9]); 
         let mut b = MatrixSlice::from_matrix(&a, [1, 1], 2, 2);
     
-        for v in b { 
+        for _ in b { 
         } 
     
-        for v in &b { 
+        for _ in &b { 
         } 
     
-        for v in &mut b { 
+        for _ in &mut b { 
         } 
     } 
     
     #[test]
-    #[allow(unused_variables)]
     fn into_iter_mut_compile() { 
-        let mut a = Matrix::new(3, 3, vec![2.0; 9]); 
+        let mut a = Matrix::<f32>::new(3, 3, vec![2.0; 9]); 
         
         {
             let b = MatrixSliceMut::from_matrix(&mut a, [1, 1], 2, 2);
-    
+                
             for v in b { 
+                *v = 1.0;
             } 
         }
     
         {
             let b = MatrixSliceMut::from_matrix(&mut a, [1, 1], 2, 2);
     
-            for v in &b { 
+            for _ in &b {
             } 
         }
     
         {
             let mut b = MatrixSliceMut::from_matrix(&mut a, [1, 1], 2, 2);
     
-            for v in &mut b { 
+            for v in &mut b {
+                *v = 1.0; 
             } 
         }
     } 
