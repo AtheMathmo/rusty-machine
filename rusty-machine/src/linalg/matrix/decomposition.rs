@@ -631,8 +631,7 @@ impl<T: Any + Float + Signed> Matrix<T> {
 
             {
                 // Update the transformation matrix
-                let trans_block =
-                    MatrixSliceMut::from_matrix(&mut transformation, [0, q], n, 2);
+                let trans_block = MatrixSliceMut::from_matrix(&mut transformation, [0, q], n, 2);
                 let transformed = &trans_block * givens_mat.transpose();
                 trans_block.set_to(transformed.as_slice());
             }
@@ -846,11 +845,10 @@ mod tests {
 
     #[test]
     fn test_5_by_5_eigenvals() {
-        let a = Matrix::new(5, 5, vec![1f64, 2.0, 3.0, 4.0, 5.0,
-                                    2.0, 4.0, 1.0, 2.0, 1.0,
-                                    3.0, 1.0, 7.0, 1.0, 1.0,
-                                    4.0, 2.0, 1.0, -1.0, 3.0,
-                                    5.0, 1.0, 1.0, 3.0, 2.0]);
+        let a = Matrix::new(5,
+                            5,
+                            vec![1f64, 2.0, 3.0, 4.0, 5.0, 2.0, 4.0, 1.0, 2.0, 1.0, 3.0, 1.0,
+                                 7.0, 1.0, 1.0, 4.0, 2.0, 1.0, -1.0, 3.0, 5.0, 1.0, 1.0, 3.0, 2.0]);
 
         let eigs = a.eigenvalues().unwrap();
 
