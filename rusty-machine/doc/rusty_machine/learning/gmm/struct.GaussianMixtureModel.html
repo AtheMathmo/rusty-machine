@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-4289' class='srclink' href='../../../src/rusty_machine/src/learning/gmm.rs.html#59-68' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-4332' class='srclink' href='../../../src/rusty_machine/src/learning/gmm.rs.html#59-68' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct GaussianMixtureModel {
     pub cov_option: <a class='enum' href='../../../rusty_machine/learning/gmm/enum.CovOption.html' title='rusty_machine::learning::gmm::CovOption'>CovOption</a>,
     // some fields omitted
@@ -88,18 +88,18 @@ Each element of the mixture weights must be non-negative.</p>
 <li>Mixture weights do not have length k.</li>
 <li>Mixture weights have a negative entry.</li>
 </ul>
-</div><h4 id='method.means' class='method'><code>fn <a href='#method.means' class='fnname'>means</a>(&amp;self) -&gt; &amp;<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;&gt;</code></h4>
+</div><h4 id='method.means' class='method'><code>fn <a href='#method.means' class='fnname'>means</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;&gt;</code></h4>
 <div class='docblock'><p>The model means</p>
 
-<p>Returns a reference to the Option<Matrix<f64>&gt;
-which contains the model means. Each row represents
+<p>Returns an Option&lt;&amp;Matrix<f64>&gt; containing
+the model means. Each row represents
 the mean of one of the Gaussians.</p>
-</div><h4 id='method.covariances' class='method'><code>fn <a href='#method.covariances' class='fnname'>covariances</a>(&amp;self) -&gt; &amp;<a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;&gt;&gt;</code></h4>
+</div><h4 id='method.covariances' class='method'><code>fn <a href='#method.covariances' class='fnname'>covariances</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='../../../rusty_machine/linalg/matrix/struct.Matrix.html' title='rusty_machine::linalg::matrix::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;&gt;&gt;</code></h4>
 <div class='docblock'><p>The model covariances</p>
 
-<p>Returns a reference to the Option<Vec<Matrix<f64>&gt;&gt;
-which contains the model covariances. Each Matrix in
-the vector is the covariance of one of the Gaussians.</p>
+<p>Returns an Option&lt;&amp;Vec<Matrix<f64>&gt;&gt; containing
+the model covariances. Each Matrix in the vector
+is the covariance of one of the Gaussians.</p>
 </div><h4 id='method.mixture_weights' class='method'><code>fn <a href='#method.mixture_weights' class='fnname'>mixture_weights</a>(&amp;self) -&gt; &amp;<a class='struct' href='../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;</code></h4>
 <div class='docblock'><p>The model mixture weights</p>
 

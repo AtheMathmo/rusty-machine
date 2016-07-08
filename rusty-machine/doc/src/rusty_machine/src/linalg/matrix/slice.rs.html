@@ -562,7 +562,6 @@
 <span id="518">518</span>
 <span id="519">519</span>
 <span id="520">520</span>
-<span id="521">521</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Slices for the `Matrix` struct.</span>
 <span class='doccomment'>//!</span>
@@ -762,7 +761,7 @@
     <span class='doccomment'>/// let slice_data = slice.iter().map(|v| *v).collect::&lt;Vec&lt;usize&gt;&gt;();</span>
     <span class='doccomment'>/// assert_eq!(slice_data, vec![4,5,7,8]);</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>iter</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>SliceIter</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>iter</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>SliceIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='ident'>SliceIter</span> {
             <span class='ident'>slice_start</span>: <span class='self'>self</span>.<span class='ident'>ptr</span>,
             <span class='ident'>row_pos</span>: <span class='number'>0</span>,
@@ -896,7 +895,7 @@
     <span class='doccomment'>/// let slice_data = slice.iter().map(|v| *v).collect::&lt;Vec&lt;usize&gt;&gt;();</span>
     <span class='doccomment'>/// assert_eq!(slice_data, vec![4,5,7,8]);</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>iter</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>SliceIter</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>iter</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>SliceIter</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='ident'>SliceIter</span> {
             <span class='ident'>slice_start</span>: <span class='self'>self</span>.<span class='ident'>ptr</span> <span class='kw'>as</span> <span class='op'>*</span><span class='kw'>const</span> <span class='ident'>T</span>,
             <span class='ident'>row_pos</span>: <span class='number'>0</span>,
@@ -929,7 +928,7 @@
     <span class='doccomment'>/// // Only the matrix slice is updated.</span>
     <span class='doccomment'>/// assert_eq!(a.into_vec(), vec![0,1,2,3,6,7,6,9,10]);</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>iter_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>SliceIterMut</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>iter_mut</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>SliceIterMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
         <span class='ident'>SliceIterMut</span> {
             <span class='ident'>slice_start</span>: <span class='self'>self</span>.<span class='ident'>ptr</span>,
             <span class='ident'>row_pos</span>: <span class='number'>0</span>,
@@ -941,7 +940,6 @@
         }
     }
 }
-
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span>: <span class='ident'>Copy</span><span class='op'>&gt;</span> <span class='ident'>MatrixSliceMut</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Convert the matrix slice into a new Matrix.</span>

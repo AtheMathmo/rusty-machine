@@ -573,20 +573,20 @@
 
     <span class='doccomment'>/// The model means</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Returns a reference to the Option&lt;Matrix&lt;f64&gt;&gt;</span>
-    <span class='doccomment'>/// which contains the model means. Each row represents</span>
+    <span class='doccomment'>/// Returns an Option&lt;&amp;Matrix&lt;f64&gt;&gt; containing</span>
+    <span class='doccomment'>/// the model means. Each row represents</span>
     <span class='doccomment'>/// the mean of one of the Gaussians.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>means</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>model_means</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>means</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>model_means</span>.<span class='ident'>as_ref</span>()
     }
 
     <span class='doccomment'>/// The model covariances</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// Returns a reference to the Option&lt;Vec&lt;Matrix&lt;f64&gt;&gt;&gt;</span>
-    <span class='doccomment'>/// which contains the model covariances. Each Matrix in</span>
-    <span class='doccomment'>/// the vector is the covariance of one of the Gaussians.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>covariances</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span> {
-        <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>model_covars</span>
+    <span class='doccomment'>/// Returns an Option&lt;&amp;Vec&lt;Matrix&lt;f64&gt;&gt;&gt; containing</span>
+    <span class='doccomment'>/// the model covariances. Each Matrix in the vector</span>
+    <span class='doccomment'>/// is the covariance of one of the Gaussians.</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>covariances</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>model_covars</span>.<span class='ident'>as_ref</span>()
     }
 
     <span class='doccomment'>/// The model mixture weights</span>
@@ -711,14 +711,14 @@
     <span class='kw'>fn</span> <span class='ident'>test_means_none</span>() {
         <span class='kw'>let</span> <span class='ident'>model</span> <span class='op'>=</span> <span class='ident'>GaussianMixtureModel</span>::<span class='ident'>new</span>(<span class='number'>5</span>);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>model</span>.<span class='ident'>means</span>(), <span class='kw-2'>&amp;</span><span class='prelude-val'>None</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>model</span>.<span class='ident'>means</span>(), <span class='prelude-val'>None</span>);
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>
     <span class='kw'>fn</span> <span class='ident'>test_covars_none</span>() {
         <span class='kw'>let</span> <span class='ident'>model</span> <span class='op'>=</span> <span class='ident'>GaussianMixtureModel</span>::<span class='ident'>new</span>(<span class='number'>5</span>);
 
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>model</span>.<span class='ident'>covariances</span>(), <span class='kw-2'>&amp;</span><span class='prelude-val'>None</span>);
+        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>model</span>.<span class='ident'>covariances</span>(), <span class='prelude-val'>None</span>);
     }
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>

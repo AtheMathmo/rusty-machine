@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-4479' class='srclink' href='../../../src/rusty_machine/src/learning/logistic_reg.rs.html#49-54' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-4520' class='srclink' href='../../../src/rusty_machine/src/learning/logistic_reg.rs.html#49-54' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct LogisticRegressor&lt;A&gt; <span class='where'>where A: <a class='trait' href='../../../rusty_machine/learning/optim/trait.OptimAlgorithm.html' title='rusty_machine::learning::optim::OptimAlgorithm'>OptimAlgorithm</a>&lt;<a class='struct' href='../../../rusty_machine/learning/logistic_reg/struct.BaseLogisticRegressor.html' title='rusty_machine::learning::logistic_reg::BaseLogisticRegressor'>BaseLogisticRegressor</a>&gt;</span> {
     // some fields omitted
 }</pre><div class='docblock'><p>Logistic Regression Model.</p>
@@ -63,7 +63,7 @@
 
 <span class='kw'>let</span> <span class='ident'>gd</span> <span class='op'>=</span> <span class='ident'>GradientDesc</span>::<span class='ident'>default</span>();
 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>logistic_mod</span> <span class='op'>=</span> <span class='ident'>LogisticRegressor</span>::<span class='ident'>new</span>(<span class='ident'>gd</span>);</pre>
-</div><h4 id='method.parameters' class='method'><code>fn <a href='#method.parameters' class='fnname'>parameters</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;&gt;</code></h4>
+</div><h4 id='method.parameters' class='method'><code>fn <a href='#method.parameters' class='fnname'>parameters</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='../../../rusty_machine/linalg/vector/struct.Vector.html' title='rusty_machine::linalg::vector::Vector'>Vector</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;&gt;</code></h4>
 <div class='docblock'><p>Get the parameters from the model.</p>
 
 <p>Returns an option that is None if the model has not been trained.</p>

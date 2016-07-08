@@ -614,22 +614,22 @@
     <span class='doccomment'>/// Get the cluster count for this model.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Returns an option which is `None` until the model has been trained.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>cluster_count</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
-        <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>cluster_count</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>cluster_count</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>cluster_count</span>.<span class='ident'>as_ref</span>()
     }
 
     <span class='doccomment'>/// Get the class prior distribution for this model.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Returns an option which is `None` until the model has been trained.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>class_prior</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
-        <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>class_prior</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>class_prior</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>class_prior</span>.<span class='ident'>as_ref</span>()
     }
 
     <span class='doccomment'>/// Get the distribution for this model.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Returns an option which is `None` until the model has been trained.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>distr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='kw-2'>&amp;</span><span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-        <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>distr</span>
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>distr</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='kw-2'>&amp;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+        <span class='self'>self</span>.<span class='ident'>distr</span>.<span class='ident'>as_ref</span>()
     }
 }
 
