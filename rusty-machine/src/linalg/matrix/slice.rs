@@ -216,33 +216,6 @@ impl<'a, T: Copy> MatrixSlice<'a, T> {
     }
 }
 
-impl<'a, T> IntoIterator for MatrixSlice<'a, T> {
-    type Item = &'a T;
-    type IntoIter = SliceIter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a MatrixSlice<'a, T> {
-    type Item = &'a T;
-    type IntoIter = SliceIter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut MatrixSlice<'a, T> {
-    type Item = &'a T;
-    type IntoIter = SliceIter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
 impl<'a, T> MatrixSliceMut<'a, T> {
     /// Produce a matrix slice from a matrix
     ///
@@ -403,38 +376,10 @@ impl<'a, T> MatrixSliceMut<'a, T> {
     }
 }
 
-
 impl<'a, T: Copy> MatrixSliceMut<'a, T> {
     /// Convert the matrix slice into a new Matrix.
     pub fn into_matrix(self) -> Matrix<T> {
         self.iter_rows().collect::<Matrix<T>>()
-    }
-}
-
-impl<'a, T> IntoIterator for MatrixSliceMut<'a, T> {
-    type Item = &'a mut T;
-    type IntoIter = SliceIterMut<'a, T>;
-
-    fn into_iter(mut self) -> Self::IntoIter {
-        self.iter_mut()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a MatrixSliceMut<'a, T> {
-    type Item = &'a T;
-    type IntoIter = SliceIter<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter()
-    }
-}
-
-impl<'a, T> IntoIterator for &'a mut MatrixSliceMut<'a, T> {
-    type Item = &'a mut T;
-    type IntoIter = SliceIterMut<'a, T>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.iter_mut()
     }
 }
 
@@ -572,47 +517,4 @@ mod tests {
         assert_eq!(e.rows(), 2);
         assert_eq!(e.cols(), 2);
     }
-    
-    #[test]
-    #[allow(unused_variables)]
-    fn into_iter_compile() { 
-        let a = Matrix::new(3, 3, vec![2.0; 9]); 
-        let mut b = MatrixSlice::from_matrix(&a, [1, 1], 2, 2);
-    
-        for v in b { 
-        } 
-    
-        for v in &b { 
-        } 
-    
-        for v in &mut b { 
-        } 
-    } 
-    
-    #[test]
-    #[allow(unused_variables)]
-    fn into_iter_mut_compile() { 
-        let mut a = Matrix::new(3, 3, vec![2.0; 9]); 
-        
-        {
-            let b = MatrixSliceMut::from_matrix(&mut a, [1, 1], 2, 2);
-    
-            for v in b { 
-            } 
-        }
-    
-        {
-            let b = MatrixSliceMut::from_matrix(&mut a, [1, 1], 2, 2);
-    
-            for v in &b { 
-            } 
-        }
-    
-        {
-            let mut b = MatrixSliceMut::from_matrix(&mut a, [1, 1], 2, 2);
-    
-            for v in &mut b { 
-            } 
-        }
-    } 
 }
