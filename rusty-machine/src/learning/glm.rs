@@ -114,7 +114,10 @@ impl<C: Criterion> SupModel<Matrix<f64>, Vector<f64>> for GenLinearModel<C> {
 
             let x_t_w = &x_t * w;
 
-            let new_beta = (&x_t_w * &full_inputs).inverse() * x_t_w * z;
+            let new_beta = (&x_t_w * &full_inputs)
+                .inverse()
+                .expect("Could not compute input data inverse.") *
+                           x_t_w * z;
             let diff = (beta - &new_beta).apply(&|x| x.abs()).sum();
             beta = new_beta;
 

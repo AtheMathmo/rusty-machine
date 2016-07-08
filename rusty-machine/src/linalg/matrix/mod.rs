@@ -5,13 +5,15 @@
 
 use std::any::Any;
 use std::fmt;
-use std::ops::{Mul, Add, Div, Sub, Neg};
-use libnum::{One, Zero, Float, FromPrimitive};
+use std::ops::{Mul, Add, Div};
 use std::cmp::{PartialEq, min};
-use linalg::Metric;
-use linalg::vector::Vector;
-use linalg::utils;
 use std::marker::PhantomData;
+use libnum::{One, Zero, Float, FromPrimitive};
+
+use linalg::Metric;
+use linalg::error::{Error, ErrorKind};
+use linalg::utils;
+use linalg::vector::Vector;
 
 mod decomposition;
 mod impl_ops;
@@ -917,7 +919,7 @@ impl<T: Float + FromPrimitive> Matrix<T> {
 
             unsafe {
                 t.set_len(m);
-                
+
                 for j in 0..m {
                     t[j] = match axis {
                         Axes::Row => *self.data.get_unchecked(i * m + j),
@@ -937,57 +939,153 @@ impl<T: Float + FromPrimitive> Matrix<T> {
     }
 }
 
-impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
-                           Add<T, Output=T> + Mul<T, Output=T> +
-                           Sub<T, Output=T> + Div<T, Output=T> +
-                           PartialOrd
-{
+impl<T: Any + Float> Matrix<T> {
+    /// Solves an upper triangular linear system.
+    ///
+    /// Given a matrix `U`, which is upper triangular, and a vector `y`, this function returns `x`
+    /// such that `Ux = y`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::vector::Vector;
+    /// use std::f32;
+    ///
+    /// let u = Matrix::new(2,2, vec![1.0, 2.0, 0.0, 1.0]);
+    /// let y = Vector::new(vec![3.0, 1.0]);
+    ///
+    /// let x = u.solve_u_triangular(y).expect("A solution should exist!");
+    /// assert!((x[0] - 1.0) < f32::EPSILON);
+    /// assert!((x[1] - 1.0) < f32::EPSILON);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// - Vector size and matrix column count are not equal.
+    /// - Matrix is not upper triangular.
+    ///
+    /// # Failures
+    ///
+    /// Fails if there is no valid solution to the system (matrix is singular).
+    pub fn solve_u_triangular(&self, y: Vector<T>) -> Result<Vector<T>, Error> {
+        assert!(self.cols == y.size(),
+                format!("Vector size {0} != {1} Matrix column count.",
+                        y.size(),
+                        self.cols));
 
-/// Solves an upper triangular linear system.
-    fn solve_u_triangular(&self, y: Vector<T>) -> Vector<T> {
-        assert!(self.cols == y.size(), "Matrix and Vector dimensions do not agree.");
+        // Make sure we are upper triangular.
+        for (row_idx, row) in self.iter_rows().enumerate() {
+            for i in 0..row_idx {
+                unsafe {
+                    assert!(*row.get_unchecked(i) == T::zero(),
+                            "Matrix is not upper triangular.");
+                }
 
+            }
+        }
+
+        self.back_substitution(y)
+    }
+
+    fn back_substitution(&self, y: Vector<T>) -> Result<Vector<T>, Error> {
         let mut x = vec![T::zero(); y.size()];
 
-        x[y.size()-1] = y[y.size()-1] / self[[y.size()-1,y.size()-1]];
+        x[y.size() - 1] = y[y.size() - 1] / self[[y.size() - 1, y.size() - 1]];
 
         unsafe {
-            for i in (0..y.size()-1).rev() {
+            for i in (0..y.size() - 1).rev() {
                 let mut holding_u_sum = T::zero();
-                for j in (i+1..y.size()).rev() {
-                    holding_u_sum = holding_u_sum +
-                                    *self.data.get_unchecked(i * self.cols + j) * x[j];
+                for j in (i + 1..y.size()).rev() {
+                    holding_u_sum = holding_u_sum + *self.get_unchecked([i, j]) * x[j];
                 }
-                x[i] = (y[i] - holding_u_sum) / *self.data.get_unchecked(i*(self.cols+1));
+
+                let diag = *self.get_unchecked([i, i]);
+                if diag.abs() < T::min_positive_value() + T::min_positive_value() {
+                    return Err(Error::new(ErrorKind::AlgebraFailure,
+                                          "Linear system cannot be solved (matrix is singular)."));
+                }
+                x[i] = (y[i] - holding_u_sum) / diag;
             }
         }
 
-        Vector::new(x)
+        Ok(Vector::new(x))
     }
 
-/// Solves a lower triangular linear system.
-    fn solve_l_triangular(&self, y: Vector<T>) -> Vector<T> {
-        assert!(self.cols == y.size(), "Matrix and Vector dimensions do not agree.");
+    /// Solves a lower triangular linear system.
+    ///
+    /// Given a matrix `L`, which is lower triangular, and a vector `y`, this function returns `x`
+    /// such that `Lx = y`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::vector::Vector;
+    /// use std::f32;
+    ///
+    /// let l = Matrix::new(2,2, vec![1.0, 0.0, 2.0, 1.0]);
+    /// let y = Vector::new(vec![1.0, 3.0]);
+    ///
+    /// let x = l.solve_l_triangular(y).expect("A solution should exist!");
+    /// println!("{:?}", x);
+    /// assert!((x[0] - 1.0) < f32::EPSILON);
+    /// assert!((x[1] - 1.0) < f32::EPSILON);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// - Vector size and matrix column count are not equal.
+    /// - Matrix is not lower triangular.
+    ///
+    /// # Failures
+    ///
+    /// Fails if there is no valid solution to the system (matrix is singular).
+    pub fn solve_l_triangular(&self, y: Vector<T>) -> Result<Vector<T>, Error> {
+        assert!(self.cols == y.size(),
+                format!("Vector size {0} != {1} Matrix column count.",
+                        y.size(),
+                        self.cols));
 
+        // Make sure we are lower triangular.
+        for (row_idx, row) in self.iter_rows().enumerate() {
+            for i in row_idx + 1..self.cols {
+                unsafe {
+                    assert!(*row.get_unchecked(i) == T::zero(),
+                            "Matrix is not lower triangular.");
+                }
+            }
+        }
+
+        self.forward_substitution(y)
+    }
+
+    fn forward_substitution(&self, y: Vector<T>) -> Result<Vector<T>, Error> {
         let mut x = Vec::with_capacity(y.size());
 
-        x.push(y[0] / self[[0,0]]);
+        x.push(y[0] / self[[0, 0]]);
 
         unsafe {
-            for (i,y_item) in y.data().iter().enumerate().take(y.size()).skip(1) {
+            for (i, y_item) in y.data().iter().enumerate().take(y.size()).skip(1) {
                 let mut holding_l_sum = T::zero();
                 for (j, x_item) in x.iter().enumerate().take(i) {
-                    holding_l_sum = holding_l_sum +
-                                    *self.data.get_unchecked(i * self.cols + j) * *x_item;
+                    holding_l_sum = holding_l_sum + *self.get_unchecked([i, j]) * *x_item;
                 }
-                x.push((*y_item - holding_l_sum) / *self.data.get_unchecked(i*(self.cols+1)));
+
+                let diag = *self.get_unchecked([i, i]);
+
+                if diag.abs() < T::min_positive_value() + T::min_positive_value() {
+                    return Err(Error::new(ErrorKind::AlgebraFailure,
+                                          "Linear system cannot be solved (matrix is singular)."));
+                }
+                x.push((*y_item - holding_l_sum) / diag);
             }
         }
 
-        Vector::new(x)
+        Ok(Vector::new(x))
     }
 
-/// Computes the parity of a permutation matrix.
+    /// Computes the parity of a permutation matrix.
     fn parity(&self) -> T {
         let mut visited = vec![false; self.rows];
         let mut sgn = T::one();
@@ -1000,7 +1098,8 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
                 while !visited[next] {
                     len += 1;
                     visited[next] = true;
-                    next = utils::find(&self.data[next*self.cols..(next+1)*self.cols], T::one());
+                    next = utils::find(&self.data[next * self.cols..(next + 1) * self.cols],
+                                       T::one());
                 }
 
                 if len % 2 == 0 {
@@ -1011,103 +1110,121 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
         sgn
     }
 
-/// Solves the equation Ax = y.
-///
-/// Requires a Vector y as input.
-///
-/// # Examples
-///
-/// ```
-/// use rusty_machine::linalg::matrix::Matrix;
-/// use rusty_machine::linalg::vector::Vector;
-///
-/// let a = Matrix::new(2,2, vec![2.0,3.0,1.0,2.0]);
-/// let y = Vector::new(vec![13.0,8.0]);
-///
-/// let x = a.solve(y);
-///
-/// assert_eq!(*x.data(), vec![2.0, 3.0]);
-/// ```
-///
-/// # Panics
-///
-/// - The matrix column count and vector size are different.
-    pub fn solve(&self, y: Vector<T>) -> Vector<T> {
-        let (l,u,p) = self.lup_decomp();
+    /// Solves the equation `Ax = y`.
+    ///
+    /// Requires a Vector `y` as input.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    /// use rusty_machine::linalg::vector::Vector;
+    ///
+    /// let a = Matrix::new(2,2, vec![2.0,3.0,1.0,2.0]);
+    /// let y = Vector::new(vec![13.0,8.0]);
+    ///
+    /// let x = a.solve(y).unwrap();
+    ///
+    /// assert_eq!(*x.data(), vec![2.0, 3.0]);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// - The matrix column count and vector size are different.
+    /// - The matrix is not square.
+    ///
+    /// # Failures
+    ///
+    /// - The matrix cannot be decomposed into an LUP form to solve.
+    /// - There is no valid solution as the matrix is singular.
+    pub fn solve(&self, y: Vector<T>) -> Result<Vector<T>, Error> {
+        let (l, u, p) = try!(self.lup_decomp());
 
-        let b = l.solve_l_triangular(p * y);
-        u.solve_u_triangular(b)
+        let b = try!(l.forward_substitution(p * y));
+        u.back_substitution(b)
     }
 
-/// Computes the inverse of the matrix.
-///
-/// # Examples
-///
-/// ```
-/// use rusty_machine::linalg::matrix::Matrix;
-///
-/// let a = Matrix::new(2,2, vec![2.,3.,1.,2.]);
-/// let inv = a.inverse();
-///
-/// let I = a * inv;
-///
-/// assert_eq!(*I.data(), vec![1.0,0.0,0.0,1.0]);
-/// ```
-///
-/// # Panics
-///
-/// - The matrix is not square.
-    pub fn inverse(&self) -> Matrix<T> {
-        assert!(self.rows==self.cols, "Matrix is not square.");
+    /// Computes the inverse of the matrix.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(2,2, vec![2.,3.,1.,2.]);
+    /// let inv = a.inverse().expect("This matrix should have an inverse!");
+    ///
+    /// let I = a * inv;
+    ///
+    /// assert_eq!(*I.data(), vec![1.0,0.0,0.0,1.0]);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// - The matrix is not square.
+    ///
+    /// # Failures
+    ///
+    /// - The matrix could not be LUP decomposed.
+    /// - The matrix has zero determinant.
+    pub fn inverse(&self) -> Result<Matrix<T>, Error> {
+        assert!(self.rows == self.cols, "Matrix is not square.");
 
-        let mut new_t_data = Vec::<T>::new();
-        let (l,u,p) = self.lup_decomp();
+        let mut inv_t_data = Vec::<T>::new();
+        let (l, u, p) = try!(self.lup_decomp().map_err(|_| {
+            Error::new(ErrorKind::DecompFailure,
+                       "Could not compute LUP factorization for inverse.")
+        }));
 
         let mut d = T::one();
 
         unsafe {
             for i in 0..l.cols {
-                d = d * *l.data.get_unchecked(i*(l.cols+1));
-                d = d * *u.data.get_unchecked(i*(u.cols+1));
+                d = d * *l.get_unchecked([i, i]);
+                d = d * *u.get_unchecked([i, i]);
             }
         }
 
         if d == T::zero() {
-            panic!("Matrix has zero determinant.")
+            return Err(Error::new(ErrorKind::DecompFailure,
+                                  "Matrix is singular and cannot be inverted."));
         }
 
         for i in 0..self.rows {
             let mut id_col = vec![T::zero(); self.cols];
             id_col[i] = T::one();
 
-            let b = l.solve_l_triangular(&p * Vector::new(id_col));
-            new_t_data.append(&mut u.solve_u_triangular(b).into_vec());
+            let b = l.forward_substitution(&p * Vector::new(id_col))
+                .expect("Matrix is singular AND has non-zero determinant!?");
+            inv_t_data.append(&mut u.back_substitution(b)
+                .expect("Matrix is singular AND has non-zero determinant!?")
+                .into_vec());
 
         }
 
-        Matrix::new(self.rows, self.cols, new_t_data).transpose()
+        Ok(Matrix::new(self.rows, self.cols, inv_t_data).transpose())
     }
 
-/// Computes the determinant of the matrix.
-///
-/// # Examples
-///
-/// ```
-/// use rusty_machine::linalg::matrix::Matrix;
-///
-/// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
-///                               0.0,3.0,4.0,
-///                               5.0, 1.0, 2.0]);
-///
-/// let det = a.det();
-///
-/// ```
-///
-/// # Panics
-///
-/// - The matrix is not square.
+    /// Computes the determinant of the matrix.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::Matrix;
+    ///
+    /// let a = Matrix::new(3,3, vec![1.0,2.0,0.0,
+    ///                               0.0,3.0,4.0,
+    ///                               5.0, 1.0, 2.0]);
+    ///
+    /// let det = a.det();
+    ///
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// - The matrix is not square.
     pub fn det(&self) -> T {
-        assert!(self.rows==self.cols, "Matrix is not square.");
+        assert!(self.rows == self.cols, "Matrix is not square.");
 
         let n = self.cols;
 
@@ -1116,7 +1233,7 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
 
             unsafe {
                 for i in 0..n {
-                    d = d * *self.data.get_unchecked(i*(self.cols+1));
+                    d = d * *self.get_unchecked([i, i]);
                 }
             }
 
@@ -1124,32 +1241,30 @@ impl<T> Matrix<T> where T: Any + Copy + One + Zero + Neg<Output=T> +
         }
 
         if n == 2 {
-            return (self[[0,0]] * self[[1,1]]) - (self[[0,1]] * self[[1,0]]);
-        }
+            (self[[0, 0]] * self[[1, 1]]) - (self[[0, 1]] * self[[1, 0]])
+        } else if n == 3 {
+            (self[[0, 0]] * self[[1, 1]] * self[[2, 2]]) +
+            (self[[0, 1]] * self[[1, 2]] * self[[2, 0]]) +
+            (self[[0, 2]] * self[[1, 0]] * self[[2, 1]]) -
+            (self[[0, 0]] * self[[1, 2]] * self[[2, 1]]) -
+            (self[[0, 1]] * self[[1, 0]] * self[[2, 2]]) -
+            (self[[0, 2]] * self[[1, 1]] * self[[2, 0]])
+        } else {
+            let (l, u, p) = self.lup_decomp().expect("Could not compute LUP decomposition.");
 
-        if n == 3 {
-            return (self[[0,0]] * self[[1,1]] * self[[2,2]]) +
-                    (self[[0,1]] * self[[1,2]] * self[[2,0]]) +
-                    (self[[0,2]] * self[[1,0]] * self[[2,1]]) -
-                    (self[[0,0]] * self[[1,2]] * self[[2,1]]) -
-                    (self[[0,1]] * self[[1,0]] * self[[2,2]]) -
-                    (self[[0,2]] * self[[1,1]] * self[[2,0]]);
-        }
+            let mut d = T::one();
 
-        let (l,u,p) = self.lup_decomp();
-
-        let mut d = T::one();
-
-        unsafe {
-            for i in 0..l.cols {
-                d = d * *l.data.get_unchecked(i*(l.cols+1));
-                d = d * *u.data.get_unchecked(i*(u.cols+1));
+            unsafe {
+                for i in 0..l.cols {
+                    d = d * *l.get_unchecked([i, i]);
+                    d = d * *u.get_unchecked([i, i]);
+                }
             }
+
+            let sgn = p.parity();
+
+            sgn * d
         }
-
-        let sgn = p.parity();
-
-        sgn * d
     }
 }
 
@@ -1514,7 +1629,7 @@ mod tests {
 
         let y = Vector::new(vec![8., 5.]);
 
-        let x = a.solve(y);
+        let x = a.solve(y).unwrap();
 
         assert_eq!(x.size(), 2);
 

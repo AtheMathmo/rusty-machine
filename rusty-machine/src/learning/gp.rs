@@ -163,10 +163,11 @@ impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Vector<f64>> for GaussianProc
 
         let ker_mat = self.ker_mat(inputs, inputs);
 
-        let train_mat = (ker_mat + noise_mat).cholesky();
+        let train_mat =
+            (ker_mat + noise_mat).cholesky().expect("Could not compute Cholesky decomposition.");
 
-        let x = solve_l_triangular(&train_mat, &(targets - self.mean.func(inputs.clone())));
-        let alpha = solve_u_triangular(&train_mat.transpose(), &x);
+        let x = train_mat.solve_l_triangular(targets - self.mean.func(inputs.clone())).unwrap();
+        let alpha = train_mat.transpose().solve_u_triangular(x).unwrap();
 
         self.train_mat = Some(train_mat);
         self.train_data = Some(inputs.clone());
@@ -190,9 +191,9 @@ impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
 
             let test_mat = self.ker_mat(inputs, t_data);
             let mut var_data = Vec::with_capacity(inputs.rows() * inputs.cols());
-            for i in 0..test_mat.rows() {
-                let test_point = Vector::new(test_mat.select_rows(&[i]).into_vec());
-                var_data.append(&mut solve_l_triangular(t_mat, &test_point).into_vec());
+            for row in test_mat.iter_rows() {
+                let test_point = Vector::new(row.to_vec());
+                var_data.append(&mut t_mat.solve_l_triangular(test_point).unwrap().into_vec());
             }
 
             let v_mat = Matrix::new(test_mat.rows(), test_mat.cols(), var_data);
@@ -204,48 +205,4 @@ impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
 
         panic!("The model has not been trained.");
     }
-}
-
-/// Solves an upper triangular linear system.
-fn solve_u_triangular(mat: &Matrix<f64>, y: &Vector<f64>) -> Vector<f64> {
-    assert!(mat.cols() == y.size(),
-            "Matrix and Vector dimensions do not agree.");
-
-    let mut x = vec![0.; y.size()];
-
-
-    x[y.size() - 1] = y[y.size() - 1] / mat[[y.size() - 1, y.size() - 1]];
-
-    for i in (0..y.size() - 1).rev() {
-        let mut holding_u_sum = 0.;
-        for j in (i + 1..y.size()).rev() {
-            holding_u_sum += mat.data()[i * mat.cols() + j] * x[j];
-        }
-
-        x[i] = (y[i] - holding_u_sum) / mat.data()[i * (mat.cols() + 1)];
-    }
-
-    Vector::new(x)
-}
-
-/// Solves a lower triangular linear system.
-fn solve_l_triangular(mat: &Matrix<f64>, y: &Vector<f64>) -> Vector<f64> {
-    assert!(mat.cols() == y.size(),
-            "Matrix and Vector dimensions do not agree.");
-
-    let mut x = vec![0.; y.size()];
-
-
-    x[0] = y[0] / mat[[0, 0]];
-
-    for i in 1..y.size() {
-        let mut holding_l_sum = 0.;
-        for (j, x_item) in x.iter().enumerate().take(i) {
-            holding_l_sum += mat.data()[i * mat.cols() + j] * x_item;
-        }
-
-        x[i] = (y[i] - holding_l_sum) / mat.data()[i * (mat.cols() + 1)];
-    }
-
-    Vector::new(x)
 }

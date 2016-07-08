@@ -19,6 +19,7 @@
 use super::Matrix;
 use super::MatrixSlice;
 use super::MatrixSliceMut;
+use linalg::utils;
 
 use std::marker::PhantomData;
 use std::mem;
@@ -380,6 +381,39 @@ impl<'a, T: Copy> MatrixSliceMut<'a, T> {
     /// Convert the matrix slice into a new Matrix.
     pub fn into_matrix(self) -> Matrix<T> {
         self.iter_rows().collect::<Matrix<T>>()
+    }
+
+    /// Sets the underlying matrix data to the target data.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::matrix::{Matrix, MatrixSliceMut};
+    ///
+    /// let mut mat = Matrix::<f32>::zeros(4,4);
+    /// let one_block = Matrix::<f32>::ones(2,2);
+    ///
+    /// // Get a mutable slice of the upper left 2x2 block.
+    /// let mat_block = MatrixSliceMut::from_matrix(&mut mat, [0,0], 2, 2);
+    ///
+    /// // Set the upper left 2x2 block to be ones.
+    /// mat_block.set_to(one_block.as_slice());
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// Panics if the dimensions of `self` and `target` are not the same.
+    pub fn set_to(self, target: MatrixSlice<T>) {
+        // TODO: Should this method take an Into<MatrixSlice> or something similar?
+        // So we can use `Matrix` and `MatrixSlice` and `MatrixSliceMut`.
+        assert!(self.rows == target.rows,
+                "Target has different row count to self.");
+        assert!(self.cols == target.cols,
+                "Target has different column count to self.");
+        for (s, t) in self.iter_rows_mut().zip(target.iter_rows()) {
+            // Vectorized assignment per row.
+            utils::in_place_vec_bin_op(s, t, |x, &y| *x = y);
+        }
     }
 }
 

@@ -232,7 +232,7 @@ impl GaussianMixtureModel {
             for cov in covars {
                 // TODO: combine these. We compute det to get the inverse.
                 let covar_det = cov.det();
-                let covar_inv = cov.inverse();
+                let covar_inv = cov.inverse().expect("Could not compute inverse of covariance.");
 
                 cov_sqrt_dets.push(covar_det.sqrt());
                 cov_invs.push(covar_inv);

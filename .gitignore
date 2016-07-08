@@ -4,3 +4,4 @@ rusty-machine/Cargo.lock
 *~
 *.swp
 *.swo
+.vscode
