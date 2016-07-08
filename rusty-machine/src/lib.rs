@@ -101,6 +101,7 @@
 //! let _ = Matrix::new(2,2,vec![2.0;4]);
 //! ```
 
+#![deny(missing_docs)]
 #![warn(missing_debug_implementations)]
 
 extern crate num as libnum;
@@ -138,6 +139,8 @@ pub mod learning {
     pub mod gp;
     pub mod svm;
     pub mod naive_bayes;
+
+    pub mod error;
 
     /// Trait for supervised model.
     pub trait SupModel<T, U> {
