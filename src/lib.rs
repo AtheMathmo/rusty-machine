@@ -1,6 +1,6 @@
 //! # The rusty-machine crate.
 //!
-//! Crate built for machine learning with some linear algebra thrown in.
+//! A crate built for machine learning that works out-of-the-box.
 //!
 //! ---
 //!
@@ -27,13 +27,13 @@
 //!
 //! ### linalg
 //!
-//! The linalg module contains all of the linear algebra tools and structures.
-//! This module is efficient but not state of the art. In the future this module
-//! will likely be pulled out of rusty-machine and maintained separately.
+//! The linalg module reexports some structs and traits from the
+//! [rulinalg](https://crates.io/crates/rulinalg) crate. This is to provide
+//! easy access to common linear algebra tools within this library.
 //!
 //! ---
 //!
-//! # Usage
+//! ## Usage
 //!
 //! Specific usage of modules is described within the modules themselves. This section
 //! will focus on the general workflow for this library.
@@ -88,7 +88,7 @@
 //! let outputs = gp.predict(&test_inputs);
 //! ```
 //!
-//! Of course this code could have been a lot simpler if we had simply adopted
+//! This code could have been a lot simpler if we had simply adopted
 //! `let mut gp = GaussianProcess::default();`. Conversely, you could also implement
 //! your own kernels and mean functions by using the appropriate traits.
 //!

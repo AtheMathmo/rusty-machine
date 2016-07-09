@@ -1,15 +1,19 @@
 [package]
-name = "rulinalg"
-version = "0.0.1"
-authors = ["james <LucasJ94@hotmail.co.uk>"]
+name = "rusty-machine"
+version = "0.3.3"
+authors = ["AtheMathmo"]
 
-description = "A linear algebra library."
+description = "A machine learning library."
 repository = "https://github.com/AtheMathmo/rusty-machine"
 documentation = "https://AtheMathmo.github.io/rusty-machine/"
-keywords = ["linalg","algebra","matrix",]
+keywords = ["machine","learning","stats","statistics","algebra"]
 readme = "../README.md"
 license = "MIT"
 
+[features]
+stats = []
+
 [dependencies]
 num = {version = "0.1.31", default-features = false }
-matrixmultiply = "0.1.8"
+rand = "0.3.14"
+rulinalg = "0.0.2"

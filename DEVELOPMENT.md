@@ -21,10 +21,13 @@ This marks my intended release goals. I won't estimate the actual dates of relea
         <th>Version</th><th>Features</th><th>Dependencies</th>
     </tr>
     <tr>
-        <td>0.3.X</td><td>Linalg Separation</td><td><ul><li>None</li></ul></td>
+        <td>0.4.X</td><td>Model improvements</td><td><ul><li>None</li></ul></td>
     </tr>
     <tr>
-        <td>0.3.X</td><td>Better error handling</td><td><ul><li>None</li></ul></td>
+        <td>0.4.X</td><td>Nearest Neighbours</td><td><ul><li>None</li></ul></td>
+    </tr>
+    <tr>
+        <td>0.4.X</td><td>DBSCAN</td><td><ul><li>None</li></ul></td>
     </tr>
 </table>
 

@@ -1,8 +1,6 @@
 # compiled code
-rusty-machine/target/
-rusty-machine/Cargo.lock
-rulinalg/target/
-rulinalg/Cargo.lock
+target/
+Cargo.lock
 *~
 *.swp
 *.swo

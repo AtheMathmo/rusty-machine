@@ -7,11 +7,7 @@ matrix:
   allow_failures:
     - rust: nightly
 script:
-  - cd rusty-machine
   - cargo build --verbose
   - cargo test --verbose
   - cargo build --features stats
   - cargo test --features stats
-  - cd ../rulinalg
-  - cargo build --verbose
-  - cargo test --verbose

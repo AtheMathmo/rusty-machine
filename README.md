@@ -6,7 +6,8 @@ Here is the API documentation for the rust crate. Currently up to date for [vers
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
-And here is a document detailing development efforts. Including a projected timeline for immediate features. Please feel free to give feedback and let me know if there any features you believe should take precedence.
+And here is a document detailing development efforts. Including a projected timeline for immediate features.
+Please feel free to give feedback and let me know if there any features you believe should take precedence.
 
 - [Development](DEVELOPMENT.md)
 
@@ -14,11 +15,14 @@ And here is a document detailing development efforts. Including a projected time
 
 ## Summary
 
-Rusty-machine is a general purpose machine learning library implemented entirely in Rust. It aims to combine speed and ease of use - without requiring a huge number of external dependencies.
+Rusty-machine is a general purpose machine learning library implemented entirely in Rust.
+It aims to combine speed and ease of use - without requiring a huge number of external dependencies.
 
-This project began as a way for me to learn Rust and brush up on some less familiar machine learning algorithms and techniques. Now the project aims to provide a complete, easy to use, machine learning library for Rust.
+This project began as a way for me to learn Rust and brush up on some less familiar machine learning algorithms and techniques.
+Now the project aims to provide a complete, easy to use, machine learning library for Rust.
 
-This library is still very much in early stages of development. Although there are a good number of algorithms many other things are missing. Rusty-machine is probably not the best choice for any serious projects - but hopefully that can change in the near future!
+This library is still very much in early stages of development. Although there are a good number of algorithms many other 
+things are missing. Rusty-machine is probably not the best choice for any serious projects - but hopefully that can change in the near future!
 
 #### Contributing
 
@@ -30,23 +34,15 @@ I have now created a dedicated page for [contributing](CONTRIBUTING.md). If you'
 
 ## Implementation
 
-This project is implemented using [Rust](https://www.rust-lang.org/). Currently there are no other dependencies! Though, we are planning on introducing optional BLAS/LAPACK dependencies soon.
+This project is implemented using [Rust](https://www.rust-lang.org/). Currently there are no other dependencies!
+Though, we are planning on introducing optional BLAS/LAPACK dependencies soon.
 
 ---
 
 ## Current Progress
 
-The linear algebra library is now fairly filled out. But there is still lots of room for optimization and we should provide BLAS/LAPACK support.
-
-There is also a `stats` module behind an optional features flag.
-
-### Matrices
-
-- Generic data matrices
-- Concatenation
-- Data manipulation (row and column selection/repetition etc.)
-- Matrix arithmetic
-- Efficient matrix slicing
+Rusty-machine uses [rulinalg](https://github.com/AtheMathmo/rulinalg) for its linear algebra back end.
+This is fairly complete but there is still lots of room for optimization and we should provide BLAS/LAPACK support.
 
 ### Machine Learning
 
@@ -60,19 +56,22 @@ There is also a `stats` module behind an optional features flag.
 - Gaussian Mixture Models
 - Naive Bayes Classifiers
 
+There is also a basic `stats` module behind a feature flag.
+
 ---
 
 ## Usage
 
-The library usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code. I will provide a brief overview of the library in it's current state and intended usage.
+The library usage is described well in the [API documentation](https://AtheMathmo.github.io/rusty-machine/) - including example code.
+I will provide a brief overview of the library in it's current state and intended usage.
 
 ### Installation
 
 The library is most easily used with [cargo](http://doc.crates.io/guide.html). Simply include the following in your Cargo.toml file:
 
 ```toml
-[dependencies.rusty-machine]
-version="0.3.3"
+[dependencies]
+rusty-machine="0.3.3"
 ```
 
 And then import the library using:
@@ -85,26 +84,17 @@ The library consists of two core components. The linear algebra module and the l
 
 #### Linalg
 
-The linear algebra module contains the Matrix and Vector data structures and related methods - such as matrix decomposition. Usage looks like this:
-
-```rust
-extern crate rusty_machine as rm;
-
-use rm::linalg::matrix::Matrix;
-
-let a = Matrix::new(2,2, vec![1.0, 2.0, 3.0, 4.0]); // Create a 2x2 matrix [[1,2],[3,4]]
-
-let b = Matrix::new(2,3, vec![1.0,2.0,3.0,4.0,5.0,6.0]); // Create a 2x3 matrix [[1.0,2.0,3.0],[4.0,5.0,6.0]]
-
-let c = &a * &b; // Matrix product of a and b
-```
+The linear algebra module contains reexports from the [rulinalg](https://github.com/AtheMathmo/rulinalg) crate. This is to
+provide easy access to components which are used frequently within rusty-machine.
 
 More detailed coverage can be found in the [API documentation](https://AtheMathmo.github.io/rusty-machine/).
 
 #### Learning
 
-The learning module contains machine learning models. The machine learning implementations are designed with customizability in mind. This means you can control the optimization algorithms but still retain the ease of using default values. This is an area I am actively trying to improve on!
+The learning module contains machine learning models. The machine learning implementations are designed with simpicity and customization in mind.
+This means you can control the optimization algorithms but still retain the ease of using default values.
+This is an area I am actively trying to improve on!
 
-The models all provide `predict` and `train` methods - similar to [sklearn](http://scikit-learn.org/stable/).
+The models all provide `predict` and `train` methods enforced by the `SupModel` and `UnSupModel` traits.
 
-The models focus on modularity - you can plug in the pieces you want and easily construct new pieces from existing traits.
+There are some examples within this repository that can help you familiarize yourself with the library.
