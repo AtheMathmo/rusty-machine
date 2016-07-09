@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/AtheMathmo/rusty-machine](https://badges.gitter.im/AtheMathmo/rusty-machine.svg)](https://gitter.im/AtheMathmo/rusty-machine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/AtheMathmo/rusty-machine.svg?branch=master)](https://travis-ci.org/AtheMathmo/rusty-machine)
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.3.3](https://crates.io/crates/rusty-machine/0.3.3).
+Here is the API documentation for the rust crate. Currently up to date for [version 0.4.0](https://crates.io/crates/rusty-machine/0.4.0).
 
 - [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
 
@@ -71,7 +71,7 @@ The library is most easily used with [cargo](http://doc.crates.io/guide.html). S
 
 ```toml
 [dependencies]
-rusty-machine="0.3.3"
+rusty-machine="0.4.0"
 ```
 
 And then import the library using:
@@ -91,9 +91,9 @@ More detailed coverage can be found in the [API documentation](https://AtheMathm
 
 #### Learning
 
-The learning module contains machine learning models. The machine learning implementations are designed with simpicity and customization in mind.
-This means you can control the optimization algorithms but still retain the ease of using default values.
-This is an area I am actively trying to improve on!
+The learning module contains machine learning models. The machine learning implementations are designed with
+simpicity and customization in mind. This means you can control the optimization algorithms but still retain
+the ease of using default values. This is an area I am actively trying to improve on!
 
 The models all provide `predict` and `train` methods enforced by the `SupModel` and `UnSupModel` traits.
 
