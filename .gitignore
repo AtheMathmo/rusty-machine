@@ -1,6 +1,7 @@
 # compiled code
-rusty-machine/target/
-rusty-machine/Cargo.lock
+target/
+Cargo.lock
 *~
 *.swp
 *.swo
+.vscode

@@ -67,7 +67,7 @@ For now I have no special measures in place to assist with this. Due to this I'm
 
 ### How can I test out this project?
 
-_There will be examples in the repository very soon!_
+**There are now some examples in the repository!**
 
 Where is the test data? How do I know the current algorithms even work? How can I test things I've implemented?
 
