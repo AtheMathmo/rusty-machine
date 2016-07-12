@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["convert","The convert module."],["error","Error handling for the linalg module."],["macros","Macros for the linear algebra modules."],["matrix","The matrix module."],["utils","Linear algebra utils module."],["vector","The vector module."]],"trait":[["Metric","Trait for linear algebra metrics."]]});

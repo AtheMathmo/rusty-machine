@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Forgy","The Forgy initialization scheme."],["KMeansClassifier","K-Means Classification model."],["KPlusPlus","The K-means ++ initialization scheme."],["RandomPartition","The Random Partition initialization scheme."]],"trait":[["Initializer","Trait for algorithms initializing the K-means centroids."]]});

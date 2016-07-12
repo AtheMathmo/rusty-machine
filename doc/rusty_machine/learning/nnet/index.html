@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `nnet` mod in crate `rusty_machine`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, nnet">
+
+    <title>rusty_machine::learning::nnet - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>learning</a></p><script>window.sidebarCurrent = {name: 'nnet', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Module <a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>learning</a>::<wbr><a class='mod' href=''>nnet</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-694' class='srclink' href='../../../src/rusty_machine/src/learning/nnet.rs.html#1-558' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Neural Network module</p>
+
+<p>Contains implementation of simple feed forward neural network.</p>
+
+<h1 id='usage' class='section-header'><a href='#usage'>Usage</a></h1>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>learning</span>::<span class='ident'>nnet</span>::{<span class='ident'>NeuralNet</span>, <span class='ident'>BCECriterion</span>};
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>regularization</span>::<span class='ident'>Regularization</span>;
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>learning</span>::<span class='ident'>optim</span>::<span class='ident'>grad_desc</span>::<span class='ident'>StochasticGD</span>;
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>linalg</span>::<span class='ident'>Matrix</span>;
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>learning</span>::<span class='ident'>SupModel</span>;
+
+<span class='kw'>let</span> <span class='ident'>inputs</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>5</span>,<span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.</span>,<span class='number'>1.</span>,<span class='number'>1.</span>,<span class='number'>2.</span>,<span class='number'>2.</span>,<span class='number'>2.</span>,<span class='number'>3.</span>,<span class='number'>3.</span>,<span class='number'>3.</span>,
+                                <span class='number'>4.</span>,<span class='number'>4.</span>,<span class='number'>4.</span>,<span class='number'>5.</span>,<span class='number'>5.</span>,<span class='number'>5.</span>,]);
+<span class='kw'>let</span> <span class='ident'>targets</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>5</span>,<span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.</span>,<span class='number'>0.</span>,<span class='number'>0.</span>,<span class='number'>0.</span>,<span class='number'>1.</span>,<span class='number'>0.</span>,<span class='number'>0.</span>,<span class='number'>0.</span>,<span class='number'>1.</span>,
+                                    <span class='number'>0.</span>,<span class='number'>0.</span>,<span class='number'>1.</span>,<span class='number'>0.</span>,<span class='number'>0.</span>,<span class='number'>1.</span>]);
+
+<span class='comment'>// Set the layer sizes - from input to output</span>
+<span class='kw'>let</span> <span class='ident'>layers</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span>[<span class='number'>3</span>,<span class='number'>5</span>,<span class='number'>11</span>,<span class='number'>7</span>,<span class='number'>3</span>];
+
+<span class='comment'>// Choose the BCE criterion with L2 regularization (`lambda=0.1`).</span>
+<span class='kw'>let</span> <span class='ident'>criterion</span> <span class='op'>=</span> <span class='ident'>BCECriterion</span>::<span class='ident'>new</span>(<span class='ident'>Regularization</span>::<span class='ident'>L2</span>(<span class='number'>0.1</span>));
+
+<span class='comment'>// We will just use the default stochastic gradient descent.</span>
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>model</span> <span class='op'>=</span> <span class='ident'>NeuralNet</span>::<span class='ident'>new</span>(<span class='ident'>layers</span>, <span class='ident'>criterion</span>, <span class='ident'>StochasticGD</span>::<span class='ident'>default</span>());
+
+<span class='comment'>// Train the model!</span>
+<span class='ident'>model</span>.<span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>, <span class='kw-2'>&amp;</span><span class='ident'>targets</span>);
+
+<span class='kw'>let</span> <span class='ident'>test_inputs</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>,<span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.5</span>,<span class='number'>1.5</span>,<span class='number'>1.5</span>,<span class='number'>5.1</span>,<span class='number'>5.1</span>,<span class='number'>5.1</span>]);
+
+<span class='comment'>// And predict new output from the test inputs</span>
+<span class='ident'>model</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>test_inputs</span>);</pre>
+
+<p>The neural networks are specified via a criterion - similar to
+<a href="https://github.com/torch/nn/blob/master/doc/criterion.md">Torch</a>.
+The criterions combine an activation function and a cost function.</p>
+
+<p>You can define your own criterion by implementing the <code>Criterion</code>
+trait with a concrete <code>ActivationFunc</code> and <code>CostFunc</code>.</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.BCECriterion.html'
+                                  title='rusty_machine::learning::nnet::BCECriterion'>BCECriterion</a></td>
+                           <td class='docblock short'>
+                                <p>The binary cross entropy criterion.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.BaseNeuralNet.html'
+                                  title='rusty_machine::learning::nnet::BaseNeuralNet'>BaseNeuralNet</a></td>
+                           <td class='docblock short'>
+                                <p>Base Neural Network struct</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.MSECriterion.html'
+                                  title='rusty_machine::learning::nnet::MSECriterion'>MSECriterion</a></td>
+                           <td class='docblock short'>
+                                <p>The mean squared error criterion.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='struct' href='struct.NeuralNet.html'
+                                  title='rusty_machine::learning::nnet::NeuralNet'>NeuralNet</a></td>
+                           <td class='docblock short'>
+                                <p>Neural Network Model</p>
+                           </td>
+                       </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class='trait' href='trait.Criterion.html'
+                                  title='rusty_machine::learning::nnet::Criterion'>Criterion</a></td>
+                           <td class='docblock short'>
+                                <p>Criterion for Neural Networks</p>
+                           </td>
+                       </tr></table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../";
+        window.currentCrate = "rusty_machine";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../jquery.js"></script>
+    <script src="../../../main.js"></script>
+    
+    <script defer src="../../../search-index.js"></script>
+</body>
+</html>
