@@ -7,7 +7,7 @@ description = "A machine learning library."
 repository = "https://github.com/AtheMathmo/rusty-machine"
 documentation = "https://AtheMathmo.github.io/rusty-machine/"
 keywords = ["machine","learning","stats","statistics","machine-learning"]
-readme = "../README.md"
+readme = "README.md"
 license = "MIT"
 
 [features]
