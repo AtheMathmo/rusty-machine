@@ -6,10 +6,21 @@ This directory gathers fully-fledged programs, each using a piece of
 
 ## Overview
 
+* [K-Means](#k-means)
 * [SVM](#svm)
 * [Neural Networks](#neural-networks)
 
 ## The Examples
+
+### K Means
+
+#### Generating Clusters
+
+[Generating Clusters](k-means_generating_clusters.rs) randomly generates data around a pair of clusters.
+It then trains a K-Means model to learn new centroids from this sample.
+
+The example shows a basic usage of the K-Means API - an Unsupervised model. We also show some basic usage
+of [rulinalg](https://github.com/AtheMathmo/rulinalg) to generate the data.
 
 ### SVM
 
@@ -17,7 +28,9 @@ This directory gathers fully-fledged programs, each using a piece of
 
 [Sign learner](svm-sign_learner.rs) constructs and evaluates a model that learns to recognize the sign of an input number.
 
-The sample shows a basic usage of the SVM API. It also configures the SVM algorithm with a specific kernel (`HyperTan`). Evaluations are run in a loop to log individual predictions and do some book keeping for reporting the performance at the end. The salient part from `rusty-machine` is to use the `train` and `predict` methods of the SVM model.
+The sample shows a basic usage of the SVM API. It also configures the SVM algorithm with a specific kernel (`HyperTan`).
+Evaluations are run in a loop to log individual predictions and do some book keeping for reporting the performance at the end.
+The salient part from `rusty-machine` is to use the `train` and `predict` methods of the SVM model.
 
 The accuracy evaluation is simplistic, so the model manages 100% accuracy (which is *really* too simple an example).
 
@@ -61,11 +74,17 @@ Accuracy: 100
 
 [AND gate](nnet-and_gate.rs) makes an AND gate out of a perceptron.
 
-The sample code generates random data to learn from. The input data is like an electric signal between 0 and 1, with some jitter that makes it not quite 0 or 1. By default, the code decides that any pair input "above" (0.7, 0.7) is labeled as 1.0 (AND gate passing), otherwise labeled as 0.0 (AND gate blocking). This means that the training set is biased toward learning the passing scenario: An AND gate passes 25% of the time on average, and we'd like it to learn it.
+The sample code generates random data to learn from.
+The input data is like an electric signal between 0 and 1, with some jitter that makes it not quite 0 or 1.
+By default, the code decides that any pair input "above"
+(0.7, 0.7) is labeled as 1.0 (AND gate passing), otherwise labeled as 0.0 (AND gate blocking).
+This means that the training set is biased toward learning the passing scenario: An AND gate passes
+25% of the time on average, and we'd like it to learn it.
 
 The test data uses only the 4 "perfect" inputs for a gate: (0.0, 0.0), (1.0, 0.0), etc.
 
-The code generates 10,000 training data points by default. Please give it a try, and then change `SAMPLE`, the number of training data points, and `THRESHOLD`, the value for "deciding" for a passing gate.
+The code generates 10,000 training data points by default. Please give it a try, and then change `SAMPLE`,
+the number of training data points, and `THRESHOLD`, the value for "deciding" for a passing gate.
 
 Sample run:
 
@@ -85,4 +104,3 @@ Got  Expected
 Hits: 4, Misses: 0
 Accuracy: 100%
 ```
-
