@@ -22,6 +22,25 @@ It then trains a K-Means model to learn new centroids from this sample.
 The example shows a basic usage of the K-Means API - an Unsupervised model. We also show some basic usage
 of [rulinalg](https://github.com/AtheMathmo/rulinalg) to generate the data.
 
+Sample run:
+
+```
+cargo run --example k-means_generating_cluster
+   Compiling rusty-machine v0.4.0 (file:///rusty-machine/rusty-machine)
+     Running `target/debug/examples/k-means_generating_cluster`
+K-Means clustering example:
+Generating 2000 samples from each centroids:
+⎡-0.5 -0.5⎤
+⎣   0  0.5⎦
+Training the model...
+Model Centroids:
+⎡-0.812 -0.888⎤
+⎣-0.525  0.877⎦
+Classifying the samples...
+Samples closest to first centroid: 1878
+Samples closest to second centroid: 2122
+```
+
 ### SVM
 
 #### Sign Learner
