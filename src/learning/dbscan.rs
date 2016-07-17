@@ -1,4 +1,34 @@
-//! DBSCAN
+//! DBSCAN Clustering
+//!
+//! Provides an implementaton of DBSCAN clustering. The model
+//! also implements a `predict` function which uses nearest neighbours
+//! to classify the points. To utilize this function you must use
+//! `self.set_predictive(true)` before training the model.
+//!
+//! The algorithm works by specifying `eps` and `min_points` parameters.
+//! The `eps` parameter controls how close together points must be to be
+//! placed in the same cluster. The `min_points` parameter controls how many
+//! points must be within distance `eps` of eachother to be considered a cluster.
+//!
+//! # Examples
+//!
+//! ```
+//! use rusty_machine::learning::dbscan::DBSCAN;
+//! use rusty_machine::learning::UnSupModel;
+//! use rusty_machine::linalg::Matrix;
+//!
+//! let inputs = Matrix::new(6, 2, vec![1.0, 2.0,
+//!                                     1.1, 2.2,
+//!                                     0.9, 1.9,
+//!                                     1.0, 2.1,
+//!                                     -2.0, 3.0,
+//!                                     -2.2, 3.1]);
+//!
+//! let mut model = DBSCAN::new(0.5, 2);
+//! model.train(&inputs);
+//!
+//! let clustering = model.clusters().unwrap();
+//! ```
 
 use learning::UnSupModel;
 
@@ -6,26 +36,38 @@ use linalg::{Matrix, Vector};
 use rulinalg::utils;
 
 /// DBSCAN Model
+///
+/// Implements clustering using the DBSCAN algorithm
+/// via the `UnSupModel` trait.
 #[derive(Debug)]
 pub struct DBSCAN {
     eps: f64,
     min_points: usize,
     clusters: Option<Vector<Option<usize>>>,
+    predictive: bool,
     _visited: Vec<bool>,
+    _cluster_data: Option<Matrix<f64>>,
 }
 
+/// Constructs a non-predictive DBSCAN model with the
+/// following parameters:
+///
+/// - `eps` : `0.5`
+/// - `min_points` : `5`
 impl Default for DBSCAN {
     fn default() -> DBSCAN {
         DBSCAN {
             eps: 0.5,
             min_points: 5,
             clusters: None,
+            predictive: false,
             _visited: Vec::new(),
+            _cluster_data: None,
         }
     }
 }
 
-impl UnSupModel<Matrix<f64>, Vector<usize>> for DBSCAN {
+impl UnSupModel<Matrix<f64>, Vector<Option<usize>>> for DBSCAN {
     /// Train the classifier using input data.
     fn train(&mut self, inputs: &Matrix<f64>) {
         self.init_params(inputs.rows());
@@ -45,15 +87,48 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for DBSCAN {
                 }
             }
         }
+
+        if self.predictive {
+            self._cluster_data = Some(inputs.clone())
+        }
     }
 
-    fn predict(&self, _: &Matrix<f64>) -> Vector<usize> {
-        unimplemented!();
+    fn predict(&self, inputs: &Matrix<f64>) -> Vector<Option<usize>> {
+        if self.predictive {
+            if let (&Some(ref cluster_data), &Some(ref clusters)) = (&self._cluster_data,
+                                                                     &self.clusters) {
+                let mut classes = Vec::with_capacity(inputs.rows());
+
+                for input_point in inputs.iter_rows() {
+                    let mut distances = Vec::with_capacity(cluster_data.rows());
+
+                    for cluster_point in cluster_data.iter_rows() {
+                        let point_distance =
+                            utils::vec_bin_op(input_point, cluster_point, |x, y| x - y);
+                        distances.push(utils::dot(&point_distance, &point_distance).sqrt());
+                    }
+
+                    let (closest_idx, closest_dist) = utils::argmin(&distances);
+                    if closest_dist < self.eps {
+                        classes.push(clusters[closest_idx]);
+                    } else {
+                        classes.push(None);
+                    }
+                }
+
+                Vector::new(classes)
+            } else {
+                panic!("The model has not been trained.");
+            }
+        } else {
+            panic!("Model must be set to predictive. Use `self.set_predictive(true)`.");
+        }
     }
 }
 
 impl DBSCAN {
-    /// Create a new DBSCAN model.
+    /// Create a new DBSCAN model with a given
+    /// distance episilon and minimum points per cluster.
     pub fn new(eps: f64, min_points: usize) -> DBSCAN {
         assert!(eps > 0f64, "The model epsilon must be positive.");
 
@@ -61,12 +136,23 @@ impl DBSCAN {
             eps: eps,
             min_points: min_points,
             clusters: None,
+            predictive: false,
             _visited: Vec::new(),
+            _cluster_data: None,
         }
     }
 
+    /// Set predictive to true if the model is to be used
+    /// to classify future points.
+    ///
+    /// If the model is set as predictive then the input data
+    /// will be cloned during training.
+    pub fn set_predictive(&mut self, predictive: bool) {
+        self.predictive = predictive;
+    }
+
     /// Return an Option pointing to the model clusters.
-    pub fn cluster(&self) -> Option<&Vector<Option<usize>>> {
+    pub fn clusters(&self) -> Option<&Vector<Option<usize>>> {
         self.clusters.as_ref()
     }
 
