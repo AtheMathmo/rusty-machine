@@ -55,6 +55,8 @@ impl UnSupModel<Matrix<f64>, Vector<usize>> for DBSCAN {
 impl DBSCAN {
     /// Create a new DBSCAN model.
     pub fn new(eps: f64, min_points: usize) -> DBSCAN {
+        assert!(eps > 0f64, "The model epsilon must be positive.");
+
         DBSCAN {
             eps: eps,
             min_points: min_points,
@@ -129,6 +131,30 @@ impl DBSCAN {
     }
 }
 
-
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use super::DBSCAN;
+    use linalg::Matrix;
+
+    #[test]
+    fn test_region_query() {
+        let model = DBSCAN::new(1.0, 3);
+
+        let inputs = Matrix::new(3, 2, vec![1.0, 1.0, 1.1, 1.9, 3.0, 3.0]);
+
+        let neighbours = model.region_query(&[1.0, 1.0], &inputs);
+
+        assert!(neighbours.len() == 2);
+    }
+
+    #[test]
+    fn test_region_query_small_eps() {
+        let model = DBSCAN::new(0.01, 3);
+
+        let inputs = Matrix::new(3, 2, vec![1.0, 1.0, 1.1, 1.9, 1.1, 1.1]);
+
+        let neighbours = model.region_query(&[1.0, 1.0], &inputs);
+
+        assert!(neighbours.len() == 1);
+    }
+}
