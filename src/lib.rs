@@ -122,6 +122,7 @@ pub mod linalg {
 
 /// Module for machine learning.
 pub mod learning {
+    pub mod dbscan;
     pub mod glm;
     pub mod gmm;
     pub mod lin_reg;
