@@ -1,5 +1,8 @@
 //! DBSCAN Clustering
 //!
+//! *Note: This module is likely to change dramatically in the future and
+//! should be treated as experimental.*
+//!
 //! Provides an implementaton of DBSCAN clustering. The model
 //! also implements a `predict` function which uses nearest neighbours
 //! to classify the points. To utilize this function you must use
@@ -9,6 +12,9 @@
 //! The `eps` parameter controls how close together points must be to be
 //! placed in the same cluster. The `min_points` parameter controls how many
 //! points must be within distance `eps` of eachother to be considered a cluster.
+//!
+//! If a point is not within distance `eps` of a cluster it will be classified
+//! as noise. This means that it will be set to `None` in the clusters `Vector`.
 //!
 //! # Examples
 //!
