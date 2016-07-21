@@ -55,6 +55,7 @@ This is fairly complete but there is still lots of room for optimization and we 
 - Support Vector Machines
 - Gaussian Mixture Models
 - Naive Bayes Classifiers
+- DBSCAN
 
 There is also a basic `stats` module behind a feature flag.
 

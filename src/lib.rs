@@ -24,6 +24,7 @@
 //! - Support Vector Machines
 //! - Gaussian Mixture Models
 //! - Naive Bayes Classifiers
+//! - DBSCAN
 //!
 //! ### linalg
 //!
@@ -122,6 +123,7 @@ pub mod linalg {
 
 /// Module for machine learning.
 pub mod learning {
+    pub mod dbscan;
     pub mod glm;
     pub mod gmm;
     pub mod lin_reg;
