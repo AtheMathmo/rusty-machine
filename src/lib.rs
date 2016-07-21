@@ -24,6 +24,7 @@
 //! - Support Vector Machines
 //! - Gaussian Mixture Models
 //! - Naive Bayes Classifiers
+//! - DBSCAN
 //!
 //! ### linalg
 //!

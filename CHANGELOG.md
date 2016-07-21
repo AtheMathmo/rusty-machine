@@ -2,6 +2,20 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.4.1
+
+### Breaking Changes
+
+- None
+
+### Features
+
+- Added experimental implementation of DBSCAN clustering.
+
+### Minor Changes
+
+- Added new example for K-Means clustering in repo.
+
 ## 0.4.0
 
 This is the biggest release so far. Primarily because the `linalg`
