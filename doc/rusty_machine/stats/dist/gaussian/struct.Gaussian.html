@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Gaussian` struct in crate `rusty_machine`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Gaussian">
+
+    <title>rusty_machine::stats::dist::gaussian::Gaussian - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../../../index.html'>rusty_machine</a>::<wbr><a href='../../index.html'>stats</a>::<wbr><a href='../index.html'>dist</a>::<wbr><a href='index.html'>gaussian</a></p><script>window.sidebarCurrent = {name: 'Gaussian', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../../index.html'>rusty_machine</a>::<wbr><a href='../../index.html'>stats</a>::<wbr><a href='../index.html'>dist</a>::<wbr><a href='index.html'>gaussian</a>::<wbr><a class='struct' href=''>Gaussian</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-2334' class='srclink' href='../../../../src/rusty_machine/src/stats/dist/gaussian.rs.html#22-26' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Gaussian {
+    // some fields omitted
+}</pre><div class='docblock'><p>A Gaussian random variable.</p>
+
+<p>This struct stores both the variance and the standard deviation.
+This is to minimize the computation required for computing
+the distribution functions and sampling.</p>
+
+<p>It is most efficient to construct the struct using the <code>from_std_dev</code> constructor.</p>
+</div><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class='struct' href='../../../../rusty_machine/stats/dist/gaussian/struct.Gaussian.html' title='rusty_machine::stats::dist::gaussian::Gaussian'>Gaussian</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-2340' class='srclink' href='../../../../src/rusty_machine/src/stats/dist/gaussian.rs.html#45-65' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(mean: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>, variance: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='struct' href='../../../../rusty_machine/stats/dist/gaussian/struct.Gaussian.html' title='rusty_machine::stats::dist::gaussian::Gaussian'>Gaussian</a></code></h4>
+<div class='docblock'><p>Creates a new Gaussian random variable from
+a given mean and variance.</p>
+</div><h4 id='method.from_std_dev' class='method'><code>fn <a href='#method.from_std_dev' class='fnname'>from_std_dev</a>(mean: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>, std_dev: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='struct' href='../../../../rusty_machine/stats/dist/gaussian/struct.Gaussian.html' title='rusty_machine::stats::dist::gaussian::Gaussian'>Gaussian</a></code></h4>
+<div class='docblock'><p>Creates a new Gaussian random variable from
+a given mean and standard deviation.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> for <a class='struct' href='../../../../rusty_machine/stats/dist/gaussian/struct.Gaussian.html' title='rusty_machine::stats::dist::gaussian::Gaussian'>Gaussian</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-2319' class='srclink' href='../../../../src/rusty_machine/src/stats/dist/gaussian.rs.html#21' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../../../../rusty_machine/stats/dist/gaussian/struct.Gaussian.html' title='rusty_machine::stats::dist::gaussian::Gaussian'>Gaussian</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-2320' class='srclink' href='../../../../src/rusty_machine/src/stats/dist/gaussian.rs.html#21' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../../../../rusty_machine/stats/dist/gaussian/struct.Gaussian.html' title='rusty_machine::stats::dist::gaussian::Gaussian'>Gaussian</a></code></h4>
+<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
+</div><h4 id='method.clone_from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></h4>
+<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../../../rusty_machine/stats/dist/gaussian/struct.Gaussian.html' title='rusty_machine::stats::dist::gaussian::Gaussian'>Gaussian</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-2326' class='srclink' href='../../../../src/rusty_machine/src/stats/dist/gaussian.rs.html#21' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../../../../rusty_machine/stats/dist/gaussian/struct.Gaussian.html' title='rusty_machine::stats::dist::gaussian::Gaussian'>Gaussian</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-2338' class='srclink' href='../../../../src/rusty_machine/src/stats/dist/gaussian.rs.html#35-43' title='goto source code'>[src]</a></span></h3>
+<div class='docblock'><p>The default Gaussian random variable.
+This is the Standard Normal random variable.</p>
+
+<p>The defaults are:</p>
+
+<ul>
+<li>mean = 0</li>
+<li>variance = 1</li>
+</ul>
+</div><div class='impl-items'><h4 id='method.default' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default' class='fnname'>default</a>() -&gt; <a class='struct' href='../../../../rusty_machine/stats/dist/gaussian/struct.Gaussian.html' title='rusty_machine::stats::dist::gaussian::Gaussian'>Gaussian</a></code></h4>
+<div class='docblock'><p>Returns the &quot;default value&quot; for a type. <a href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='../../../../rusty_machine/stats/dist/trait.Distribution.html' title='rusty_machine::stats::dist::Distribution'>Distribution</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../../../rusty_machine/stats/dist/gaussian/struct.Gaussian.html' title='rusty_machine::stats::dist::gaussian::Gaussian'>Gaussian</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-2347' class='srclink' href='../../../../src/rusty_machine/src/stats/dist/gaussian.rs.html#71-148' title='goto source code'>[src]</a></span></h3>
+<div class='docblock'><p>The distribution of the gaussian random variable.</p>
+
+<p>Accurately computes the PDF and log PDF.
+Estimates the CDF accurate only to 0.003.</p>
+</div><div class='impl-items'><h4 id='method.pdf' class='method'><code>fn <a href='../../../../rusty_machine/stats/dist/trait.Distribution.html#tymethod.pdf' class='fnname'>pdf</a>(&amp;self, x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h4>
+<div class='docblock'><p>The pdf of the normal distribution</p>
+
+<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>stats</span>::<span class='ident'>dist</span>::<span class='ident'>Gaussian</span>;
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>stats</span>::<span class='ident'>dist</span>::<span class='ident'>Distribution</span>;
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>stats</span>::<span class='ident'>dist</span>::<span class='ident'>consts</span>;
+
+<span class='kw'>let</span> <span class='ident'>gauss</span> <span class='op'>=</span> <span class='ident'>Gaussian</span>::<span class='ident'>default</span>();
+
+<span class='kw'>let</span> <span class='ident'>lpdf_zero</span> <span class='op'>=</span> <span class='ident'>gauss</span>.<span class='ident'>pdf</span>(<span class='number'>0f64</span>);
+
+<span class='comment'>// The value should be very close to 1/sqrt(2 * pi)</span>
+<span class='macro'>assert</span><span class='macro'>!</span>((<span class='ident'>lpdf_zero</span> <span class='op'>-</span> (<span class='number'>1f64</span><span class='op'>/</span><span class='ident'>consts</span>::<span class='ident'>SQRT_2_PI</span>).<span class='ident'>abs</span>()) <span class='op'>&lt;</span> <span class='number'>1e-20</span>);</pre>
+</div><h4 id='method.logpdf' class='method'><code>fn <a href='../../../../rusty_machine/stats/dist/trait.Distribution.html#method.logpdf' class='fnname'>logpdf</a>(&amp;self, x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h4>
+<div class='docblock'><p>The log pdf of the normal distribution.</p>
+
+<h1 id='examples-1' class='section-header'><a href='#examples-1'>Examples</a></h1>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>stats</span>::<span class='ident'>dist</span>::<span class='ident'>Gaussian</span>;
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>stats</span>::<span class='ident'>dist</span>::<span class='ident'>Distribution</span>;
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>stats</span>::<span class='ident'>dist</span>::<span class='ident'>consts</span>;
+
+<span class='kw'>let</span> <span class='ident'>gauss</span> <span class='op'>=</span> <span class='ident'>Gaussian</span>::<span class='ident'>default</span>();
+
+<span class='kw'>let</span> <span class='ident'>lpdf_zero</span> <span class='op'>=</span> <span class='ident'>gauss</span>.<span class='ident'>logpdf</span>(<span class='number'>0f64</span>);
+
+<span class='comment'>// The value should be very close to -0.5*Ln(2 * pi)</span>
+<span class='macro'>assert</span><span class='macro'>!</span>((<span class='ident'>lpdf_zero</span> <span class='op'>+</span> <span class='number'>0.5</span><span class='op'>*</span><span class='ident'>consts</span>::<span class='ident'>LN_2_PI</span>).<span class='ident'>abs</span>() <span class='op'>&lt;</span> <span class='number'>1e-20</span>);</pre>
+</div><h4 id='method.cdf' class='method'><code>fn <a href='../../../../rusty_machine/stats/dist/trait.Distribution.html#tymethod.cdf' class='fnname'>cdf</a>(&amp;self, x: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h4>
+<div class='docblock'><p>Rough estimate for the cdf of the gaussian distribution.
+Accurate to 0.003.</p>
+
+<h1 id='examples-2' class='section-header'><a href='#examples-2'>Examples</a></h1>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>stats</span>::<span class='ident'>dist</span>::<span class='ident'>Gaussian</span>;
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>stats</span>::<span class='ident'>dist</span>::<span class='ident'>Distribution</span>;
+
+<span class='kw'>let</span> <span class='ident'>gauss</span> <span class='op'>=</span> <span class='ident'>Gaussian</span>::<span class='ident'>new</span>(<span class='number'>10f64</span>, <span class='number'>5f64</span>);
+<span class='kw'>let</span> <span class='ident'>cdf_mid</span> <span class='op'>=</span> <span class='ident'>gauss</span>.<span class='ident'>cdf</span>(<span class='number'>10f64</span>);
+
+<span class='macro'>assert</span><span class='macro'>!</span>((<span class='number'>0.5</span> <span class='op'>-</span> <span class='ident'>cdf_mid</span>).<span class='ident'>abs</span>() <span class='op'>&lt;</span> <span class='number'>0.004</span>);</pre>
+
+<p>A slightly more involved test:</p>
+
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>stats</span>::<span class='ident'>dist</span>::<span class='ident'>Gaussian</span>;
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>stats</span>::<span class='ident'>dist</span>::<span class='ident'>Distribution</span>;
+
+<span class='kw'>let</span> <span class='ident'>gauss</span> <span class='op'>=</span> <span class='ident'>Gaussian</span>::<span class='ident'>new</span>(<span class='number'>10f64</span>, <span class='number'>4f64</span>);
+<span class='kw'>let</span> <span class='ident'>cdf</span> <span class='op'>=</span> <span class='ident'>gauss</span>.<span class='ident'>cdf</span>(<span class='number'>9f64</span>);
+
+<span class='macro'>assert</span><span class='macro'>!</span>((<span class='number'>0.5</span><span class='op'>*</span>(<span class='number'>1f64</span> <span class='op'>-</span> <span class='number'>0.382924922548</span>) <span class='op'>-</span> <span class='ident'>cdf</span>).<span class='ident'>abs</span>() <span class='op'>&lt;</span> <span class='number'>0.004</span>);</pre>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/rand/rand/distributions/trait.Sample.html' title='rand::distributions::Sample'>Sample</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../../../rusty_machine/stats/dist/gaussian/struct.Gaussian.html' title='rusty_machine::stats::dist::gaussian::Gaussian'>Gaussian</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-2357' class='srclink' href='../../../../src/rusty_machine/src/stats/dist/gaussian.rs.html#150-154' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.sample' class='method'><code>fn <a href='https://doc.rust-lang.org/rand/rand/distributions/trait.Sample.html#tymethod.sample' class='fnname'>sample</a>&lt;R:&nbsp;<a class='trait' href='https://doc.rust-lang.org/rand/rand/trait.Rng.html' title='rand::Rng'>Rng</a>&gt;(&amp;mut self, rng: &amp;mut R) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h4>
+<div class='docblock'><p>Generate a random value of <code>Support</code>, using <code>rng</code> as the source of randomness. <a href="https://doc.rust-lang.org/rand/rand/distributions/trait.Sample.html#tymethod.sample">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/rand/rand/distributions/trait.IndependentSample.html' title='rand::distributions::IndependentSample'>IndependentSample</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt; for <a class='struct' href='../../../../rusty_machine/stats/dist/gaussian/struct.Gaussian.html' title='rusty_machine::stats::dist::gaussian::Gaussian'>Gaussian</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-2362' class='srclink' href='../../../../src/rusty_machine/src/stats/dist/gaussian.rs.html#156-161' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.ind_sample' class='method'><code>fn <a href='https://doc.rust-lang.org/rand/rand/distributions/trait.IndependentSample.html#tymethod.ind_sample' class='fnname'>ind_sample</a>&lt;R:&nbsp;<a class='trait' href='https://doc.rust-lang.org/rand/rand/trait.Rng.html' title='rand::Rng'>Rng</a>&gt;(&amp;self, rng: &amp;mut R) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code></h4>
+<div class='docblock'><p>Generate a random value.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../../";
+        window.currentCrate = "rusty_machine";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../../jquery.js"></script>
+    <script src="../../../../main.js"></script>
+    
+    <script defer src="../../../../search-index.js"></script>
+</body>
+</html>

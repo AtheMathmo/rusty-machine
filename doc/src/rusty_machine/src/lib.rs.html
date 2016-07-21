@@ -248,6 +248,8 @@
 <span id="204">204</span>
 <span id="205">205</span>
 <span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! # The rusty-machine crate.</span>
 <span class='doccomment'>//!</span>
@@ -275,6 +277,7 @@
 <span class='doccomment'>//! - Support Vector Machines</span>
 <span class='doccomment'>//! - Gaussian Mixture Models</span>
 <span class='doccomment'>//! - Naive Bayes Classifiers</span>
+<span class='doccomment'>//! - DBSCAN</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! ### linalg</span>
 <span class='doccomment'>//!</span>
@@ -373,6 +376,7 @@
 
 <span class='doccomment'>/// Module for machine learning.</span>
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>learning</span> {
+    <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>dbscan</span>;
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>glm</span>;
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>gmm</span>;
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>lin_reg</span>;

@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["consts","Statistical constants"],["exponential","Exponential distribution module."],["gaussian","Gaussian distribution module."]],"trait":[["Distribution","Trait for statistical distributions."]]});
