@@ -179,11 +179,7 @@ pub struct BaseNeuralNet<'a, T: Criterion> {
 impl<'a> BaseNeuralNet<'a, BCECriterion> {
     /// Creates a base neural network with the specified layer sizes.
     fn default(layer_sizes: &[usize]) -> BaseNeuralNet<BCECriterion> {
-        BaseNeuralNet {
-            layer_sizes: layer_sizes,
-            weights: BaseNeuralNet::<BCECriterion>::create_weights(layer_sizes),
-            criterion: BCECriterion::default(),
-        }
+        BaseNeuralNet::new(layer_sizes, BCECriterion::default())
     }
 }
 
@@ -279,8 +275,8 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
 
                 a = ones.hcat(&a);
 
-                activations.push(a.clone());
-                z = a * self.get_layer_weights(weights, l);
+                z = &a * self.get_layer_weights(weights, l);
+                activations.push(a);
                 forward_weights.push(z.clone());
             }
 
