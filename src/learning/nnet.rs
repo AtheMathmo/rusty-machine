@@ -53,7 +53,8 @@ use learning::toolkit::regularization::Regularization;
 use learning::optim::{Optimizable, OptimAlgorithm};
 use learning::optim::grad_desc::StochasticGD;
 
-use rand::{Rng, thread_rng};
+use rand::thread_rng;
+use rand::distributions::{Sample, range};
 
 /// Neural Network Model
 ///
@@ -199,32 +200,18 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
 
     /// Creates initial weights for all neurons in the network.
     fn create_weights(layer_sizes: &[usize]) -> Vec<f64> {
-        let total_layers = layer_sizes.len();
-
-        let mut layers = Vec::new();
-
-        for (l, item) in layer_sizes.iter().enumerate().take(total_layers - 1) {
-            layers.append(&mut BaseNeuralNet::<T>::initialize_weights(item + 1,
-                                                                      layer_sizes[l + 1]));
-        }
-        layers.shrink_to_fit();
-
-        layers
-    }
-
-    /// Initializes the weights for a single layer in the network.
-    fn initialize_weights(l_in: usize, l_out: usize) -> Vec<f64> {
-        let mut weights = Vec::with_capacity(l_in * l_out);
-        let eps_init = (6f64 / (l_in + l_out) as f64).sqrt();
-
+        let mut between = range::Range::new(0f64, 1f64);
         let mut rng = thread_rng();
-
-        for _i in 0..l_in * l_out {
-            let w = (rng.gen_range(0f64, 1f64) * 2f64 * eps_init) - eps_init;
-            weights.push(w);
-        }
-
-        weights
+        layer_sizes
+            .windows(2)
+            .flat_map(|w| {
+                let l_in = w[0] + 1;
+                let l_out = w[1];
+                let eps_init = (6f64 / (l_in + l_out) as f64).sqrt();
+                (0..l_in * l_out)
+                    .map(|_i| (between.sample(&mut rng) * 2f64 * eps_init) - eps_init)
+                    .collect::<Vec<_>>()
+            }).collect()
     }
 
     /// Gets matrix of weights between specified layer and forward layer for the weights.
