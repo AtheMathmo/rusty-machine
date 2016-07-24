@@ -421,6 +421,7 @@
 <span id="377">377</span>
 <span id="378">378</span>
 <span id="379">379</span>
+<span id="380">380</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! K-means Classification</span>
 <span class='doccomment'>//!</span>
@@ -636,12 +637,13 @@
         <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>k</span> {
             <span class='kw'>let</span> <span class='ident'>vec_i</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>classes</span>.<span class='ident'>data</span>()
                 .<span class='ident'>iter</span>()
-                .<span class='ident'>filter</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span><span class='ident'>x</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>==</span> <span class='ident'>i</span>)
-                .<span class='ident'>cloned</span>()
+                .<span class='ident'>enumerate</span>()
+                .<span class='ident'>filter</span>(<span class='op'>|</span><span class='kw-2'>&amp;</span>(_, <span class='kw-2'>&amp;</span><span class='ident'>x</span>)<span class='op'>|</span> <span class='ident'>x</span> <span class='op'>==</span> <span class='ident'>i</span>)
+                .<span class='ident'>map</span>(<span class='op'>|</span>(<span class='ident'>idx</span>, _)<span class='op'>|</span> <span class='ident'>idx</span>)
                 .<span class='ident'>collect</span>();
-
+            
             <span class='kw'>let</span> <span class='ident'>mat_i</span> <span class='op'>=</span> <span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>vec_i</span>);
-            <span class='ident'>new_centroids</span>.<span class='ident'>extend</span>(<span class='ident'>mat_i</span>.<span class='ident'>mean</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>).<span class='ident'>data</span>());
+            <span class='ident'>new_centroids</span>.<span class='ident'>extend</span>(<span class='ident'>mat_i</span>.<span class='ident'>mean</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>).<span class='ident'>into_vec</span>());
         }
 
         <span class='self'>self</span>.<span class='ident'>centroids</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='self'>self</span>.<span class='ident'>k</span>, <span class='ident'>inputs</span>.<span class='ident'>cols</span>(), <span class='ident'>new_centroids</span>));
