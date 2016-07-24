@@ -212,12 +212,13 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
         for i in 0..self.k {
             let vec_i: Vec<usize> = classes.data()
                 .iter()
-                .filter(|&x| *x == i)
-                .cloned()
+                .enumerate()
+                .filter(|&(_, &x)| x == i)
+                .map(|(idx, _)| idx)
                 .collect();
-
+            
             let mat_i = inputs.select_rows(&vec_i);
-            new_centroids.extend(mat_i.mean(Axes::Row).data());
+            new_centroids.extend(mat_i.mean(Axes::Row).into_vec());
         }
 
         self.centroids = Some(Matrix::new(self.k, inputs.cols(), new_centroids));

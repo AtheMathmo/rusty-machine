@@ -2,6 +2,21 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.4.2
+
+### Breaking Changes
+
+- None
+
+### Features
+
+- None
+
+### Minor Changes
+
+- Fixed a significant bug in the K-Means algorithm. Centroids
+were not updating correctly during M-step.
+
 ## 0.4.1
 
 ### Breaking Changes
