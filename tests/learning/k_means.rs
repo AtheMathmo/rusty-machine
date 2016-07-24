@@ -78,3 +78,24 @@ fn test_no_train_predict() {
     model.predict(&inputs);
 
 }
+
+#[test]
+fn test_two_centroids() {
+    let mut model = KMeansClassifier::new(2);
+    let inputs = Matrix::new(6, 2, vec![59.59375, 270.6875,
+                                        51.59375, 307.6875,
+                                        86.59375, 286.6875,
+                                        319.59375, 145.6875,
+                                        314.59375, 174.6875,
+                                        350.59375, 161.6875]);
+
+    model.train(&inputs);
+
+    let classes = model.predict(&inputs);
+    let class_a = classes[0];
+
+    let class_b = if class_a == 0 { 1 } else { 0 };
+
+    assert!(classes.data().iter().take(3).all(|x| *x == class_a));
+    assert!(classes.data().iter().skip(3).all(|x| *x == class_b));
+}
