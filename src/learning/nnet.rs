@@ -311,9 +311,9 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
             }
         }
 
-        let mut gradients = Vec::new();
+        let mut gradients = Vec::with_capacity(weights.len());
 
-        for (l, activ_item) in activations[..self.layer_sizes.len() - 1].iter().enumerate() {
+        for (l, activ_item) in activations.iter().take(self.layer_sizes.len() - 1).enumerate() {
             // Compute the gradient
             let mut g = deltas[self.layer_sizes.len() - 2 - l].transpose() * activ_item;
 
@@ -333,9 +333,9 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
 
         // Add the regularized cost
         if self.criterion.is_regularized() {
-            cost += (0..self.layer_sizes.len() - 1)
-                .map(|i| self.criterion.reg_cost(self.get_non_bias_weights(weights, i)))
-                .sum();
+            for i in 0..self.layer_sizes.len() - 1 {
+                cost += self.criterion.reg_cost(self.get_non_bias_weights(weights, i));
+            }
         }
 
         (cost, gradients)
