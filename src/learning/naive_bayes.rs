@@ -195,15 +195,13 @@ impl<T: Distribution> NaiveBayes<T> {
     }
 
     fn get_classes(log_probs: Matrix<f64>) -> Vec<usize> {
-        let class_count = log_probs.cols();
         let mut data_classes = Vec::with_capacity(log_probs.rows());
 
-        // Argmax each class log-probability per input
-        for row in log_probs.data().chunks(class_count) {
+        data_classes.extend(log_probs.iter_rows().map(|row| {
+            // Argmax each class log-probability per input
             let (class, _) = utils::argmax(row);
-
-            data_classes.push(class);
-        }
+            class
+        }));
 
         data_classes
     }
