@@ -146,13 +146,12 @@ impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
 
         let ones = Matrix::<f64>::ones(inputs.rows(), 1);
         let full_inputs = ones.hcat(inputs);
-        let m = full_inputs.cols();
 
         for t in 0..self.optim_iters {
             let i = rng.gen_range(0, n);
-            let row_i = &full_inputs.data()[i * m..(i + 1) * m];
+            let row_i = full_inputs.select_rows(&[i]);
             let sum =  full_inputs.iter_rows()
-                .fold(0f64, |sum, row| sum + self.ker.kernel(row_i, row)) * 
+                .fold(0f64, |sum, row| sum + self.ker.kernel(row_i.data(), row)) * 
                 targets[i] / (self.lambda * (t as f64));
 
             if sum < 1f64 {
