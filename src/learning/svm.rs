@@ -103,19 +103,15 @@ impl<K: Kernel> SVM<K> {
     /// Construct a kernel matrix
     fn ker_mat(&self, m1: &Matrix<f64>, m2: &Matrix<f64>) -> Matrix<f64> {
         assert_eq!(m1.cols(), m2.cols());
-        let cols = m1.cols();
 
         let dim1 = m1.rows();
         let dim2 = m2.rows();
 
         let mut ker_data = Vec::with_capacity(dim1 * dim2);
 
-        for i in 0..dim1 {
-            for j in 0..dim2 {
-                ker_data.push(self.ker.kernel(&m1.data()[i * cols..(i + 1) * cols],
-                                              &m2.data()[j * cols..(j + 1) * cols]));
-            }
-        }
+        ker_data.extend(
+            m1.iter_rows().flat_map(|row1| m2.iter_rows()
+                                    .map(move |row2| self.ker.kernel(row1, row2))));
 
         Matrix::new(dim1, dim2, ker_data)
     }
