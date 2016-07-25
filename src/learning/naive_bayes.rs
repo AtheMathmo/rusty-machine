@@ -151,7 +151,7 @@ impl<T: Distribution> NaiveBayes<T> {
         self.class_counts = vec![0; class_count];
         let mut class_data = vec![Vec::new(); class_count];
 
-        for (idx, row) in targets.data().chunks(class_count).enumerate() {
+        for (idx, row) in targets.iter_rows().enumerate() {
             // Find the class of this input
             let class = NaiveBayes::<T>::find_class(row);
 
