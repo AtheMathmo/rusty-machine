@@ -150,13 +150,10 @@ impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
 
         for t in 0..self.optim_iters {
             let i = rng.gen_range(0, n);
-            let mut sum = 0f64;
-            for j in 0..n {
-                sum += alpha[j] * targets[j] *
-                       self.ker.kernel(&full_inputs.data()[i * m..(i + 1) * m],
-                                       &full_inputs.data()[j * m..(j + 1) * m]);
-            }
-            sum *= targets[i] / (self.lambda * (t as f64));
+            let row_i = &full_inputs.data()[i * m..(i + 1) * m];
+            let sum =  full_inputs.iter_rows()
+                .fold(0f64, |sum, row| sum + self.ker.kernel(row_i, row)) * 
+                targets[i] / (self.lambda * (t as f64));
 
             if sum < 1f64 {
                 alpha[i] += 1f64;
