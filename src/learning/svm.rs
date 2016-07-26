@@ -103,19 +103,15 @@ impl<K: Kernel> SVM<K> {
     /// Construct a kernel matrix
     fn ker_mat(&self, m1: &Matrix<f64>, m2: &Matrix<f64>) -> Matrix<f64> {
         assert_eq!(m1.cols(), m2.cols());
-        let cols = m1.cols();
 
         let dim1 = m1.rows();
         let dim2 = m2.rows();
 
         let mut ker_data = Vec::with_capacity(dim1 * dim2);
 
-        for i in 0..dim1 {
-            for j in 0..dim2 {
-                ker_data.push(self.ker.kernel(&m1.data()[i * cols..(i + 1) * cols],
-                                              &m2.data()[j * cols..(j + 1) * cols]));
-            }
-        }
+        ker_data.extend(
+            m1.iter_rows().flat_map(|row1| m2.iter_rows()
+                                    .map(move |row2| self.ker.kernel(row1, row2))));
 
         Matrix::new(dim1, dim2, ker_data)
     }
@@ -150,17 +146,13 @@ impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
 
         let ones = Matrix::<f64>::ones(inputs.rows(), 1);
         let full_inputs = ones.hcat(inputs);
-        let m = full_inputs.cols();
 
         for t in 0..self.optim_iters {
             let i = rng.gen_range(0, n);
-            let mut sum = 0f64;
-            for j in 0..n {
-                sum += alpha[j] * targets[j] *
-                       self.ker.kernel(&full_inputs.data()[i * m..(i + 1) * m],
-                                       &full_inputs.data()[j * m..(j + 1) * m]);
-            }
-            sum *= targets[i] / (self.lambda * (t as f64));
+            let row_i = full_inputs.select_rows(&[i]);
+            let sum =  full_inputs.iter_rows()
+                .fold(0f64, |sum, row| sum + self.ker.kernel(row_i.data(), row)) * 
+                targets[i] / (self.lambda * (t as f64));
 
             if sum < 1f64 {
                 alpha[i] += 1f64;

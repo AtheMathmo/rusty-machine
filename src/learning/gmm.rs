@@ -279,9 +279,9 @@ impl GaussianMixtureModel {
 
         let mut new_means = membership_weights.transpose() * inputs;
 
-        for (idx, mean) in new_means.mut_data().chunks_mut(d).enumerate() {
-            for m in mean {
-                *m /= sum_weights[idx];
+        for (mean, w) in new_means.iter_rows_mut().zip(sum_weights.data().iter()) {
+            for m in mean.iter_mut() {
+                *m /= *w;
             }
         }
 
