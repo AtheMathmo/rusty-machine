@@ -290,21 +290,18 @@ pub struct RandomPartition;
 
 impl Initializer for RandomPartition {
     fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error> {
-        let mut random_assignments = Vec::with_capacity(inputs.rows());
 
         // Populate so we have something in each class.
-        random_assignments.extend(0..k);
-
+        let mut random_assignments = (0..k).map(|i| vec![i]).collect::<Vec<Vec<usize>>>();
         let mut rng = thread_rng();
-        random_assignments.extend((k..inputs.rows()).map(|_| rng.gen_range(0, k)));
+        for i in k..inputs.rows() {
+            let idx = rng.gen_range(0, k);
+            unsafe { random_assignments.get_unchecked_mut(idx).push(i); }
+        }
 
         let mut init_centroids = Vec::with_capacity(k * inputs.cols());
-        for i in 0..k {
-            let vec_i: Vec<usize> = random_assignments.iter()
-                .filter(|&x| *x == i)
-                .cloned()
-                .collect();
 
+        for vec_i in random_assignments {
             let mat_i = inputs.select_rows(&vec_i);
             init_centroids.extend_from_slice(&*mat_i.mean(Axes::Row).into_vec());
         }
