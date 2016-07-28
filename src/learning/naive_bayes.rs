@@ -151,7 +151,7 @@ impl<T: Distribution> NaiveBayes<T> {
         self.class_counts = vec![0; class_count];
         let mut class_data = vec![Vec::new(); class_count];
 
-        for (idx, row) in targets.data().chunks(class_count).enumerate() {
+        for (idx, row) in targets.iter_rows().enumerate() {
             // Find the class of this input
             let class = NaiveBayes::<T>::find_class(row);
 
@@ -169,16 +169,14 @@ impl<T: Distribution> NaiveBayes<T> {
                     continue;
                 }
                 // Update the parameters within this class
-                distr.update_params(inputs.select_rows(&c), idx);
+                distr.update_params(&inputs.select_rows(&c), idx);
             }
         }
 
         let mut class_prior = Vec::with_capacity(class_count);
 
         // Compute the prior as the proportion in each class
-        for i in 0..class_count {
-            class_prior.push(self.class_counts[i] as f64 / total_data as f64);
-        }
+        class_prior.extend(self.class_counts.iter().map(|c| *c as f64 / total_data as f64));
 
         self.class_prior = Some(class_prior);
         self.cluster_count = Some(class_count);
@@ -195,15 +193,13 @@ impl<T: Distribution> NaiveBayes<T> {
     }
 
     fn get_classes(log_probs: Matrix<f64>) -> Vec<usize> {
-        let class_count = log_probs.cols();
         let mut data_classes = Vec::with_capacity(log_probs.rows());
 
-        // Argmax each class log-probability per input
-        for row in log_probs.data().chunks(class_count) {
+        data_classes.extend(log_probs.iter_rows().map(|row| {
+            // Argmax each class log-probability per input
             let (class, _) = utils::argmax(row);
-
-            data_classes.push(class);
-        }
+            class
+        }));
 
         data_classes
     }
@@ -215,7 +211,7 @@ pub trait Distribution {
     fn from_model_params(class_count: usize, features: usize) -> Self;
 
     /// Updates the distribution parameters.
-    fn update_params(&mut self, data: Matrix<f64>, class: usize);
+    fn update_params(&mut self, data: &Matrix<f64>, class: usize);
 
     /// Compute the joint log likelihood of the data.
     ///
@@ -259,7 +255,7 @@ impl Distribution for Gaussian {
         }
     }
 
-    fn update_params(&mut self, data: Matrix<f64>, class: usize) {
+    fn update_params(&mut self, data: &Matrix<f64>, class: usize) {
         // Compute mean and sample variance
         let mean = data.mean(Axes::Row).into_vec();
         let var = data.variance(Axes::Row).into_vec();
@@ -276,7 +272,7 @@ impl Distribution for Gaussian {
         let class_count = class_prior.len();
         let mut log_lik = Vec::with_capacity(class_count);
 
-        for (i, item) in class_prior.iter().enumerate() {
+        for (i, item) in class_prior.into_iter().enumerate() {
             let joint_i = item.ln();
             let n_ij = -0.5 * (self.sigma.select_rows(&[i]) * 2.0 * PI).apply(&|x| x.ln()).sum();
 
@@ -287,7 +283,6 @@ impl Distribution for Gaussian {
                 .sum_cols();
 
             let res = (-r_ij * 0.5) + n_ij;
-
 
             log_lik.append(&mut (res + joint_i).into_vec());
         }
@@ -325,7 +320,7 @@ impl Distribution for Bernoulli {
         }
     }
 
-    fn update_params(&mut self, data: Matrix<f64>, class: usize) {
+    fn update_params(&mut self, data: &Matrix<f64>, class: usize) {
         let features = data.cols();
 
         // We add the pseudo count to the class count and feature count
@@ -393,7 +388,7 @@ impl Distribution for Multinomial {
         }
     }
 
-    fn update_params(&mut self, data: Matrix<f64>, class: usize) {
+    fn update_params(&mut self, data: &Matrix<f64>, class: usize) {
         let features = data.cols();
 
         let pseudo_fc = data.sum_rows() + self.pseudo_count;

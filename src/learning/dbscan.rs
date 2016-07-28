@@ -178,11 +178,8 @@ impl DBSCAN {
             let visited = self._visited[*data_point_idx];
             if !visited {
                 self._visited[*data_point_idx] = true;
-                let sub_neighbours =
-                    self.region_query(&inputs.data()[data_point_idx * inputs.cols()..(data_point_idx +
-                                                                                   1) *
-                                                                                  inputs.cols()],
-                                      inputs);
+                let data_point_row = unsafe { inputs.get_row_unchecked(*data_point_idx) };
+                let sub_neighbours = self.region_query(data_point_row, inputs);
 
                 if sub_neighbours.len() >= self.min_points {
                     self.expand_cluster(inputs, *data_point_idx, sub_neighbours, cluster);

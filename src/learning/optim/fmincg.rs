@@ -115,7 +115,7 @@ impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
 
             x = x + &s * z1;
 
-            let cost = model.compute_grad(&x.data()[..], inputs, targets);
+            let cost = model.compute_grad(x.data(), inputs, targets);
             f2 = cost.0;
             df2 = Vector::new(cost.1);
 
@@ -167,7 +167,7 @@ impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
 
                     z1 += z2;
                     x = x + &s * z2;
-                    let cost_grad = model.compute_grad(&x.data()[..], inputs, targets);
+                    let cost_grad = model.compute_grad(x.data(), inputs, targets);
                     f2 = cost_grad.0;
                     df2 = Vector::new(cost_grad.1);
 
@@ -215,7 +215,7 @@ impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
                 z1 += z2;
                 x = x + &s * z2;
 
-                let cost_grad = model.compute_grad(&x.data()[..], inputs, targets);
+                let cost_grad = model.compute_grad(x.data(), inputs, targets);
                 f2 = cost_grad.0;
                 df2 = Vector::new(cost_grad.1);
 

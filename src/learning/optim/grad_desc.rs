@@ -80,7 +80,7 @@ impl<M: Optimizable> OptimAlgorithm<M> for GradientDesc {
 
         for _ in 0..self.iters {
             // Compute the cost and gradient for the current parameters
-            let (cost, grad) = model.compute_grad(&optimizing_val.data()[..], inputs, targets);
+            let (cost, grad) = model.compute_grad(optimizing_val.data(), inputs, targets);
 
             // Early stopping
             if (start_iter_cost - cost).abs() < LEARNING_EPS {

@@ -209,14 +209,13 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
     /// Used internally within model.
     fn update_centroids(&mut self, inputs: &Matrix<f64>, classes: Vector<usize>) {
         let mut new_centroids = Vec::with_capacity(self.k * inputs.cols());
-        for i in 0..self.k {
-            let vec_i: Vec<usize> = classes.data()
-                .iter()
-                .enumerate()
-                .filter(|&(_, &x)| x == i)
-                .map(|(idx, _)| idx)
-                .collect();
-            
+
+        let mut row_indexes = vec![Vec::new(); self.k];
+        for (i, c) in classes.into_vec().into_iter().enumerate() {
+            row_indexes.get_mut(c as usize).map(|v| v.push(i));
+        }
+
+        for vec_i in row_indexes {
             let mat_i = inputs.select_rows(&vec_i);
             new_centroids.extend(mat_i.mean(Axes::Row).into_vec());
         }
@@ -251,7 +250,6 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
             let (min_idx, min_dist) = dist.argmin();
             idx.push(min_idx);
             distances.push(min_dist);
-
         }
 
         (Vector::new(idx), Vector::new(distances))
@@ -292,27 +290,20 @@ pub struct RandomPartition;
 
 impl Initializer for RandomPartition {
     fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error> {
-        let mut random_assignments = Vec::with_capacity(inputs.rows());
 
         // Populate so we have something in each class.
-        for i in 0..k {
-            random_assignments.push(i);
-        }
-
+        let mut random_assignments = (0..k).map(|i| vec![i]).collect::<Vec<Vec<usize>>>();
         let mut rng = thread_rng();
-        for _ in k..inputs.rows() {
-            random_assignments.push(rng.gen_range(0, k));
+        for i in k..inputs.rows() {
+            let idx = rng.gen_range(0, k);
+            unsafe { random_assignments.get_unchecked_mut(idx).push(i); }
         }
 
         let mut init_centroids = Vec::with_capacity(k * inputs.cols());
-        for i in 0..k {
-            let vec_i: Vec<usize> = random_assignments.iter()
-                .filter(|&x| *x == i)
-                .cloned()
-                .collect();
 
+        for vec_i in random_assignments {
             let mat_i = inputs.select_rows(&vec_i);
-            init_centroids.extend(mat_i.mean(Axes::Row).into_vec());
+            init_centroids.extend_from_slice(&*mat_i.mean(Axes::Row).into_vec());
         }
 
         Ok(Matrix::new(k, inputs.cols(), init_centroids))
@@ -330,7 +321,9 @@ impl Initializer for KPlusPlus {
         let mut init_centroids = Vec::with_capacity(k * inputs.cols());
         let first_cen = rng.gen_range(0usize, inputs.rows());
 
-        init_centroids.append(&mut inputs.select_rows(&[first_cen]).into_vec());
+        unsafe { 
+            init_centroids.extend_from_slice(inputs.get_row_unchecked(first_cen)); 
+        }
 
         for i in 1..k {
             unsafe {
@@ -349,7 +342,7 @@ impl Initializer for KPlusPlus {
                 }
 
                 let next_cen = sample_discretely(dist);
-                init_centroids.append(&mut inputs.select_rows(&[next_cen]).into_vec())
+                init_centroids.extend_from_slice(inputs.get_row_unchecked(next_cen)); 
             }
         }
 

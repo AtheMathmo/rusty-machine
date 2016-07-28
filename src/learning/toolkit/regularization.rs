@@ -141,11 +141,8 @@ mod tests {
 
         assert!((a - (input_mat.norm() / 12f64)) < 1e-18);
 
-        let true_grad = input_mat.data()
-            .iter()
-            .map(|x| x / 6f64)
-            .collect::<Vec<_>>();
-        for eps in (b - Matrix::new(3, 4, true_grad)).into_vec() {
+        let true_grad = &input_mat / 6f64;
+        for eps in (b - true_grad).into_vec() {
             assert!(eps < 1e-18);
         }
     }
@@ -162,16 +159,14 @@ mod tests {
 
         assert!(a - ((input_mat.norm() / 24f64) + (42f64 / 12f64)) < 1e-18);
 
-        let l1_true_grad = vec![-1., -1., -1., 1., 1., 1., 1., 1., 1., 1., 1., 1.]
+        let l1_true_grad = Matrix::new(3, 4,
+            vec![-1., -1., -1., 1., 1., 1., 1., 1., 1., 1., 1., 1.]
             .into_iter()
             .map(|x| x / 12f64)
-            .collect::<Vec<_>>();
-        let l2_true_grad = input_mat.data()
-            .iter()
-            .map(|x| x / 12f64)
-            .collect::<Vec<_>>();
+            .collect::<Vec<_>>());
+        let l2_true_grad = &input_mat / 12f64;
 
-        for eps in (b - Matrix::new(3, 4, l1_true_grad) - Matrix::new(3, 4, l2_true_grad))
+        for eps in (b - l1_true_grad - l2_true_grad)
             .into_vec() {
             // Slightly lower boundary than others - more numerical error as more ops.
             assert!(eps < 1e-12);

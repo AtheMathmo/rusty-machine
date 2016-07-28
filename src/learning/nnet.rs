@@ -53,7 +53,8 @@ use learning::toolkit::regularization::Regularization;
 use learning::optim::{Optimizable, OptimAlgorithm};
 use learning::optim::grad_desc::StochasticGD;
 
-use rand::{Rng, thread_rng};
+use rand::thread_rng;
+use rand::distributions::{Sample, range};
 
 /// Neural Network Model
 ///
@@ -178,11 +179,7 @@ pub struct BaseNeuralNet<'a, T: Criterion> {
 impl<'a> BaseNeuralNet<'a, BCECriterion> {
     /// Creates a base neural network with the specified layer sizes.
     fn default(layer_sizes: &[usize]) -> BaseNeuralNet<BCECriterion> {
-        BaseNeuralNet {
-            layer_sizes: layer_sizes,
-            weights: BaseNeuralNet::<BCECriterion>::create_weights(layer_sizes),
-            criterion: BCECriterion::default(),
-        }
+        BaseNeuralNet::new(layer_sizes, BCECriterion::default())
     }
 }
 
@@ -199,32 +196,18 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
 
     /// Creates initial weights for all neurons in the network.
     fn create_weights(layer_sizes: &[usize]) -> Vec<f64> {
-        let total_layers = layer_sizes.len();
-
-        let mut layers = Vec::new();
-
-        for (l, item) in layer_sizes.iter().enumerate().take(total_layers - 1) {
-            layers.append(&mut BaseNeuralNet::<T>::initialize_weights(item + 1,
-                                                                      layer_sizes[l + 1]));
-        }
-        layers.shrink_to_fit();
-
-        layers
-    }
-
-    /// Initializes the weights for a single layer in the network.
-    fn initialize_weights(l_in: usize, l_out: usize) -> Vec<f64> {
-        let mut weights = Vec::with_capacity(l_in * l_out);
-        let eps_init = (6f64 / (l_in + l_out) as f64).sqrt();
-
+        let mut between = range::Range::new(0f64, 1f64);
         let mut rng = thread_rng();
-
-        for _i in 0..l_in * l_out {
-            let w = (rng.gen_range(0f64, 1f64) * 2f64 * eps_init) - eps_init;
-            weights.push(w);
-        }
-
-        weights
+        layer_sizes
+            .windows(2)
+            .flat_map(|w| {
+                let l_in = w[0] + 1;
+                let l_out = w[1];
+                let eps_init = (6f64 / (l_in + l_out) as f64).sqrt();
+                (0..l_in * l_out)
+                    .map(|_i| (between.sample(&mut rng) * 2f64 * eps_init) - eps_init)
+                    .collect::<Vec<_>>()
+            }).collect()
     }
 
     /// Gets matrix of weights between specified layer and forward layer for the weights.
@@ -292,8 +275,8 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
 
                 a = ones.hcat(&a);
 
-                activations.push(a.clone());
-                z = a * self.get_layer_weights(weights, l);
+                z = &a * self.get_layer_weights(weights, l);
+                activations.push(a);
                 forward_weights.push(z.clone());
             }
 
@@ -328,10 +311,9 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
             }
         }
 
-        let mut grad = Vec::with_capacity(self.layer_sizes.len() - 1);
-        let mut capacity = 0;
+        let mut gradients = Vec::with_capacity(weights.len());
 
-        for (l, activ_item) in activations.iter().enumerate().take(self.layer_sizes.len() - 1) {
+        for (l, activ_item) in activations.iter().take(self.layer_sizes.len() - 1).enumerate() {
             // Compute the gradient
             let mut g = deltas[self.layer_sizes.len() - 2 - l].transpose() * activ_item;
 
@@ -343,14 +325,7 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
                 g += zeros.vcat(&self.criterion.reg_cost_grad(non_bias_weights));
             }
 
-            capacity += g.cols() * g.rows();
-            grad.push(g / (inputs.rows() as f64));
-        }
-
-        let mut gradients = Vec::with_capacity(capacity);
-
-        for g in grad {
-            gradients.append(&mut g.into_vec());
+            gradients.append(&mut (g / inputs.rows() as f64).into_vec());
         }
 
         // Compute the cost
