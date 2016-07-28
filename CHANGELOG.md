@@ -2,6 +2,27 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.4.3
+
+### New Contributors
+
+- [tafia](https://github.com/tafia) who is responsible for all changes in this release.
+
+### Breaking Changes
+
+- None
+
+### Features
+
+- None
+
+### Minor Changes
+
+- Made neural nets more efficient by reducing clones
+and some restructuring.
+- Removing unneeded copying in favour of slicing for performance.
+- Using `iter_rows` in favour of manually row iterating by chunks.
+
 ## 0.4.2
 
 ### Breaking Changes
