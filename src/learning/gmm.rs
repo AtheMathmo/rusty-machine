@@ -31,8 +31,7 @@
 //! println!("{:?}", post_probs.data());
 //! ```
 
-use linalg::Vector;
-use linalg::Matrix;
+use linalg::{Matrix, MatrixSlice, Vector};
 use rulinalg::utils;
 
 use learning::UnSupModel;
@@ -245,11 +244,11 @@ impl GaussianMixtureModel {
         if let Some(ref means) = self.model_means {
             for i in 0..n {
                 let mut pdfs = Vec::with_capacity(self.comp_count);
-                let x_i = inputs.select_rows(&[i]);
+                let x_i = MatrixSlice::from_matrix(inputs, [i, 0], 1, inputs.cols());
 
                 for j in 0..self.comp_count {
-                    let mu_j = means.select_rows(&[j]);
-                    let diff = &x_i - mu_j;
+                    let mu_j = MatrixSlice::from_matrix(means, [j, 0], 1, means.cols());
+                    let diff = x_i - mu_j;
 
                     let pdf = (&diff * &cov_invs[j] * diff.transpose() * -0.5).into_vec()[0]
                         .exp() / cov_sqrt_dets[j];
@@ -289,10 +288,12 @@ impl GaussianMixtureModel {
 
         for k in 0..self.comp_count {
             let mut cov_mat = Matrix::zeros(d, d);
+            let new_means_k = MatrixSlice::from_matrix(&new_means, [k, 0], 1, d);
 
             for i in 0..n {
-                let diff = inputs.select_rows(&[i]) - new_means.select_rows(&[k]);
-                cov_mat = cov_mat + self.compute_cov(diff, membership_weights[[i, k]]);
+                let inputs_i = MatrixSlice::from_matrix(inputs, [i, 0], 1, d);
+                let diff = inputs_i - new_means_k; 
+                cov_mat += self.compute_cov(diff, membership_weights[[i, k]]);
             }
             new_covs.push(cov_mat / sum_weights[k]);
 
