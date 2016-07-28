@@ -293,7 +293,7 @@ impl GaussianMixtureModel {
             for i in 0..n {
                 let inputs_i = MatrixSlice::from_matrix(inputs, [i, 0], 1, d);
                 let diff = inputs_i - new_means_k; 
-                cov_mat += self.compute_cov(&diff, membership_weights[[i, k]]);
+                cov_mat += self.compute_cov(diff, membership_weights[[i, k]]);
             }
             new_covs.push(cov_mat / sum_weights[k]);
 
@@ -303,7 +303,7 @@ impl GaussianMixtureModel {
         self.model_covars = Some(new_covs);
     }
 
-    fn compute_cov(&self, diff: &Matrix<f64>, weight: f64) -> Matrix<f64> {
+    fn compute_cov(&self, diff: Matrix<f64>, weight: f64) -> Matrix<f64> {
         match self.cov_option {
             CovOption::Full => (diff.transpose() * diff) * weight,
             CovOption::Regularized(eps) => (diff.transpose() * diff) * weight + eps,
