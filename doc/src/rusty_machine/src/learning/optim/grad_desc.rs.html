@@ -466,7 +466,7 @@
 
         <span class='kw'>for</span> _ <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>iters</span> {
             <span class='comment'>// Compute the cost and gradient for the current parameters</span>
-            <span class='kw'>let</span> (<span class='ident'>cost</span>, <span class='ident'>grad</span>) <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='kw-2'>&amp;</span><span class='ident'>optimizing_val</span>.<span class='ident'>data</span>()[..], <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
+            <span class='kw'>let</span> (<span class='ident'>cost</span>, <span class='ident'>grad</span>) <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='ident'>optimizing_val</span>.<span class='ident'>data</span>(), <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
 
             <span class='comment'>// Early stopping</span>
             <span class='kw'>if</span> (<span class='ident'>start_iter_cost</span> <span class='op'>-</span> <span class='ident'>cost</span>).<span class='ident'>abs</span>() <span class='op'>&lt;</span> <span class='ident'>LEARNING_EPS</span> {

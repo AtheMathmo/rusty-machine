@@ -575,31 +575,6 @@
 <span id="531">531</span>
 <span id="532">532</span>
 <span id="533">533</span>
-<span id="534">534</span>
-<span id="535">535</span>
-<span id="536">536</span>
-<span id="537">537</span>
-<span id="538">538</span>
-<span id="539">539</span>
-<span id="540">540</span>
-<span id="541">541</span>
-<span id="542">542</span>
-<span id="543">543</span>
-<span id="544">544</span>
-<span id="545">545</span>
-<span id="546">546</span>
-<span id="547">547</span>
-<span id="548">548</span>
-<span id="549">549</span>
-<span id="550">550</span>
-<span id="551">551</span>
-<span id="552">552</span>
-<span id="553">553</span>
-<span id="554">554</span>
-<span id="555">555</span>
-<span id="556">556</span>
-<span id="557">557</span>
-<span id="558">558</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Neural Network module</span>
 <span class='doccomment'>//!</span>
@@ -656,7 +631,8 @@
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>optim</span>::{<span class='ident'>Optimizable</span>, <span class='ident'>OptimAlgorithm</span>};
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>optim</span>::<span class='ident'>grad_desc</span>::<span class='ident'>StochasticGD</span>;
 
-<span class='kw'>use</span> <span class='ident'>rand</span>::{<span class='ident'>Rng</span>, <span class='ident'>thread_rng</span>};
+<span class='kw'>use</span> <span class='ident'>rand</span>::<span class='ident'>thread_rng</span>;
+<span class='kw'>use</span> <span class='ident'>rand</span>::<span class='ident'>distributions</span>::{<span class='ident'>Sample</span>, <span class='ident'>range</span>};
 
 <span class='doccomment'>/// Neural Network Model</span>
 <span class='doccomment'>///</span>
@@ -781,11 +757,7 @@
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span><span class='op'>&gt;</span> <span class='ident'>BaseNeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>BCECriterion</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Creates a base neural network with the specified layer sizes.</span>
     <span class='kw'>fn</span> <span class='ident'>default</span>(<span class='ident'>layer_sizes</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>usize</span>]) <span class='op'>-&gt;</span> <span class='ident'>BaseNeuralNet</span><span class='op'>&lt;</span><span class='ident'>BCECriterion</span><span class='op'>&gt;</span> {
-        <span class='ident'>BaseNeuralNet</span> {
-            <span class='ident'>layer_sizes</span>: <span class='ident'>layer_sizes</span>,
-            <span class='ident'>weights</span>: <span class='ident'>BaseNeuralNet</span>::<span class='op'>&lt;</span><span class='ident'>BCECriterion</span><span class='op'>&gt;</span>::<span class='ident'>create_weights</span>(<span class='ident'>layer_sizes</span>),
-            <span class='ident'>criterion</span>: <span class='ident'>BCECriterion</span>::<span class='ident'>default</span>(),
-        }
+        <span class='ident'>BaseNeuralNet</span>::<span class='ident'>new</span>(<span class='ident'>layer_sizes</span>, <span class='ident'>BCECriterion</span>::<span class='ident'>default</span>())
     }
 }
 
@@ -802,32 +774,18 @@
 
     <span class='doccomment'>/// Creates initial weights for all neurons in the network.</span>
     <span class='kw'>fn</span> <span class='ident'>create_weights</span>(<span class='ident'>layer_sizes</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>usize</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>total_layers</span> <span class='op'>=</span> <span class='ident'>layer_sizes</span>.<span class='ident'>len</span>();
-
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>layers</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>new</span>();
-
-        <span class='kw'>for</span> (<span class='ident'>l</span>, <span class='ident'>item</span>) <span class='kw'>in</span> <span class='ident'>layer_sizes</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>().<span class='ident'>take</span>(<span class='ident'>total_layers</span> <span class='op'>-</span> <span class='number'>1</span>) {
-            <span class='ident'>layers</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>BaseNeuralNet</span>::<span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>::<span class='ident'>initialize_weights</span>(<span class='ident'>item</span> <span class='op'>+</span> <span class='number'>1</span>,
-                                                                      <span class='ident'>layer_sizes</span>[<span class='ident'>l</span> <span class='op'>+</span> <span class='number'>1</span>]));
-        }
-        <span class='ident'>layers</span>.<span class='ident'>shrink_to_fit</span>();
-
-        <span class='ident'>layers</span>
-    }
-
-    <span class='doccomment'>/// Initializes the weights for a single layer in the network.</span>
-    <span class='kw'>fn</span> <span class='ident'>initialize_weights</span>(<span class='ident'>l_in</span>: <span class='ident'>usize</span>, <span class='ident'>l_out</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>weights</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>l_in</span> <span class='op'>*</span> <span class='ident'>l_out</span>);
-        <span class='kw'>let</span> <span class='ident'>eps_init</span> <span class='op'>=</span> (<span class='number'>6f64</span> <span class='op'>/</span> (<span class='ident'>l_in</span> <span class='op'>+</span> <span class='ident'>l_out</span>) <span class='kw'>as</span> <span class='ident'>f64</span>).<span class='ident'>sqrt</span>();
-
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>between</span> <span class='op'>=</span> <span class='ident'>range</span>::<span class='ident'>Range</span>::<span class='ident'>new</span>(<span class='number'>0f64</span>, <span class='number'>1f64</span>);
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>rng</span> <span class='op'>=</span> <span class='ident'>thread_rng</span>();
-
-        <span class='kw'>for</span> <span class='ident'>_i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>l_in</span> <span class='op'>*</span> <span class='ident'>l_out</span> {
-            <span class='kw'>let</span> <span class='ident'>w</span> <span class='op'>=</span> (<span class='ident'>rng</span>.<span class='ident'>gen_range</span>(<span class='number'>0f64</span>, <span class='number'>1f64</span>) <span class='op'>*</span> <span class='number'>2f64</span> <span class='op'>*</span> <span class='ident'>eps_init</span>) <span class='op'>-</span> <span class='ident'>eps_init</span>;
-            <span class='ident'>weights</span>.<span class='ident'>push</span>(<span class='ident'>w</span>);
-        }
-
-        <span class='ident'>weights</span>
+        <span class='ident'>layer_sizes</span>
+            .<span class='ident'>windows</span>(<span class='number'>2</span>)
+            .<span class='ident'>flat_map</span>(<span class='op'>|</span><span class='ident'>w</span><span class='op'>|</span> {
+                <span class='kw'>let</span> <span class='ident'>l_in</span> <span class='op'>=</span> <span class='ident'>w</span>[<span class='number'>0</span>] <span class='op'>+</span> <span class='number'>1</span>;
+                <span class='kw'>let</span> <span class='ident'>l_out</span> <span class='op'>=</span> <span class='ident'>w</span>[<span class='number'>1</span>];
+                <span class='kw'>let</span> <span class='ident'>eps_init</span> <span class='op'>=</span> (<span class='number'>6f64</span> <span class='op'>/</span> (<span class='ident'>l_in</span> <span class='op'>+</span> <span class='ident'>l_out</span>) <span class='kw'>as</span> <span class='ident'>f64</span>).<span class='ident'>sqrt</span>();
+                (<span class='number'>0</span>..<span class='ident'>l_in</span> <span class='op'>*</span> <span class='ident'>l_out</span>)
+                    .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>_i</span><span class='op'>|</span> (<span class='ident'>between</span>.<span class='ident'>sample</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>rng</span>) <span class='op'>*</span> <span class='number'>2f64</span> <span class='op'>*</span> <span class='ident'>eps_init</span>) <span class='op'>-</span> <span class='ident'>eps_init</span>)
+                    .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>()
+            }).<span class='ident'>collect</span>()
     }
 
     <span class='doccomment'>/// Gets matrix of weights between specified layer and forward layer for the weights.</span>
@@ -895,8 +853,8 @@
 
                 <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>ones</span>.<span class='ident'>hcat</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>);
 
-                <span class='ident'>activations</span>.<span class='ident'>push</span>(<span class='ident'>a</span>.<span class='ident'>clone</span>());
-                <span class='ident'>z</span> <span class='op'>=</span> <span class='ident'>a</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>get_layer_weights</span>(<span class='ident'>weights</span>, <span class='ident'>l</span>);
+                <span class='ident'>z</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>a</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>get_layer_weights</span>(<span class='ident'>weights</span>, <span class='ident'>l</span>);
+                <span class='ident'>activations</span>.<span class='ident'>push</span>(<span class='ident'>a</span>);
                 <span class='ident'>forward_weights</span>.<span class='ident'>push</span>(<span class='ident'>z</span>.<span class='ident'>clone</span>());
             }
 
@@ -931,10 +889,9 @@
             }
         }
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>grad</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='self'>self</span>.<span class='ident'>layer_sizes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>);
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>capacity</span> <span class='op'>=</span> <span class='number'>0</span>;
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>gradients</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>weights</span>.<span class='ident'>len</span>());
 
-        <span class='kw'>for</span> (<span class='ident'>l</span>, <span class='ident'>activ_item</span>) <span class='kw'>in</span> <span class='ident'>activations</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>().<span class='ident'>take</span>(<span class='self'>self</span>.<span class='ident'>layer_sizes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>) {
+        <span class='kw'>for</span> (<span class='ident'>l</span>, <span class='ident'>activ_item</span>) <span class='kw'>in</span> <span class='ident'>activations</span>.<span class='ident'>iter</span>().<span class='ident'>take</span>(<span class='self'>self</span>.<span class='ident'>layer_sizes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span>).<span class='ident'>enumerate</span>() {
             <span class='comment'>// Compute the gradient</span>
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>g</span> <span class='op'>=</span> <span class='ident'>deltas</span>[<span class='self'>self</span>.<span class='ident'>layer_sizes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>2</span> <span class='op'>-</span> <span class='ident'>l</span>].<span class='ident'>transpose</span>() <span class='op'>*</span> <span class='ident'>activ_item</span>;
 
@@ -946,14 +903,7 @@
                 <span class='ident'>g</span> <span class='op'>+=</span> <span class='ident'>zeros</span>.<span class='ident'>vcat</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>criterion</span>.<span class='ident'>reg_cost_grad</span>(<span class='ident'>non_bias_weights</span>));
             }
 
-            <span class='ident'>capacity</span> <span class='op'>+=</span> <span class='ident'>g</span>.<span class='ident'>cols</span>() <span class='op'>*</span> <span class='ident'>g</span>.<span class='ident'>rows</span>();
-            <span class='ident'>grad</span>.<span class='ident'>push</span>(<span class='ident'>g</span> <span class='op'>/</span> (<span class='ident'>inputs</span>.<span class='ident'>rows</span>() <span class='kw'>as</span> <span class='ident'>f64</span>));
-        }
-
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>gradients</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>capacity</span>);
-
-        <span class='kw'>for</span> <span class='ident'>g</span> <span class='kw'>in</span> <span class='ident'>grad</span> {
-            <span class='ident'>gradients</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>g</span>.<span class='ident'>into_vec</span>());
+            <span class='ident'>gradients</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> (<span class='ident'>g</span> <span class='op'>/</span> <span class='ident'>inputs</span>.<span class='ident'>rows</span>() <span class='kw'>as</span> <span class='ident'>f64</span>).<span class='ident'>into_vec</span>());
         }
 
         <span class='comment'>// Compute the cost</span>

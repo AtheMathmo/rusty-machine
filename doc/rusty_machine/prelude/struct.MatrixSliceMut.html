@@ -170,13 +170,44 @@ function safely whilst violating this condition. So long as
 
 <span class='comment'>// Only the matrix slice is updated.</span>
 <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>a</span>.<span class='ident'>into_vec</span>(), <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0</span>,<span class='number'>1</span>,<span class='number'>2</span>,<span class='number'>3</span>,<span class='number'>6</span>,<span class='number'>7</span>,<span class='number'>6</span>,<span class='number'>9</span>,<span class='number'>10</span>]);</pre>
+</div><h4 id='method.get_row_mut' class='method'><code>fn <a href='#method.get_row_mut' class='fnname'>get_row_mut</a>(&amp;mut self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;mut [T]</a>&gt;</code></h4>
+<div class='docblock'><p>Returns a mutable reference to the row of a <code>MatrixSliceMut</code> at the given index.
+<code>None</code> if the index is out of bounds.</p>
+
+<h1 id='examples-7' class='section-header'><a href='#examples-7'>Examples</a></h1>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>rulinalg</span>::<span class='ident'>matrix</span>::<span class='ident'>Matrix</span>;
+<span class='kw'>use</span> <span class='ident'>rulinalg</span>::<span class='ident'>matrix</span>::<span class='ident'>MatrixSliceMut</span>;
+
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>,<span class='number'>3</span>, (<span class='number'>0</span>..<span class='number'>9</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>());
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>slice</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>a</span>, [<span class='number'>1</span>,<span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
+{
+    <span class='kw'>let</span> <span class='ident'>row</span> <span class='op'>=</span> <span class='ident'>slice</span>.<span class='ident'>get_row_mut</span>(<span class='number'>1</span>);
+    <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>expected</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>7usize</span>, <span class='number'>8</span>];
+    <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>row</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='op'>*</span><span class='ident'>expected</span>));
+}
+<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>slice</span>.<span class='ident'>get_row_mut</span>(<span class='number'>5</span>).<span class='ident'>is_none</span>());</pre>
+</div><h4 id='method.get_row_unchecked_mut' class='method'><code>unsafe fn <a href='#method.get_row_unchecked_mut' class='fnname'>get_row_unchecked_mut</a>(&amp;mut self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;mut [T]</a></code></h4>
+<div class='docblock'><p>Returns a mutable reference to the row of a <code>MatrixSliceMut</code> at the given index
+without doing unbounds checking</p>
+
+<h1 id='examples-8' class='section-header'><a href='#examples-8'>Examples</a></h1>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>rulinalg</span>::<span class='ident'>matrix</span>::<span class='ident'>Matrix</span>;
+<span class='kw'>use</span> <span class='ident'>rulinalg</span>::<span class='ident'>matrix</span>::<span class='ident'>MatrixSliceMut</span>;
+
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>,<span class='number'>3</span>, (<span class='number'>0</span>..<span class='number'>9</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>());
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>slice</span> <span class='op'>=</span> <span class='ident'>MatrixSliceMut</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>a</span>, [<span class='number'>1</span>,<span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
+<span class='kw'>let</span> <span class='ident'>row</span> <span class='op'>=</span> <span class='kw'>unsafe</span> { <span class='ident'>slice</span>.<span class='ident'>get_row_unchecked_mut</span>(<span class='number'>1</span>) };
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>expected</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>7usize</span>, <span class='number'>8</span>];
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>row</span>, <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='op'>*</span><span class='ident'>expected</span>);</pre>
 </div></div><h3 class='impl'><span class='in-band'><code>impl&lt;'a,&nbsp;T&gt; <a class='struct' href='../../rusty_machine/linalg/struct.MatrixSliceMut.html' title='rusty_machine::linalg::MatrixSliceMut'>MatrixSliceMut</a>&lt;'a,&nbsp;T&gt; <span class='where'>where T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a></span></code></span><span class='out-of-band'></span></h3>
 <div class='impl-items'><h4 id='method.into_matrix' class='method'><code>fn <a href='#method.into_matrix' class='fnname'>into_matrix</a>(self) -&gt; <a class='struct' href='../../rusty_machine/linalg/struct.Matrix.html' title='rusty_machine::linalg::Matrix'>Matrix</a>&lt;T&gt;</code></h4>
 <div class='docblock'><p>Convert the matrix slice into a new Matrix.</p>
 </div><h4 id='method.set_to' class='method'><code>fn <a href='#method.set_to' class='fnname'>set_to</a>(self, target: <a class='struct' href='../../rusty_machine/linalg/struct.MatrixSlice.html' title='rusty_machine::linalg::MatrixSlice'>MatrixSlice</a>&lt;T&gt;)</code></h4>
 <div class='docblock'><p>Sets the underlying matrix data to the target data.</p>
 
-<h1 id='examples-7' class='section-header'><a href='#examples-7'>Examples</a></h1>
+<h1 id='examples-9' class='section-header'><a href='#examples-9'>Examples</a></h1>
 <pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>rulinalg</span>::<span class='ident'>matrix</span>::{<span class='ident'>Matrix</span>, <span class='ident'>MatrixSliceMut</span>};
 
@@ -683,8 +714,12 @@ subtraction
 <div class='docblock'><p>Row stride in the slice.</p>
 </div><h4 id='method.as_ptr' class='method'><code>fn <a href='../../rusty_machine/linalg/trait.BaseSlice.html#tymethod.as_ptr' class='fnname'>as_ptr</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const T</a></code></h4>
 <div class='docblock'><p>Top left index of the slice.</p>
-</div><h4 id='method.get_unchecked' class='method'><code>unsafe fn <a href='../../rusty_machine/linalg/trait.BaseSlice.html#tymethod.get_unchecked' class='fnname'>get_unchecked</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>; 2]</a>) -&gt; &amp;T</code></h4>
+</div><h4 id='method.get_unchecked' class='method'><code>unsafe fn <a href='../../rusty_machine/linalg/trait.BaseSlice.html#method.get_unchecked' class='fnname'>get_unchecked</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>; 2]</a>) -&gt; &amp;T</code></h4>
 <div class='docblock'><p>Get a reference to a point in the slice without bounds checking.</p>
+</div><h4 id='method.get_row' class='method'><code>fn <a href='../../rusty_machine/linalg/trait.BaseSlice.html#method.get_row' class='fnname'>get_row</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[T]</a>&gt;</code></h4>
+<div class='docblock'><p>Returns the row of a <code>Matrix</code> at the given index. <code>None</code> if the index is out of bounds. <a href="../../rusty_machine/linalg/trait.BaseSlice.html#method.get_row">Read more</a></p>
+</div><h4 id='method.get_row_unchecked' class='method'><code>unsafe fn <a href='../../rusty_machine/linalg/trait.BaseSlice.html#method.get_row_unchecked' class='fnname'>get_row_unchecked</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[T]</a></code></h4>
+<div class='docblock'><p>Returns the row of a <code>BaseSlice</code> at the given index without doing unbounds checking <a href="../../rusty_machine/linalg/trait.BaseSlice.html#method.get_row_unchecked">Read more</a></p>
 </div></div><h3 class='impl'><span class='in-band'><code>impl&lt;'a,&nbsp;T&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../rusty_machine/linalg/struct.MatrixSliceMut.html' title='rusty_machine::linalg::MatrixSliceMut'>MatrixSliceMut</a>&lt;'a,&nbsp;T&gt; <span class='where'>where T: 'a + <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a></span></code></span><span class='out-of-band'></span></h3>
 <div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>,&nbsp;<a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Error.html' title='core::fmt::Error'>Error</a>&gt;</code></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
@@ -692,7 +727,7 @@ subtraction
 <div class='impl-items'><h4 id='method.norm' class='method'><code>fn <a href='../../rusty_machine/linalg/trait.Metric.html#tymethod.norm' class='fnname'>norm</a>(&amp;self) -&gt; T</code></h4>
 <div class='docblock'><p>Compute euclidean norm for matrix.</p>
 
-<h1 id='examples-8' class='section-header'><a href='#examples-8'>Examples</a></h1>
+<h1 id='examples-10' class='section-header'><a href='#examples-10'>Examples</a></h1>
 <pre class='rust rust-example-rendered'>
 <span class='kw'>use</span> <span class='ident'>rulinalg</span>::<span class='ident'>matrix</span>::{<span class='ident'>Matrix</span>, <span class='ident'>MatrixSliceMut</span>};
 <span class='kw'>use</span> <span class='ident'>rulinalg</span>::<span class='ident'>Metric</span>;

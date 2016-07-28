@@ -527,11 +527,6 @@
 <span id="483">483</span>
 <span id="484">484</span>
 <span id="485">485</span>
-<span id="486">486</span>
-<span id="487">487</span>
-<span id="488">488</span>
-<span id="489">489</span>
-<span id="490">490</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Naive Bayes Classifiers</span>
 <span class='doccomment'>//!</span>
@@ -686,7 +681,7 @@
         <span class='self'>self</span>.<span class='ident'>class_counts</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0</span>; <span class='ident'>class_count</span>];
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>class_data</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='ident'>Vec</span>::<span class='ident'>new</span>(); <span class='ident'>class_count</span>];
 
-        <span class='kw'>for</span> (<span class='ident'>idx</span>, <span class='ident'>row</span>) <span class='kw'>in</span> <span class='ident'>targets</span>.<span class='ident'>data</span>().<span class='ident'>chunks</span>(<span class='ident'>class_count</span>).<span class='ident'>enumerate</span>() {
+        <span class='kw'>for</span> (<span class='ident'>idx</span>, <span class='ident'>row</span>) <span class='kw'>in</span> <span class='ident'>targets</span>.<span class='ident'>iter_rows</span>().<span class='ident'>enumerate</span>() {
             <span class='comment'>// Find the class of this input</span>
             <span class='kw'>let</span> <span class='ident'>class</span> <span class='op'>=</span> <span class='ident'>NaiveBayes</span>::<span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>::<span class='ident'>find_class</span>(<span class='ident'>row</span>);
 
@@ -704,16 +699,14 @@
                     <span class='kw'>continue</span>;
                 }
                 <span class='comment'>// Update the parameters within this class</span>
-                <span class='ident'>distr</span>.<span class='ident'>update_params</span>(<span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>c</span>), <span class='ident'>idx</span>);
+                <span class='ident'>distr</span>.<span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>c</span>), <span class='ident'>idx</span>);
             }
         }
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>class_prior</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>class_count</span>);
 
         <span class='comment'>// Compute the prior as the proportion in each class</span>
-        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>class_count</span> {
-            <span class='ident'>class_prior</span>.<span class='ident'>push</span>(<span class='self'>self</span>.<span class='ident'>class_counts</span>[<span class='ident'>i</span>] <span class='kw'>as</span> <span class='ident'>f64</span> <span class='op'>/</span> <span class='ident'>total_data</span> <span class='kw'>as</span> <span class='ident'>f64</span>);
-        }
+        <span class='ident'>class_prior</span>.<span class='ident'>extend</span>(<span class='self'>self</span>.<span class='ident'>class_counts</span>.<span class='ident'>iter</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>c</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>c</span> <span class='kw'>as</span> <span class='ident'>f64</span> <span class='op'>/</span> <span class='ident'>total_data</span> <span class='kw'>as</span> <span class='ident'>f64</span>));
 
         <span class='self'>self</span>.<span class='ident'>class_prior</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>class_prior</span>);
         <span class='self'>self</span>.<span class='ident'>cluster_count</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>class_count</span>);
@@ -730,15 +723,13 @@
     }
 
     <span class='kw'>fn</span> <span class='ident'>get_classes</span>(<span class='ident'>log_probs</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>class_count</span> <span class='op'>=</span> <span class='ident'>log_probs</span>.<span class='ident'>cols</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>data_classes</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>log_probs</span>.<span class='ident'>rows</span>());
 
-        <span class='comment'>// Argmax each class log-probability per input</span>
-        <span class='kw'>for</span> <span class='ident'>row</span> <span class='kw'>in</span> <span class='ident'>log_probs</span>.<span class='ident'>data</span>().<span class='ident'>chunks</span>(<span class='ident'>class_count</span>) {
+        <span class='ident'>data_classes</span>.<span class='ident'>extend</span>(<span class='ident'>log_probs</span>.<span class='ident'>iter_rows</span>().<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>row</span><span class='op'>|</span> {
+            <span class='comment'>// Argmax each class log-probability per input</span>
             <span class='kw'>let</span> (<span class='ident'>class</span>, _) <span class='op'>=</span> <span class='ident'>utils</span>::<span class='ident'>argmax</span>(<span class='ident'>row</span>);
-
-            <span class='ident'>data_classes</span>.<span class='ident'>push</span>(<span class='ident'>class</span>);
-        }
+            <span class='ident'>class</span>
+        }));
 
         <span class='ident'>data_classes</span>
     }
@@ -750,7 +741,7 @@
     <span class='kw'>fn</span> <span class='ident'>from_model_params</span>(<span class='ident'>class_count</span>: <span class='ident'>usize</span>, <span class='ident'>features</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span>;
 
     <span class='doccomment'>/// Updates the distribution parameters.</span>
-    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>);
+    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>);
 
     <span class='doccomment'>/// Compute the joint log likelihood of the data.</span>
     <span class='doccomment'>///</span>
@@ -794,7 +785,7 @@
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>) {
+    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>) {
         <span class='comment'>// Compute mean and sample variance</span>
         <span class='kw'>let</span> <span class='ident'>mean</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>mean</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>).<span class='ident'>into_vec</span>();
         <span class='kw'>let</span> <span class='ident'>var</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>variance</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>).<span class='ident'>into_vec</span>();
@@ -811,7 +802,7 @@
         <span class='kw'>let</span> <span class='ident'>class_count</span> <span class='op'>=</span> <span class='ident'>class_prior</span>.<span class='ident'>len</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>log_lik</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>class_count</span>);
 
-        <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>item</span>) <span class='kw'>in</span> <span class='ident'>class_prior</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
+        <span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>item</span>) <span class='kw'>in</span> <span class='ident'>class_prior</span>.<span class='ident'>into_iter</span>().<span class='ident'>enumerate</span>() {
             <span class='kw'>let</span> <span class='ident'>joint_i</span> <span class='op'>=</span> <span class='ident'>item</span>.<span class='ident'>ln</span>();
             <span class='kw'>let</span> <span class='ident'>n_ij</span> <span class='op'>=</span> <span class='op'>-</span><span class='number'>0.5</span> <span class='op'>*</span> (<span class='self'>self</span>.<span class='ident'>sigma</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='ident'>i</span>]) <span class='op'>*</span> <span class='number'>2.0</span> <span class='op'>*</span> <span class='ident'>PI</span>).<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span>.<span class='ident'>ln</span>()).<span class='ident'>sum</span>();
 
@@ -822,7 +813,6 @@
                 .<span class='ident'>sum_cols</span>();
 
             <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> (<span class='op'>-</span><span class='ident'>r_ij</span> <span class='op'>*</span> <span class='number'>0.5</span>) <span class='op'>+</span> <span class='ident'>n_ij</span>;
-
 
             <span class='ident'>log_lik</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> (<span class='ident'>res</span> <span class='op'>+</span> <span class='ident'>joint_i</span>).<span class='ident'>into_vec</span>());
         }
@@ -860,7 +850,7 @@
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>) {
+    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>) {
         <span class='kw'>let</span> <span class='ident'>features</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>cols</span>();
 
         <span class='comment'>// We add the pseudo count to the class count and feature count</span>
@@ -928,7 +918,7 @@
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>) {
+    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>) {
         <span class='kw'>let</span> <span class='ident'>features</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>cols</span>();
 
         <span class='kw'>let</span> <span class='ident'>pseudo_fc</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>sum_rows</span>() <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>pseudo_count</span>;

@@ -245,11 +245,6 @@
 <span id="201">201</span>
 <span id="202">202</span>
 <span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Gaussian Processes</span>
 <span class='doccomment'>//!</span>
@@ -375,19 +370,14 @@
     <span class='doccomment'>/// Construct a kernel matrix</span>
     <span class='kw'>fn</span> <span class='ident'>ker_mat</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>m1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>m2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>m1</span>.<span class='ident'>cols</span>(), <span class='ident'>m2</span>.<span class='ident'>cols</span>());
-        <span class='kw'>let</span> <span class='ident'>cols</span> <span class='op'>=</span> <span class='ident'>m1</span>.<span class='ident'>cols</span>();
 
         <span class='kw'>let</span> <span class='ident'>dim1</span> <span class='op'>=</span> <span class='ident'>m1</span>.<span class='ident'>rows</span>();
         <span class='kw'>let</span> <span class='ident'>dim2</span> <span class='op'>=</span> <span class='ident'>m2</span>.<span class='ident'>rows</span>();
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ker_data</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>dim1</span> <span class='op'>*</span> <span class='ident'>dim2</span>);
-
-        <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>dim1</span> {
-            <span class='kw'>for</span> <span class='ident'>j</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>dim2</span> {
-                <span class='ident'>ker_data</span>.<span class='ident'>push</span>(<span class='self'>self</span>.<span class='ident'>ker</span>.<span class='ident'>kernel</span>(<span class='kw-2'>&amp;</span><span class='ident'>m1</span>.<span class='ident'>data</span>()[<span class='ident'>i</span> <span class='op'>*</span> <span class='ident'>cols</span>..(<span class='ident'>i</span> <span class='op'>+</span> <span class='number'>1</span>) <span class='op'>*</span> <span class='ident'>cols</span>],
-                                              <span class='kw-2'>&amp;</span><span class='ident'>m2</span>.<span class='ident'>data</span>()[<span class='ident'>j</span> <span class='op'>*</span> <span class='ident'>cols</span>..(<span class='ident'>j</span> <span class='op'>+</span> <span class='number'>1</span>) <span class='op'>*</span> <span class='ident'>cols</span>]));
-            }
-        }
+        <span class='ident'>ker_data</span>.<span class='ident'>extend</span>(
+            <span class='ident'>m1</span>.<span class='ident'>iter_rows</span>().<span class='ident'>flat_map</span>(<span class='op'>|</span><span class='ident'>row1</span><span class='op'>|</span> <span class='ident'>m2</span>.<span class='ident'>iter_rows</span>()
+                                    .<span class='ident'>map</span>(<span class='kw'>move</span> <span class='op'>|</span><span class='ident'>row2</span><span class='op'>|</span> <span class='self'>self</span>.<span class='ident'>ker</span>.<span class='ident'>kernel</span>(<span class='ident'>row1</span>, <span class='ident'>row2</span>))));
 
         <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>dim1</span>, <span class='ident'>dim2</span>, <span class='ident'>ker_data</span>)
     }

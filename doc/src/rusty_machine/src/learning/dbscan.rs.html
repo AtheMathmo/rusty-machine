@@ -291,9 +291,6 @@
 <span id="247">247</span>
 <span id="248">248</span>
 <span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! DBSCAN Clustering</span>
 <span class='doccomment'>//!</span>
@@ -475,11 +472,8 @@
             <span class='kw'>let</span> <span class='ident'>visited</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>_visited</span>[<span class='op'>*</span><span class='ident'>data_point_idx</span>];
             <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>visited</span> {
                 <span class='self'>self</span>.<span class='ident'>_visited</span>[<span class='op'>*</span><span class='ident'>data_point_idx</span>] <span class='op'>=</span> <span class='bool-val'>true</span>;
-                <span class='kw'>let</span> <span class='ident'>sub_neighbours</span> <span class='op'>=</span>
-                    <span class='self'>self</span>.<span class='ident'>region_query</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>.<span class='ident'>data</span>()[<span class='ident'>data_point_idx</span> <span class='op'>*</span> <span class='ident'>inputs</span>.<span class='ident'>cols</span>()..(<span class='ident'>data_point_idx</span> <span class='op'>+</span>
-                                                                                   <span class='number'>1</span>) <span class='op'>*</span>
-                                                                                  <span class='ident'>inputs</span>.<span class='ident'>cols</span>()],
-                                      <span class='ident'>inputs</span>);
+                <span class='kw'>let</span> <span class='ident'>data_point_row</span> <span class='op'>=</span> <span class='kw'>unsafe</span> { <span class='ident'>inputs</span>.<span class='ident'>get_row_unchecked</span>(<span class='op'>*</span><span class='ident'>data_point_idx</span>) };
+                <span class='kw'>let</span> <span class='ident'>sub_neighbours</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>region_query</span>(<span class='ident'>data_point_row</span>, <span class='ident'>inputs</span>);
 
                 <span class='kw'>if</span> <span class='ident'>sub_neighbours</span>.<span class='ident'>len</span>() <span class='op'>&gt;=</span> <span class='self'>self</span>.<span class='ident'>min_points</span> {
                     <span class='self'>self</span>.<span class='ident'>expand_cluster</span>(<span class='ident'>inputs</span>, <span class='op'>*</span><span class='ident'>data_point_idx</span>, <span class='ident'>sub_neighbours</span>, <span class='ident'>cluster</span>);

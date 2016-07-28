@@ -53,7 +53,10 @@
     fn <a href='#tymethod.cols' class='fnname'>cols</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>;
     fn <a href='#tymethod.row_stride' class='fnname'>row_stride</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>;
     fn <a href='#tymethod.as_ptr' class='fnname'>as_ptr</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const T</a>;
-    unsafe fn <a href='#tymethod.get_unchecked' class='fnname'>get_unchecked</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>; 2]</a>) -&gt; &amp;T;
+
+    unsafe fn <a href='#method.get_unchecked' class='fnname'>get_unchecked</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>; 2]</a>) -&gt; &amp;T { ... }
+    fn <a href='#method.get_row' class='fnname'>get_row</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[T]</a>&gt; { ... }
+    unsafe fn <a href='#method.get_row_unchecked' class='fnname'>get_row_unchecked</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[T]</a> { ... }
 }</pre><div class='docblock'><p>Trait for Matrix Slices.</p>
 </div>
             <h2 id='required-methods'>Required Methods</h2>
@@ -62,7 +65,36 @@
 </div><h3 id='tymethod.cols' class='method stab '><code>fn <a href='#tymethod.cols' class='fnname'>cols</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h3><div class='docblock'><p>Columns in the slice.</p>
 </div><h3 id='tymethod.row_stride' class='method stab '><code>fn <a href='#tymethod.row_stride' class='fnname'>row_stride</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code></h3><div class='docblock'><p>Row stride in the slice.</p>
 </div><h3 id='tymethod.as_ptr' class='method stab '><code>fn <a href='#tymethod.as_ptr' class='fnname'>as_ptr</a>(&amp;self) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.pointer.html'>*const T</a></code></h3><div class='docblock'><p>Top left index of the slice.</p>
-</div><h3 id='tymethod.get_unchecked' class='method stab '><code>unsafe fn <a href='#tymethod.get_unchecked' class='fnname'>get_unchecked</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>; 2]</a>) -&gt; &amp;T</code></h3><div class='docblock'><p>Get a reference to a point in the slice without bounds checking.</p>
+</div></div>
+            <h2 id='provided-methods'>Provided Methods</h2>
+            <div class='methods'>
+        <h3 id='method.get_unchecked' class='method stab '><code>unsafe fn <a href='#method.get_unchecked' class='fnname'>get_unchecked</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>[</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a><a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.array.html'>; 2]</a>) -&gt; &amp;T</code></h3><div class='docblock'><p>Get a reference to a point in the slice without bounds checking.</p>
+</div><h3 id='method.get_row' class='method stab '><code>fn <a href='#method.get_row' class='fnname'>get_row</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[T]</a>&gt;</code></h3><div class='docblock'><p>Returns the row of a <code>Matrix</code> at the given index.
+<code>None</code> if the index is out of bounds.</p>
+
+<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>rulinalg</span>::<span class='ident'>matrix</span>::{<span class='ident'>Matrix</span>, <span class='ident'>MatrixSlice</span>};
+<span class='kw'>use</span> <span class='ident'>rulinalg</span>::<span class='ident'>matrix</span>::<span class='ident'>slice</span>::<span class='ident'>BaseSlice</span>;
+
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>,<span class='number'>3</span>, (<span class='number'>0</span>..<span class='number'>9</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>());
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>slice</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>a</span>, [<span class='number'>1</span>,<span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
+<span class='kw'>let</span> <span class='ident'>row</span> <span class='op'>=</span> <span class='ident'>slice</span>.<span class='ident'>get_row</span>(<span class='number'>1</span>);
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>expected</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>7usize</span>, <span class='number'>8</span>];
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>row</span>, <span class='prelude-val'>Some</span>(<span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>expected</span>));
+<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>slice</span>.<span class='ident'>get_row</span>(<span class='number'>5</span>).<span class='ident'>is_none</span>());</pre>
+</div><h3 id='method.get_row_unchecked' class='method stab '><code>unsafe fn <a href='#method.get_row_unchecked' class='fnname'>get_row_unchecked</a>(&amp;self, index: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[T]</a></code></h3><div class='docblock'><p>Returns the row of a <code>BaseSlice</code> at the given index without doing unbounds checking</p>
+
+<h1 id='examples-1' class='section-header'><a href='#examples-1'>Examples</a></h1>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>rulinalg</span>::<span class='ident'>matrix</span>::{<span class='ident'>Matrix</span>, <span class='ident'>MatrixSlice</span>};
+<span class='kw'>use</span> <span class='ident'>rulinalg</span>::<span class='ident'>matrix</span>::<span class='ident'>slice</span>::<span class='ident'>BaseSlice</span>;
+
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>,<span class='number'>3</span>, (<span class='number'>0</span>..<span class='number'>9</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;&gt;</span>());
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>slice</span> <span class='op'>=</span> <span class='ident'>MatrixSlice</span>::<span class='ident'>from_matrix</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>a</span>, [<span class='number'>1</span>,<span class='number'>1</span>], <span class='number'>2</span>, <span class='number'>2</span>);
+<span class='kw'>let</span> <span class='ident'>row</span> <span class='op'>=</span> <span class='kw'>unsafe</span> { <span class='ident'>slice</span>.<span class='ident'>get_row_unchecked</span>(<span class='number'>1</span>) };
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>expected</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>7usize</span>, <span class='number'>8</span>];
+<span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>row</span>, <span class='kw-2'>&amp;</span><span class='op'>*</span><span class='ident'>expected</span>);</pre>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
         <ul class='item-list' id='implementors-list'>
