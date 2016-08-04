@@ -144,6 +144,23 @@ mod tests {
     }
 
     #[test]
+    fn custom_scale_test() {
+        let inputs = Matrix::new(2, 2, vec![-1.0f32, 2.0, 0.0, 3.0]);
+
+        let mut scaler = MinMaxScaler::new(1.0, 3.0);
+        let transformed = scaler.transform(inputs).unwrap();
+
+        assert!(transformed.data().iter().all(|&x| x >= 1.0));
+        assert!(transformed.data().iter().all(|&x| x <= 3.0));
+
+        // First column scales to zero and second to 1
+        (transformed[[0, 0]] - 1.0).abs() < 1e-10;
+        (transformed[[0, 1]] - 1.0).abs() < 1e-10;
+        (transformed[[1, 0]] - 3.0).abs() < 1e-10;
+        (transformed[[1, 1]] - 3.0).abs() < 1e-10;
+    }
+
+    #[test]
     fn constant_feature_test() {
         let inputs = Matrix::new(2, 2, vec![1.0, 2.0, 1.0, 3.0]);
 

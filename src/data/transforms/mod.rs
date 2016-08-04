@@ -1,8 +1,10 @@
 pub mod minmax;
+pub mod standardize;
 
 use learning::error;
 
 pub use self::minmax::MinMaxScaler;
+pub use self::standardize::Standardizer;
 
 /// Trait for data transformers
 pub trait Transformer<T> {
