@@ -1,4 +1,28 @@
 //! The Min-Max transformer
+//!
+//! This module contains the `MinMaxScaler` transformer.
+//!
+//! The `MinMaxScaler` transformer is used to transform input data
+//! so that the minimum and maximum of each column are as specified.
+//! This is commonly used to transform the data to have a minimum of
+//! `0` and a maximum of `1`.
+//!
+//! # Examples
+//!
+//! ```
+//! use rusty_machine::data::transforms::{Transformer, MinMaxScaler};
+//! use rusty_machine::linalg::Matrix;
+//!
+//! // Constructs a new `MinMaxScaler` to map minimum to 0 and maximum 
+//! // to 1.
+//! let mut transformer = MinMaxScaler::default();
+//!
+//! let inputs = Matrix::new(2, 2, vec![-1.0, 2.0, 1.5, 3.0]);
+//!
+//! // Transform the inputs to get output data with required minimum
+//! // and maximum.
+//! let transformed = transformer.transform(inputs).unwrap();
+//! ```
 
 use learning::error::{Error, ErrorKind};
 use linalg::Matrix;
@@ -6,7 +30,13 @@ use super::Transformer;
 
 use libnum::Float;
 
-/// The min max scaler
+/// The `MinMaxScaler`
+/// 
+/// The `MinMaxScaler` provides an implementation of `Transformer`
+/// which allows us to transform the input data to have a new minimum
+/// and maximum per column.
+///
+/// See the module description for more information.
 #[derive(Debug)]
 pub struct MinMaxScaler<T: Float> {
     /// Mins per column of input data
@@ -19,6 +49,8 @@ pub struct MinMaxScaler<T: Float> {
     scaled_max: T,
 }
 
+/// Create a default `MinMaxScaler` with minimum of `0` and
+/// maximum of `1`.
 impl<T: Float> Default for MinMaxScaler<T> {
     fn default() -> MinMaxScaler<T> {
         MinMaxScaler {
@@ -32,6 +64,16 @@ impl<T: Float> Default for MinMaxScaler<T> {
 
 impl<T: Float> MinMaxScaler<T> {
     /// Constructs a new MinMaxScaler with the specified scale.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::data::transforms::{MinMaxScaler, Transformer};
+    ///
+    /// // Constructs a new `MinMaxScaler` which will give the data
+    /// // minimum `0` and maximum `2`.
+    /// let transformer = MinMaxScaler::new(0.0, 2.0);
+    /// ```
     pub fn new(min: T, max: T) -> MinMaxScaler<T> {
         MinMaxScaler {
             scale_factors: None,
@@ -136,7 +178,7 @@ mod tests {
         assert!(transformed.data().iter().all(|&x| x >= 0.0));
         assert!(transformed.data().iter().all(|&x| x <= 1.0));
 
-        // First column scales to zero and second to 1
+        // First row scales to 0 and second to 1
         transformed[[0, 0]].abs() < 1e-10;
         transformed[[0, 1]].abs() < 1e-10;
         (transformed[[1, 0]] - 1.0).abs() < 1e-10;
@@ -153,7 +195,7 @@ mod tests {
         assert!(transformed.data().iter().all(|&x| x >= 1.0));
         assert!(transformed.data().iter().all(|&x| x <= 3.0));
 
-        // First column scales to zero and second to 1
+        // First row scales to 1 and second to 3
         (transformed[[0, 0]] - 1.0).abs() < 1e-10;
         (transformed[[0, 1]] - 1.0).abs() < 1e-10;
         (transformed[[1, 0]] - 3.0).abs() < 1e-10;

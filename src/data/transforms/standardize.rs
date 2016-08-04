@@ -1,4 +1,28 @@
-//! The standardizing transformer.
+//! The Standardizing Transformer
+//!
+//! This module contains the `Standardizer` transformer.
+//!
+//! The `Standardizer` transformer is used to transform input data
+//! so that the mean and standard deviation of each column are as 
+//! specified. This is commonly used to transform the data to have `0` mean
+//! and a standard deviation of `1`.
+//!
+//! # Examples
+//!
+//! ```
+//! use rusty_machine::data::transforms::{Transformer, Standardizer};
+//! use rusty_machine::linalg::Matrix;
+//!
+//! // Constructs a new `Standardizer` to map to mean 0 and standard 
+//! // deviation of 1.
+//! let mut transformer = Standardizer::default();
+//!
+//! let inputs = Matrix::new(2, 2, vec![-1.0, 2.0, 1.5, 3.0]);
+//!
+//! // Transform the inputs to get output data with required mean and
+//! // standard deviation.
+//! let transformed = transformer.transform(inputs).unwrap();
+//! ```
 
 use learning::error::{Error, ErrorKind};
 use linalg::{Matrix, Vector, Axes};
@@ -8,7 +32,13 @@ use rulinalg::utils;
 
 use libnum::{Float, FromPrimitive};
 
-/// The standardizer
+/// The Standardizer
+/// 
+/// The Standardizer provides an implementation of `Transformer`
+/// which allows us to transform the input data to have a new mean
+/// and standard deviation.
+///
+/// See the module description for more information.
 #[derive(Debug)]
 pub struct Standardizer<T: Float> {
     /// Mins per column of input data
@@ -21,6 +51,8 @@ pub struct Standardizer<T: Float> {
     scaled_stdev: T,
 }
 
+/// Create a `Standardizer` with mean `0` and standard 
+/// deviation `1`.
 impl<T: Float> Default for Standardizer<T> {
     fn default() -> Standardizer<T> {
         Standardizer {
@@ -33,7 +65,17 @@ impl<T: Float> Default for Standardizer<T> {
 }
 
 impl<T: Float> Standardizer<T> {
-    /// Constructs a new Standardizer with the given mean and variance
+    /// Constructs a new `Standardizer` with the given mean and variance
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::data::transforms::Standardizer;
+    ///
+    /// // Constructs a new `Standardizer` which will give the data
+    /// // mean `0` and standard deviation `2`.
+    /// let transformer = Standardizer::new(0.0, 2.0);
+    /// ```
     pub fn new(mean: T, stdev: T) -> Standardizer<T> {
         Standardizer {
             means: None,

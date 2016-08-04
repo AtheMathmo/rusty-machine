@@ -123,7 +123,6 @@ pub mod linalg {
 
 /// Module for data handling
 pub mod data {
-    /// Module for data transformation as preprocessing
     pub mod transforms;
 }
 

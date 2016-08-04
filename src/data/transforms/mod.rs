@@ -1,3 +1,14 @@
+//! The Transforms module
+//!
+//! This module contains the `Transformer` trait and reexports
+//! the transformers from child modules.
+//!
+//! The `Transformer` trait provides a shared interface for all of the
+//! data preprocessing transformations in rusty-machine.
+//!
+//! The transformers provide preprocessing transformations which are 
+//! commonly used in machine learning.
+
 pub mod minmax;
 pub mod standardize;
 
