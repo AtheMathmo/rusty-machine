@@ -3,56 +3,67 @@
 use learning::error::{Error, ErrorKind};
 use linalg::Matrix;
 use super::Transformer;
-use std::f64;
+
+use libnum::Float;
 
 /// The min max scaler
 #[derive(Debug)]
-pub struct MinMaxScaler {
+pub struct MinMaxScaler<T: Float> {
     /// Mins per column of input data
-    input_min: Vec<f64>,
+    scale_factors: Option<Vec<T>>,
     /// Maxs per column of input data
-    input_max: Vec<f64>,
+    const_factors: Option<Vec<T>>,
     /// The min of the new data (default 0)
-    scaled_min: f64,
+    scaled_min: T,
     /// The max of the new data (default 1)
-    scaled_max: f64,
+    scaled_max: T,
 }
 
-impl MinMaxScaler {
-    /// Constructs a new MinMaxScaler with the specified scale.
-    pub fn new(min: f64, max: f64) -> MinMaxScaler {
+impl<T: Float> Default for MinMaxScaler<T> {
+    fn default() -> MinMaxScaler<T> {
         MinMaxScaler {
-            input_min: Vec::new(),
-            input_max: Vec::new(),
+            scale_factors: None,
+            const_factors: None,
+            scaled_min: T::zero(),
+            scaled_max: T::one(),
+        }
+    }
+}
+
+impl<T: Float> MinMaxScaler<T> {
+    /// Constructs a new MinMaxScaler with the specified scale.
+    pub fn new(min: T, max: T) -> MinMaxScaler<T> {
+        MinMaxScaler {
+            scale_factors: None,
+            const_factors: None,
             scaled_min: min,
             scaled_max: max,
         }
     }
 }
 
-impl Transformer<Matrix<f64>> for MinMaxScaler {
-    fn transform(&mut self, mut inputs: Matrix<f64>) -> Result<Matrix<f64>, Error> {
+impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
+    fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
         let features = inputs.cols();
 
-        self.input_min = vec![f64::MAX; features];
-        self.input_max = vec![f64::MIN; features];
+        let mut input_min = vec![T::max_value(); features];
+        let mut input_max = vec![T::min_value(); features];
 
         for row in inputs.iter_rows() {
             for (idx, feature) in row.into_iter().enumerate() {
                 if !feature.is_finite() {
                     return Err(Error::new(ErrorKind::InvalidData,
-                                          format!("Data point {0} in column {1} cannot be \
+                                          format!("Data point in column {} cannot be \
                                                    processed",
-                                                  feature,
                                                   idx)));
                 }
 
-                if *feature < self.input_min[idx] {
-                    self.input_min[idx] = *feature;
+                if *feature < input_min[idx] {
+                    input_min[idx] = *feature;
                 }
 
-                if *feature > self.input_max[idx] {
-                    self.input_max[idx] = *feature;
+                if *feature > input_max[idx] {
+                    input_max[idx] = *feature;
                 }
             }
         }
@@ -60,23 +71,29 @@ impl Transformer<Matrix<f64>> for MinMaxScaler {
         // We'll scale each feature by a * x + b.
         // Where scales holds `a` per column and consts
         // holds `b`.
-        let scales = self.input_min
-            .iter()
-            .zip(self.input_max.iter())
+        let scales = input_min.iter()
+            .zip(input_max.iter())
             .map(|(&x, &y)| (self.scaled_max - self.scaled_min) / (y - x))
             .collect::<Vec<_>>();
 
-        let consts = self.input_max
-            .iter()
+        if !scales.iter().all(|&x| x.is_finite()) {
+            return Err(Error::new(ErrorKind::InvalidData,
+                                  "Constant feature columns not supported."));
+        }
+
+        let consts = input_max.iter()
             .zip(scales.iter())
             .map(|(&x, &s)| self.scaled_max - x * s)
             .collect::<Vec<_>>();
 
         for row in inputs.iter_rows_mut() {
-            for (idx, feature) in row.into_iter().enumerate() {
-                *feature = scales[idx] * *feature + consts[idx];
+            for i in 0..features {
+                row[i] = scales[i] * row[i] + consts[i];
             }
         }
+
+        self.scale_factors = Some(scales);
+        self.const_factors = Some(consts);
 
         Ok(inputs)
     }
@@ -111,14 +128,28 @@ mod tests {
 
     #[test]
     fn basic_scale_test() {
-        let inputs = Matrix::new(2, 2, vec![-1.0, 2.0, 0.0, 3.0]);
+        let inputs = Matrix::new(2, 2, vec![-1.0f32, 2.0, 0.0, 3.0]);
 
         let mut scaler = MinMaxScaler::new(0.0, 1.0);
         let transformed = scaler.transform(inputs).unwrap();
 
-        println!("{}", transformed);
-
         assert!(transformed.data().iter().all(|&x| x >= 0.0));
         assert!(transformed.data().iter().all(|&x| x <= 1.0));
+
+        // First column scales to zero and second to 1
+        transformed[[0, 0]].abs() < 1e-10;
+        transformed[[0, 1]].abs() < 1e-10;
+        (transformed[[1, 0]] - 1.0).abs() < 1e-10;
+        (transformed[[1, 1]] - 1.0).abs() < 1e-10;
+    }
+
+    #[test]
+    fn constant_feature_test() {
+        let inputs = Matrix::new(2, 2, vec![1.0, 2.0, 1.0, 3.0]);
+
+        let mut scaler = MinMaxScaler::new(0.0, 1.0);
+        let res = scaler.transform(inputs);
+
+        assert!(res.is_err());
     }
 }
