@@ -61,10 +61,10 @@ impl<T: Float + FromPrimitive> Transformer<Matrix<T>> for Standardizer<T> {
                 // Subtract the mean
                 utils::in_place_vec_bin_op(row,
                                            &mean.data(),
-                                           |x, &y| *x = *x - y + self.scaled_mean);
+                                           |x, &y| *x = *x - y);
                 utils::in_place_vec_bin_op(row,
                                            &variance.data(),
-                                           |x, &y| *x = *x * self.scaled_stdev / y.sqrt());
+                                           |x, &y| *x = (*x * self.scaled_stdev / y.sqrt()) + self.scaled_mean);
             }
 
             self.means = Some(mean);
@@ -124,5 +124,19 @@ mod tests {
 
         assert!(new_mean.data().iter().all(|x| x.abs() < 1e-5));
         assert!(new_var.data().iter().all(|x| (x.abs() - 1.0) < 1e-5));
+    }
+
+    #[test]
+    fn custom_standardize_test() {
+        let inputs = Matrix::new(2, 2, vec![-1.0f32, 2.0, 0.0, 3.0]);
+
+        let mut standardizer = Standardizer::new(1.0, 2.0);
+        let transformed = standardizer.transform(inputs).unwrap();
+
+        let new_mean = transformed.mean(Axes::Row);
+        let new_var = transformed.variance(Axes::Row);
+
+        assert!(new_mean.data().iter().all(|x| (x.abs() - 1.0) < 1e-5));
+        assert!(new_var.data().iter().all(|x| (x.abs() - 4.0) < 1e-5));
     }
 }
