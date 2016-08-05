@@ -39,9 +39,9 @@ use libnum::Float;
 /// See the module description for more information.
 #[derive(Debug)]
 pub struct MinMaxScaler<T: Float> {
-    /// Mins per column of input data
+    /// Values to scale each column by
     scale_factors: Option<Vec<T>>,
-    /// Maxs per column of input data
+    /// Values to add to each column after scaling
     const_factors: Option<Vec<T>>,
     /// The min of the new data (default 0)
     scaled_min: T,

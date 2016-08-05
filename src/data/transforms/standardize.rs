@@ -41,9 +41,9 @@ use libnum::{Float, FromPrimitive};
 /// See the module description for more information.
 #[derive(Debug)]
 pub struct Standardizer<T: Float> {
-    /// Mins per column of input data
+    /// Means per column of input data
     means: Option<Vector<T>>,
-    /// Maxs per column of input data
+    /// Variances per column of input data
     variances: Option<Vector<T>>,
     /// The mean of the new data (default 0)
     scaled_mean: T,
