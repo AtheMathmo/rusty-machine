@@ -13,7 +13,7 @@
 //! use rusty_machine::data::transforms::{Transformer, MinMaxScaler};
 //! use rusty_machine::linalg::Matrix;
 //!
-//! // Constructs a new `MinMaxScaler` to map minimum to 0 and maximum 
+//! // Constructs a new `MinMaxScaler` to map minimum to 0 and maximum
 //! // to 1.
 //! let mut transformer = MinMaxScaler::default();
 //!
@@ -31,7 +31,7 @@ use super::Transformer;
 use libnum::Float;
 
 /// The `MinMaxScaler`
-/// 
+///
 /// The `MinMaxScaler` provides an implementation of `Transformer`
 /// which allows us to transform the input data to have a new minimum
 /// and maximum per column.
@@ -139,6 +139,27 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
 
         Ok(inputs)
     }
+
+    fn inv_transform(&self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
+        if let (&Some(ref scales), &Some(ref consts)) = (&self.scale_factors, &self.const_factors) {
+
+            let features = scales.len();
+            if inputs.cols() != features {
+                return Err(Error::new(ErrorKind::InvalidData,
+                                      "Inputs have different feature count than transformer."));
+            }
+
+            for row in inputs.iter_rows_mut() {
+                for i in 0..features {
+                    row[i] = (row[i] - consts[i]) / scales[i];
+                }
+            }
+
+            Ok(inputs)
+        } else {
+            Err(Error::new(ErrorKind::InvalidState, "Transformer has not been fitted."))
+        }
+    }
 }
 
 #[cfg(test)]
@@ -210,5 +231,17 @@ mod tests {
         let res = scaler.transform(inputs);
 
         assert!(res.is_err());
+    }
+
+    #[test]
+    fn inv_transform_identity_test() {
+        let inputs = Matrix::new(2, 2, vec![-1.0f32, 2.0, 0.0, 3.0]);
+
+        let mut scaler = MinMaxScaler::new(1.0, 3.0);
+        let transformed = scaler.transform(inputs.clone()).unwrap();
+
+        let original = scaler.inv_transform(transformed).unwrap();
+
+        assert!((inputs - original).data().iter().all(|x| x.abs() < 1e-5));
     }
 }
