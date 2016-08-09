@@ -28,6 +28,8 @@ use learning::error::{Error, ErrorKind};
 use linalg::Matrix;
 use super::Transformer;
 
+use rulinalg::utils;
+
 use libnum::Float;
 
 /// The `MinMaxScaler`
@@ -53,12 +55,7 @@ pub struct MinMaxScaler<T: Float> {
 /// maximum of `1`.
 impl<T: Float> Default for MinMaxScaler<T> {
     fn default() -> MinMaxScaler<T> {
-        MinMaxScaler {
-            scale_factors: None,
-            const_factors: None,
-            scaled_min: T::zero(),
-            scaled_max: T::one(),
-        }
+        MinMaxScaler::new(T::zero(), T::one())
     }
 }
 
@@ -88,11 +85,10 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
     fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
         let features = inputs.cols();
 
-        let mut input_min = vec![T::max_value(); features];
-        let mut input_max = vec![T::min_value(); features];
+        let mut input_min_max = vec![(T::max_value(), T::min_value()); features];
 
         for row in inputs.iter_rows() {
-            for (idx, feature) in row.into_iter().enumerate() {
+            for (idx, (feature, min_max)) in row.into_iter().zip(input_min_max.iter_mut()).enumerate() {
                 if !feature.is_finite() {
                     return Err(Error::new(ErrorKind::InvalidData,
                                           format!("Data point in column {} cannot be \
@@ -100,38 +96,48 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
                                                   idx)));
                 }
 
-                if *feature < input_min[idx] {
-                    input_min[idx] = *feature;
+                // Update min
+                if *feature < min_max.0 {
+                    min_max.0 = *feature;
                 }
 
-                if *feature > input_max[idx] {
-                    input_max[idx] = *feature;
+                // Update max
+                if *feature > min_max.1 {
+                    min_max.1 = *feature;
                 }
+
+                
             }
         }
 
         // We'll scale each feature by a * x + b.
         // Where scales holds `a` per column and consts
         // holds `b`.
-        let scales = input_min.iter()
-            .zip(input_max.iter())
-            .map(|(&x, &y)| (self.scaled_max - self.scaled_min) / (y - x))
-            .collect::<Vec<_>>();
+        let scales = try!(input_min_max.iter()
+            .map(|&(x, y)| {
+                let s = (self.scaled_max - self.scaled_min) / (y - x);
+                if s.is_finite() {
+                    Ok(s)
+                } else {
+                    Err(Error::new(ErrorKind::InvalidData,
+                                   "Constant feature columns not supported."))
+                }
+            })
+            .collect::<Result<Vec<_>, _>>());
 
-        if !scales.iter().all(|&x| x.is_finite()) {
-            return Err(Error::new(ErrorKind::InvalidData,
-                                  "Constant feature columns not supported."));
-        }
-
-        let consts = input_max.iter()
+        let consts = input_min_max.iter()
             .zip(scales.iter())
-            .map(|(&x, &s)| self.scaled_max - x * s)
+            .map(|(&(_, x), &s)| self.scaled_max - x * s)
             .collect::<Vec<_>>();
 
         for row in inputs.iter_rows_mut() {
-            for i in 0..features {
-                row[i] = scales[i] * row[i] + consts[i];
-            }
+            utils::in_place_vec_bin_op(row, &scales, |x, &y| {
+                *x = *x * y;
+            });
+
+            utils::in_place_vec_bin_op(row, &consts, |x, &y| {
+                *x = *x + y;
+            });
         }
 
         self.scale_factors = Some(scales);
