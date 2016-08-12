@@ -97,6 +97,8 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Error handling for the learning module.</span>
 
@@ -123,6 +125,8 @@
     <span class='ident'>InvalidParameters</span>,
     <span class='doccomment'>/// The input data to the model is not valid.</span>
     <span class='ident'>InvalidData</span>,
+    <span class='doccomment'>/// The action could not be carried out as the model was in an invalid state.</span>
+    <span class='ident'>InvalidState</span>,
 }
 
 <span class='kw'>impl</span> <span class='ident'>Error</span> {

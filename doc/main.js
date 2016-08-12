@@ -125,7 +125,6 @@
             break;
 
         case "+":
-            ev.preventDefault();
             toggleAllDocs();
             break;
 
@@ -884,16 +883,12 @@
             sidebar.append(div);
         }
 
-        block("primitive", "Primitive Types");
         block("mod", "Modules");
-        block("macro", "Macros");
         block("struct", "Structs");
         block("enum", "Enums");
-        block("constant", "Constants");
-        block("static", "Statics");
         block("trait", "Traits");
         block("fn", "Functions");
-        block("type", "Type Definitions");
+        block("macro", "Macros");
     }
 
     window.initSidebarItems = initSidebarItems;

@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["minmax","The Min-Max transformer"],["standardize","The Standardizing Transformer"]],"trait":[["Transformer","Trait for data transformers"]]});

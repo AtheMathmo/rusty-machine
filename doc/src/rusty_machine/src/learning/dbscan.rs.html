@@ -360,7 +360,7 @@
             <span class='ident'>eps</span>: <span class='number'>0.5</span>,
             <span class='ident'>min_points</span>: <span class='number'>5</span>,
             <span class='ident'>clusters</span>: <span class='prelude-val'>None</span>,
-            <span class='ident'>predictive</span>: <span class='bool-val'>false</span>,
+            <span class='ident'>predictive</span>: <span class='boolvalue'>false</span>,
             <span class='ident'>_visited</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
             <span class='ident'>_cluster_data</span>: <span class='prelude-val'>None</span>,
         }
@@ -377,7 +377,7 @@
             <span class='kw'>let</span> <span class='ident'>visited</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>_visited</span>[<span class='ident'>idx</span>];
 
             <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>visited</span> {
-                <span class='self'>self</span>.<span class='ident'>_visited</span>[<span class='ident'>idx</span>] <span class='op'>=</span> <span class='bool-val'>true</span>;
+                <span class='self'>self</span>.<span class='ident'>_visited</span>[<span class='ident'>idx</span>] <span class='op'>=</span> <span class='boolvalue'>true</span>;
 
                 <span class='kw'>let</span> <span class='ident'>neighbours</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>region_query</span>(<span class='ident'>point</span>, <span class='ident'>inputs</span>);
 
@@ -436,7 +436,7 @@
             <span class='ident'>eps</span>: <span class='ident'>eps</span>,
             <span class='ident'>min_points</span>: <span class='ident'>min_points</span>,
             <span class='ident'>clusters</span>: <span class='prelude-val'>None</span>,
-            <span class='ident'>predictive</span>: <span class='bool-val'>false</span>,
+            <span class='ident'>predictive</span>: <span class='boolvalue'>false</span>,
             <span class='ident'>_visited</span>: <span class='ident'>Vec</span>::<span class='ident'>new</span>(),
             <span class='ident'>_cluster_data</span>: <span class='prelude-val'>None</span>,
         }
@@ -471,7 +471,7 @@
         <span class='kw'>for</span> <span class='ident'>data_point_idx</span> <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>neighbour_pts</span> {
             <span class='kw'>let</span> <span class='ident'>visited</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>_visited</span>[<span class='op'>*</span><span class='ident'>data_point_idx</span>];
             <span class='kw'>if</span> <span class='op'>!</span><span class='ident'>visited</span> {
-                <span class='self'>self</span>.<span class='ident'>_visited</span>[<span class='op'>*</span><span class='ident'>data_point_idx</span>] <span class='op'>=</span> <span class='bool-val'>true</span>;
+                <span class='self'>self</span>.<span class='ident'>_visited</span>[<span class='op'>*</span><span class='ident'>data_point_idx</span>] <span class='op'>=</span> <span class='boolvalue'>true</span>;
                 <span class='kw'>let</span> <span class='ident'>data_point_row</span> <span class='op'>=</span> <span class='kw'>unsafe</span> { <span class='ident'>inputs</span>.<span class='ident'>get_row_unchecked</span>(<span class='op'>*</span><span class='ident'>data_point_idx</span>) };
                 <span class='kw'>let</span> <span class='ident'>sub_neighbours</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>region_query</span>(<span class='ident'>data_point_row</span>, <span class='ident'>inputs</span>);
 
@@ -507,7 +507,7 @@
         }
 
         <span class='kw'>for</span> <span class='ident'>i</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='ident'>total_points</span> {
-            <span class='self'>self</span>.<span class='ident'>_visited</span>[<span class='ident'>i</span>] <span class='op'>=</span> <span class='bool-val'>false</span>;
+            <span class='self'>self</span>.<span class='ident'>_visited</span>[<span class='ident'>i</span>] <span class='op'>=</span> <span class='boolvalue'>false</span>;
         }
 
         <span class='self'>self</span>.<span class='ident'>clusters</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='macro'>vec</span><span class='macro'>!</span>[<span class='prelude-val'>None</span>; <span class='ident'>total_points</span>]));

@@ -405,7 +405,7 @@
                 <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>M</span>::<span class='ident'>Targets</span>)
                 <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='number'>0usize</span>;
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ls_failed</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
+        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ls_failed</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
 
         <span class='kw'>let</span> (<span class='kw-2'>mut</span> <span class='ident'>f1</span>, <span class='ident'>vec_df1</span>) <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>compute_grad</span>(<span class='ident'>start</span>, <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>df1</span> <span class='op'>=</span> <span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>vec_df1</span>);
@@ -450,7 +450,7 @@
                 <span class='ident'>cmp</span>::<span class='ident'>min</span>(<span class='self'>self</span>.<span class='ident'>max</span> <span class='kw'>as</span> <span class='ident'>i32</span>, <span class='op'>-</span><span class='ident'>length</span> <span class='op'>-</span> (<span class='ident'>i</span> <span class='kw'>as</span> <span class='ident'>i32</span>))
             };
 
-            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>success</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>success</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
             <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>limit</span> <span class='op'>=</span> <span class='op'>-</span><span class='number'>1f64</span>;
 
             <span class='kw'>loop</span> {
@@ -500,7 +500,7 @@
                 <span class='kw'>if</span> <span class='ident'>f2</span> <span class='op'>&gt;</span> <span class='ident'>f1</span> <span class='op'>+</span> <span class='ident'>z1</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>rho</span> <span class='op'>*</span> <span class='ident'>d1</span> <span class='op'>||</span> <span class='ident'>d2</span> <span class='op'>&gt;</span> <span class='op'>-</span><span class='self'>self</span>.<span class='ident'>sig</span> <span class='op'>*</span> <span class='ident'>d1</span> {
                     <span class='kw'>break</span>;
                 } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>d2</span> <span class='op'>&gt;</span> <span class='self'>self</span>.<span class='ident'>sig</span> <span class='op'>*</span> <span class='ident'>d1</span> {
-                    <span class='ident'>success</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
+                    <span class='ident'>success</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
                     <span class='kw'>break</span>;
                 } <span class='kw'>else</span> <span class='kw'>if</span> <span class='ident'>m</span> <span class='op'>==</span> <span class='number'>0i32</span> {
                     <span class='kw'>break</span>;
@@ -565,7 +565,7 @@
                 }
 
                 <span class='ident'>d1</span> <span class='op'>=</span> <span class='ident'>d2</span>;
-                <span class='ident'>ls_failed</span> <span class='op'>=</span> <span class='bool-val'>false</span>;
+                <span class='ident'>ls_failed</span> <span class='op'>=</span> <span class='boolvalue'>false</span>;
             } <span class='kw'>else</span> {
                 <span class='ident'>x</span> <span class='op'>=</span> <span class='ident'>x0</span>;
                 <span class='ident'>f1</span> <span class='op'>=</span> <span class='ident'>f0</span>;
@@ -580,7 +580,7 @@
                 <span class='ident'>d1</span> <span class='op'>=</span> <span class='op'>-</span><span class='ident'>s</span>.<span class='ident'>dot</span>(<span class='kw-2'>&amp;</span><span class='ident'>s</span>);
 
                 <span class='ident'>z1</span> <span class='op'>=</span> <span class='number'>1f64</span> <span class='op'>/</span> (<span class='number'>1f64</span> <span class='op'>-</span> <span class='ident'>d1</span>);
-                <span class='ident'>ls_failed</span> <span class='op'>=</span> <span class='bool-val'>true</span>;
+                <span class='ident'>ls_failed</span> <span class='op'>=</span> <span class='boolvalue'>true</span>;
             }
 
         }
