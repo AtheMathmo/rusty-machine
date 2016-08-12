@@ -23,6 +23,8 @@ pub enum ErrorKind {
     InvalidParameters,
     /// The input data to the model is not valid.
     InvalidData,
+    /// The action could not be carried out as the model was in an invalid state.
+    InvalidState,
 }
 
 impl Error {

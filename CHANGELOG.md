@@ -2,6 +2,22 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.4.4
+
+### Breaking Changes
+
+- None
+
+### Features
+
+- Adding new `Transformer` trait for data preprocessing.
+- Adding a `MinMax` transformer.
+- Adding a `Standardizer` transformer.
+
+### Minor Changes
+
+- None
+
 ## 0.4.3
 
 ### New Contributors

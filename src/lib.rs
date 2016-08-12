@@ -121,6 +121,11 @@ pub mod linalg {
     pub use rulinalg::Metric;
 }
 
+/// Module for data handling
+pub mod data {
+    pub mod transforms;
+}
+
 /// Module for machine learning.
 pub mod learning {
     pub mod dbscan;
