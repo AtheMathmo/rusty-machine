@@ -40,7 +40,7 @@
 //! println!("Final outputs --\n{}", outputs);
 //! ```
 
-use linalg::{Matrix, Axes};
+use linalg::{Matrix, Axes, BaseMatrix, BaseMatrixMut};
 use rulinalg::utils;
 use learning::SupModel;
 

@@ -35,7 +35,7 @@
 //! a `GradientDesc` object with custom parameters.
 
 use learning::SupModel;
-use linalg::Matrix;
+use linalg::{Matrix, BaseMatrix};
 use linalg::Vector;
 use learning::toolkit::activ_fn::{ActivationFunc, Sigmoid};
 use learning::toolkit::cost_fn::{CostFunc, CrossEntropyError};

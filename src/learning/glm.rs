@@ -36,7 +36,7 @@
 //! ```
 
 use linalg::Vector;
-use linalg::Matrix;
+use linalg::{Matrix, BaseMatrix};
 
 use learning::SupModel;
 

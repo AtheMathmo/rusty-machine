@@ -41,8 +41,7 @@
 //! You can define your own criterion by implementing the `Criterion`
 //! trait with a concrete `ActivationFunc` and `CostFunc`.
 
-use linalg::{Matrix, MatrixSlice};
-use linalg::BaseSlice;
+use linalg::{Matrix, MatrixSlice, BaseMatrix, BaseMatrixMut};
 
 use learning::SupModel;
 use learning::toolkit::activ_fn;
@@ -147,7 +146,7 @@ impl<'a, T, A> NeuralNet<'a, T, A>
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::BaseSlice;
+    /// use rusty_machine::linalg::BaseMatrix;
     /// use rusty_machine::learning::nnet::NeuralNet;
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.
