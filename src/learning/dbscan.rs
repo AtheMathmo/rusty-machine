@@ -38,7 +38,7 @@
 
 use learning::UnSupModel;
 
-use linalg::{Matrix, Vector};
+use linalg::{Matrix, Vector, BaseMatrix};
 use rulinalg::utils;
 
 /// DBSCAN Model

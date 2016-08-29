@@ -28,7 +28,7 @@
 
 use learning::toolkit::kernel::{Kernel, SquaredExp};
 use learning::SupModel;
-use linalg::Matrix;
+use linalg::{Matrix, BaseMatrix};
 use linalg::Vector;
 
 /// Trait for GP mean functions.

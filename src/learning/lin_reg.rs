@@ -31,7 +31,7 @@
 //! ```
 
 use learning::SupModel;
-use linalg::Matrix;
+use linalg::{Matrix, BaseMatrix};
 use linalg::Vector;
 use learning::toolkit::cost_fn::CostFunc;
 use learning::toolkit::cost_fn::MeanSqError;

@@ -10,7 +10,7 @@
 
 use learning::optim::{Optimizable, OptimAlgorithm};
 use linalg::Vector;
-use linalg::Matrix;
+use linalg::{Matrix, BaseMatrix};
 use rulinalg::utils;
 
 use learning::toolkit::rand_utils;
