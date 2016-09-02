@@ -18,14 +18,14 @@
 //! model.cov_option = CovOption::Diagonal;
 //!
 //! // Where inputs is a Matrix with features in columns.
-//! model.train(&inputs);
+//! model.train(&inputs).unwrap();
 //!
 //! // Print the means and covariances of the GMM
 //! println!("{:?}", model.means());
 //! println!("{:?}", model.covariances());
 //!
 //! // Where test_inputs is a Matrix with features in columns.
-//! let post_probs = model.predict(&test_inputs);
+//! let post_probs = model.predict(&test_inputs).unwrap();
 //!
 //! // Probabilities that each point comes from each Gaussian.
 //! println!("{:?}", post_probs.data());
@@ -34,8 +34,9 @@
 use linalg::{Matrix, MatrixSlice, Vector};
 use rulinalg::utils;
 
-use learning::UnSupModel;
+use learning::{LearningResult, UnSupModel};
 use learning::toolkit::rand_utils;
+use learning::error::{Error, ErrorKind};
 
 /// Covariance options for GMMs.
 ///
@@ -68,7 +69,7 @@ pub struct GaussianMixtureModel {
 
 impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
     /// Train the model using inputs.
-    fn train(&mut self, inputs: &Matrix<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
         // Initialization:
         let k = self.comp_count;
 
@@ -98,14 +99,16 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
 
             self.update_params(inputs, weights);
         }
+
+        Ok(())
     }
 
     /// Predict output from inputs.
-    fn predict(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
+    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
         if let (&Some(_), &Some(_)) = (&self.model_means, &self.model_covars) {
-            self.membership_weights(inputs).0
+            Ok(self.membership_weights(inputs).0)
         } else {
-            panic!("Model has not been trained.");
+            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
         }
 
     }
@@ -292,7 +295,7 @@ impl GaussianMixtureModel {
 
             for i in 0..n {
                 let inputs_i = MatrixSlice::from_matrix(inputs, [i, 0], 1, d);
-                let diff = inputs_i - new_means_k; 
+                let diff = inputs_i - new_means_k;
                 cov_mat += self.compute_cov(diff, membership_weights[[i, k]]);
             }
             new_covs.push(cov_mat / sum_weights[k]);

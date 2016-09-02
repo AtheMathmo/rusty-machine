@@ -16,10 +16,10 @@
 //! let mut model = KMeansClassifier::new(2);
 //!
 //! // Where inputs is a Matrix with features in columns.
-//! model.train(&inputs);
+//! model.train(&inputs).unwrap();
 //!
 //! // Where test_inputs is a Matrix with features in columns.
-//! let a = model.predict(&test_inputs);
+//! let a = model.predict(&test_inputs).unwrap();
 //! ```
 //!
 //! Additionally you can control the initialization
@@ -45,7 +45,7 @@
 use linalg::BaseSlice;
 use linalg::{Matrix, MatrixSlice, Axes};
 use linalg::Vector;
-use learning::UnSupModel;
+use learning::{LearningResult, UnSupModel};
 use learning::error::{Error, ErrorKind};
 
 use rand::{Rng, thread_rng};
@@ -82,18 +82,16 @@ impl<InitAlg: Initializer> UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClas
     /// Predict classes from data.
     ///
     /// Model must be trained.
-    fn predict(&self, inputs: &Matrix<f64>) -> Vector<usize> {
+    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<usize>> {
         if let Some(ref centroids) = self.centroids {
-            return KMeansClassifier::<InitAlg>::find_closest_centroids(centroids.as_slice(),
-                                                                       inputs)
-                .0;
+            Ok(KMeansClassifier::<InitAlg>::find_closest_centroids(centroids.as_slice(), inputs).0)
         } else {
-            panic!("Model has not been trained.");
+            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
         }
     }
 
     /// Train the classifier using input data.
-    fn train(&mut self, inputs: &Matrix<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
         self.init_centroids(inputs).expect("Could not initialize centroids.");
         let mut cost = 0.0;
         let eps = 1e-14;
@@ -109,6 +107,8 @@ impl<InitAlg: Initializer> UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClas
 
             cost = cost_i;
         }
+
+        Ok(())
     }
 }
 
@@ -296,7 +296,9 @@ impl Initializer for RandomPartition {
         let mut rng = thread_rng();
         for i in k..inputs.rows() {
             let idx = rng.gen_range(0, k);
-            unsafe { random_assignments.get_unchecked_mut(idx).push(i); }
+            unsafe {
+                random_assignments.get_unchecked_mut(idx).push(i);
+            }
         }
 
         let mut init_centroids = Vec::with_capacity(k * inputs.cols());
@@ -321,8 +323,8 @@ impl Initializer for KPlusPlus {
         let mut init_centroids = Vec::with_capacity(k * inputs.cols());
         let first_cen = rng.gen_range(0usize, inputs.rows());
 
-        unsafe { 
-            init_centroids.extend_from_slice(inputs.get_row_unchecked(first_cen)); 
+        unsafe {
+            init_centroids.extend_from_slice(inputs.get_row_unchecked(first_cen));
         }
 
         for i in 1..k {
@@ -342,7 +344,7 @@ impl Initializer for KPlusPlus {
                 }
 
                 let next_cen = sample_discretely(dist);
-                init_centroids.extend_from_slice(inputs.get_row_unchecked(next_cen)); 
+                init_centroids.extend_from_slice(inputs.get_row_unchecked(next_cen));
             }
         }
 

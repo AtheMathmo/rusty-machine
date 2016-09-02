@@ -31,18 +31,20 @@
 //! let mut model = NaiveBayes::<Gaussian>::new();
 //!
 //! // Train the model.
-//! model.train(&inputs, &targets);
+//! model.train(&inputs, &targets).unwrap();
 //!
 //! // Predict the classes on the input data
-//! let outputs = model.predict(&inputs);
+//! let outputs = model.predict(&inputs).unwrap();
 //!
 //! // Will output the target classes - otherwise our classifier is bad!
 //! println!("Final outputs --\n{}", outputs);
 //! ```
 
+use learning::{LearningResult, SupModel};
+use learning::error::{Error, ErrorKind};
+
 use linalg::{Matrix, Axes};
 use rulinalg::utils;
-use learning::SupModel;
 
 use std::f64::consts::PI;
 
@@ -105,13 +107,14 @@ impl<T: Distribution> NaiveBayes<T> {
 /// the input class. e.g. [[1,0,0],[0,0,1]] shows class 1 first, then class 3.
 impl<T: Distribution> SupModel<Matrix<f64>, Matrix<f64>> for NaiveBayes<T> {
     /// Train the model using inputs and targets.
-    fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) -> LearningResult<()> {
         self.distr = Some(T::from_model_params(targets.cols(), inputs.cols()));
         self.update_params(inputs, targets);
+        Ok(())
     }
 
     /// Predict output from inputs.
-    fn predict(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
+    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
         let log_probs = self.get_log_probs(inputs);
         let input_classes = NaiveBayes::<T>::get_classes(log_probs);
 
@@ -125,9 +128,9 @@ impl<T: Distribution> SupModel<Matrix<f64>, Matrix<f64>> for NaiveBayes<T> {
                 class_data.append(&mut row);
             }
 
-            Matrix::new(inputs.rows(), cluster_count, class_data)
+            Ok(Matrix::new(inputs.rows(), cluster_count, class_data))
         } else {
-            panic!("The model has not been trained.");
+            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
         }
     }
 }
@@ -441,10 +444,9 @@ mod tests {
                                        0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]);
 
         let mut model = NaiveBayes::<Gaussian>::new();
-        model.train(&inputs, &targets);
+        model.train(&inputs, &targets).unwrap();
 
-        let outputs = model.predict(&inputs);
-
+        let outputs = model.predict(&inputs).unwrap();
         assert_eq!(outputs.into_vec(), targets.into_vec());
     }
 
@@ -457,11 +459,9 @@ mod tests {
         let targets = Matrix::new(4, 2, vec![1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0]);
 
         let mut model = NaiveBayes::<Bernoulli>::new();
-        model.train(&inputs, &targets);
+        model.train(&inputs, &targets).unwrap();
 
-        let outputs = model.predict(&inputs);
-        println!("{}", outputs);
-
+        let outputs = model.predict(&inputs).unwrap();
         assert_eq!(outputs.into_vec(), targets.into_vec());
     }
 
@@ -475,11 +475,9 @@ mod tests {
         let targets = Matrix::new(4, 2, vec![1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0]);
 
         let mut model = NaiveBayes::<Multinomial>::new();
-        model.train(&inputs, &targets);
+        model.train(&inputs, &targets).unwrap();
 
-        let outputs = model.predict(&inputs);
-        println!("{}", outputs);
-
+        let outputs = model.predict(&inputs).unwrap();
         assert_eq!(outputs.into_vec(), targets.into_vec());
     }
 }

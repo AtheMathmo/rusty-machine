@@ -22,11 +22,11 @@
 //! let mut svm_mod = SVM::default();
 //!
 //! // Train the model
-//! svm_mod.train(&inputs, &targets);
+//! svm_mod.train(&inputs, &targets).unwrap();
 //!
 //! // Now we'll predict a new point
 //! let new_point = Matrix::new(1,1,vec![10.]);
-//! let output = svm_mod.predict(&new_point);
+//! let output = svm_mod.predict(&new_point).unwrap();
 //!
 //! // Hopefully we classified our new point correctly!
 //! assert!(output[0] == 1f64, "Our classifier isn't very good!");
@@ -37,7 +37,8 @@ use linalg::Matrix;
 use linalg::Vector;
 
 use learning::toolkit::kernel::{Kernel, SquaredExp};
-use learning::SupModel;
+use learning::{LearningResult, SupModel};
+use learning::error::{Error, ErrorKind};
 
 use rand;
 use rand::Rng;
@@ -109,9 +110,10 @@ impl<K: Kernel> SVM<K> {
 
         let mut ker_data = Vec::with_capacity(dim1 * dim2);
 
-        ker_data.extend(
-            m1.iter_rows().flat_map(|row1| m2.iter_rows()
-                                    .map(move |row2| self.ker.kernel(row1, row2))));
+        ker_data.extend(m1.iter_rows().flat_map(|row1| {
+            m2.iter_rows()
+                .map(move |row2| self.ker.kernel(row1, row2))
+        }));
 
         Matrix::new(dim1, dim2, ker_data)
     }
@@ -120,7 +122,7 @@ impl<K: Kernel> SVM<K> {
 /// Train the model using the Pegasos algorithm and
 /// predict the model output from new data.
 impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
-    fn predict(&self, inputs: &Matrix<f64>) -> Vector<f64> {
+    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<f64>> {
         let ones = Matrix::<f64>::ones(inputs.rows(), 1);
         let full_inputs = ones.hcat(inputs);
 
@@ -131,13 +133,13 @@ impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
 
             let plane_dist = ker_mat * weight_vec;
 
-            plane_dist.apply(&|d| d.signum())
+            Ok(plane_dist.apply(&|d| d.signum()))
         } else {
-            panic!("Model has not been trained.");
+            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
         }
     }
 
-    fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) -> LearningResult<()> {
         let n = inputs.rows();
 
         let mut rng = rand::thread_rng();
@@ -150,9 +152,9 @@ impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
         for t in 0..self.optim_iters {
             let i = rng.gen_range(0, n);
             let row_i = full_inputs.select_rows(&[i]);
-            let sum =  full_inputs.iter_rows()
-                .fold(0f64, |sum, row| sum + self.ker.kernel(row_i.data(), row)) * 
-                targets[i] / (self.lambda * (t as f64));
+            let sum = full_inputs.iter_rows()
+                .fold(0f64, |sum, row| sum + self.ker.kernel(row_i.data(), row)) *
+                      targets[i] / (self.lambda * (t as f64));
 
             if sum < 1f64 {
                 alpha[i] += 1f64;
@@ -162,5 +164,7 @@ impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
         self.alpha = Some(Vector::new(alpha) / (self.optim_iters as f64));
         self.train_inputs = Some(full_inputs);
         self.train_targets = Some(targets.clone());
+
+        Ok(())
     }
 }

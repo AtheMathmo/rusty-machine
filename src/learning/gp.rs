@@ -16,20 +16,23 @@
 //! let train_data = Matrix::new(10,1,vec![0.,1.,2.,3.,4.,5.,6.,7.,8.,9.]);
 //! let target = Vector::new(vec![0.,1.,2.,3.,4.,4.,3.,2.,1.,0.]);
 //!
-//! gaussp.train(&train_data, &target);
+//! gaussp.train(&train_data, &target).unwrap();
 //!
 //! let test_data = Matrix::new(5,1,vec![2.3,4.4,5.1,6.2,7.1]);
 //!
-//! let outputs = gaussp.predict(&test_data);
+//! let outputs = gaussp.predict(&test_data).unwrap();
 //! ```
 //! Alternatively one could use `gaussp.get_posterior()` which would return both
 //! the predictive mean and covariance. However, this is likely to change in
 //! a future release.
 
 use learning::toolkit::kernel::{Kernel, SquaredExp};
-use learning::SupModel;
+use learning::{LearningResult, SupModel};
+use learning::error::{Error, ErrorKind};
+
 use linalg::Matrix;
 use linalg::Vector;
+
 
 /// Trait for GP mean functions.
 pub trait MeanFunc {
@@ -127,9 +130,10 @@ impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
         let dim2 = m2.rows();
 
         let mut ker_data = Vec::with_capacity(dim1 * dim2);
-        ker_data.extend(
-            m1.iter_rows().flat_map(|row1| m2.iter_rows()
-                                    .map(move |row2| self.ker.kernel(row1, row2))));
+        ker_data.extend(m1.iter_rows().flat_map(|row1| {
+            m2.iter_rows()
+                .map(move |row2| self.ker.kernel(row1, row2))
+        }));
 
         Matrix::new(dim1, dim2, ker_data)
     }
@@ -137,29 +141,28 @@ impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
 
 impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Vector<f64>> for GaussianProcess<T, U> {
     /// Predict output from inputs.
-    fn predict(&self, inputs: &Matrix<f64>) -> Vector<f64> {
+    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<f64>> {
 
         // Messy referencing for succint syntax
         if let (&Some(ref alpha), &Some(ref t_data)) = (&self.alpha, &self.train_data) {
             let mean = self.mean.func(inputs.clone());
-
             let post_mean = self.ker_mat(inputs, t_data) * alpha;
-
-            return mean + post_mean;
-
+            Ok(mean + post_mean)
+        } else {
+            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
         }
-
-        panic!("The model has not been trained.");
     }
 
     /// Train the model using data and outputs.
-    fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) -> LearningResult<()> {
         let noise_mat = Matrix::identity(inputs.rows()) * self.noise;
 
         let ker_mat = self.ker_mat(inputs, inputs);
 
-        let train_mat =
-            (ker_mat + noise_mat).cholesky().expect("Could not compute Cholesky decomposition.");
+        let train_mat = try!((ker_mat + noise_mat).cholesky().map_err(|_| {
+            Error::new(ErrorKind::InvalidState,
+                       "Could not compute Cholesky decomposition.")
+        }));
 
         let x = train_mat.solve_l_triangular(targets - self.mean.func(inputs.clone())).unwrap();
         let alpha = train_mat.transpose().solve_u_triangular(x).unwrap();
@@ -167,6 +170,8 @@ impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Vector<f64>> for GaussianProc
         self.train_mat = Some(train_mat);
         self.train_data = Some(inputs.clone());
         self.alpha = Some(alpha);
+
+        Ok(())
     }
 }
 

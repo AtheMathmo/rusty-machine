@@ -26,12 +26,12 @@
 //! let mut model = NeuralNet::new(layers, criterion, StochasticGD::default());
 //!
 //! // Train the model!
-//! model.train(&inputs, &targets);
+//! model.train(&inputs, &targets).unwrap();
 //!
 //! let test_inputs = Matrix::new(2,3, vec![1.5,1.5,1.5,5.1,5.1,5.1]);
 //!
 //! // And predict new output from the test inputs
-//! model.predict(&test_inputs);
+//! let outputs = model.predict(&test_inputs).unwrap();
 //! ```
 //!
 //! The neural networks are specified via a criterion - similar to
@@ -44,7 +44,7 @@
 use linalg::{Matrix, MatrixSlice};
 use linalg::BaseSlice;
 
-use learning::SupModel;
+use learning::{LearningResult, SupModel};
 use learning::toolkit::activ_fn;
 use learning::toolkit::activ_fn::ActivationFunc;
 use learning::toolkit::cost_fn;
@@ -77,14 +77,15 @@ impl<'a, T, A> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, T, A>
           A: OptimAlgorithm<BaseNeuralNet<'a, T>>
 {
     /// Predict neural network output using forward propagation.
-    fn predict(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
-        self.base.forward_prop(inputs)
+    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
+        Ok(self.base.forward_prop(inputs))
     }
 
     /// Train the model using gradient optimization and back propagation.
-    fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) -> LearningResult<()> {
         let optimal_w = self.alg.optimize(&self.base, &self.base.weights, inputs, targets);
         self.base.weights = optimal_w;
+        Ok(())
     }
 }
 
@@ -198,8 +199,7 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
     fn create_weights(layer_sizes: &[usize]) -> Vec<f64> {
         let mut between = range::Range::new(0f64, 1f64);
         let mut rng = thread_rng();
-        layer_sizes
-            .windows(2)
+        layer_sizes.windows(2)
             .flat_map(|w| {
                 let l_in = w[0] + 1;
                 let l_out = w[1];
@@ -207,7 +207,8 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
                 (0..l_in * l_out)
                     .map(|_i| (between.sample(&mut rng) * 2f64 * eps_init) - eps_init)
                     .collect::<Vec<_>>()
-            }).collect()
+            })
+            .collect()
     }
 
     /// Gets matrix of weights between specified layer and forward layer for the weights.

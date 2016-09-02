@@ -83,10 +83,10 @@
 //! // Now we can train and predict from the model.
 //!
 //! // Train the model!
-//! gp.train(&inputs, &targets);
+//! gp.train(&inputs, &targets).unwrap();
 //!
 //! // Predict output from test datae]
-//! let outputs = gp.predict(&test_inputs);
+//! let outputs = gp.predict(&test_inputs).unwrap();
 //! ```
 //!
 //! This code could have been a lot simpler if we had simply adopted
@@ -109,7 +109,7 @@ extern crate rulinalg;
 extern crate num as libnum;
 extern crate rand;
 
-pub mod prelude;
+pub mod prelude; 
 
 /// The linear algebra module
 ///
@@ -141,22 +141,25 @@ pub mod learning {
 
     pub mod error;
 
+    /// A new type which provides clean access to the learning errors
+    pub type LearningResult<T> = Result<T, error::Error>;
+
     /// Trait for supervised model.
     pub trait SupModel<T, U> {
         /// Predict output from inputs.
-        fn predict(&self, inputs: &T) -> U;
+        fn predict(&self, inputs: &T) -> LearningResult<U>;
 
         /// Train the model using inputs and targets.
-        fn train(&mut self, inputs: &T, targets: &U);
+        fn train(&mut self, inputs: &T, targets: &U) -> LearningResult<()>;
     }
 
     /// Trait for unsupervised model.
     pub trait UnSupModel<T, U> {
         /// Predict output from inputs.
-        fn predict(&self, inputs: &T) -> U;
+        fn predict(&self, inputs: &T) -> LearningResult<U>;
 
         /// Train the model using inputs.
-        fn train(&mut self, inputs: &T);
+        fn train(&mut self, inputs: &T) -> LearningResult<()>;
     }
 
     /// Module for optimization in machine learning setting.

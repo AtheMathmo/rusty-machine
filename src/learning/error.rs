@@ -25,6 +25,8 @@ pub enum ErrorKind {
     InvalidData,
     /// The action could not be carried out as the model was in an invalid state.
     InvalidState,
+    /// The model has not been trained
+    UntrainedModel
 }
 
 impl Error {
