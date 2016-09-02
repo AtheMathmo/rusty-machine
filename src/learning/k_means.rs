@@ -92,12 +92,12 @@ impl<InitAlg: Initializer> UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClas
 
     /// Train the classifier using input data.
     fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
-        self.init_centroids(inputs).expect("Could not initialize centroids.");
+        try!(self.init_centroids(inputs));
         let mut cost = 0.0;
         let eps = 1e-14;
 
         for _i in 0..self.iters {
-            let (idx, distances) = self.get_closest_centroids(inputs);
+            let (idx, distances) = try!(self.get_closest_centroids(inputs));
             self.update_centroids(inputs, idx);
 
             let cost_i = distances.sum();
@@ -185,7 +185,7 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
     /// Initialize the centroids.
     ///
     /// Used internally within model.
-    fn init_centroids(&mut self, inputs: &Matrix<f64>) -> Result<(), Error> {
+    fn init_centroids(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
         if self.k > inputs.rows() {
             Err(Error::new(ErrorKind::InvalidData,
                            format!("Number of clusters ({0}) exceeds number of data points \
@@ -194,12 +194,17 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
                                    inputs.rows())))
         } else {
             let centroids = try!(self.init_algorithm.init_centroids(self.k, inputs));
-            assert!(centroids.rows() == self.k,
-                    "Initial centroids must have exactly k rows.");
-            assert!(centroids.cols() == inputs.cols(),
-                    "Initial centroids must have the same column count as inputs.");
-            self.centroids = Some(centroids);
-            Ok(())
+
+            if centroids.rows() != self.k {
+                Err(Error::new(ErrorKind::InvalidState,
+                                    "Initial centroids must have exactly k rows."))
+            } else if centroids.cols() != inputs.cols() {
+                Err(Error::new(ErrorKind::InvalidState,
+                                    "Initial centroids must have the same column count as inputs."))
+            } else {
+                self.centroids = Some(centroids);
+                Ok(())
+            }
         }
 
     }
@@ -223,11 +228,14 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
         self.centroids = Some(Matrix::new(self.k, inputs.cols(), new_centroids));
     }
 
-    fn get_closest_centroids(&self, inputs: &Matrix<f64>) -> (Vector<usize>, Vector<f64>) {
+    fn get_closest_centroids(&self,
+                             inputs: &Matrix<f64>)
+                             -> LearningResult<(Vector<usize>, Vector<f64>)> {
         if let Some(ref c) = self.centroids {
-            return KMeansClassifier::<InitAlg>::find_closest_centroids(c.as_slice(), inputs);
+            Ok(KMeansClassifier::<InitAlg>::find_closest_centroids(c.as_slice(), inputs))
         } else {
-            panic!("Centroids not correctly initialized.");
+            Err(Error::new(ErrorKind::InvalidState,
+                           "Centroids not correctly initialized."))
         }
     }
 
@@ -261,7 +269,7 @@ pub trait Initializer: Debug {
     /// Initialize the centroids for the initial state of the K-Means model.
     ///
     /// The `Matrix` returned must have `k` rows and the same column count as `inputs`.
-    fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error>;
+    fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>>;
 }
 
 /// The Forgy initialization scheme.
@@ -269,7 +277,7 @@ pub trait Initializer: Debug {
 pub struct Forgy;
 
 impl Initializer for Forgy {
-    fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error> {
+    fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
         let mut random_choices = Vec::with_capacity(k);
         let mut rng = thread_rng();
         while random_choices.len() < k {
@@ -289,7 +297,7 @@ impl Initializer for Forgy {
 pub struct RandomPartition;
 
 impl Initializer for RandomPartition {
-    fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error> {
+    fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
 
         // Populate so we have something in each class.
         let mut random_assignments = (0..k).map(|i| vec![i]).collect::<Vec<Vec<usize>>>();
@@ -317,7 +325,7 @@ impl Initializer for RandomPartition {
 pub struct KPlusPlus;
 
 impl Initializer for KPlusPlus {
-    fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> Result<Matrix<f64>, Error> {
+    fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
         let mut rng = thread_rng();
 
         let mut init_centroids = Vec::with_capacity(k * inputs.cols());

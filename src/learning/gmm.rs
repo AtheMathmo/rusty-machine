@@ -151,32 +151,33 @@ impl GaussianMixtureModel {
     ///
     /// let mix_weights = Vector::new(vec![0.25, 0.25, 0.5]);
     ///
-    /// let _ = GaussianMixtureModel::with_weights(3, mix_weights);
+    /// let gmm = GaussianMixtureModel::with_weights(3, mix_weights).unwrap();
     /// ```
     ///
-    /// # Panics
+    /// # Failures
     ///
-    /// Panics if either of the following conditions are met:
+    /// Fails if either of the following conditions are met:
     ///
     /// - Mixture weights do not have length k.
     /// - Mixture weights have a negative entry.
-    pub fn with_weights(k: usize, mixture_weights: Vector<f64>) -> GaussianMixtureModel {
-        assert!(mixture_weights.size() == k,
-                "Mixture weights must have length k.");
-        assert!(!mixture_weights.data().iter().any(|&x| x < 0f64),
-                "Mixture weights must have only non-negative entries.");
+    pub fn with_weights(k: usize, mixture_weights: Vector<f64>) -> LearningResult<GaussianMixtureModel> {
+        if mixture_weights.size() != k {
+            Err(Error::new(ErrorKind::InvalidParameters, "Mixture weights must have length k."))
+        } else if mixture_weights.data().iter().any(|&x| x < 0f64) {
+            Err(Error::new(ErrorKind::InvalidParameters, "Mixture weights must have only non-negative entries.")) 
+        } else {
+            let sum = mixture_weights.sum();
+            let normalized_weights = mixture_weights / sum;
 
-        let sum = mixture_weights.sum();
-        let normalized_weights = mixture_weights / sum;
-
-        GaussianMixtureModel {
-            comp_count: k,
-            mix_weights: normalized_weights,
-            model_means: None,
-            model_covars: None,
-            log_lik: 0f64,
-            max_iters: 100,
-            cov_option: CovOption::Full,
+            Ok(GaussianMixtureModel {
+                comp_count: k,
+                mix_weights: normalized_weights,
+                model_means: None,
+                model_covars: None,
+                log_lik: 0f64,
+                max_iters: 100,
+                cov_option: CovOption::Full,
+            })
         }
     }
 
@@ -335,16 +336,16 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn test_negative_mixtures() {
         let mix_weights = Vector::new(vec![-0.25, 0.75, 0.5]);
-        let _ = GaussianMixtureModel::with_weights(3, mix_weights);
+        let gmm_res = GaussianMixtureModel::with_weights(3, mix_weights);
+        assert!(gmm_res.is_err());
     }
 
     #[test]
-    #[should_panic]
     fn test_wrong_length_mixtures() {
         let mix_weights = Vector::new(vec![0.1, 0.25, 0.75, 0.5]);
-        let _ = GaussianMixtureModel::with_weights(3, mix_weights);
+        let gmm_res = GaussianMixtureModel::with_weights(3, mix_weights);
+        assert!(gmm_res.is_err());
     }
 }

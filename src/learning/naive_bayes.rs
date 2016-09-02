@@ -109,13 +109,12 @@ impl<T: Distribution> SupModel<Matrix<f64>, Matrix<f64>> for NaiveBayes<T> {
     /// Train the model using inputs and targets.
     fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) -> LearningResult<()> {
         self.distr = Some(T::from_model_params(targets.cols(), inputs.cols()));
-        self.update_params(inputs, targets);
-        Ok(())
+        self.update_params(inputs, targets)
     }
 
     /// Predict output from inputs.
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
-        let log_probs = self.get_log_probs(inputs);
+        let log_probs = try!(self.get_log_probs(inputs));
         let input_classes = NaiveBayes::<T>::get_classes(log_probs);
 
         if let Some(cluster_count) = self.cluster_count {
@@ -137,17 +136,17 @@ impl<T: Distribution> SupModel<Matrix<f64>, Matrix<f64>> for NaiveBayes<T> {
 
 impl<T: Distribution> NaiveBayes<T> {
     /// Get the log-probabilities per class for each input.
-    pub fn get_log_probs(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
+    pub fn get_log_probs(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
 
         if let (&Some(ref distr), &Some(ref prior)) = (&self.distr, &self.class_prior) {
             // Get the joint log likelihood from the distribution
-            distr.joint_log_lik(inputs, prior)
+            Ok(distr.joint_log_lik(inputs, prior))
         } else {
-            panic!("Model has not been trained.");
+            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
         }
     }
 
-    fn update_params(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) {
+    fn update_params(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) -> LearningResult<()> {
         let class_count = targets.cols();
         let total_data = inputs.rows();
 
@@ -156,7 +155,7 @@ impl<T: Distribution> NaiveBayes<T> {
 
         for (idx, row) in targets.iter_rows().enumerate() {
             // Find the class of this input
-            let class = NaiveBayes::<T>::find_class(row);
+            let class = try!(NaiveBayes::<T>::find_class(row));
 
             // Note the class of the input
             class_data[class].push(idx);
@@ -183,16 +182,18 @@ impl<T: Distribution> NaiveBayes<T> {
 
         self.class_prior = Some(class_prior);
         self.cluster_count = Some(class_count);
+        Ok(())
     }
 
-    fn find_class(row: &[f64]) -> usize {
+    fn find_class(row: &[f64]) -> LearningResult<usize> {
         // Find the `1` entry in the row
         for (idx, r) in row.into_iter().enumerate() {
             if *r == 1f64 {
-                return idx;
+                return Ok(idx);
             }
         }
-        panic!("No class found for entry in targets");
+        
+        Err(Error::new(ErrorKind::InvalidState, "No class found for entry in targets"))
     }
 
     fn get_classes(log_probs: Matrix<f64>) -> Vec<usize> {
