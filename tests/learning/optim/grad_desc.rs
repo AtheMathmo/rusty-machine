@@ -1,6 +1,6 @@
 use rm::learning::optim::Optimizable;
 use rm::learning::optim::fmincg::ConjugateGD;
-use rm::learning::optim::grad_desc::{GradientDesc, StochasticGD, AdaGrad};
+use rm::learning::optim::grad_desc::{GradientDesc, StochasticGD, AdaGrad, RMSProp};
 use rm::learning::optim::OptimAlgorithm;
 
 use rm::linalg::Matrix;
@@ -82,4 +82,19 @@ fn convex_adagrad_training() {
 
     assert!(params[0] - 20f64 < 1e-10);
     assert!(x_sq.compute_grad(&params, &Matrix::zeros(1, 1), &Matrix::zeros(1, 1)).0 < 1e-10);
+}
+
+#[test]
+fn convex_rmsprop_training() {
+  let x_sq = XSqModel { c: 20f64 };
+
+  let rms = RMSProp::new(0.05, 0.9, 1e-5, 50);
+  let test_data = vec![100f64];
+  let params = rms.optimize(&x_sq,
+                              &test_data[..],
+                              &Matrix::zeros(100, 1),
+                              &Matrix::zeros(100, 1));
+
+  assert!(params[0] - 20f64 < 1e-10);
+  assert!(x_sq.compute_grad(&params, &Matrix::zeros(1, 1), &Matrix::zeros(1, 1)).0 < 1e-10);
 }
