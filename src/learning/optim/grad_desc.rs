@@ -310,7 +310,7 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
 pub struct RMSProp {
     /// The base step size of gradient descent steps 
     learning_rate: f64,
-    /// Factor of averaged square gradients to keep
+    /// Rate at which running total of average square gradients decays
     decay_rate: f64,
     /// Small value used to avoid divide by zero
     epsilon: f64,
@@ -378,8 +378,8 @@ impl<M> OptimAlgorithm<M> for RMSProp
 
         // Set up indices for permutation
         let mut permutation = (0..inputs.rows()).collect::<Vec<_>>();
-        // The cost at the start of each iteration
-        let mut start_iter_cost = 0f64;
+        // The cost from the previous iteration
+        let mut prev_cost = 0f64;
 
         for _ in 0..self.iters {
             // The cost at end of each pass
@@ -397,17 +397,17 @@ impl<M> OptimAlgorithm<M> for RMSProp
                 rmsprop_cache = &rmsprop_cache*self.decay_rate + &grad_squared*(1.0 - self.decay_rate);
                 // RMSProp update rule 
                 params = &params - (&grad*self.learning_rate).elediv(
-                                    &rmsprop_cache.clone().apply(&|x| (x + self.epsilon).sqrt()));
+                                        &rmsprop_cache.clone().apply(&|x| (x + self.epsilon).sqrt()));
                 
                 end_cost += cost;
             }
             end_cost /= inputs.rows() as f64;
 
             // Early stopping
-            if (start_iter_cost - end_cost).abs() < LEARNING_EPS {
+            if (prev_cost - end_cost).abs() < LEARNING_EPS {
                 break;
             } else {
-                start_iter_cost = end_cost;
+                prev_cost = end_cost;
             }
         }
         params.into_vec()
