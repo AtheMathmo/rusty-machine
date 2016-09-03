@@ -54,9 +54,14 @@ pub fn k_fold_validate<M, C>(model: &mut M,
 // TODO: If not, should we change some signatures defined in terms
 // TODO: Matrix<f64> to be instead use iterators of &[f64]s?
 fn copy_rows(mat: &Matrix<f64>, rows: &[usize]) -> Matrix<f64> {
-    // get the data. copy the bits we're interested in.
-    // create a new matrix from this data
     let mut data = vec![0f64; rows.len() * mat.cols()];
+    let mut idx = 0;
+    for &row in rows {
+        for col in 0..mat.cols(){
+            data[idx] = mat[[row, col]];
+            idx += 1;
+        }
+    }
     Matrix::<f64>::new(rows.len(), mat.cols(), data)
 }
 
@@ -124,4 +129,23 @@ pub fn train_and_test<I, T, M, C>(model: &mut SupModel<I, T>,
     model.train(train_inputs, train_targets);
     let outputs = model.predict(test_inputs);
     C::cost(&outputs, test_targets)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::copy_rows;
+    use linalg::Matrix;
+
+    #[test]
+    fn test_copy_rows() {
+        let m = Matrix::new(4, 2, vec![ 0.0,  1.0,
+                                       10.0, 11.0,
+                                       20.0, 21.0,
+                                       30.0, 31.0]);
+
+        let s = copy_rows(&m, &vec![0, 2]);
+
+        assert_eq!(s, Matrix::new(2, 2, vec![ 0.0,  1.0,
+                                             20.0, 21.0]));
+    }
 }
