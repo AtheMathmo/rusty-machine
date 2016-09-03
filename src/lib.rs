@@ -197,8 +197,9 @@ pub mod learning {
     /// Module for learning tools.
     pub mod toolkit {
         pub mod activ_fn;
-        pub mod kernel;
         pub mod cost_fn;
+        pub mod cross_validation;
+        pub mod kernel;
         pub mod rand_utils;
         pub mod regularization;
     }
