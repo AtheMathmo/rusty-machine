@@ -45,6 +45,7 @@ use linalg::{Matrix, MatrixSlice};
 use linalg::BaseSlice;
 
 use learning::{LearningResult, SupModel};
+use learning::error::{Error, ErrorKind};
 use learning::toolkit::activ_fn;
 use learning::toolkit::activ_fn::ActivationFunc;
 use learning::toolkit::cost_fn;
@@ -78,7 +79,7 @@ impl<'a, T, A> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<'a, T, A>
 {
     /// Predict neural network output using forward propagation.
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
-        Ok(self.base.forward_prop(inputs))
+        self.base.forward_prop(inputs)
     }
 
     /// Train the model using gradient optimization and back propagation.
@@ -343,22 +344,25 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
     }
 
     /// Forward propagation of the model weights to get the outputs.
-    fn forward_prop(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
-        assert_eq!(inputs.cols(), self.layer_sizes[0]);
+    fn forward_prop(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
+        if inputs.cols() != self.layer_sizes[0] {
+            Err(Error::new(ErrorKind::InvalidData,
+                           "The input data dimensions must match the first layer."))
+        } else {
+            let net_data = Matrix::ones(inputs.rows(), 1).hcat(inputs);
 
-        let net_data = Matrix::ones(inputs.rows(), 1).hcat(inputs);
+            let mut z = net_data * self.get_net_weights(0);
+            let mut a = self.criterion.activate(z.clone());
 
-        let mut z = net_data * self.get_net_weights(0);
-        let mut a = self.criterion.activate(z.clone());
+            for l in 1..self.layer_sizes.len() - 1 {
+                let ones = Matrix::ones(a.rows(), 1);
+                a = ones.hcat(&a);
+                z = a * self.get_net_weights(l);
+                a = self.criterion.activate(z.clone());
+            }
 
-        for l in 1..self.layer_sizes.len() - 1 {
-            let ones = Matrix::ones(a.rows(), 1);
-            a = ones.hcat(&a);
-            z = a * self.get_net_weights(l);
-            a = self.criterion.activate(z.clone());
+            Ok(a)
         }
-
-        a
     }
 }
 
