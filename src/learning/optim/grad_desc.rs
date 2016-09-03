@@ -391,14 +391,16 @@ impl<M> OptimAlgorithm<M> for RMSProp
                                                       &inputs.select_rows(&[*i]),
                                                       &targets.select_rows(&[*i]));
 
-                let grad = Vector::new(grad);
+                let mut grad = Vector::new(grad);
                 let grad_squared = grad.clone().apply(&|x| x*x);
                 // Update cached average of squared gradients
                 rmsprop_cache = &rmsprop_cache*self.decay_rate + &grad_squared*(1.0 - self.decay_rate);
                 // RMSProp update rule 
-                params = &params - (&grad*self.learning_rate).elediv(
-                                        &rmsprop_cache.clone().apply(&|x| (x + self.epsilon).sqrt()));
-                
+                utils::in_place_vec_bin_op(grad.mut_data(), rmsprop_cache.data(), |x, &y| {
+                    *x = *x * self.learning_rate / (y + self.epsilon).sqrt();
+                });
+                params = &params - &grad;
+
                 end_cost += cost;
             }
             end_cost /= inputs.rows() as f64;
