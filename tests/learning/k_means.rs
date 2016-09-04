@@ -1,11 +1,11 @@
-use rm::linalg::Matrix;
+use rm::linalg::{Matrix, MatrixSlice, BaseMatrix};
 use rm::learning::UnSupModel;
 use rm::learning::k_means::KMeansClassifier;
 use rm::learning::k_means::{Forgy, RandomPartition, KPlusPlus};
 
 #[test]
 fn test_model_default() {
-    let mut model = KMeansClassifier::<KPlusPlus>::new(3);
+    let mut model = KMeansClassifier::<Matrix<f64>, KPlusPlus>::new(3);
     let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
     let targets = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
 
@@ -17,8 +17,21 @@ fn test_model_default() {
 }
 
 #[test]
+fn test_model_default_slice() {
+    let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
+    let targets = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
+    let mut model = KMeansClassifier::new(3);
+
+    model.train(&inputs.as_slice());
+
+    let outputs = model.predict(&targets.as_slice());
+
+    assert_eq!(outputs.size(), 3);
+}
+
+#[test]
 fn test_model_iter() {
-    let mut model = KMeansClassifier::<KPlusPlus>::new(3);
+    let mut model = KMeansClassifier::<Matrix<f64>, KPlusPlus>::new(3);
     let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
     let targets = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
 
@@ -72,7 +85,7 @@ fn test_model_kplusplus() {
 #[test]
 #[should_panic]
 fn test_no_train_predict() {
-    let model = KMeansClassifier::<KPlusPlus>::new(3);
+    let model = KMeansClassifier::<Matrix<f64>, KPlusPlus>::new(3);
     let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
 
     model.predict(&inputs);
