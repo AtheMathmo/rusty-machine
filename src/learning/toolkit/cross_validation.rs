@@ -9,13 +9,13 @@ use learning::toolkit::rand_utils::in_place_fisher_yates;
 
 // TODO: Support other input and output types.
 // TODO:
-// TODO: DON'T COPY THE DATA FOR EACH FOLD
+// TODO: DON'T ALLOCATE DATA FOR EACH FOLD
 // TODO: See comment on copy_rows.
 // TODO:
 // TODO: Remove gradient from CostFunc and add a new trait
 // TODO: for differentiable cost functions.
 // TODO:
-// TODO: Clarify what happens when mode.train is called multiple
+// TODO: Clarify what happens when model.train is called multiple
 // TODO: times. This assumes that it throws away the old data and
 // TODO: trains a new model.
 /// Randomly splits the inputs into k 'folds'. For each fold a model
