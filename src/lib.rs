@@ -134,12 +134,37 @@ pub mod learning {
     pub mod lin_reg;
     pub mod logistic_reg;
     pub mod k_means;
+    pub mod new_k_means;
     pub mod nnet;
     pub mod gp;
     pub mod svm;
     pub mod naive_bayes;
 
     pub mod error;
+
+    /// Trainer trait
+    pub trait Trainer<T>
+        where T: Model<Input = Self::Input, Output = Self::Target>
+    {
+        /// Input type
+        type Input;
+        /// Target type
+        type Target;
+
+        /// Train the model
+        fn train(self, inputs: &Self::Input) -> T;
+    }
+
+    /// A model which can be predicted from
+    pub trait Model {
+        /// Input type
+        type Input;
+        /// Output type
+        type Output;
+
+        /// Predict from the model
+        fn predict(&self, inputs: &Self::Input) -> Self::Output;
+    }
 
     /// Trait for supervised model.
     pub trait SupModel<T, U> {
