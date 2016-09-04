@@ -1,7 +1,7 @@
 extern crate rusty_machine;
 
 use rusty_machine::learning::naive_bayes::{NaiveBayes, Bernoulli};
-use rusty_machine::learning::toolkit::cross_validation::train_and_test;
+use rusty_machine::learning::toolkit::cross_validation::k_fold_validate;
 use rusty_machine::learning::toolkit::cost_fn::{MeanSqError};
 use rusty_machine::linalg::Matrix;
 
@@ -21,12 +21,14 @@ fn main () {
                                         0.0, 0.0, 1.0]);
 
     let mut model = NaiveBayes::<Bernoulli>::new();
-    let cost = train_and_test::<_,_,NaiveBayes<Bernoulli>,MeanSqError>(
+    let k = 3;
+
+    let costs = k_fold_validate::<NaiveBayes<Bernoulli>, MeanSqError>(
         &mut model,
         &inputs,
         &targets,
-        &inputs,
-        &targets);
+        k
+    );
 
-    println!("Cost is: {}", cost);
+    println!("Costs are: {:?}", costs);
 }
