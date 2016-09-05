@@ -147,7 +147,7 @@ struct Folds<'a> {
 impl<'a> Folds<'a> {
     /// Let n = indices.len(), and k = num_folds.
     /// The first n % k folds have size n / k + 1 and the
-    /// rest have size n / k. (In particular, if n %k == 0 then all
+    /// rest have size n / k. (In particular, if n % k == 0 then all
     /// folds are the same size.)
     fn new(indices: &'a ShuffledIndices, num_folds: usize) -> Folds<'a> {
         let num_samples = indices.0.len();
