@@ -1,5 +1,6 @@
 //! Cross-validation
 
+use std::cmp;
 use std::iter::Chain;
 use std::slice::Iter;
 use linalg::Matrix;
@@ -139,22 +140,22 @@ impl <'a> ExactSizeIterator for TrainingIndices<'a> {
 /// An iterator over the sets of indices required for k-fold cross validation.
 struct Folds<'a> {
     num_folds: usize,
-    fold_size: usize,
     indices: &'a[usize],
     count: usize
 }
 
 impl<'a> Folds<'a> {
+    /// Let n = indices.len(), and k = num_folds.
+    /// The first n % k folds have size n / k + 1 and the
+    /// rest have size n / k. (In particular, if n %k == 0 then all
+    /// folds are the same size.)
     fn new(indices: &'a ShuffledIndices, num_folds: usize) -> Folds<'a> {
         let num_samples = indices.0.len();
         assert!(num_folds > 1 && num_samples >= num_folds,
             "Require num_folds > 1 && num_samples >= num_folds");
-        assert!(num_samples % num_folds == 0,
-            "Require num_samples % num_folds == 0");
 
         Folds {
             num_folds: num_folds,
-            fold_size: num_samples / num_folds,
             indices: &indices.0,
             count: 0
         }
@@ -169,8 +170,13 @@ impl<'a> Iterator for Folds<'a> {
             return None;
         }
 
-        let fold_start = self.count * self.fold_size;
-        let fold_end = fold_start + self.fold_size;
+        let num_samples = self.indices.len();
+        let q = num_samples / self.num_folds;
+        let r = num_samples % self.num_folds;
+        let fold_start = self.count * q + cmp::min(self.count, r);
+        let fold_size = if self.count >= r {q} else {q + 1};
+        let fold_end = fold_start + fold_size;
+
         self.count += 1;
 
         let prefix = &self.indices[..fold_start];
@@ -201,8 +207,9 @@ mod tests {
                                              20.0, 21.0]));
     }
 
+    // k % n == 0
     #[test]
-    fn test_folds_ordered_indices() {
+    fn test_folds_n6_k3() {
         let idxs = ShuffledIndices(vec![0, 1, 2, 3, 4, 5]);
         let folds = collect_folds(Folds::new(&idxs, 3));
 
@@ -213,6 +220,55 @@ mod tests {
             ]);
     }
 
+    // k % n == 1
+    #[test]
+    fn test_folds_n5_k2() {
+        let idxs = ShuffledIndices(vec![0, 1, 2, 3, 4]);
+        let folds = collect_folds(Folds::new(&idxs, 2));
+
+        assert_eq!(folds, vec![
+            (vec![3, 4], vec![0, 1, 2]),
+            (vec![0, 1, 2], vec![3, 4])
+            ]);
+    }
+
+    // k % n == 2
+    #[test]
+    fn test_folds_n6_k4() {
+        let idxs = ShuffledIndices(vec![0, 1, 2, 3, 4, 5]);
+        let folds = collect_folds(Folds::new(&idxs, 4));
+
+        assert_eq!(folds, vec![
+            (vec![2, 3, 4, 5], vec![0, 1]),
+            (vec![0, 1, 4, 5], vec![2, 3]),
+            (vec![0, 1, 2, 3, 5], vec![4]),
+            (vec![0, 1, 2, 3, 4], vec![5])
+            ]);
+    }
+
+    // k == n
+    #[test]
+    fn test_folds_n4_k4() {
+        let idxs = ShuffledIndices(vec![0, 1, 2, 3]);
+        let folds = collect_folds(Folds::new(&idxs, 4));
+
+        assert_eq!(folds, vec![
+            (vec![1, 2, 3], vec![0]),
+            (vec![0, 2, 3], vec![1]),
+            (vec![0, 1, 3], vec![2]),
+            (vec![0, 1, 2], vec![3])
+            ]);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_folds_rejects_large_k() {
+        let idxs = ShuffledIndices(vec![0, 1, 2]);
+        let folds = collect_folds(Folds::new(&idxs, 4));
+    }
+
+    // Check we're really returning iterators into the shuffled
+    // indices rather than into (0..n).
     #[test]
     fn test_folds_unordered_indices() {
         let idxs = ShuffledIndices(vec![5, 4, 3, 2, 1, 0]);
