@@ -25,7 +25,7 @@
 //! ```
 
 use learning::error::{Error, ErrorKind};
-use linalg::Matrix;
+use linalg::{Matrix, BaseMatrix, BaseMatrixMut};
 use super::Transformer;
 
 use rulinalg::utils;
