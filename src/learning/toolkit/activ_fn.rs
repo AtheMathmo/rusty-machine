@@ -79,3 +79,22 @@ impl ActivationFunc for Exp {
         x.ln()
     }
 }
+
+/// Hyperbolic tangent activation function
+#[derive(Clone, Copy, Debug)]
+pub struct Tanh;
+
+impl ActivationFunc for Tanh {
+    fn func(x: f64) -> f64 {
+        x.tanh()
+    }
+
+    fn func_grad(x: f64) -> f64 {
+        let y = x.tanh();
+        1.0 - y*y
+    }
+
+    fn func_inv(x: f64) -> f64 {
+        0.5*((1.0+x)/(1.0-x)).ln()
+    }
+}
