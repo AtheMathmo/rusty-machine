@@ -35,7 +35,7 @@ use learning::toolkit::cost_fn::CostFunc;
 use learning::toolkit::cost_fn::MeanSqError;
 use learning::optim::grad_desc::GradientDesc;
 use learning::optim::{OptimAlgorithm, Optimizable};
-use learning::error::{Error, ErrorKind};
+use learning::error::Error;
 
 use linalg::Matrix;
 use linalg::Vector;
@@ -105,7 +105,7 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
             let full_inputs = ones.hcat(inputs);
             Ok(full_inputs * v)
         } else {
-            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
+            Err(Error::new_untrained())
         }
     }
 }

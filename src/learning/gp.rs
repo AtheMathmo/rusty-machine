@@ -207,7 +207,7 @@ impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
 
             Ok((post_mean, post_var))
         } else {
-            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
+            Err(Error::new_untrained())
         }
     }
 }

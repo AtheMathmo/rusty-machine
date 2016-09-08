@@ -142,7 +142,7 @@ impl<T: Distribution> NaiveBayes<T> {
             // Get the joint log likelihood from the distribution
             Ok(distr.joint_log_lik(inputs, prior))
         } else {
-            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
+            Err(Error::new_untrained())
         }
     }
 

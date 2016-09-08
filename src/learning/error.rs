@@ -40,6 +40,13 @@ impl Error {
         }
     }
 
+    /// Returns a new error for an untrained model
+    ///
+    /// This function is unstable and may be removed with changes to the API.
+    pub fn new_untrained() -> Error {
+        Error::new(ErrorKind::UntrainedModel, "The model has not been trained.")
+    }
+
     /// Get the kind of this `Error`.
     pub fn kind(&self) -> &ErrorKind {
         &self.kind

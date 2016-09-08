@@ -108,7 +108,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
         if let (&Some(_), &Some(_)) = (&self.model_means, &self.model_covars) {
             Ok(self.membership_weights(inputs).0)
         } else {
-            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
+            Err(Error::new_untrained())
         }
 
     }

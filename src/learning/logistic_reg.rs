@@ -39,7 +39,7 @@ use learning::toolkit::activ_fn::{ActivationFunc, Sigmoid};
 use learning::toolkit::cost_fn::{CostFunc, CrossEntropyError};
 use learning::optim::grad_desc::GradientDesc;
 use learning::optim::{OptimAlgorithm, Optimizable};
-use learning::error::{Error, ErrorKind};
+use learning::error::Error;
 
 use linalg::Matrix;
 use linalg::Vector;
@@ -134,7 +134,7 @@ impl<A> SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor<A>
             let full_inputs = ones.hcat(inputs);
             Ok((full_inputs * v).apply(&Sigmoid::func))
         } else {
-            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
+            Err(Error::new_untrained())
         }
     }
 }

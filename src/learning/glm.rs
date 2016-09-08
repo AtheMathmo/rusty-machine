@@ -85,7 +85,7 @@ impl<C: Criterion> SupModel<Matrix<f64>, Vector<f64>> for GenLinearModel<C> {
             let full_inputs = ones.hcat(inputs);
             Ok(self.criterion.apply_link_inv(full_inputs * v))
         } else {
-            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
+            Err(Error::new_untrained())
         }
     }
 

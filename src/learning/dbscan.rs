@@ -127,7 +127,7 @@ impl UnSupModel<Matrix<f64>, Vector<Option<usize>>> for DBSCAN {
 
                 Ok(Vector::new(classes))
             } else {
-                Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
+                Err(Error::new_untrained())
             }
         } else {
             Err(Error::new(ErrorKind::InvalidState,

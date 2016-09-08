@@ -137,7 +137,7 @@ impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
 
             Ok(plane_dist.apply(&|d| d.signum()))
         } else {
-            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
+            Err(Error::new_untrained())
         }
     }
 
