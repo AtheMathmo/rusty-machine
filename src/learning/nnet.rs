@@ -50,6 +50,8 @@ use learning::toolkit::activ_fn::ActivationFunc;
 use learning::toolkit::cost_fn;
 use learning::toolkit::cost_fn::CostFunc;
 use learning::toolkit::regularization::Regularization;
+use learning::toolkit::net_layer;
+use learning::toolkit::net_layer::NetLayer;
 use learning::optim::{Optimizable, OptimAlgorithm};
 use learning::optim::grad_desc::StochasticGD;
 
