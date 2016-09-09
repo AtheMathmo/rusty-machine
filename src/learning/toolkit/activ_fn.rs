@@ -8,8 +8,10 @@
 //! You can also create your own custom activation Functions for use in your models.
 //! Just create a unit struct implementing the `ActivationFunc` trait.
 
+use std::fmt::Debug;
+
 /// Trait for activation functions in models.
-pub trait ActivationFunc {
+pub trait ActivationFunc: Clone + Debug {
     /// The activation function.
     fn func(x: f64) -> f64;
 

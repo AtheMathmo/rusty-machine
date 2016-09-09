@@ -6,6 +6,7 @@ use std::vec::Vec;
 
 use rusty_machine::learning::nnet::{NeuralNet, BCECriterion};
 use rusty_machine::learning::toolkit::regularization::Regularization;
+use rusty_machine::learning::toolkit::activ_fn::Sigmoid;
 use rusty_machine::learning::optim::grad_desc::StochasticGD;
 
 use rusty_machine::linalg::Matrix;
@@ -41,7 +42,7 @@ fn main() {
 
     let layers = &[2, 1];
     let criterion = BCECriterion::new(Regularization::L2(0.));
-    let mut model = NeuralNet::new(layers, criterion, StochasticGD::default());
+    let mut model = NeuralNet::mlp(layers, criterion, StochasticGD::default(), Sigmoid);
 
     println!("Training...");
     model.train(&inputs, &targets);
