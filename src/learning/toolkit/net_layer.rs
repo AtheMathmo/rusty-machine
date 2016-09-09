@@ -50,20 +50,20 @@ pub struct Linear {
 
 impl Linear {
 	/// Construct a new Linear layer
-	pub fn new(input_size: usize, output_size: usize, has_bias: bool) -> Linear {
-		Linear {
-			input_size: input_size + has_bias as usize, 
-			output_size: output_size,
-			has_bias: has_bias
-		}
-	}
-
-	/// Construct a Linear layer with a bias term
-	pub fn default(input_size: usize, output_size: usize) -> Linear {
+	pub fn with_bias(input_size: usize, output_size: usize) -> Linear {
 		Linear {
 			input_size: input_size + 1, 
 			output_size: output_size,
 			has_bias: true
+		}
+	}
+
+	/// Construct a Linear layer with a bias term
+	pub fn without_bias(input_size: usize, output_size: usize) -> Linear {
+		Linear {
+			input_size: input_size, 
+			output_size: output_size,
+			has_bias: false
 		}
 	}
 }

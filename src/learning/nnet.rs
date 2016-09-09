@@ -183,8 +183,8 @@ impl<T, A> NeuralNet<T, A>
     /// let mut net = NeuralNet::new(BCECriterion::default(), StochasticGD::default());
     ///
     /// // Give net an input layer of size 3, hidden layer of size 4, and output layer of size 5
-    /// net.add_layer(Box::new(Linear::default(3, 4)));
-    /// net.add_layer(Box::new(Linear::default(4, 5)));
+    /// net.add_layer(Box::new(Linear::with_bias(3, 4)));
+    /// net.add_layer(Box::new(Linear::with_bias(4, 5)));
     /// ```
     pub fn add_layer<'a>(&'a mut self, layer: Box<NetLayer>) -> &'a mut NeuralNet<T, A> {
         self.base.add_layer(layer);
@@ -249,7 +249,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
         where U: ActivationFunc + 'static {
         let mut mlp = BaseNeuralNet::new(criterion);
         for shape in layer_sizes.windows(2) {
-            mlp.add_layer(Box::new(net_layer::Linear::default(shape[0], shape[1])));
+            mlp.add_layer(Box::new(net_layer::Linear::with_bias(shape[0], shape[1])));
             mlp.add_layer(Box::new(activ_fn.clone()));
         }
         mlp
