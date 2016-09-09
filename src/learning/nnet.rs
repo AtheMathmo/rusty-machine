@@ -183,8 +183,8 @@ impl<T, A> NeuralNet<T, A>
     /// let mut net = NeuralNet::new(BCECriterion::default(), StochasticGD::default());
     ///
     /// // Give net an input layer of size 3, hidden layer of size 4, and output layer of size 5
-    /// net.add_layer(Box::new(Linear::new(3, 4)));
-    /// net.add_layer(Box::new(Linear::new(4, 5)));
+    /// net.add_layer(Box::new(Linear::default(3, 4)));
+    /// net.add_layer(Box::new(Linear::default(4, 5)));
     /// ```
     pub fn add_layer<'a>(&'a mut self, layer: Box<NetLayer>) -> &'a mut NeuralNet<T, A> {
         self.base.add_layer(layer);
@@ -203,7 +203,7 @@ impl<T, A> NeuralNet<T, A>
     /// let layers = &[3; 4];
     /// let mut net = NeuralNet::default(layers);
     ///
-    /// let w = &net.get_net_weights(1);
+    /// let w = &net.get_net_weights(2);
     ///
     /// // We add a bias term to the weight matrix
     /// assert_eq!(w.rows(), 4);
@@ -249,8 +249,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
         where U: ActivationFunc + 'static {
         let mut mlp = BaseNeuralNet::new(criterion);
         for shape in layer_sizes.windows(2) {
-            mlp.add_layer(Box::new(net_layer::Bias));
-            mlp.add_layer(Box::new(net_layer::Linear::new(shape[0]+1, shape[1])));
+            mlp.add_layer(Box::new(net_layer::Linear::default(shape[0], shape[1])));
             mlp.add_layer(Box::new(activ_fn.clone()));
         }
         mlp
@@ -294,7 +293,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
         let mut start = 0usize;
         for l in &self.layers[..idx] {
             start += l.num_params();
-        }
+        } 
 
         let shape = self.layers[idx].param_shape();
         unsafe {
@@ -348,7 +347,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
             activations.push(output);
             index += layer.num_params();
         }
-        let output = &activations.last().unwrap();
+        let output = activations.last().unwrap();
 
         // Backward propagation
 
@@ -379,8 +378,19 @@ impl<T: Criterion> BaseNeuralNet<T> {
     /// Forward propagation of the model weights to get the outputs.
     fn forward_prop(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
         let mut index = 0;
-        let mut outputs = inputs.clone();
-        for layer in &self.layers {
+        if self.layers.len() == 0 {
+            return inputs.clone();
+        }
+
+        let mut outputs = unsafe {
+            let shape = self.layers[0].param_shape();
+            let slice = MatrixSlice::from_raw_parts(self.weights.as_ptr(),
+                                                    shape.0,
+                                                    shape.1,
+                                                    shape.1);
+            self.layers[0].forward(inputs, slice)
+        };
+        for layer in self.layers.iter().skip(1) {
             let shape = layer.param_shape();
 
             let slice = unsafe {
