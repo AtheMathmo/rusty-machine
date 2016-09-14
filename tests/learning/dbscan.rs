@@ -13,7 +13,7 @@ fn test_basic_clusters() {
                                         -2.2, 3.1]);
 
     let mut model = DBSCAN::new(0.5, 2);
-    model.train(&inputs);
+    model.train(&inputs).unwrap();
 
     let clustering = model.clusters().unwrap();
 
@@ -33,11 +33,11 @@ fn test_basic_prediction() {
 
     let mut model = DBSCAN::new(0.5, 2);
     model.set_predictive(true);
-    model.train(&inputs);
+    model.train(&inputs).unwrap();
 
     let new_points = Matrix::new(2,2, vec![1.0, 2.0, 4.0, 4.0]);
 
-    let classes = model.predict(&new_points);
+    let classes = model.predict(&new_points).unwrap();
     assert!(classes[0] == Some(0));
     assert!(classes[1] == None);
 }

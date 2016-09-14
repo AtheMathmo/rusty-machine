@@ -20,24 +20,25 @@
 //! let mut lin_mod = LinRegressor::default();
 //!
 //! // Train the model
-//! lin_mod.train(&inputs, &targets);
+//! lin_mod.train(&inputs, &targets).unwrap();
 //!
 //! // Now we'll predict a new point
 //! let new_point = Matrix::new(1,1,vec![10.]);
-//! let output = lin_mod.predict(&new_point);
+//! let output = lin_mod.predict(&new_point).unwrap();
 //!
 //! // Hopefully we classified our new point correctly!
 //! assert!(output[0] > 17f64, "Our regressor isn't very good!");
 //! ```
 
-use learning::SupModel;
-use linalg::Matrix;
-use linalg::Vector;
+use learning::{LearningResult, SupModel};
 use learning::toolkit::cost_fn::CostFunc;
 use learning::toolkit::cost_fn::MeanSqError;
 use learning::optim::grad_desc::GradientDesc;
-use learning::optim::OptimAlgorithm;
-use learning::optim::Optimizable;
+use learning::optim::{OptimAlgorithm, Optimizable};
+use learning::error::Error;
+
+use linalg::Matrix;
+use linalg::Vector;
 
 /// Linear Regression Model.
 ///
@@ -80,9 +81,9 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
     /// let inputs = Matrix::new(3,1, vec![2.0, 3.0, 4.0]);
     /// let targets = Vector::new(vec![5.0, 6.0, 7.0]);
     ///
-    /// lin_mod.train(&inputs, &targets);
+    /// lin_mod.train(&inputs, &targets).unwrap();
     /// ```
-    fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) -> LearningResult<()> {
         let ones = Matrix::<f64>::ones(inputs.rows(), 1);
         let full_inputs = ones.hcat(inputs);
 
@@ -91,18 +92,20 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
         self.parameters =
             Some(((&xt * full_inputs).inverse().expect("Could not compute (X_T X) inverse.") *
                   &xt) * targets);
+
+        Ok(())
     }
 
     /// Predict output value from input data.
     ///
     /// Model must be trained before prediction can be made.
-    fn predict(&self, inputs: &Matrix<f64>) -> Vector<f64> {
+    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<f64>> {
         if let Some(ref v) = self.parameters {
             let ones = Matrix::<f64>::ones(inputs.rows(), 1);
             let full_inputs = ones.hcat(inputs);
-            full_inputs * v
+            Ok(full_inputs * v)
         } else {
-            panic!("Model has not been trained.");
+            Err(Error::new_untrained())
         }
     }
 }
@@ -148,7 +151,7 @@ impl LinRegressor {
     ///
     /// // Now we'll predict a new point
     /// let new_point = Matrix::new(1,1,vec![10.]);
-    /// let _ = lin_mod.predict(&new_point);
+    /// let _ = lin_mod.predict(&new_point).unwrap();
     /// ```
     pub fn train_with_optimization(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) {
         let ones = Matrix::<f64>::ones(inputs.rows(), 1);
