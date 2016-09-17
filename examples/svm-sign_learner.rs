@@ -30,7 +30,8 @@ fn main() {
 
     // Trainee
     let mut svm_mod = SVM::new(HyperTan::new(100., 0.), 0.3);
-    svm_mod.train(&inputs, &targets);
+    // Our train function returns a Result<(), E>
+    svm_mod.train(&inputs, &targets).unwrap();
 
     println!("Evaluation...");
     let mut hits = 0;
@@ -41,7 +42,7 @@ fn main() {
     for n in (-1000..1000).filter(|&x| x % 100 == 0) {
         let nf = n as f64;
         let input = Matrix::new(1, 1, vec![nf]);
-        let out = svm_mod.predict(&input);
+        let out = svm_mod.predict(&input).unwrap();
         let res = if out[0] * nf > 0. {
             hits += 1;
             true
