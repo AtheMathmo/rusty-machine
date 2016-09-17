@@ -42,8 +42,9 @@ pub fn k_fold_validate<M, C>(model: &mut M,
         let test_inputs = copy_rows(&inputs, p.test_indices.clone());
         let test_targets = copy_rows(&targets, p.test_indices.clone());
 
-        model.train(&train_inputs, &train_targets);
-        let outputs = model.predict(&test_inputs);
+        // TODO: return Result of something fmor this function
+        let _ = model.train(&train_inputs, &train_targets).unwrap();
+        let outputs = model.predict(&test_inputs).unwrap();
         costs.push(C::cost(&outputs, &test_targets));
     }
 
@@ -264,7 +265,7 @@ mod tests {
     #[should_panic]
     fn test_folds_rejects_large_k() {
         let idxs = ShuffledIndices(vec![0, 1, 2]);
-        let folds = collect_folds(Folds::new(&idxs, 4));
+        let _ = collect_folds(Folds::new(&idxs, 4));
     }
 
     // Check we're really returning iterators into the shuffled
