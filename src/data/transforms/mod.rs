@@ -11,6 +11,7 @@
 
 pub mod minmax;
 pub mod standardize;
+pub mod shuffle;
 
 use learning::error;
 
@@ -21,7 +22,10 @@ pub use self::standardize::Standardizer;
 pub trait Transformer<T> {
     /// Transforms the inputs and stores the transformation in the Transformer
     fn transform(&mut self, inputs: T) -> Result<T, error::Error>;
+}
 
+/// Trait for invertible data transformers
+pub trait Invertible<T> : Transformer<T> {
     /// Maps the inputs using the inverse of the fitted transform.
     fn inv_transform(&self, inputs: T) -> Result<T, error::Error>;
 }

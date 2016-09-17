@@ -26,7 +26,7 @@
 
 use learning::error::{Error, ErrorKind};
 use linalg::Matrix;
-use super::Transformer;
+use super::{Invertible, Transformer};
 
 use rulinalg::utils;
 
@@ -145,7 +145,9 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
 
         Ok(inputs)
     }
+}
 
+impl<T: Float> Invertible<Matrix<T>> for MinMaxScaler<T> {
     fn inv_transform(&self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
         if let (&Some(ref scales), &Some(ref consts)) = (&self.scale_factors, &self.const_factors) {
 

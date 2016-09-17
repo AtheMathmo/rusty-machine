@@ -26,7 +26,7 @@
 
 use learning::error::{Error, ErrorKind};
 use linalg::{Matrix, Vector, Axes};
-use super::Transformer;
+use super::{Invertible, Transformer};
 
 use rulinalg::utils;
 
@@ -112,7 +112,9 @@ impl<T: Float + FromPrimitive> Transformer<Matrix<T>> for Standardizer<T> {
             Ok(inputs)
         }
     }
+}
 
+impl<T: Float + FromPrimitive> Invertible<Matrix<T>> for Standardizer<T> {
     fn inv_transform(&self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
         if let (&Some(ref means), &Some(ref variances)) = (&self.means, &self.variances) {
 
