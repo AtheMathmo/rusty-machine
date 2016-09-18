@@ -4,7 +4,7 @@ use std::cmp;
 use std::iter::Chain;
 use std::slice::Iter;
 use linalg::Matrix;
-use learning::SupModel;
+use learning::{LearningResult, SupModel};
 use learning::toolkit::rand_utils::in_place_fisher_yates;
 
 /// Randomly splits the inputs into k 'folds'. For each fold a model
@@ -14,7 +14,7 @@ pub fn k_fold_validate<M, S>(model: &mut M,
                              inputs: &Matrix<f64>,
                              targets: &Matrix<f64>,
                              k: usize,
-                             score: S) -> Vec<f64>
+                             score: S) -> LearningResult<Vec<f64>>
     where S: Fn(&Matrix<f64>, &Matrix<f64>) -> f64,
           M: SupModel<Matrix<f64>, Matrix<f64>>,
 {
@@ -31,13 +31,12 @@ pub fn k_fold_validate<M, S>(model: &mut M,
         let test_inputs = copy_rows(&inputs, p.test_indices.clone());
         let test_targets = copy_rows(&targets, p.test_indices.clone());
 
-        // TODO: return Result of something fmor this function
-        let _ = model.train(&train_inputs, &train_targets).unwrap();
-        let outputs = model.predict(&test_inputs).unwrap();
+        let _ = try!(model.train(&train_inputs, &train_targets));
+        let outputs = try!(model.predict(&test_inputs));
         costs.push(score(&outputs, &test_targets));
     }
 
-    costs
+    Ok(costs)
 }
 
 // TODO: Use a preallocated buffer for each fold.
