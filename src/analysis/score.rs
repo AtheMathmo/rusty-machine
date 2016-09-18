@@ -25,7 +25,7 @@ pub fn row_accuracy(outputs: &Matrix<f64>, targets: &Matrix<f64>) -> f64 {
 }
 
 // TODO: generalise to accept arbitrary iterators of diff-able things
-/// Returns the additive inverse of the mean-square-error of the
+/// Returns the additive inverse of the mean-squared-error of the
 /// outputs. So higher is better, and the returned value is always
 /// negative.
 pub fn neg_mean_squared_error(outputs: &Matrix<f64>, targets: &Matrix<f64>) -> f64
