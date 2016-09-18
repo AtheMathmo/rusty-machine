@@ -5,28 +5,21 @@ use std::iter::Chain;
 use std::slice::Iter;
 use linalg::Matrix;
 use learning::SupModel;
-use learning::toolkit::cost_fn::*;
 use learning::toolkit::rand_utils::in_place_fisher_yates;
 
 // TODO: Support other input and output types.
 // TODO:
 // TODO: DON'T ALLOCATE DATA FOR EACH FOLD
 // TODO: See comment on copy_rows.
-// TODO:
-// TODO: Remove gradient from CostFunc and add a new trait
-// TODO: for differentiable cost functions.
-// TODO:
-// TODO: Clarify what happens when model.train is called multiple
-// TODO: times. This assumes that it throws away the old data and
-// TODO: trains a new model.
 /// Randomly splits the inputs into k 'folds'. For each fold a model
 /// is trained using all inputs except for that fold, and tested on the
 /// data in the fold. Returns the costs for each fold.
-pub fn k_fold_validate<M, C>(model: &mut M,
+pub fn k_fold_validate<M, S>(model: &mut M,
                              inputs: &Matrix<f64>,
                              targets: &Matrix<f64>,
-                             k: usize) -> Vec<f64>
-    where C: CostFunc<Matrix<f64>>,
+                             k: usize,
+                             score: S) -> Vec<f64>
+    where S: Fn(&Matrix<f64>, &Matrix<f64>) -> f64,
           M: SupModel<Matrix<f64>, Matrix<f64>>,
 {
     assert_eq!(inputs.rows(), targets.rows());
@@ -45,7 +38,7 @@ pub fn k_fold_validate<M, C>(model: &mut M,
         // TODO: return Result of something fmor this function
         let _ = model.train(&train_inputs, &train_targets).unwrap();
         let outputs = model.predict(&test_inputs).unwrap();
-        costs.push(C::cost(&outputs, &test_targets));
+        costs.push(score(&outputs, &test_targets));
     }
 
     costs

@@ -109,7 +109,7 @@ extern crate rulinalg;
 extern crate num as libnum;
 extern crate rand;
 
-pub mod prelude; 
+pub mod prelude;
 
 /// The linear algebra module
 ///
@@ -214,4 +214,10 @@ pub mod stats {
 
     /// Module for statistical distributions.
     pub mod dist;
+}
+
+/// Module for evaluating models.
+pub mod analysis {
+    /// Module for scoring predictions.
+    pub mod score;
 }

@@ -19,6 +19,11 @@ pub fn accuracy<I>(outputs: I, targets: I) -> f64
     correct as f64 / len
 }
 
+/// Returns the fraction of outputs rows which match their target.
+pub fn row_accuracy(outputs: &Matrix<f64>, targets: &Matrix<f64>) -> f64 {
+    accuracy(outputs.iter_rows(), targets.iter_rows())
+}
+
 // TODO: generalise to accept arbitrary iterators of diff-able things
 /// Returns the additive inverse of the mean-square-error of the
 /// outputs. So higher is better, and the returned value is always
