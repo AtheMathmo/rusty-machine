@@ -11,6 +11,14 @@ use learning::toolkit::rand_utils::in_place_fisher_yates;
 /// is trained using all inputs except for that fold, and tested on the
 /// data in the fold. Returns the scores for each fold.
 ///
+
+/// # Arguments
+/// * `model` - Used to train and predict for each fold.
+/// * `inputs` - All input samples.
+/// * `targets` - All targets.
+/// * `k` - Number of folds to use.
+/// * `score` - Used to compare the outputs for each fold to the targets. Higher scores are better. See the `analysis::score` module for examples.
+///
 /// # Examples
 /// ```
 /// use rusty_machine::analysis::cross_validation::k_fold_validate;
