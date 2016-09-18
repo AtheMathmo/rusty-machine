@@ -36,13 +36,15 @@ use learning::toolkit::rand_utils::in_place_fisher_yates;
 ///
 /// let mut model = NaiveBayes::<Bernoulli>::new();
 ///
-/// let accuracy = k_fold_validate(
+/// let accuracy_per_fold: Vec<f64> = k_fold_validate(
 ///     &mut model,
 ///     &inputs,
 ///     &targets,
 ///     3,
+///     // Score each fold by the fraction of test samples where
+///     // the model's prediction equals the target.
 ///     row_accuracy
-/// );
+/// ).unwrap();
 /// ```
 pub fn k_fold_validate<M, S>(model: &mut M,
                              inputs: &Matrix<f64>,
