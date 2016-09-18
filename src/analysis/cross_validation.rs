@@ -11,7 +11,6 @@ use learning::toolkit::rand_utils::in_place_fisher_yates;
 /// is trained using all inputs except for that fold, and tested on the
 /// data in the fold. Returns the scores for each fold.
 ///
-
 /// # Arguments
 /// * `model` - Used to train and predict for each fold.
 /// * `inputs` - All input samples.
