@@ -18,14 +18,14 @@
 //! model.cov_option = CovOption::Diagonal;
 //!
 //! // Where inputs is a Matrix with features in columns.
-//! model.train(&inputs);
+//! model.train(&inputs).unwrap();
 //!
 //! // Print the means and covariances of the GMM
 //! println!("{:?}", model.means());
 //! println!("{:?}", model.covariances());
 //!
 //! // Where test_inputs is a Matrix with features in columns.
-//! let post_probs = model.predict(&test_inputs);
+//! let post_probs = model.predict(&test_inputs).unwrap();
 //!
 //! // Probabilities that each point comes from each Gaussian.
 //! println!("{:?}", post_probs.data());
@@ -34,8 +34,9 @@
 use linalg::{Matrix, MatrixSlice, Vector, BaseMatrix, BaseMatrixMut};
 use rulinalg::utils;
 
-use learning::UnSupModel;
+use learning::{LearningResult, UnSupModel};
 use learning::toolkit::rand_utils;
+use learning::error::{Error, ErrorKind};
 
 /// Covariance options for GMMs.
 ///
@@ -68,7 +69,7 @@ pub struct GaussianMixtureModel {
 
 impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
     /// Train the model using inputs.
-    fn train(&mut self, inputs: &Matrix<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
         // Initialization:
         let k = self.comp_count;
 
@@ -98,14 +99,16 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
 
             self.update_params(inputs, weights);
         }
+
+        Ok(())
     }
 
     /// Predict output from inputs.
-    fn predict(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
+    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
         if let (&Some(_), &Some(_)) = (&self.model_means, &self.model_covars) {
-            self.membership_weights(inputs).0
+            Ok(self.membership_weights(inputs).0)
         } else {
-            panic!("Model has not been trained.");
+            Err(Error::new_untrained())
         }
 
     }
@@ -148,32 +151,33 @@ impl GaussianMixtureModel {
     ///
     /// let mix_weights = Vector::new(vec![0.25, 0.25, 0.5]);
     ///
-    /// let _ = GaussianMixtureModel::with_weights(3, mix_weights);
+    /// let gmm = GaussianMixtureModel::with_weights(3, mix_weights).unwrap();
     /// ```
     ///
-    /// # Panics
+    /// # Failures
     ///
-    /// Panics if either of the following conditions are met:
+    /// Fails if either of the following conditions are met:
     ///
     /// - Mixture weights do not have length k.
     /// - Mixture weights have a negative entry.
-    pub fn with_weights(k: usize, mixture_weights: Vector<f64>) -> GaussianMixtureModel {
-        assert!(mixture_weights.size() == k,
-                "Mixture weights must have length k.");
-        assert!(!mixture_weights.data().iter().any(|&x| x < 0f64),
-                "Mixture weights must have only non-negative entries.");
+    pub fn with_weights(k: usize, mixture_weights: Vector<f64>) -> LearningResult<GaussianMixtureModel> {
+        if mixture_weights.size() != k {
+            Err(Error::new(ErrorKind::InvalidParameters, "Mixture weights must have length k."))
+        } else if mixture_weights.data().iter().any(|&x| x < 0f64) {
+            Err(Error::new(ErrorKind::InvalidParameters, "Mixture weights must have only non-negative entries.")) 
+        } else {
+            let sum = mixture_weights.sum();
+            let normalized_weights = mixture_weights / sum;
 
-        let sum = mixture_weights.sum();
-        let normalized_weights = mixture_weights / sum;
-
-        GaussianMixtureModel {
-            comp_count: k,
-            mix_weights: normalized_weights,
-            model_means: None,
-            model_covars: None,
-            log_lik: 0f64,
-            max_iters: 100,
-            cov_option: CovOption::Full,
+            Ok(GaussianMixtureModel {
+                comp_count: k,
+                mix_weights: normalized_weights,
+                model_means: None,
+                model_covars: None,
+                log_lik: 0f64,
+                max_iters: 100,
+                cov_option: CovOption::Full,
+            })
         }
     }
 
@@ -292,7 +296,7 @@ impl GaussianMixtureModel {
 
             for i in 0..n {
                 let inputs_i = MatrixSlice::from_matrix(inputs, [i, 0], 1, d);
-                let diff = inputs_i - new_means_k; 
+                let diff = inputs_i - new_means_k;
                 cov_mat += self.compute_cov(diff, membership_weights[[i, k]]);
             }
             new_covs.push(cov_mat / sum_weights[k]);
@@ -332,16 +336,16 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn test_negative_mixtures() {
         let mix_weights = Vector::new(vec![-0.25, 0.75, 0.5]);
-        let _ = GaussianMixtureModel::with_weights(3, mix_weights);
+        let gmm_res = GaussianMixtureModel::with_weights(3, mix_weights);
+        assert!(gmm_res.is_err());
     }
 
     #[test]
-    #[should_panic]
     fn test_wrong_length_mixtures() {
         let mix_weights = Vector::new(vec![0.1, 0.25, 0.75, 0.5]);
-        let _ = GaussianMixtureModel::with_weights(3, mix_weights);
+        let gmm_res = GaussianMixtureModel::with_weights(3, mix_weights);
+        assert!(gmm_res.is_err());
     }
 }

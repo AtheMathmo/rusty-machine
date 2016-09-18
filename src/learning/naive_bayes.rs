@@ -31,18 +31,19 @@
 //! let mut model = NaiveBayes::<Gaussian>::new();
 //!
 //! // Train the model.
-//! model.train(&inputs, &targets);
+//! model.train(&inputs, &targets).unwrap();
 //!
 //! // Predict the classes on the input data
-//! let outputs = model.predict(&inputs);
+//! let outputs = model.predict(&inputs).unwrap();
 //!
 //! // Will output the target classes - otherwise our classifier is bad!
 //! println!("Final outputs --\n{}", outputs);
 //! ```
 
 use linalg::{Matrix, Axes, BaseMatrix, BaseMatrixMut};
+use learning::{LearningResult, SupModel};
+use learning::error::{Error, ErrorKind};
 use rulinalg::utils;
-use learning::SupModel;
 
 use std::f64::consts::PI;
 
@@ -105,14 +106,14 @@ impl<T: Distribution> NaiveBayes<T> {
 /// the input class. e.g. [[1,0,0],[0,0,1]] shows class 1 first, then class 3.
 impl<T: Distribution> SupModel<Matrix<f64>, Matrix<f64>> for NaiveBayes<T> {
     /// Train the model using inputs and targets.
-    fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) -> LearningResult<()> {
         self.distr = Some(T::from_model_params(targets.cols(), inputs.cols()));
-        self.update_params(inputs, targets);
+        self.update_params(inputs, targets)
     }
 
     /// Predict output from inputs.
-    fn predict(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
-        let log_probs = self.get_log_probs(inputs);
+    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
+        let log_probs = try!(self.get_log_probs(inputs));
         let input_classes = NaiveBayes::<T>::get_classes(log_probs);
 
         if let Some(cluster_count) = self.cluster_count {
@@ -125,26 +126,26 @@ impl<T: Distribution> SupModel<Matrix<f64>, Matrix<f64>> for NaiveBayes<T> {
                 class_data.append(&mut row);
             }
 
-            Matrix::new(inputs.rows(), cluster_count, class_data)
+            Ok(Matrix::new(inputs.rows(), cluster_count, class_data))
         } else {
-            panic!("The model has not been trained.");
+            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
         }
     }
 }
 
 impl<T: Distribution> NaiveBayes<T> {
     /// Get the log-probabilities per class for each input.
-    pub fn get_log_probs(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
+    pub fn get_log_probs(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
 
         if let (&Some(ref distr), &Some(ref prior)) = (&self.distr, &self.class_prior) {
             // Get the joint log likelihood from the distribution
-            distr.joint_log_lik(inputs, prior)
+            Ok(distr.joint_log_lik(inputs, prior))
         } else {
-            panic!("Model has not been trained.");
+            Err(Error::new_untrained())
         }
     }
 
-    fn update_params(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) {
+    fn update_params(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) -> LearningResult<()> {
         let class_count = targets.cols();
         let total_data = inputs.rows();
 
@@ -153,7 +154,7 @@ impl<T: Distribution> NaiveBayes<T> {
 
         for (idx, row) in targets.iter_rows().enumerate() {
             // Find the class of this input
-            let class = NaiveBayes::<T>::find_class(row);
+            let class = try!(NaiveBayes::<T>::find_class(row));
 
             // Note the class of the input
             class_data[class].push(idx);
@@ -180,16 +181,19 @@ impl<T: Distribution> NaiveBayes<T> {
 
         self.class_prior = Some(class_prior);
         self.cluster_count = Some(class_count);
+        Ok(())
     }
 
-    fn find_class(row: &[f64]) -> usize {
+    fn find_class(row: &[f64]) -> LearningResult<usize> {
         // Find the `1` entry in the row
         for (idx, r) in row.into_iter().enumerate() {
             if *r == 1f64 {
-                return idx;
+                return Ok(idx);
             }
         }
-        panic!("No class found for entry in targets");
+
+        Err(Error::new(ErrorKind::InvalidState,
+                       "No class found for entry in targets"))
     }
 
     fn get_classes(log_probs: Matrix<f64>) -> Vec<usize> {
@@ -258,7 +262,9 @@ impl Distribution for Gaussian {
     fn update_params(&mut self, data: &Matrix<f64>, class: usize) {
         // Compute mean and sample variance
         let mean = data.mean(Axes::Row).into_vec();
-        let var = data.variance(Axes::Row).into_vec();
+        let var = data.variance(Axes::Row)
+            .unwrap()
+            .into_vec();
 
         let features = data.cols();
 
@@ -441,10 +447,9 @@ mod tests {
                                        0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]);
 
         let mut model = NaiveBayes::<Gaussian>::new();
-        model.train(&inputs, &targets);
+        model.train(&inputs, &targets).unwrap();
 
-        let outputs = model.predict(&inputs);
-
+        let outputs = model.predict(&inputs).unwrap();
         assert_eq!(outputs.into_vec(), targets.into_vec());
     }
 
@@ -457,11 +462,9 @@ mod tests {
         let targets = Matrix::new(4, 2, vec![1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0]);
 
         let mut model = NaiveBayes::<Bernoulli>::new();
-        model.train(&inputs, &targets);
+        model.train(&inputs, &targets).unwrap();
 
-        let outputs = model.predict(&inputs);
-        println!("{}", outputs);
-
+        let outputs = model.predict(&inputs).unwrap();
         assert_eq!(outputs.into_vec(), targets.into_vec());
     }
 
@@ -475,11 +478,9 @@ mod tests {
         let targets = Matrix::new(4, 2, vec![1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0]);
 
         let mut model = NaiveBayes::<Multinomial>::new();
-        model.train(&inputs, &targets);
+        model.train(&inputs, &targets).unwrap();
 
-        let outputs = model.predict(&inputs);
-        println!("{}", outputs);
-
+        let outputs = model.predict(&inputs).unwrap();
         assert_eq!(outputs.into_vec(), targets.into_vec());
     }
 }

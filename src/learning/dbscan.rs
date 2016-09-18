@@ -31,12 +31,13 @@
 //!                                     -2.2, 3.1]);
 //!
 //! let mut model = DBSCAN::new(0.5, 2);
-//! model.train(&inputs);
+//! model.train(&inputs).unwrap();
 //!
 //! let clustering = model.clusters().unwrap();
 //! ```
 
-use learning::UnSupModel;
+use learning::{LearningResult, UnSupModel};
+use learning::error::{Error, ErrorKind};
 
 use linalg::{Matrix, Vector, BaseMatrix};
 use rulinalg::utils;
@@ -75,7 +76,7 @@ impl Default for DBSCAN {
 
 impl UnSupModel<Matrix<f64>, Vector<Option<usize>>> for DBSCAN {
     /// Train the classifier using input data.
-    fn train(&mut self, inputs: &Matrix<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
         self.init_params(inputs.rows());
         let mut cluster = 0;
 
@@ -95,11 +96,13 @@ impl UnSupModel<Matrix<f64>, Vector<Option<usize>>> for DBSCAN {
         }
 
         if self.predictive {
-            self._cluster_data = Some(inputs.clone())
+            self._cluster_data = Some(inputs.clone());
         }
+
+        Ok(())
     }
 
-    fn predict(&self, inputs: &Matrix<f64>) -> Vector<Option<usize>> {
+    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<Option<usize>>> {
         if self.predictive {
             if let (&Some(ref cluster_data), &Some(ref clusters)) = (&self._cluster_data,
                                                                      &self.clusters) {
@@ -122,12 +125,13 @@ impl UnSupModel<Matrix<f64>, Vector<Option<usize>>> for DBSCAN {
                     }
                 }
 
-                Vector::new(classes)
+                Ok(Vector::new(classes))
             } else {
-                panic!("The model has not been trained.");
+                Err(Error::new_untrained())
             }
         } else {
-            panic!("Model must be set to predictive. Use `self.set_predictive(true)`.");
+            Err(Error::new(ErrorKind::InvalidState,
+                           "Model must be set to predictive. Use `self.set_predictive(true)`."))
         }
     }
 }
