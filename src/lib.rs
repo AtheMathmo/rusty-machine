@@ -217,8 +217,6 @@ pub mod stats {
 
 /// Module for evaluating models.
 pub mod analysis {
-    /// Module for performing cross-validation of models.
     pub mod cross_validation;
-    /// Module for scoring predictions.
     pub mod score;
 }

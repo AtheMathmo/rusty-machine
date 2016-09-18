@@ -1,4 +1,4 @@
-//! Cross-validation
+//! Module for performing cross-validation of models.
 
 use std::cmp;
 use std::iter::Chain;
@@ -10,6 +10,32 @@ use learning::toolkit::rand_utils::in_place_fisher_yates;
 /// Randomly splits the inputs into k 'folds'. For each fold a model
 /// is trained using all inputs except for that fold, and tested on the
 /// data in the fold. Returns the scores for each fold.
+///
+/// # Examples
+/// ```
+/// use rusty_machine::analysis::cross_validation::k_fold_validate;
+/// use rusty_machine::analysis::score::row_accuracy;
+/// use rusty_machine::learning::naive_bayes::{NaiveBayes, Bernoulli};
+/// use rusty_machine::linalg::Matrix;
+///
+/// let inputs = Matrix::new(3, 2, vec![1.0, 1.1,
+///                                     5.2, 4.3,
+///                                     6.2, 7.3]);
+///
+/// let targets = Matrix::new(3, 3, vec![1.0, 0.0, 0.0,
+///                                      0.0, 0.0, 1.0,
+///                                      0.0, 0.0, 1.0]);
+///
+/// let mut model = NaiveBayes::<Bernoulli>::new();
+///
+/// let accuracy = k_fold_validate(
+///     &mut model,
+///     &inputs,
+///     &targets,
+///     3,
+///     row_accuracy
+/// );
+/// ```
 pub fn k_fold_validate<M, S>(model: &mut M,
                              inputs: &Matrix<f64>,
                              targets: &Matrix<f64>,
