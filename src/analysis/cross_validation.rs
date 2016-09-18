@@ -7,13 +7,9 @@ use linalg::Matrix;
 use learning::SupModel;
 use learning::toolkit::rand_utils::in_place_fisher_yates;
 
-// TODO: Support other input and output types.
-// TODO:
-// TODO: DON'T ALLOCATE DATA FOR EACH FOLD
-// TODO: See comment on copy_rows.
 /// Randomly splits the inputs into k 'folds'. For each fold a model
 /// is trained using all inputs except for that fold, and tested on the
-/// data in the fold. Returns the costs for each fold.
+/// data in the fold. Returns the scores for each fold.
 pub fn k_fold_validate<M, S>(model: &mut M,
                              inputs: &Matrix<f64>,
                              targets: &Matrix<f64>,

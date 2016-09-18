@@ -1,8 +1,8 @@
 extern crate rusty_machine;
 
 use rusty_machine::analysis::score::{row_accuracy, neg_mean_squared_error};
+use rusty_machine::analysis::cross_validation::k_fold_validate;
 use rusty_machine::learning::naive_bayes::{NaiveBayes, Bernoulli};
-use rusty_machine::learning::toolkit::cross_validation::k_fold_validate;
 use rusty_machine::linalg::Matrix;
 
 fn main () {
@@ -42,5 +42,4 @@ fn main () {
     );
 
     println!("Neg-error: {:?}", neg_mean_squared_error);
-
 }

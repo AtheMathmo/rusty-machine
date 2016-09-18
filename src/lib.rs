@@ -201,7 +201,6 @@ pub mod learning {
     pub mod toolkit {
         pub mod activ_fn;
         pub mod cost_fn;
-        pub mod cross_validation;
         pub mod kernel;
         pub mod rand_utils;
         pub mod regularization;
@@ -218,6 +217,8 @@ pub mod stats {
 
 /// Module for evaluating models.
 pub mod analysis {
+    /// Module for performing cross-validation of models.
+    pub mod cross_validation;
     /// Module for scoring predictions.
     pub mod score;
 }
