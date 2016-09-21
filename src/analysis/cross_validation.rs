@@ -3,7 +3,7 @@
 use std::cmp;
 use std::iter::Chain;
 use std::slice::Iter;
-use linalg::Matrix;
+use linalg::{BaseMatrix, Matrix};
 use learning::{LearningResult, SupModel};
 use learning::toolkit::rand_utils::in_place_fisher_yates;
 

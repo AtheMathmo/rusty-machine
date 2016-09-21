@@ -39,7 +39,7 @@
 use learning::{LearningResult, UnSupModel};
 use learning::error::{Error, ErrorKind};
 
-use linalg::{Matrix, Vector};
+use linalg::{Matrix, Vector, BaseMatrix};
 use rulinalg::utils;
 
 /// DBSCAN Model

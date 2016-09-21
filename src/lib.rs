@@ -115,8 +115,7 @@ pub mod prelude;
 ///
 /// This module contains reexports of common tools from the rulinalg crate.
 pub mod linalg {
-    pub use rulinalg::matrix::{Axes, Matrix, MatrixSlice, MatrixSliceMut};
-    pub use rulinalg::matrix::slice::BaseSlice;
+    pub use rulinalg::matrix::{Axes, Matrix, MatrixSlice, MatrixSliceMut, BaseMatrix, BaseMatrixMut};
     pub use rulinalg::vector::Vector;
     pub use rulinalg::Metric;
 }

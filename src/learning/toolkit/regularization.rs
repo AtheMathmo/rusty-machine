@@ -15,8 +15,7 @@
 //! ```
 
 use linalg::Metric;
-use linalg::{Matrix, MatrixSlice};
-use linalg::BaseSlice;
+use linalg::{Matrix, MatrixSlice, BaseMatrix};
 use libnum::{FromPrimitive, Float};
 
 /// Model Regularization
@@ -90,7 +89,7 @@ impl<T: Float + FromPrimitive> Regularization<T> {
 #[cfg(test)]
 mod tests {
     use super::Regularization;
-    use linalg::Matrix;
+    use linalg::{Matrix, BaseMatrix};
     use linalg::Metric;
 
     #[test]

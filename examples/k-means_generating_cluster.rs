@@ -1,7 +1,7 @@
 extern crate rusty_machine;
 extern crate rand;
 
-use rusty_machine::linalg::Matrix;
+use rusty_machine::linalg::{Matrix, BaseMatrix};
 use rusty_machine::learning::k_means::KMeansClassifier;
 use rusty_machine::learning::UnSupModel;
 
