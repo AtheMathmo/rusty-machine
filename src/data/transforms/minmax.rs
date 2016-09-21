@@ -25,7 +25,7 @@
 //! ```
 
 use learning::error::{Error, ErrorKind};
-use linalg::Matrix;
+use linalg::{Matrix, BaseMatrix, BaseMatrixMut};
 use super::{Invertible, Transformer};
 
 use rulinalg::utils;
@@ -173,7 +173,7 @@ impl<T: Float> Invertible<Matrix<T>> for MinMaxScaler<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::super::Transformer;
+    use super::super::{Transformer, Invertible};
     use linalg::Matrix;
     use std::f64;
 

@@ -1,19 +1,18 @@
 //! The Shuffler
 
 /// The Shuffler
+#[derive(Debug)]
 pub struct Shuffler;
 
-use learning::error::{Error, ErrorKind};
 use learning::LearningResult;
-use linalg::{Matrix, Vector, Axes};
+use linalg::{Matrix, BaseMatrix, BaseMatrixMut};
 use super::Transformer;
 
 use rand::{Rng, thread_rng};
-use rulinalg::utils;
 
 impl<T> Transformer<Matrix<T>> for Shuffler {
     /// Transforms the inputs and stores the transformation in the Transformer
-    fn transform(&mut self, inputs: Matrix<T>) -> LearningResult<Matrix<T>> {
+    fn transform(&mut self, mut inputs: Matrix<T>) -> LearningResult<Matrix<T>> {
         let n = inputs.rows();
         let mut rng = thread_rng();
 

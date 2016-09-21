@@ -25,7 +25,7 @@
 //! ```
 
 use learning::error::{Error, ErrorKind};
-use linalg::{Matrix, Vector, Axes};
+use linalg::{Matrix, Vector, Axes, BaseMatrix, BaseMatrixMut};
 use super::{Invertible, Transformer};
 
 use rulinalg::utils;
@@ -93,7 +93,9 @@ impl<T: Float + FromPrimitive> Transformer<Matrix<T>> for Standardizer<T> {
                            "Cannot standardize data with only one row."))
         } else {
             let mean = inputs.mean(Axes::Row);
-            let variance = inputs.variance(Axes::Row);
+            let variance = try!(inputs.variance(Axes::Row).map_err(|_| {
+                Error::new(ErrorKind::InvalidData, "Cannot compute variance of data.")
+            }));
 
             if mean.data().iter().any(|x| !x.is_finite()) {
                 return Err(Error::new(ErrorKind::InvalidData, "Some data point is non-finite."));
@@ -143,7 +145,7 @@ impl<T: Float + FromPrimitive> Invertible<Matrix<T>> for Standardizer<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::super::Transformer;
+    use super::super::{Transformer, Invertible};
     use linalg::{Axes, Matrix};
 
     use std::f64;
@@ -186,7 +188,7 @@ mod tests {
         let transformed = standardizer.transform(inputs).unwrap();
 
         let new_mean = transformed.mean(Axes::Row);
-        let new_var = transformed.variance(Axes::Row);
+        let new_var = transformed.variance(Axes::Row).unwrap();
 
         assert!(new_mean.data().iter().all(|x| x.abs() < 1e-5));
         assert!(new_var.data().iter().all(|x| (x.abs() - 1.0) < 1e-5));
@@ -200,7 +202,7 @@ mod tests {
         let transformed = standardizer.transform(inputs).unwrap();
 
         let new_mean = transformed.mean(Axes::Row);
-        let new_var = transformed.variance(Axes::Row);
+        let new_var = transformed.variance(Axes::Row).unwrap();
 
         assert!(new_mean.data().iter().all(|x| (x.abs() - 1.0) < 1e-5));
         assert!(new_var.data().iter().all(|x| (x.abs() - 4.0) < 1e-5));

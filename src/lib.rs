@@ -109,14 +109,13 @@ extern crate rulinalg;
 extern crate num as libnum;
 extern crate rand;
 
-pub mod prelude; 
+pub mod prelude;
 
 /// The linear algebra module
 ///
 /// This module contains reexports of common tools from the rulinalg crate.
 pub mod linalg {
-    pub use rulinalg::matrix::{Axes, Matrix, MatrixSlice, MatrixSliceMut};
-    pub use rulinalg::matrix::slice::BaseSlice;
+    pub use rulinalg::matrix::{Axes, Matrix, MatrixSlice, MatrixSliceMut, BaseMatrix, BaseMatrixMut};
     pub use rulinalg::vector::Vector;
     pub use rulinalg::Metric;
 }
@@ -200,8 +199,8 @@ pub mod learning {
     /// Module for learning tools.
     pub mod toolkit {
         pub mod activ_fn;
-        pub mod kernel;
         pub mod cost_fn;
+        pub mod kernel;
         pub mod rand_utils;
         pub mod regularization;
     }
@@ -213,4 +212,10 @@ pub mod stats {
 
     /// Module for statistical distributions.
     pub mod dist;
+}
+
+/// Module for evaluating models.
+pub mod analysis {
+    pub mod cross_validation;
+    pub mod score;
 }

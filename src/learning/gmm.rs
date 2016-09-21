@@ -31,7 +31,7 @@
 //! println!("{:?}", post_probs.data());
 //! ```
 
-use linalg::{Matrix, MatrixSlice, Vector};
+use linalg::{Matrix, MatrixSlice, Vector, BaseMatrix, BaseMatrixMut};
 use rulinalg::utils;
 
 use learning::{LearningResult, UnSupModel};

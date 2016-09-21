@@ -33,7 +33,7 @@
 //! ```
 
 
-use linalg::Matrix;
+use linalg::{Matrix, BaseMatrix};
 use linalg::Vector;
 
 use learning::toolkit::kernel::{Kernel, SquaredExp};
