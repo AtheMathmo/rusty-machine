@@ -1,7 +1,6 @@
 //!Neural Network Layers
 
-use linalg::{Matrix, MatrixSlice};
-use linalg::BaseSlice;
+use linalg::{Matrix, MatrixSlice, BaseMatrix, BaseMatrixMut};
 
 use learning::toolkit::activ_fn::ActivationFunc;
 

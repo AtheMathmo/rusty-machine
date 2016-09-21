@@ -25,20 +25,21 @@
 //! let mut log_mod = GenLinearModel::new(Bernoulli);
 //!
 //! // Train the model
-//! log_mod.train(&inputs, &targets);
+//! log_mod.train(&inputs, &targets).unwrap();
 //!
 //! // Now we'll predict a new point
 //! let new_point = Matrix::new(1,1,vec![10.]);
-//! let output = log_mod.predict(&new_point);
+//! let output = log_mod.predict(&new_point).unwrap();
 //!
 //! // Hopefully we classified our new point correctly!
 //! assert!(output[0] > 0.5, "Our classifier isn't very good!");
 //! ```
 
 use linalg::Vector;
-use linalg::Matrix;
+use linalg::{Matrix, BaseMatrix};
 
-use learning::SupModel;
+use learning::{LearningResult, SupModel};
+use learning::error::{Error, ErrorKind};
 
 /// The Generalized Linear Model
 ///
@@ -78,22 +79,24 @@ impl<C: Criterion> GenLinearModel<C> {
 /// The model is trained using Iteratively Re-weighted Least Squares.
 impl<C: Criterion> SupModel<Matrix<f64>, Vector<f64>> for GenLinearModel<C> {
     /// Predict output from inputs.
-    fn predict(&self, inputs: &Matrix<f64>) -> Vector<f64> {
+    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<f64>> {
         if let Some(ref v) = self.parameters {
             let ones = Matrix::<f64>::ones(inputs.rows(), 1);
             let full_inputs = ones.hcat(inputs);
-            self.criterion.apply_link_inv(full_inputs * v)
+            Ok(self.criterion.apply_link_inv(full_inputs * v))
         } else {
-            panic!("The model has not been trained.");
+            Err(Error::new_untrained())
         }
     }
 
     /// Train the model using inputs and targets.
-    fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) -> LearningResult<()> {
         let n = inputs.rows();
 
-        assert!(n == targets.size(),
-                "Training data do not have the same dimensions.");
+        if n != targets.size() {
+            return Err(Error::new(ErrorKind::InvalidData,
+                                  "Training data do not have the same dimensions"));
+        }
 
         // Construct initial estimate for mu
         let mut mu = Vector::new(self.criterion.initialize_mu(targets.data()));
@@ -132,6 +135,7 @@ impl<C: Criterion> SupModel<Matrix<f64>, Vector<f64>> for GenLinearModel<C> {
         }
 
         self.parameters = Some(beta);
+        Ok(())
     }
 }
 

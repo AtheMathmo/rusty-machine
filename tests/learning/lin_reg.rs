@@ -21,7 +21,7 @@ fn test_regression() {
     let inputs = Matrix::new(3, 1, vec![2.0, 3.0, 4.0]);
     let targets = Vector::new(vec![5.0, 6.0, 7.0]);
 
-    lin_mod.train(&inputs, &targets);
+    lin_mod.train(&inputs, &targets).unwrap();
 
     let parameters = lin_mod.parameters().unwrap();
 
@@ -46,5 +46,5 @@ fn test_no_train_predict() {
     let lin_mod = LinRegressor::default();
     let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
 
-    let _ = lin_mod.predict(&inputs);
+    let _ = lin_mod.predict(&inputs).unwrap();
 }

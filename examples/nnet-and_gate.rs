@@ -47,7 +47,8 @@ fn main() {
     let mut model = NeuralNet::mlp(layers, criterion, StochasticGD::default(), Sigmoid);
 
     println!("Training...");
-    model.train(&inputs, &targets);
+    // Our train function returns a Result<(), E>
+    model.train(&inputs, &targets).unwrap();
 
     let test_cases = vec![
         0.0, 0.0,
@@ -62,7 +63,7 @@ fn main() {
         0.0,
         ];
     let test_inputs = Matrix::new(test_cases.len() / 2, 2, test_cases);
-    let res = model.predict(&test_inputs);
+    let res = model.predict(&test_inputs).unwrap();
 
     println!("Evaluation...");
     let mut hits = 0;

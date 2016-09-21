@@ -1,7 +1,7 @@
 extern crate rusty_machine;
 extern crate rand;
 
-use rusty_machine::linalg::Matrix;
+use rusty_machine::linalg::{Matrix, BaseMatrix};
 use rusty_machine::learning::k_means::KMeansClassifier;
 use rusty_machine::learning::UnSupModel;
 
@@ -58,16 +58,17 @@ fn main() {
     // Create a new model with 2 clusters
     let mut model = KMeansClassifier::new(2);
 
-    println!("Training the model...");
     // Train the model
-    model.train(&samples);
+    println!("Training the model...");
+    // Our train function returns a Result<(), E>
+    model.train(&samples).unwrap();
 
     let centroids = model.centroids().as_ref().unwrap();
     println!("Model Centroids:\n{:.3}", centroids);
 
     // Predict the classes and partition into
     println!("Classifying the samples...");
-    let classes = model.predict(&samples);
+    let classes = model.predict(&samples).unwrap();
     let (first, second): (Vec<usize>, Vec<usize>) = classes.data().iter().partition(|&x| *x == 0);
 
     println!("Samples closest to first centroid: {}", first.len());

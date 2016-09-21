@@ -27,12 +27,12 @@
 //! let mut model = NeuralNet::mlp(layers, criterion, StochasticGD::default(), Sigmoid);
 //!
 //! // Train the model!
-//! model.train(&inputs, &targets);
+//! model.train(&inputs, &targets).unwrap();
 //!
 //! let test_inputs = Matrix::new(2,3, vec![1.5,1.5,1.5,5.1,5.1,5.1]);
 //!
 //! // And predict new output from the test inputs
-//! model.predict(&test_inputs);
+//! let outputs = model.predict(&test_inputs).unwrap();
 //! ```
 //!
 //! The neural networks are specified via a criterion - similar to
@@ -42,14 +42,13 @@
 //! You can define your own criterion by implementing the `Criterion`
 //! trait with a concrete `ActivationFunc` and `CostFunc`.
 
-//! TODO: Add documentation
 
 pub mod net_layer;
 
-use linalg::{Matrix, MatrixSlice};
-use linalg::BaseSlice;
+use linalg::{Matrix, MatrixSlice, BaseMatrix, BaseMatrixMut};
 
-use learning::SupModel;
+use learning::{LearningResult, SupModel};
+use learning::error::{Error, ErrorKind};
 use learning::toolkit::activ_fn;
 use learning::toolkit::activ_fn::ActivationFunc;
 use learning::toolkit::cost_fn;
@@ -86,14 +85,15 @@ impl<T, A> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<T, A>
           A: OptimAlgorithm<BaseNeuralNet<T>>
 {
     /// Predict neural network output using forward propagation.
-    fn predict(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
+    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
         self.base.forward_prop(inputs)
     }
 
     /// Train the model using gradient optimization and back propagation.
-    fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) -> LearningResult<()> {
         let optimal_w = self.alg.optimize(&self.base, &self.base.weights, inputs, targets);
         self.base.weights = optimal_w;
+        Ok(())
     }
 }
 
@@ -177,7 +177,7 @@ impl<T, A> NeuralNet<T, A>
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::BaseSlice;
+    /// use rusty_machine::linalg::BaseMatrix;
     /// use rusty_machine::learning::nnet::BCECriterion;
     /// use rusty_machine::learning::nnet::NeuralNet;
     /// use rusty_machine::learning::nnet::net_layer::Linear;
@@ -200,7 +200,7 @@ impl<T, A> NeuralNet<T, A>
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::linalg::BaseSlice;
+    /// use rusty_machine::linalg::BaseMatrix;
     /// use rusty_machine::learning::nnet::NeuralNet;
     ///
     /// // Create a neural net with 4 layers, 3 neurons in each.
@@ -270,8 +270,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
     fn create_weights(layer_sizes: &[usize]) -> Vec<f64> {
         let mut between = range::Range::new(0f64, 1f64);
         let mut rng = thread_rng();
-        layer_sizes
-            .windows(2)
+        layer_sizes.windows(2)
             .flat_map(|w| {
                 let l_in = w[0] + 1;
                 let l_out = w[1];
@@ -279,7 +278,8 @@ impl<T: Criterion> BaseNeuralNet<T> {
                 (0..l_in * l_out)
                     .map(|_i| (between.sample(&mut rng) * 2f64 * eps_init) - eps_init)
                     .collect::<Vec<_>>()
-            }).collect()
+            })
+            .collect()
     }
 
     /// Gets matrix of weights for the specified layer for the weights.
@@ -380,10 +380,10 @@ impl<T: Criterion> BaseNeuralNet<T> {
     }
 
     /// Forward propagation of the model weights to get the outputs.
-    fn forward_prop(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
+    fn forward_prop(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
         let mut index = 0;
         if self.layers.len() == 0 {
-            return inputs.clone();
+            return Ok(inputs.clone());
         }
 
         let mut outputs = unsafe {
@@ -407,7 +407,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
             outputs = layer.forward(&outputs, slice);
             index += layer.num_params();
         }
-        outputs
+        Ok(outputs)
     }
 }
 
