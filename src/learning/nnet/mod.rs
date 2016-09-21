@@ -23,7 +23,7 @@
 //! // Choose the BCE criterion with L2 regularization (`lambda=0.1`).
 //! let criterion = BCECriterion::new(Regularization::L2(0.1));
 //!
-//! // We will just use the default stochastic gradient descent.
+//! // We will create a multilayer perceptron and just use the default stochastic gradient descent.
 //! let mut model = NeuralNet::mlp(layers, criterion, StochasticGD::default(), Sigmoid);
 //!
 //! // Train the model!
@@ -42,6 +42,10 @@
 //! You can define your own criterion by implementing the `Criterion`
 //! trait with a concrete `ActivationFunc` and `CostFunc`.
 
+//! TODO: Add documentation
+
+pub mod net_layer;
+
 use linalg::{Matrix, MatrixSlice};
 use linalg::BaseSlice;
 
@@ -51,8 +55,6 @@ use learning::toolkit::activ_fn::ActivationFunc;
 use learning::toolkit::cost_fn;
 use learning::toolkit::cost_fn::CostFunc;
 use learning::toolkit::regularization::Regularization;
-use learning::toolkit::net_layer;
-use learning::toolkit::net_layer::NetLayer;
 use learning::optim::{Optimizable, OptimAlgorithm};
 use learning::optim::grad_desc::StochasticGD;
 
@@ -60,6 +62,8 @@ use rand::thread_rng;
 use rand::distributions::{Sample, range};
 
 use std::fmt::Debug;
+
+use self::net_layer::NetLayer;
 
 /// Neural Network Model
 ///
@@ -176,15 +180,15 @@ impl<T, A> NeuralNet<T, A>
     /// use rusty_machine::linalg::BaseSlice;
     /// use rusty_machine::learning::nnet::BCECriterion;
     /// use rusty_machine::learning::nnet::NeuralNet;
+    /// use rusty_machine::learning::nnet::net_layer::Linear;
     /// use rusty_machine::learning::optim::grad_desc::StochasticGD;
-    /// use rusty_machine::learning::toolkit::net_layer::Linear;
     ///
     /// // Create a new neural net 
     /// let mut net = NeuralNet::new(BCECriterion::default(), StochasticGD::default());
     ///
     /// // Give net an input layer of size 3, hidden layer of size 4, and output layer of size 5
-    /// net.add_layer(Box::new(Linear::with_bias(3, 4)));
-    /// net.add_layer(Box::new(Linear::with_bias(4, 5)));
+    /// net.add_layer(Box::new(Linear::new(3, 4)))
+    ///    .add_layer(Box::new(Linear::new(4, 5)));
     /// ```
     pub fn add_layer<'a>(&'a mut self, layer: Box<NetLayer>) -> &'a mut NeuralNet<T, A> {
         self.base.add_layer(layer);
@@ -242,14 +246,14 @@ impl<T: Criterion> BaseNeuralNet<T> {
             weights: Vec::new(),
             criterion: criterion
         }
-    }
+    } 
 
     /// Create a multilayer perceptron with the specified layer sizes.
     fn mlp<'a, U>(layer_sizes: &[usize], criterion: T, activ_fn: U) -> BaseNeuralNet<T> 
         where U: ActivationFunc + 'static {
         let mut mlp = BaseNeuralNet::new(criterion);
         for shape in layer_sizes.windows(2) {
-            mlp.add_layer(Box::new(net_layer::Linear::with_bias(shape[0], shape[1])));
+            mlp.add_layer(Box::new(net_layer::Linear::new(shape[0], shape[1])));
             mlp.add_layer(Box::new(activ_fn.clone()));
         }
         mlp

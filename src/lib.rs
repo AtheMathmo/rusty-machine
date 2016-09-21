@@ -201,7 +201,6 @@ pub mod learning {
         pub mod cost_fn;
         pub mod rand_utils;
         pub mod regularization;
-        pub mod net_layer;
     }
 }
 

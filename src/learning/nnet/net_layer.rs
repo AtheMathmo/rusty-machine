@@ -50,7 +50,7 @@ pub struct Linear {
 
 impl Linear {
 	/// Construct a new Linear layer
-	pub fn with_bias(input_size: usize, output_size: usize) -> Linear {
+	pub fn new(input_size: usize, output_size: usize) -> Linear {
 		Linear {
 			input_size: input_size + 1, 
 			output_size: output_size,

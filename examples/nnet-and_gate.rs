@@ -42,6 +42,8 @@ fn main() {
 
     let layers = &[2, 1];
     let criterion = BCECriterion::new(Regularization::L2(0.));
+    // Create a multilayer perceptron with an input layer of size 2 and output layer of size 1
+    // Uses a Sigmoid activation function and uses Stochastic gradient descent for training
     let mut model = NeuralNet::mlp(layers, criterion, StochasticGD::default(), Sigmoid);
 
     println!("Training...");
