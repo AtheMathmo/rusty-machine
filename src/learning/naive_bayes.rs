@@ -281,7 +281,10 @@ impl Distribution for Gaussian {
         Ok(())
     }
 
-    fn joint_log_lik(&self, data: &Matrix<f64>, class_prior: &[f64]) -> LearningResult<Matrix<f64>> {
+    fn joint_log_lik(&self,
+                     data: &Matrix<f64>,
+                     class_prior: &[f64])
+                     -> LearningResult<Matrix<f64>> {
         let class_count = class_prior.len();
         let mut log_lik = Vec::with_capacity(class_count);
 
@@ -350,7 +353,10 @@ impl Distribution for Bernoulli {
 
     }
 
-    fn joint_log_lik(&self, data: &Matrix<f64>, class_prior: &[f64]) -> LearningResult<Matrix<f64>> {
+    fn joint_log_lik(&self,
+                     data: &Matrix<f64>,
+                     class_prior: &[f64])
+                     -> LearningResult<Matrix<f64>> {
         let class_count = class_prior.len();
 
         let neg_prob = self.log_probs.clone().apply(&|x| (1f64 - x.exp()).ln());
@@ -418,7 +424,10 @@ impl Distribution for Multinomial {
         Ok(())
     }
 
-    fn joint_log_lik(&self, data: &Matrix<f64>, class_prior: &[f64]) -> LearningResult<Matrix<f64>> {
+    fn joint_log_lik(&self,
+                     data: &Matrix<f64>,
+                     class_prior: &[f64])
+                     -> LearningResult<Matrix<f64>> {
         let class_count = class_prior.len();
 
         let res = data * self.log_probs.transpose();
