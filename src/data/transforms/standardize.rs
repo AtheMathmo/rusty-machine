@@ -93,7 +93,9 @@ impl<T: Float + FromPrimitive> Transformer<Matrix<T>> for Standardizer<T> {
                            "Cannot standardize data with only one row."))
         } else {
             let mean = inputs.mean(Axes::Row);
-            let variance = inputs.variance(Axes::Row).unwrap();
+            let variance = try!(inputs.variance(Axes::Row).map_err(|_| {
+                Error::new(ErrorKind::InvalidData, "Cannot compute variance of data.")
+            }));
 
             if mean.data().iter().any(|x| !x.is_finite()) {
                 return Err(Error::new(ErrorKind::InvalidData, "Some data point is non-finite."));

@@ -139,7 +139,7 @@ impl<T: Distribution> NaiveBayes<T> {
 
         if let (&Some(ref distr), &Some(ref prior)) = (&self.distr, &self.class_prior) {
             // Get the joint log likelihood from the distribution
-            Ok(distr.joint_log_lik(inputs, prior))
+            distr.joint_log_lik(inputs, prior)
         } else {
             Err(Error::new_untrained())
         }
@@ -170,7 +170,7 @@ impl<T: Distribution> NaiveBayes<T> {
                     continue;
                 }
                 // Update the parameters within this class
-                distr.update_params(&inputs.select_rows(&c), idx);
+                try!(distr.update_params(&inputs.select_rows(&c), idx));
             }
         }
 
@@ -215,12 +215,15 @@ pub trait Distribution {
     fn from_model_params(class_count: usize, features: usize) -> Self;
 
     /// Updates the distribution parameters.
-    fn update_params(&mut self, data: &Matrix<f64>, class: usize);
+    fn update_params(&mut self, data: &Matrix<f64>, class: usize) -> LearningResult<()>;
 
     /// Compute the joint log likelihood of the data.
     ///
     /// Returns a matrix with rows containing the probability that the input lies in each class.
-    fn joint_log_lik(&self, data: &Matrix<f64>, class_prior: &[f64]) -> Matrix<f64>;
+    fn joint_log_lik(&self,
+                     data: &Matrix<f64>,
+                     class_prior: &[f64])
+                     -> LearningResult<Matrix<f64>>;
 }
 
 /// The Gaussian Naive Bayes model distribution.
@@ -259,11 +262,13 @@ impl Distribution for Gaussian {
         }
     }
 
-    fn update_params(&mut self, data: &Matrix<f64>, class: usize) {
+    fn update_params(&mut self, data: &Matrix<f64>, class: usize) -> LearningResult<()> {
         // Compute mean and sample variance
         let mean = data.mean(Axes::Row).into_vec();
-        let var = data.variance(Axes::Row)
-            .unwrap()
+        let var = try!(data.variance(Axes::Row).map_err(|_| {
+                Error::new(ErrorKind::InvalidData,
+                           "Cannot compute variance for Gaussian distribution.")
+            }))
             .into_vec();
 
         let features = data.cols();
@@ -272,9 +277,11 @@ impl Distribution for Gaussian {
             self.theta.mut_data()[class * features + idx] = m;
             self.sigma.mut_data()[class * features + idx] = v;
         }
+
+        Ok(())
     }
 
-    fn joint_log_lik(&self, data: &Matrix<f64>, class_prior: &[f64]) -> Matrix<f64> {
+    fn joint_log_lik(&self, data: &Matrix<f64>, class_prior: &[f64]) -> LearningResult<Matrix<f64>> {
         let class_count = class_prior.len();
         let mut log_lik = Vec::with_capacity(class_count);
 
@@ -293,7 +300,7 @@ impl Distribution for Gaussian {
             log_lik.append(&mut (res + joint_i).into_vec());
         }
 
-        Matrix::new(class_count, data.rows(), log_lik).transpose()
+        Ok(Matrix::new(class_count, data.rows(), log_lik).transpose())
     }
 }
 
@@ -326,7 +333,7 @@ impl Distribution for Bernoulli {
         }
     }
 
-    fn update_params(&mut self, data: &Matrix<f64>, class: usize) {
+    fn update_params(&mut self, data: &Matrix<f64>, class: usize) -> LearningResult<()> {
         let features = data.cols();
 
         // We add the pseudo count to the class count and feature count
@@ -339,9 +346,11 @@ impl Distribution for Bernoulli {
             self.log_probs[[class, i]] = *item;
         }
 
+        Ok(())
+
     }
 
-    fn joint_log_lik(&self, data: &Matrix<f64>, class_prior: &[f64]) -> Matrix<f64> {
+    fn joint_log_lik(&self, data: &Matrix<f64>, class_prior: &[f64]) -> LearningResult<Matrix<f64>> {
         let class_count = class_prior.len();
 
         let neg_prob = self.log_probs.clone().apply(&|x| (1f64 - x.exp()).ln());
@@ -362,7 +371,7 @@ impl Distribution for Bernoulli {
 
         let class_row_mat = Matrix::new(1, class_count, per_class_row);
 
-        res + class_row_mat.select_rows(&vec![0; data.rows()])
+        Ok(res + class_row_mat.select_rows(&vec![0; data.rows()]))
     }
 }
 
@@ -394,7 +403,7 @@ impl Distribution for Multinomial {
         }
     }
 
-    fn update_params(&mut self, data: &Matrix<f64>, class: usize) {
+    fn update_params(&mut self, data: &Matrix<f64>, class: usize) -> LearningResult<()> {
         let features = data.cols();
 
         let pseudo_fc = data.sum_rows() + self.pseudo_count;
@@ -406,9 +415,10 @@ impl Distribution for Multinomial {
             self.log_probs[[class, i]] = *item;
         }
 
+        Ok(())
     }
 
-    fn joint_log_lik(&self, data: &Matrix<f64>, class_prior: &[f64]) -> Matrix<f64> {
+    fn joint_log_lik(&self, data: &Matrix<f64>, class_prior: &[f64]) -> LearningResult<Matrix<f64>> {
         let class_count = class_prior.len();
 
         let res = data * self.log_probs.transpose();
@@ -420,7 +430,7 @@ impl Distribution for Multinomial {
 
         let class_row_mat = Matrix::new(1, class_count, per_class_row);
 
-        res + class_row_mat.select_rows(&vec![0; data.rows()])
+        Ok(res + class_row_mat.select_rows(&vec![0; data.rows()]))
     }
 }
 
