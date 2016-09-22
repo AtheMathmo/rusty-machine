@@ -348,13 +348,12 @@ impl<T: Criterion> BaseNeuralNet<T> {
             gradients.set_len(weights.len());
         }
         //activations[0] is input and activations[i+1] is output of layer[i]
-        let mut activations = Vec::with_capacity(self.layers.len()+1);
+        let mut activations = Vec::with_capacity(self.layers.len());
 
         // Forward propagation
         
         let mut index = 0;
-        activations.push(inputs.clone());
-        for layer in &self.layers {
+        for (i, layer) in self.layers.iter().enumerate() {
             let shape = layer.param_shape();
 
             let slice = unsafe {
@@ -364,7 +363,12 @@ impl<T: Criterion> BaseNeuralNet<T> {
                                             shape.1)
             };
 
-            let output = layer.forward(activations.last().unwrap(), slice);
+            let output = if i == 0 {
+            	layer.forward(inputs, slice)
+            } else {
+            	layer.forward(activations.last().unwrap(), slice)
+            };
+
             activations.push(output);
             index += layer.num_params();
         }
@@ -373,7 +377,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
         // Backward propagation
 
         //The gradient with respect to the current layer's output
-        let mut out_grad = self.criterion.cost_grad(output, targets);
+        let mut out_grad = self.criterion.cost_grad(&output, targets);
         // at this point index == weights.len()
         for (i, layer) in self.layers.iter().enumerate().rev() {
             index -= layer.num_params();
@@ -386,13 +390,15 @@ impl<T: Criterion> BaseNeuralNet<T> {
                                             shape.1)
             };
 
-            let grad_params = layer.back_params(&out_grad, &activations[i], slice);
-            out_grad = layer.back_input(&out_grad, &activations[i], slice);
+
+            let activation = if i == 0 {inputs} else {&activations[i-1]};
+            let grad_params = layer.back_params(&out_grad, activation, slice);
+            out_grad = layer.back_input(&out_grad, activation, slice);
 
             gradients[index..index+layer.num_params()].copy_from_slice(&grad_params.data());
         }
 
-        let cost = self.criterion.cost(output, targets);
+        let cost = self.criterion.cost(&output, targets);
         (cost, gradients)
     }
 
