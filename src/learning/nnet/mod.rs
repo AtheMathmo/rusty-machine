@@ -188,6 +188,7 @@ impl<T, A> NeuralNet<T, A>
     /// let mut net = NeuralNet::new(BCECriterion::default(), StochasticGD::default());
     ///
     /// // Give net an input layer of size 3, hidden layer of size 4, and output layer of size 5
+    /// // This net will not apply any activation function to the Linear layer outputs
     /// net.add(Box::new(Linear::new(3, 4)))
     ///    .add(Box::new(Linear::new(4, 5)));
     /// ```
@@ -197,7 +198,28 @@ impl<T, A> NeuralNet<T, A>
     }
 
     /// Adds multiple layers to the end of the network
-    fn add_layers<'a, U>(&'a mut self, layers: U) -> &'a mut NeuralNet<T, A>
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::linalg::BaseMatrix;
+    /// use rusty_machine::learning::nnet::BCECriterion;
+    /// use rusty_machine::learning::nnet::NeuralNet;
+    /// use rusty_machine::learning::nnet::net_layer::{NetLayer, Linear};
+    /// use rusty_machine::learning::toolkit::activ_fn::Sigmoid;
+    /// use rusty_machine::learning::optim::grad_desc::StochasticGD;
+    ///
+    /// use std::clone::Clone;
+    ///
+    /// // Create a new neural net 
+    /// let mut net = NeuralNet::new(BCECriterion::default(), StochasticGD::default());
+    ///
+    /// let linear_sig: Vec<Box<NetLayer>> = vec![Box::new(Linear::new(5, 5)), Box::new(Sigmoid)];
+    ///
+    /// // Give net a layer of size 5, followed by a Sigmoid activation function
+    /// net.add_layers(linear_sig);
+    /// ```
+    pub fn add_layers<'a, U>(&'a mut self, layers: U) -> &'a mut NeuralNet<T, A>
     	where U: IntoIterator<Item = Box<NetLayer>> {
     		self.base.add_layers(layers);
     		self
