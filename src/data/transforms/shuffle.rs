@@ -43,16 +43,19 @@ impl<R: Rng> Shuffler<R> {
     ///
     /// ```
     /// // This doesn't work!
-    /// extern crate rand;
+    /// # extern crate rand;
+    /// # extern crate rusty_machine;
     ///
     /// use rusty_machine::data::transforms::Transformer;
     /// use rusty_machine::data::transforms::shuffle::Shuffler;
     /// use rand::{IsaacRng, SeedableRng};
     ///
+    /// # fn main() {
     /// // We can create a seeded rng
     /// let rng = IsaacRng::from_seed(&[1, 2, 3]);
     ///
     /// let shuffler = Shuffler::new(rng);
+    /// # }
     /// ```
     pub fn new(rng: R) -> Self {
         Shuffler { rng: rng }
