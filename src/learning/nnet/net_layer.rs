@@ -125,11 +125,14 @@ impl NetLayer for Linear {
 impl<T: ActivationFunc + Debug> NetLayer for T {
 	/// Applys the activation function to each element of the input
 	fn forward(&self, input: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
-		input.clone().apply(&T::func)
+	    Matrix::new(input.rows(), input.cols(),
+	        input.iter().map(|&x| T::func(x)).collect::<Vec<_>>())
 	}
 
 	fn back_input(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
-		out_grad.elemul(&input.clone().apply(&T::func_grad))
+		let in_grad = Matrix::new(input.rows(), input.cols(),
+	        			input.iter().map(|&x| T::func_grad(x)).collect::<Vec<_>>());
+		out_grad.elemul(&in_grad)
 	}
 	
 	fn back_params(&self, _: &Matrix<f64>, _: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {

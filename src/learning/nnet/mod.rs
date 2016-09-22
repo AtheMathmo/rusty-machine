@@ -61,6 +61,7 @@ use rand::thread_rng;
 use rand::distributions::{Sample, range};
 
 use std::fmt::Debug;
+use std::iter::IntoIterator;
 
 use self::net_layer::NetLayer;
 
@@ -187,12 +188,19 @@ impl<T, A> NeuralNet<T, A>
     /// let mut net = NeuralNet::new(BCECriterion::default(), StochasticGD::default());
     ///
     /// // Give net an input layer of size 3, hidden layer of size 4, and output layer of size 5
-    /// net.add_layer(Box::new(Linear::new(3, 4)))
-    ///    .add_layer(Box::new(Linear::new(4, 5)));
+    /// net.add(Box::new(Linear::new(3, 4)))
+    ///    .add(Box::new(Linear::new(4, 5)));
     /// ```
-    pub fn add_layer<'a>(&'a mut self, layer: Box<NetLayer>) -> &'a mut NeuralNet<T, A> {
-        self.base.add_layer(layer);
+    pub fn add<'a>(&'a mut self, layer: Box<NetLayer>) -> &'a mut NeuralNet<T, A> {
+        self.base.add(layer);
         self
+    }
+
+    /// Adds multiple layers to the end of the network
+    fn add_layers<'a, U>(&'a mut self, layers: U) -> &'a mut NeuralNet<T, A>
+    	where U: IntoIterator<Item = Box<NetLayer>> {
+    		self.base.add_layers(layers);
+    		self
     }
 
     /// Gets matrix of weights between specified layer and forward layer.
@@ -253,17 +261,26 @@ impl<T: Criterion> BaseNeuralNet<T> {
         where U: ActivationFunc + 'static {
         let mut mlp = BaseNeuralNet::new(criterion);
         for shape in layer_sizes.windows(2) {
-            mlp.add_layer(Box::new(net_layer::Linear::new(shape[0], shape[1])));
-            mlp.add_layer(Box::new(activ_fn.clone()));
+            mlp.add(Box::new(net_layer::Linear::new(shape[0], shape[1])));
+            mlp.add(Box::new(activ_fn.clone()));
         }
         mlp
     }
 
     /// Adds the specified layer to the end of the network
-    fn add_layer<'a>(&'a mut self, layer: Box<NetLayer>) -> &'a mut BaseNeuralNet<T> {
+    fn add<'a>(&'a mut self, layer: Box<NetLayer>) -> &'a mut BaseNeuralNet<T> {
         self.weights.append(&mut layer.default_params());
         self.layers.push(layer);
         self
+    }
+
+    /// Adds multiple layers to the end of the network
+    fn add_layers<'a, U>(&'a mut self, layers: U) -> &'a mut BaseNeuralNet<T>
+    	where U: IntoIterator<Item = Box<NetLayer>> {
+    		for layer in layers {
+    			self.add(layer);
+    		}
+    		self
     }
 
     /// Creates initial weights for all neurons in the network.
