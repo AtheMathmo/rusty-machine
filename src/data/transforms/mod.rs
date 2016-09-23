@@ -1,6 +1,6 @@
 //! The Transforms module
 //!
-//! This module contains the `Transformer` trait and reexports
+//! This module contains the `Transformer` and `Invertible` traits and reexports
 //! the transformers from child modules.
 //!
 //! The `Transformer` trait provides a shared interface for all of the
@@ -16,6 +16,7 @@ pub mod shuffle;
 use learning::error;
 
 pub use self::minmax::MinMaxScaler;
+pub use self::shuffle::Shuffler;
 pub use self::standardize::Standardizer;
 
 /// Trait for data transformers
