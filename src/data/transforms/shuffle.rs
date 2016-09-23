@@ -1,8 +1,8 @@
 //! The Shuffler
 //!
-//! This module contains the unit `Shuffler` struct. This struct implements the
+//! This module contains the `Shuffler` transformer. `Shuffler` implements the
 //! `Transformer` trait and is used to shuffle the rows of an input matrix.
-//! You can also control the random number generator.
+//! You can control the random number generator used by the `Shuffler`.
 //!
 //! # Examples
 //!
@@ -42,17 +42,16 @@ impl<R: Rng> Shuffler<R> {
     /// # Examples
     ///
     /// ```
-    /// // This doesn't work!
     /// # extern crate rand;
     /// # extern crate rusty_machine;
     ///
     /// use rusty_machine::data::transforms::Transformer;
     /// use rusty_machine::data::transforms::shuffle::Shuffler;
-    /// use rand::{IsaacRng, SeedableRng};
+    /// use rand::{StdRng, SeedableRng};
     ///
     /// # fn main() {
     /// // We can create a seeded rng
-    /// let rng = IsaacRng::from_seed(&[1, 2, 3]);
+    /// let rng = StdRng::from_seed(&[1, 2, 3]);
     ///
     /// let shuffler = Shuffler::new(rng);
     /// # }
@@ -94,18 +93,18 @@ mod tests {
     use super::super::Transformer;
     use super::Shuffler;
 
-    use rand::{IsaacRng, SeedableRng};
+    use rand::{StdRng, SeedableRng};
 
     #[test]
     fn seeded_shuffle() {
-        let rng = IsaacRng::from_seed(&[1, 2, 3]);
+        let rng = StdRng::from_seed(&[1, 2, 3]);
         let mut shuffler = Shuffler::new(rng);
 
         let mat = Matrix::new(4, 2, vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]);
         let shuffled = shuffler.transform(mat).unwrap();
 
         assert_eq!(shuffled.into_vec(),
-                   vec![7.0, 8.0, 5.0, 6.0, 3.0, 4.0, 1.0, 2.0]);
+                   vec![3.0, 4.0, 1.0, 2.0, 7.0, 8.0, 5.0, 6.0]);
     }
 
     #[test]
