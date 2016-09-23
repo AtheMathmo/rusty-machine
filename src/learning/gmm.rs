@@ -70,17 +70,25 @@ pub struct GaussianMixtureModel {
 impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
     /// Train the model using inputs.
     fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
+        use rulinalg::matrix::Axes;
+
         // Initialization:
         let k = self.comp_count;
 
-        // TODO: Compute sample covariance of the data.
-        // https://en.wikipedia.org/wiki/Sample_mean_and_covariance#Sample_covariance
-        let mut cov_vec = Vec::with_capacity(k);
-        for _ in 0..k {
-            cov_vec.push(Matrix::identity(inputs.cols()));
+        let means = inputs.mean(Axes::Col);
+
+        let mut cov_mat = Matrix::zeros(inputs.cols(), inputs.cols());
+        let reg_value = 1f64 / (inputs.rows() - 1) as f64;
+
+        for j in 0..inputs.cols() {
+            for k in 0..inputs.cols() {
+                cov_mat[[j, k]] = (0..inputs.rows()).map(|i| {
+                    (inputs[[i, j]] - means[j]) * (inputs[[i, k]] - means[k])
+                }).sum::<f64>() * reg_value;
+            }
         }
 
-        self.model_covars = Some(cov_vec);
+        self.model_covars = Some(vec![cov_mat; k]);
 
         let random_rows: Vec<usize> =
             rand_utils::reservoir_sample(&(0..inputs.rows()).collect::<Vec<usize>>(), k);
