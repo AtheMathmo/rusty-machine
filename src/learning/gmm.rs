@@ -82,13 +82,15 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
             return Err(Error::new(ErrorKind::InvalidData, "Only one row of data provided."));
         };
 
-        for j in 0..inputs.cols() {
-            for k in 0..inputs.cols() {
-                cov_mat[[j, k]] = (0..inputs.rows()).map(|i| {
+        for (j, row) in cov_mat.iter_rows_mut().enumerate() {
+            for (k, elem) in row.iter_mut().enumerate() {
+                *elem = (0..inputs.rows()).map(|i| {
                     (inputs[[i, j]] - means[j]) * (inputs[[i, k]] - means[k])
-                }).sum::<f64>() * reg_value;
+                }).sum::<f64>();
             }
         }
+
+        cov_mat *= reg_value;
 
         self.model_covars = Some(vec![cov_mat; k]);
 
