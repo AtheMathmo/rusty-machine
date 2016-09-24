@@ -70,15 +70,17 @@ pub struct GaussianMixtureModel {
 impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
     /// Train the model using inputs.
     fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
-        use rulinalg::matrix::Axes;
-
         // Initialization:
         let k = self.comp_count;
 
         let means = inputs.mean(Axes::Col);
 
         let mut cov_mat = Matrix::zeros(inputs.cols(), inputs.cols());
-        let reg_value = 1f64 / (inputs.rows() - 1) as f64;
+        let reg_value = if inputs.rows() > 1 {
+            1f64 / (inputs.rows() - 1) as f64
+        } else {
+            return Err(Error::new(ErrorKind::InvalidData, "Only one row of data provided."));
+        };
 
         for j in 0..inputs.cols() {
             for k in 0..inputs.cols() {
