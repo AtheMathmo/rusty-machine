@@ -5,6 +5,7 @@ use std::vec::Vec;
 
 use rusty_machine::learning::nnet::{NeuralNet, BCECriterion};
 use rusty_machine::learning::toolkit::regularization::Regularization;
+use rusty_machine::learning::toolkit::activ_fn::Sigmoid;
 use rusty_machine::learning::optim::grad_desc::StochasticGD;
 
 use rusty_machine::linalg::Matrix;
@@ -51,8 +52,8 @@ fn nnet_and_gate_train(b: &mut Bencher) {
     let criterion = BCECriterion::new(Regularization::L2(0.));
 
     b.iter(|| {
-        let mut model = black_box(NeuralNet::new(layers, criterion, StochasticGD::default()));
-        model.train(&inputs, &targets);
+        let mut model = black_box(NeuralNet::mlp(layers, criterion, StochasticGD::default(), Sigmoid));
+        let _ = model.train(&inputs, &targets);
     })
 }
 
@@ -62,10 +63,10 @@ fn nnet_and_gate_predict(b: &mut Bencher) {
     let layers = &[2, 1];
     let criterion = BCECriterion::new(Regularization::L2(0.));
 
-    let mut model = NeuralNet::new(layers, criterion, StochasticGD::default());
-    model.train(&inputs, &targets);
+    let mut model = NeuralNet::mlp(layers, criterion, StochasticGD::default(), Sigmoid);
+    let _ = model.train(&inputs, &targets);
 
     b.iter(|| {
-        model.predict(&test_inputs);
+        let _ = model.predict(&test_inputs);
     })
 }

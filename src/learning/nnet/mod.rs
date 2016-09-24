@@ -45,10 +45,9 @@
 
 pub mod net_layer;
 
-use linalg::{Matrix, MatrixSlice, BaseMatrix, BaseMatrixMut};
+use linalg::{Matrix, MatrixSlice, BaseMatrixMut};
 
 use learning::{LearningResult, SupModel};
-use learning::error::{Error, ErrorKind};
 use learning::toolkit::activ_fn;
 use learning::toolkit::activ_fn::ActivationFunc;
 use learning::toolkit::cost_fn;
@@ -56,9 +55,6 @@ use learning::toolkit::cost_fn::CostFunc;
 use learning::toolkit::regularization::Regularization;
 use learning::optim::{Optimizable, OptimAlgorithm};
 use learning::optim::grad_desc::StochasticGD;
-
-use rand::thread_rng;
-use rand::distributions::{Sample, range};
 
 use std::fmt::Debug;
 use std::iter::IntoIterator;
@@ -305,22 +301,6 @@ impl<T: Criterion> BaseNeuralNet<T> {
     		self
     }
 
-    /// Creates initial weights for all neurons in the network.
-    fn create_weights(layer_sizes: &[usize]) -> Vec<f64> {
-        let mut between = range::Range::new(0f64, 1f64);
-        let mut rng = thread_rng();
-        layer_sizes.windows(2)
-            .flat_map(|w| {
-                let l_in = w[0] + 1;
-                let l_out = w[1];
-                let eps_init = (6f64 / (l_in + l_out) as f64).sqrt();
-                (0..l_in * l_out)
-                    .map(|_i| (between.sample(&mut rng) * 2f64 * eps_init) - eps_init)
-                    .collect::<Vec<_>>()
-            })
-            .collect()
-    }
-
     /// Gets matrix of weights for the specified layer for the weights.
     fn get_layer_weights(&self, weights: &[f64], idx: usize) -> MatrixSlice<f64> {
         debug_assert!(idx < self.layers.len());
@@ -345,18 +325,6 @@ impl<T: Criterion> BaseNeuralNet<T> {
                                         shape.1,
                                         shape.1)
         }
-    }
-
-    /// Gets matrix of weights between specified layer and forward layer
-    /// for the base model.
-    fn get_net_weights(&self, idx: usize) -> MatrixSlice<f64> {
-        self.get_layer_weights(&self.weights[..], idx)
-    }
-
-    /// Gets the weights for a layer excluding the bias weights.
-    fn get_non_bias_weights(&self, weights: &[f64], idx: usize) -> MatrixSlice<f64> {
-        let layer_weights = self.get_layer_weights(weights, idx);
-        layer_weights.reslice([1, 0], layer_weights.rows() - 1, layer_weights.cols())
     }
 
     /// Compute the gradient using the back propagation algorithm.
@@ -426,31 +394,30 @@ impl<T: Criterion> BaseNeuralNet<T> {
 
     /// Forward propagation of the model weights to get the outputs.
     fn forward_prop(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
-        let mut index = 0;
         if self.layers.len() == 0 {
             return Ok(inputs.clone());
         }
 
+        let mut ptr = self.weights.as_ptr();
         let mut outputs = unsafe {
             let shape = self.layers[0].param_shape();
-            let slice = MatrixSlice::from_raw_parts(self.weights.as_ptr(),
+            let slice = MatrixSlice::from_raw_parts(ptr,
                                                     shape.0,
                                                     shape.1,
                                                     shape.1);
+            ptr = ptr.offset(self.layers[0].num_params() as isize);
             self.layers[0].forward(inputs, slice)
         };
         for layer in self.layers.iter().skip(1) {
             let shape = layer.param_shape();
-
-            let slice = unsafe {
-                MatrixSlice::from_raw_parts(self.weights.as_ptr().offset(index as isize),
-                                            shape.0,
-                                            shape.1,
-                                            shape.1)
-            };
-
-            outputs = layer.forward(&outputs, slice);
-            index += layer.num_params();
+            unsafe {
+                let slice = MatrixSlice::from_raw_parts(ptr,
+                                                        shape.0,
+                                                        shape.1,
+                                                        shape.1);
+                outputs = layer.forward(&outputs, slice);
+                ptr = ptr.offset(layer.num_params() as isize);
+            }
         }
         Ok(outputs)
     }

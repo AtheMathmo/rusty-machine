@@ -49,7 +49,7 @@ fn k_means_train(b: &mut Bencher) {
 
     b.iter(|| {
         let mut model = black_box(KMeansClassifier::new(2));
-        model.train(&samples);
+        let _ = model.train(&samples);
     });
 }
 
@@ -64,7 +64,7 @@ fn k_means_predict(b: &mut Bencher) {
     let samples = generate_data(&centroids, SAMPLES_PER_CENTROID, 0.4);
 
     let mut model = KMeansClassifier::new(2);
-    model.train(&samples);
+    let _ = model.train(&samples);
     b.iter(|| {
         let _ = black_box(model.centroids().as_ref().unwrap());
         let _ = black_box(model.predict(&samples));

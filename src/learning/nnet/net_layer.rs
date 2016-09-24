@@ -24,11 +24,14 @@ pub trait NetLayer : Debug {
 	/// The default value of the parameters of this layer before training
 	fn default_params(&self) -> Vec<f64>;
 
-	/// The number of parameters used by this layer
-	fn num_params(&self) -> usize;
-
 	/// The shape of the parameters used by this layer
 	fn param_shape(&self) -> (usize, usize);
+
+	/// The number of parameters used by this layer
+	fn num_params(&self) -> usize {
+		let shape = self.param_shape();
+		shape.0 * shape.1
+	}
 }
 
 /// Linear network layer
@@ -84,19 +87,23 @@ impl NetLayer for Linear {
 
 	fn back_input(&self, out_grad: &Matrix<f64>, _: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64> {
 		assert_eq!(out_grad.cols(), params.cols());
-		let gradient = out_grad * &params.into_matrix().transpose();
+		//let gradient = out_grad * &params.into_matrix().transpose();
 		if self.has_bias {
-			let columns: Vec<_> = (0..gradient.cols()-1).collect();
-			gradient.select_cols(&columns)
+			//let columns: Vec<_> = (0..gradient.cols()-1).collect();
+			//gradient.select_cols(&columns)
+			let rows: Vec<_> = (0..params.cols()-1).collect();
+			out_grad * &params.into_matrix().select_rows(&rows).transpose()
 		} else {
-			gradient
+			//gradient
+			out_grad * &params.into_matrix().transpose()
 		}
 	}
 	
 	fn back_params(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
 		assert_eq!(input.rows(), out_grad.rows());
 		if self.has_bias {
-			input.transpose().vcat(&Matrix::<f64>::ones(1, input.rows())) * out_grad
+			//input.transpose().vcat(&Matrix::<f64>::ones(1, input.rows())) * out_grad
+			input.hcat(&Matrix::<f64>::ones(input.rows(), 1)).transpose() * out_grad
 		} else {
 			input.transpose() * out_grad
 		}
@@ -113,10 +120,6 @@ impl NetLayer for Linear {
 											 .collect()
 	}
 
-	fn num_params(&self) -> usize {
-		self.input_size * self.output_size
-	}
-
 	fn param_shape(&self) -> (usize, usize) {
 		(self.input_size, self.output_size)
 	}
@@ -125,8 +128,9 @@ impl NetLayer for Linear {
 impl<T: ActivationFunc + Debug> NetLayer for T {
 	/// Applys the activation function to each element of the input
 	fn forward(&self, input: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
-	    Matrix::new(input.rows(), input.cols(),
-	        input.iter().map(|&x| T::func(x)).collect::<Vec<_>>())
+		//Matrix::new(input.rows(), input.cols(),
+		//	input.iter().map(|&x| T::func(x)).collect::<Vec<_>>());
+		input.clone().apply(&T::func)
 	}
 
 	fn back_input(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
@@ -141,10 +145,6 @@ impl<T: ActivationFunc + Debug> NetLayer for T {
 
 	fn default_params(&self) -> Vec<f64> {
 		Vec::new()
-	}
-
-	fn num_params(&self) -> usize {
-		0
 	}
 
 	fn param_shape(&self) -> (usize, usize) {
