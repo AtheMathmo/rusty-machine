@@ -9,6 +9,7 @@ This directory gathers fully-fledged programs, each using a piece of
 * [K-Means](#k-means)
 * [SVM](#svm)
 * [Neural Networks](#neural-networks)
+* [Naïve Bayes](#naïve-bayes)
 
 ## The Examples
 
@@ -122,4 +123,28 @@ Got  Expected
 0.01  0
 Hits: 4, Misses: 0
 Accuracy: 100%
+```
+
+### Naïve Bayes
+
+#### Dog Classification
+
+Suppose we have a population composed of red dogs and white dogs, whose friendliness, furriness, and speed can be measured. The group of white dogs is friendlier, furrier, and slower than red dogs by one standard deviation (respectively), but given the color of a dog, friendliness, furriness, and speed are independent of each other. We can use a naïve Bayes model to try to predict dog color given friendliness, furriness, and speed as observations.
+
+Sample run:
+
+```
+$ cargo run --example naive_bayes_dogs
+Predicted: White; Actual: White; Accurate? true
+Predicted: White; Actual: White; Accurate? true
+Predicted: White; Actual: White; Accurate? true
+Predicted: White; Actual: White; Accurate? true
+Predicted: White; Actual: Red; Accurate? false
+Predicted: Red; Actual: Red; Accurate? true
+[redacted for brevity ...]
+Predicted: Red; Actual: Red; Accurate? true
+Predicted: White; Actual: White; Accurate? true
+Predicted: Red; Actual: Red; Accurate? true
+Predicted: Red; Actual: White; Accurate? false
+Accuracy: 815/1000 = 81.5%
 ```
