@@ -82,7 +82,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
         let cov_mat = match self.cov_option {
             CovOption::Diagonal => {
                 let variance = try!(inputs.variance(Axes::Row));
-                Matrix::from_diag(&variance.data()) * reg_value
+                Matrix::from_diag(&variance.data()) * reg_value.sqrt()
             }
 
             CovOption::Full | CovOption::Regularized(_) => {
@@ -95,7 +95,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
                         }).sum::<f64>();
                     }
                 }
-                cov_mat *= reg_value.powi(2);
+                cov_mat *= reg_value;
 
                 if let CovOption::Regularized(eps) = self.cov_option {
                     cov_mat += eps;
