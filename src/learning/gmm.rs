@@ -90,8 +90,8 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
                 let mut cov_mat = Matrix::zeros(inputs.cols(), inputs.cols());
                 for (j, row) in cov_mat.iter_rows_mut().enumerate() {
                     for (k, elem) in row.iter_mut().enumerate() {
-                        *elem = (0..inputs.rows()).map(|i| {
-                            (inputs[[i, j]] - means[j]) * (inputs[[i, k]] - means[k])
+                        *elem = inputs.iter_rows().map(|r| {
+                            (r[j] - means[j]) * (r[k] - means[k])
                         }).sum::<f64>();
                     }
                 }
