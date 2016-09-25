@@ -91,7 +91,7 @@ impl NetLayer for Linear {
 		if self.has_bias {
 			//let columns: Vec<_> = (0..gradient.cols()-1).collect();
 			//gradient.select_cols(&columns)
-			let rows: Vec<_> = (0..params.cols()-1).collect();
+			let rows: Vec<_> = (0..params.rows()-1).collect();
 			out_grad * &params.into_matrix().select_rows(&rows).transpose()
 		} else {
 			//gradient
