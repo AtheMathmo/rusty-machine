@@ -79,17 +79,31 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
         // Initialization:
         let k = self.comp_count;
 
-        let means = inputs.mean(Axes::Col);
-        let mut cov_mat = Matrix::zeros(inputs.cols(), inputs.cols());
-        for (j, row) in cov_mat.iter_rows_mut().enumerate() {
-            for (k, elem) in row.iter_mut().enumerate() {
-                *elem = (0..inputs.rows()).map(|i| {
-                    (inputs[[i, j]] - means[j]) * (inputs[[i, k]] - means[k])
-                }).sum::<f64>();
+        let cov_mat = match self.cov_option {
+            CovOption::Diagonal => {
+                let variance = try!(inputs.variance(Axes::Col));
+                Matrix::from_diag(&variance.data()) * reg_value
             }
-        }
 
-        cov_mat *= reg_value;
+            CovOption::Full | CovOption::Regularized(_) => {
+                let means = inputs.mean(Axes::Col);
+                let mut cov_mat = Matrix::zeros(inputs.cols(), inputs.cols());
+                for (j, row) in cov_mat.iter_rows_mut().enumerate() {
+                    for (k, elem) in row.iter_mut().enumerate() {
+                        *elem = (0..inputs.rows()).map(|i| {
+                            (inputs[[i, j]] - means[j]) * (inputs[[i, k]] - means[k])
+                        }).sum::<f64>();
+                    }
+                }
+                cov_mat *= reg_value;
+
+                if let CovOption::Regularized(eps) = self.cov_option {
+                    cov_mat += eps;
+                }
+
+                cov_mat
+            }
+        };
 
         self.model_covars = Some(vec![cov_mat; k]);
 
