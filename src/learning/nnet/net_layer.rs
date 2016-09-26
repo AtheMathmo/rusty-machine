@@ -77,16 +77,16 @@ impl NetLayer for Linear {
 	/// where N is the number of samples and I is the dimensionality of the input
 	fn forward(&self, input: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64> {
 		if self.has_bias {
-			assert_eq!(input.cols()+1, params.rows());
+			debug_assert_eq!(input.cols()+1, params.rows());
 			input.hcat(&Matrix::<f64>::ones(input.rows(), 1)) * &params
 		} else {
-			assert_eq!(input.cols(), params.rows());
+			debug_assert_eq!(input.cols(), params.rows());
 			input * &params
 		}
 	}
 
 	fn back_input(&self, out_grad: &Matrix<f64>, _: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64> {
-		assert_eq!(out_grad.cols(), params.cols());
+		debug_assert_eq!(out_grad.cols(), params.cols());
 		//let gradient = out_grad * &params.into_matrix().transpose();
 		if self.has_bias {
 			//let columns: Vec<_> = (0..gradient.cols()-1).collect();

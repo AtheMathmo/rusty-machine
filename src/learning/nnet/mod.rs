@@ -46,6 +46,7 @@
 pub mod net_layer;
 
 use linalg::{Matrix, MatrixSlice, BaseMatrixMut};
+use rulinalg::utils;
 
 use learning::{LearningResult, SupModel};
 use learning::toolkit::activ_fn;
@@ -57,7 +58,6 @@ use learning::optim::{Optimizable, OptimAlgorithm};
 use learning::optim::grad_desc::StochasticGD;
 
 use std::fmt::Debug;
-use std::iter::IntoIterator;
 
 use self::net_layer::NetLayer;
 
@@ -337,8 +337,10 @@ impl<T: Criterion> BaseNeuralNet<T> {
         unsafe {
             gradients.set_len(weights.len());
         }
-        //activations[0] is input and activations[i+1] is output of layer[i]
+        // activations[i] is output of layer[i]
         let mut activations = Vec::with_capacity(self.layers.len());
+        // params[i] is the weights for layer[i]
+        let mut params = Vec::with_capacity(self.layers.len());
 
         // Forward propagation
         
@@ -360,35 +362,38 @@ impl<T: Criterion> BaseNeuralNet<T> {
             };
 
             activations.push(output);
+            params.push(slice);
             index += layer.num_params();
         }
         let output = activations.last().unwrap();
 
         // Backward propagation
 
-        //The gradient with respect to the current layer's output
+        // The gradient with respect to the current layer's output
         let mut out_grad = self.criterion.cost_grad(&output, targets);
         // at this point index == weights.len()
         for (i, layer) in self.layers.iter().enumerate().rev() {
-            index -= layer.num_params();
-            let shape = layer.param_shape();
-
-            let slice = unsafe {
-                MatrixSlice::from_raw_parts(weights.as_ptr().offset(index as isize),
-                                            shape.0,
-                                            shape.1,
-                                            shape.1)
-            };
-
-
             let activation = if i == 0 {inputs} else {&activations[i-1]};
-            let grad_params = layer.back_params(&out_grad, activation, slice);
-            out_grad = layer.back_input(&out_grad, activation, slice);
+            let mut grad_params = layer.back_params(&out_grad, activation, params[i]);
 
+            if self.criterion.is_regularized() {
+                utils::in_place_vec_bin_op(grad_params.mut_data(), self.criterion.reg_cost_grad(params[i]).data(), |x, &y| {
+                    *x = *x + y
+                });
+            }
+
+            out_grad = layer.back_input(&out_grad, activation, params[i]);
+
+            index -= layer.num_params();
             gradients[index..index+layer.num_params()].copy_from_slice(&grad_params.data());
         }
 
-        let cost = self.criterion.cost(&output, targets);
+        let mut cost = self.criterion.cost(&output, targets);
+        if self.criterion.is_regularized() {
+            for i in 0..self.layers.len() {
+                cost += self.criterion.reg_cost(params[i]);
+            }
+        }
         (cost, gradients)
     }
 
