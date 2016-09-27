@@ -31,7 +31,7 @@
 //! println!("{:?}", post_probs.data());
 //! ```
 
-use linalg::{Matrix, MatrixSlice, Vector, BaseMatrix, BaseMatrixMut};
+use linalg::{Matrix, MatrixSlice, Vector, BaseMatrix, BaseMatrixMut, Axes};
 use rulinalg::utils;
 
 use learning::{LearningResult, UnSupModel};
@@ -70,17 +70,42 @@ pub struct GaussianMixtureModel {
 impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
     /// Train the model using inputs.
     fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
+        let reg_value = if inputs.rows() > 1 {
+            1f64 / (inputs.rows() - 1) as f64
+        } else {
+            return Err(Error::new(ErrorKind::InvalidData, "Only one row of data provided."));
+        };
+
         // Initialization:
         let k = self.comp_count;
 
-        // TODO: Compute sample covariance of the data.
-        // https://en.wikipedia.org/wiki/Sample_mean_and_covariance#Sample_covariance
-        let mut cov_vec = Vec::with_capacity(k);
-        for _ in 0..k {
-            cov_vec.push(Matrix::identity(inputs.cols()));
-        }
+        let cov_mat = match self.cov_option {
+            CovOption::Diagonal => {
+                let variance = try!(inputs.variance(Axes::Row));
+                Matrix::from_diag(&variance.data()) * reg_value.sqrt()
+            }
 
-        self.model_covars = Some(cov_vec);
+            CovOption::Full | CovOption::Regularized(_) => {
+                let means = inputs.mean(Axes::Row);
+                let mut cov_mat = Matrix::zeros(inputs.cols(), inputs.cols());
+                for (j, row) in cov_mat.iter_rows_mut().enumerate() {
+                    for (k, elem) in row.iter_mut().enumerate() {
+                        *elem = inputs.iter_rows().map(|r| {
+                            (r[j] - means[j]) * (r[k] - means[k])
+                        }).sum::<f64>();
+                    }
+                }
+                cov_mat *= reg_value;
+
+                if let CovOption::Regularized(eps) = self.cov_option {
+                    cov_mat += Matrix::<f64>::identity(cov_mat.cols()) * eps;
+                }
+
+                cov_mat
+            }
+        };
+
+        self.model_covars = Some(vec![cov_mat; k]);
 
         let random_rows: Vec<usize> =
             rand_utils::reservoir_sample(&(0..inputs.rows()).collect::<Vec<usize>>(), k);
