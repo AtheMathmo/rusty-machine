@@ -53,7 +53,7 @@ fn nnet_and_gate_train(b: &mut Bencher) {
 
     b.iter(|| {
         let mut model = black_box(NeuralNet::mlp(layers, criterion, StochasticGD::default(), Sigmoid));
-        let _ = model.train(&inputs, &targets);
+        let _ = black_box(model.train(&inputs, &targets).unwrap());
     })
 }
 
@@ -67,6 +67,6 @@ fn nnet_and_gate_predict(b: &mut Bencher) {
     let _ = model.train(&inputs, &targets);
 
     b.iter(|| {
-        let _ = model.predict(&test_inputs);
+        let _ = black_box(model.predict(&test_inputs));
     })
 }

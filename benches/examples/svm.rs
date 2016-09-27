@@ -35,7 +35,7 @@ fn svm_sign_learner_train(b: &mut Bencher) {
     // Trainee
     b.iter(|| {
         let mut svm_mod = black_box(SVM::new(HyperTan::new(100., 0.), 0.3));
-        let _ = svm_mod.train(&inputs, &targets); 
+        let _ = black_box(svm_mod.train(&inputs, &targets).unwrap());
     });
 }
 
@@ -48,6 +48,6 @@ fn svm_sign_learner_predict(b: &mut Bencher) {
     let mut svm_mod = SVM::new(HyperTan::new(100., 0.), 0.3);
     let _ = svm_mod.train(&inputs, &targets);
     b.iter(|| {
-        let _ = svm_mod.predict(&test_inputs);
+        let _ = black_box(svm_mod.predict(&test_inputs).unwrap());
     });
 }
