@@ -98,7 +98,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
                 cov_mat *= reg_value;
 
                 if let CovOption::Regularized(eps) = self.cov_option {
-                    cov_mat += eps;
+                    cov_mat += Matrix::<f64>::identity(cov_mat.cols()) * eps;
                 }
 
                 cov_mat
