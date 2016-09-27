@@ -1,6 +1,6 @@
 # Development
 
-This document will (loosely) keep track of my development goals for this project.
+This document will (loosely) keep track of development goals for this project.
 
 ---
 
@@ -14,17 +14,21 @@ For full information on what is currently available look at the [crate documenta
 
 ## Goals
 
-This marks my intended release goals. I won't estimate the actual dates of release but rather the content I want to include in each version. I am actively developing and so expect to move through these at a good pace!
+The table below details some planned features and the release version we are aiming for.
+We are actively developing and so expect to move through these at a good pace!
 
 <table>
     <tr>
-        <th>Version</th><th>Features</th><th>Dependencies</th>
+        <th>Version</th><th>Feature</th><th>Dependencies</th>
     </tr>
     <tr>
-        <td>0.4.X</td><td>Model improvements</td><td><ul><li>None</li></ul></td>
+        <td>0.5.X</td><td>Nearest Neighbours</td><td><ul><li>None</li></ul></td>
     </tr>
     <tr>
-        <td>0.4.X</td><td>Nearest Neighbours</td><td><ul><li>None</li></ul></td>
+        <td>0.6.0</td><td>Model API Improvements</td><td><ul><li>None</li></ul></td>
+    </tr>
+    <tr>
+        <td>0.6.0</td><td>Neural Net Improvements</td><td><ul><li>None</li></ul></td>
     </tr>
 </table>
 
@@ -34,3 +38,8 @@ Whilst working on the above there will of course be ongoing development on the e
 
 - Convolutional and Recurrent neural nets.
 - SVM coordinate descent as per [this paper](http://www.loshchilov.com/publications/GECCO2011_AdaptiveCoordinateDescent.pdf).
+
+### Why aren't you working on X?
+
+If you think there is an obvious feature missing from the library please open an issue about it.
+If you want to work on said feature than even better!

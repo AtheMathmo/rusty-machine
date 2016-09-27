@@ -2,9 +2,9 @@
 
 [![Join the chat at https://gitter.im/AtheMathmo/rusty-machine](https://badges.gitter.im/AtheMathmo/rusty-machine.svg)](https://gitter.im/AtheMathmo/rusty-machine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/AtheMathmo/rusty-machine.svg?branch=master)](https://travis-ci.org/AtheMathmo/rusty-machine)
 
-Here is the API documentation for the rust crate. Currently up to date for [version 0.4.4](https://crates.io/crates/rusty-machine/0.4.4).
+The crate is currently on version [0.5.0](https://crates.io/crates/rusty-machine/0.5.0).
 
-- [API Documentation](https://AtheMathmo.github.io/rusty-machine/)
+Read the [API Documentation](https://AtheMathmo.github.io/rusty-machine/) to learn more.
 
 And here is a document detailing development efforts. Including a projected timeline for immediate features.
 Please feel free to give feedback and let me know if there any features you believe should take precedence.
@@ -72,7 +72,7 @@ The library is most easily used with [cargo](http://doc.crates.io/guide.html). S
 
 ```toml
 [dependencies]
-rusty-machine="0.4.3"
+rusty-machine="0.5.0"
 ```
 
 And then import the library using:
