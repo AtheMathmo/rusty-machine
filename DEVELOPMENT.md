@@ -42,4 +42,4 @@ Whilst working on the above there will of course be ongoing development on the e
 ### Why aren't you working on X?
 
 If you think there is an obvious feature missing from the library please open an issue about it.
-If you want to work on said feature than even better!
+If you want to work on said feature then even better!
