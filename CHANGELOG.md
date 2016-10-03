@@ -2,6 +2,13 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.5.1
+
+This version includes no changes but is a bump due to a
+[crates bug](https://github.com/rust-lang/crates.io/issues/448#issuecomment-251037439).
+
+See the notes for 0.5.0 below.
+
 ## 0.5.0
 
 This is another fairly large release. Thank you to everyone who contributed!
