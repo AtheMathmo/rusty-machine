@@ -30,7 +30,6 @@
 //! // Probabilities that each point comes from each Gaussian.
 //! println!("{:?}", post_probs.data());
 //! ```
-
 use linalg::{Matrix, MatrixSlice, Vector, BaseMatrix, BaseMatrixMut, Axes};
 use rulinalg::utils;
 
@@ -114,7 +113,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
         for _ in 0..self.max_iters {
             let log_lik_0 = self.log_lik;
 
-            let (weights, log_lik_1) = self.membership_weights(inputs);
+            let (weights, log_lik_1) = try!(self.membership_weights(inputs));
 
             if (log_lik_1 - log_lik_0).abs() < 1e-15 {
                 break;
@@ -131,7 +130,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
     /// Predict output from inputs.
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
         if let (&Some(_), &Some(_)) = (&self.model_means, &self.model_covars) {
-            Ok(self.membership_weights(inputs).0)
+            Ok(try!(self.membership_weights(inputs)).0)
         } else {
             Err(Error::new_untrained())
         }
@@ -247,7 +246,7 @@ impl GaussianMixtureModel {
         self.max_iters = iters;
     }
 
-    fn membership_weights(&self, inputs: &Matrix<f64>) -> (Matrix<f64>, f64) {
+    fn membership_weights(&self, inputs: &Matrix<f64>) -> LearningResult<(Matrix<f64>, f64)> {
         let n = inputs.rows();
 
         let mut member_weights_data = Vec::with_capacity(n * self.comp_count);
@@ -260,7 +259,7 @@ impl GaussianMixtureModel {
             for cov in covars {
                 // TODO: combine these. We compute det to get the inverse.
                 let covar_det = cov.det();
-                let covar_inv = cov.inverse().expect("Could not compute inverse of covariance.");
+                let covar_inv = try!(cov.inverse().map_err(Error::from));
 
                 cov_sqrt_dets.push(covar_det.sqrt());
                 cov_invs.push(covar_inv);
@@ -294,7 +293,7 @@ impl GaussianMixtureModel {
             }
         }
 
-        (Matrix::new(n, self.comp_count, member_weights_data), log_lik)
+        Ok((Matrix::new(n, self.comp_count, member_weights_data), log_lik))
     }
 
     fn update_params(&mut self, inputs: &Matrix<f64>, membership_weights: Matrix<f64>) {
