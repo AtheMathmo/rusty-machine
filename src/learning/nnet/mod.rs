@@ -49,6 +49,7 @@ use linalg::{Matrix, MatrixSlice, BaseMatrixMut};
 use rulinalg::utils;
 
 use learning::{LearningResult, SupModel};
+use learning::error::{Error, ErrorKind};
 use learning::toolkit::activ_fn;
 use learning::toolkit::activ_fn::ActivationFunc;
 use learning::toolkit::cost_fn;
@@ -277,7 +278,11 @@ impl<T: Criterion> BaseNeuralNet<T> {
     /// Create a multilayer perceptron with the specified layer sizes.
     fn mlp<'a, U>(layer_sizes: &[usize], criterion: T, activ_fn: U) -> BaseNeuralNet<T> 
         where U: ActivationFunc + 'static {
-        let mut mlp = BaseNeuralNet::new(criterion);
+        let mut mlp = BaseNeuralNet {
+            layers: Vec::with_capacity(2*(layer_sizes.len()-1)),
+            weights: Vec::new(),
+            criterion: criterion
+        };
         for shape in layer_sizes.windows(2) {
             mlp.add(Box::new(net_layer::Linear::new(shape[0], shape[1])));
             mlp.add(Box::new(activ_fn.clone()));
@@ -356,9 +361,9 @@ impl<T: Criterion> BaseNeuralNet<T> {
             };
 
             let output = if i == 0 {
-            	layer.forward(inputs, slice)
+            	layer.forward(inputs, slice).unwrap()
             } else {
-            	layer.forward(activations.last().unwrap(), slice)
+            	layer.forward(activations.last().unwrap(), slice).unwrap()
             };
 
             activations.push(output);
@@ -374,8 +379,8 @@ impl<T: Criterion> BaseNeuralNet<T> {
         // at this point index == weights.len()
         for (i, layer) in self.layers.iter().enumerate().rev() {
             let activation = if i == 0 {inputs} else {&activations[i-1]};
-            let mut grad_params = layer.back_params(&out_grad, activation, params[i]);
 
+            let mut grad_params = layer.back_params(&out_grad, activation, params[i]);
             if self.criterion.is_regularized() {
                 utils::in_place_vec_bin_op(grad_params.mut_data(), self.criterion.reg_cost_grad(params[i]).data(), |x, &y| {
                     *x = *x + y
@@ -411,7 +416,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
                                                     shape.1,
                                                     shape.1);
             ptr = ptr.offset(self.layers[0].num_params() as isize);
-            self.layers[0].forward(inputs, slice)
+            try!(self.layers[0].forward(inputs, slice))
         };
         for layer in self.layers.iter().skip(1) {
             let shape = layer.param_shape();
@@ -420,7 +425,11 @@ impl<T: Criterion> BaseNeuralNet<T> {
                                                         shape.0,
                                                         shape.1,
                                                         shape.1);
-                outputs = layer.forward(&outputs, slice);
+                outputs = match layer.forward(&outputs, slice) {
+                    Ok(act) => act,
+                    Err(_) => {return Err(Error::new(ErrorKind::InvalidParameters,
+                        "The network's layers do not line up correctly."))}
+                };
                 ptr = ptr.offset(layer.num_params() as isize);
             }
         }

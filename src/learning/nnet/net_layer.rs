@@ -2,6 +2,8 @@
 
 use linalg::{Matrix, MatrixSlice, BaseMatrix, BaseMatrixMut};
 
+use learning::LearningResult;
+use learning::error::{Error, ErrorKind};
 use learning::toolkit::activ_fn::ActivationFunc;
 
 use rand::thread_rng;
@@ -13,7 +15,7 @@ use std::fmt::Debug;
 /// Trait for neural net layers
 pub trait NetLayer : Debug {
 	/// The result of propogating data forward through this layer
-	fn forward(&self, input: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64>;
+	fn forward(&self, input: &Matrix<f64>, params: MatrixSlice<f64>) -> LearningResult<Matrix<f64>>;
 
 	/// The gradient of the output of this layer with respect to its input
 	fn back_input(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64>;
@@ -75,13 +77,19 @@ impl NetLayer for Linear {
 	///
 	/// input should have dimensions N x I
 	/// where N is the number of samples and I is the dimensionality of the input
-	fn forward(&self, input: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64> {
+	fn forward(&self, input: &Matrix<f64>, params: MatrixSlice<f64>) -> LearningResult<Matrix<f64>> {
 		if self.has_bias {
-			debug_assert_eq!(input.cols()+1, params.rows());
-			input.hcat(&Matrix::<f64>::ones(input.rows(), 1)) * &params
+			if input.cols()+1 != params.rows() {
+				Err(Error::new(ErrorKind::InvalidData, "The input had the wrong number of columns"))
+			} else {
+				Ok(input.hcat(&Matrix::<f64>::ones(input.rows(), 1)) * &params)
+			}
 		} else {
-			debug_assert_eq!(input.cols(), params.rows());
-			input * &params
+			if input.cols() != params.rows() {
+				Err(Error::new(ErrorKind::InvalidData, "The input had the wrong number of columns"))
+			} else {
+				Ok(input * &params)
+			}
 		}
 	}
 
@@ -100,7 +108,7 @@ impl NetLayer for Linear {
 	}
 	
 	fn back_params(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
-		assert_eq!(input.rows(), out_grad.rows());
+		debug_assert_eq!(input.rows(), out_grad.rows());
 		if self.has_bias {
 			//input.transpose().vcat(&Matrix::<f64>::ones(1, input.rows())) * out_grad
 			input.hcat(&Matrix::<f64>::ones(input.rows(), 1)).transpose() * out_grad
@@ -127,10 +135,10 @@ impl NetLayer for Linear {
 
 impl<T: ActivationFunc + Debug> NetLayer for T {
 	/// Applys the activation function to each element of the input
-	fn forward(&self, input: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
+	fn forward(&self, input: &Matrix<f64>, _: MatrixSlice<f64>) -> LearningResult<Matrix<f64>> {
 		//Matrix::new(input.rows(), input.cols(),
-		//	input.iter().map(|&x| T::func(x)).collect::<Vec<_>>());
-		input.clone().apply(&T::func)
+		//	input.iter().map(|&x| T::func(x)).collect::<Vec<_>>())
+		Ok(input.clone().apply(&T::func))
 	}
 
 	fn back_input(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
