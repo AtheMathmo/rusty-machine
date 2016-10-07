@@ -353,7 +353,11 @@ impl GaussianMixtureModel {
     fn calculate_bic(&self, n: f64) -> f64 {
         let num_clusters= self.comp_count as f64;
         let log_lik = self.log_lik;
-        -2f64*log_lik + num_clusters * n.ln()
+        let log_samples = n.ln();
+        assert!(num_clusters != 0.0f64 / 0.0f64);
+        assert!(log_lik != 0.0f64 / 0.0f64);
+        assert!(log_samples != 0.0f64 / 0.0f64);
+        -2.0f64*log_lik + num_clusters * log_samples
     }
 
     fn compute_cov(&self, diff: Matrix<f64>, weight: f64) -> Matrix<f64> {
@@ -368,8 +372,8 @@ impl GaussianMixtureModel {
 #[cfg(test)]
 mod tests {
     use super::GaussianMixtureModel;
-    use linalg::Vector;
-
+    use learning::UnSupModel;
+    use linalg::{Matrix, Vector};
     #[test]
     fn test_means_none() {
         let model = GaussianMixtureModel::new(5);
@@ -382,6 +386,12 @@ mod tests {
         let model = GaussianMixtureModel::new(5);
 
         assert_eq!(model.covariances(), None);
+    }
+    #[test]
+    fn test_bic_none() {
+        let mut model = GaussianMixtureModel::new(5);
+
+        assert_eq!(model.bic(), 0f64);
     }
 
     #[test]
@@ -396,5 +406,14 @@ mod tests {
         let mix_weights = Vector::new(vec![0.1, 0.25, 0.75, 0.5]);
         let gmm_res = GaussianMixtureModel::with_weights(3, mix_weights);
         assert!(gmm_res.is_err());
+    }
+
+    #[test]
+    fn test_bic_works() {
+        let mut model: GaussianMixtureModel = GaussianMixtureModel::new(2);
+        let input = Matrix::new(4, 2, vec![1.0, 2.0, -3.0, -3.0, 0.1, 1.5, -5.0, -2.5]);
+        model.set_max_iters(10);
+        model.train(&input);
+        assert!(model.bic() != 0.23/0.23);
     }
 }
