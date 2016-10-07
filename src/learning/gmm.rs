@@ -61,6 +61,7 @@ pub struct GaussianMixtureModel {
     model_means: Option<Matrix<f64>>,
     model_covars: Option<Vec<Matrix<f64>>>,
     log_lik: f64,
+    bic: f64,
     max_iters: usize,
     /// The covariance options for the GMM.
     pub cov_option: CovOption,
@@ -157,6 +158,7 @@ impl GaussianMixtureModel {
             model_means: None,
             model_covars: None,
             log_lik: 0f64,
+            bic: 0f64,
             max_iters: 100,
             cov_option: CovOption::Full,
         }
@@ -199,6 +201,7 @@ impl GaussianMixtureModel {
                 model_means: None,
                 model_covars: None,
                 log_lik: 0f64,
+                bic: 0f64,
                 max_iters: 100,
                 cov_option: CovOption::Full,
             })
@@ -244,6 +247,15 @@ impl GaussianMixtureModel {
     /// ```
     pub fn set_max_iters(&mut self, iters: usize) {
         self.max_iters = iters;
+    }
+
+    /// The model's Bayesian Information Criterion (BIC)
+    ///
+    /// returns an f64 containing the BIC.
+    /// Is calculated during model training, useful for
+    /// determining optimal k for a given dataset.
+    pub fn bic(&self) -> f64 {
+        self.bic
     }
 
     fn membership_weights(&self, inputs: &Matrix<f64>) -> LearningResult<(Matrix<f64>, f64)> {
@@ -299,7 +311,7 @@ impl GaussianMixtureModel {
     fn update_params(&mut self, inputs: &Matrix<f64>, membership_weights: Matrix<f64>) {
         let n = membership_weights.rows();
         let d = inputs.cols();
-
+        let samples = inputs.rows() as f64;
         let sum_weights = membership_weights.sum_rows();
 
         self.mix_weights = &sum_weights / (n as f64);
@@ -326,9 +338,22 @@ impl GaussianMixtureModel {
             new_covs.push(cov_mat / sum_weights[k]);
 
         }
-
+        self.bic = self.calculate_bic(samples);
         self.model_means = Some(new_means);
         self.model_covars = Some(new_covs);
+    }
+
+    ///Calculates the model's Bayesian Information Criterion (BIC)
+    /// BIC = -2*log(l) + k * ln(n)
+    /// very useful for determining the optimal number of clusters when iteratively generating GMMs.
+    /// log_lik = log likelihood criterion for the model.
+    /// num_clusters = the number of clusters created in the model.
+    /// n = the total number of samples used to create the model.
+
+    fn calculate_bic(&self, n: f64) -> f64 {
+        let num_clusters= self.comp_count as f64;
+        let log_lik = self.log_lik;
+        -2f64*log_lik + num_clusters * n.ln()
     }
 
     fn compute_cov(&self, diff: Matrix<f64>, weight: f64) -> Matrix<f64> {
