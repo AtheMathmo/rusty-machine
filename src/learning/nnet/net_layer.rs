@@ -1,6 +1,7 @@
 //!Neural Network Layers
 
 use linalg::{Matrix, MatrixSlice, BaseMatrix, BaseMatrixMut};
+use rulinalg::utils;
 
 use learning::LearningResult;
 use learning::error::{Error, ErrorKind};
@@ -82,7 +83,7 @@ impl NetLayer for Linear {
 			if input.cols()+1 != params.rows() {
 				Err(Error::new(ErrorKind::InvalidData, "The input had the wrong number of columns"))
 			} else {
-				Ok(input.hcat(&Matrix::<f64>::ones(input.rows(), 1)) * &params)
+				Ok(&input.hcat(&Matrix::ones(input.rows(), 1)) * &params)
 			}
 		} else {
 			if input.cols() != params.rows() {
@@ -95,25 +96,21 @@ impl NetLayer for Linear {
 
 	fn back_input(&self, out_grad: &Matrix<f64>, _: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64> {
 		debug_assert_eq!(out_grad.cols(), params.cols());
-		//let gradient = out_grad * &params.into_matrix().transpose();
+		let gradient = out_grad * &params.transpose();
 		if self.has_bias {
-			//let columns: Vec<_> = (0..gradient.cols()-1).collect();
-			//gradient.select_cols(&columns)
-			let rows: Vec<_> = (0..params.rows()-1).collect();
-			out_grad * &params.into_matrix().select_rows(&rows).transpose()
+			let columns: Vec<_> = (0..gradient.cols()-1).collect();
+			gradient.select_cols(&columns)
 		} else {
-			//gradient
-			out_grad * &params.into_matrix().transpose()
+			gradient
 		}
 	}
 	
 	fn back_params(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
 		debug_assert_eq!(input.rows(), out_grad.rows());
 		if self.has_bias {
-			//input.transpose().vcat(&Matrix::<f64>::ones(1, input.rows())) * out_grad
-			input.hcat(&Matrix::<f64>::ones(input.rows(), 1)).transpose() * out_grad
+			&input.hcat(&Matrix::ones(input.rows(), 1)).transpose() * out_grad
 		} else {
-			input.transpose() * out_grad
+			&input.transpose() * out_grad
 		}
 	}
 
@@ -136,15 +133,15 @@ impl NetLayer for Linear {
 impl<T: ActivationFunc + Debug> NetLayer for T {
 	/// Applys the activation function to each element of the input
 	fn forward(&self, input: &Matrix<f64>, _: MatrixSlice<f64>) -> LearningResult<Matrix<f64>> {
-		//Matrix::new(input.rows(), input.cols(),
-		//	input.iter().map(|&x| T::func(x)).collect::<Vec<_>>())
 		Ok(input.clone().apply(&T::func))
 	}
 
 	fn back_input(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
-		let in_grad = Matrix::new(input.rows(), input.cols(),
-	        			input.iter().map(|&x| T::func_grad(x)).collect::<Vec<_>>());
-		out_grad.elemul(&in_grad)
+		let mut in_grad = input.clone();
+		utils::in_place_vec_bin_op(in_grad.mut_data(), out_grad.data(), |x, &y| {
+            *x = T::func_grad(*x) * y
+        });
+		in_grad
 	}
 	
 	fn back_params(&self, _: &Matrix<f64>, _: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {

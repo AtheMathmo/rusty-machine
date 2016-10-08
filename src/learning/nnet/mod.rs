@@ -342,7 +342,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
         unsafe {
             gradients.set_len(weights.len());
         }
-        // activations[i] is output of layer[i]
+        // activations[i] is the output of layer[i]
         let mut activations = Vec::with_capacity(self.layers.len());
         // params[i] is the weights for layer[i]
         let mut params = Vec::with_capacity(self.layers.len());
@@ -370,30 +370,30 @@ impl<T: Criterion> BaseNeuralNet<T> {
             params.push(slice);
             index += layer.num_params();
         }
-        let output = activations.last().unwrap();
+        let output = &activations[activations.len()-1];
 
         // Backward propagation
-
+        
         // The gradient with respect to the current layer's output
-        let mut out_grad = self.criterion.cost_grad(&output, targets);
+        let mut out_grad = self.criterion.cost_grad(output, targets);
         // at this point index == weights.len()
         for (i, layer) in self.layers.iter().enumerate().rev() {
             let activation = if i == 0 {inputs} else {&activations[i-1]};
+            index -= layer.num_params();
 
-            let mut grad_params = layer.back_params(&out_grad, activation, params[i]);
+            let grad_params = &mut gradients[index..index+layer.num_params()];
+            grad_params.copy_from_slice(&layer.back_params(&out_grad, activation, params[i]).data());
+            
             if self.criterion.is_regularized() {
-                utils::in_place_vec_bin_op(grad_params.mut_data(), self.criterion.reg_cost_grad(params[i]).data(), |x, &y| {
+                utils::in_place_vec_bin_op(grad_params, self.criterion.reg_cost_grad(params[i]).data(), |x, &y| {
                     *x = *x + y
                 });
             }
-
+            
             out_grad = layer.back_input(&out_grad, activation, params[i]);
-
-            index -= layer.num_params();
-            gradients[index..index+layer.num_params()].copy_from_slice(&grad_params.data());
         }
 
-        let mut cost = self.criterion.cost(&output, targets);
+        let mut cost = self.criterion.cost(output, targets);
         if self.criterion.is_regularized() {
             for i in 0..self.layers.len() {
                 cost += self.criterion.reg_cost(params[i]);
