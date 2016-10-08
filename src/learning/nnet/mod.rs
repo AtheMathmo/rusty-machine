@@ -217,9 +217,9 @@ impl<T, A> NeuralNet<T, A>
     /// net.add_layers(linear_sig);
     /// ```
     pub fn add_layers<'a, U>(&'a mut self, layers: U) -> &'a mut NeuralNet<T, A>
-    	where U: IntoIterator<Item = Box<NetLayer>> {
-    		self.base.add_layers(layers);
-    		self
+        where U: IntoIterator<Item = Box<NetLayer>> {
+            self.base.add_layers(layers);
+            self
     }
 
     /// Gets matrix of weights between specified layer and forward layer.
@@ -247,7 +247,7 @@ impl<T, A> NeuralNet<T, A>
 
 /// Base Neural Network struct
 ///
-/// This struct cannot be instantianated and is used internally only.
+/// This struct cannot be instantiated and is used internally only.
 #[derive(Debug)]
 pub struct BaseNeuralNet<T: Criterion> {
     layers: Vec<Box<NetLayer>>,
@@ -299,11 +299,12 @@ impl<T: Criterion> BaseNeuralNet<T> {
 
     /// Adds multiple layers to the end of the network
     fn add_layers<'a, U>(&'a mut self, layers: U) -> &'a mut BaseNeuralNet<T>
-    	where U: IntoIterator<Item = Box<NetLayer>> {
-    		for layer in layers {
-    			self.add(layer);
-    		}
-    		self
+        where U: IntoIterator<Item = Box<NetLayer>> 
+    {
+        for layer in layers {
+            self.add(layer);
+        }
+        self
     }
 
     /// Gets matrix of weights for the specified layer for the weights.
@@ -311,17 +312,11 @@ impl<T: Criterion> BaseNeuralNet<T> {
         debug_assert!(idx < self.layers.len());
 
         // Check that the weights are the right size.
-        let mut full_size = 0usize;
-        for l in &self.layers {
-            full_size += l.num_params();
-        }
+        let full_size: usize = self.layers.iter().map(|l| l.num_params()).sum();
 
         debug_assert_eq!(full_size, weights.len());
 
-        let mut start = 0usize;
-        for l in &self.layers[..idx] {
-            start += l.num_params();
-        } 
+        let start: usize = self.layers.iter().take(idx).map(|l| l.num_params()).sum();
 
         let shape = self.layers[idx].param_shape();
         unsafe {
@@ -361,9 +356,9 @@ impl<T: Criterion> BaseNeuralNet<T> {
             };
 
             let output = if i == 0 {
-            	layer.forward(inputs, slice).unwrap()
+                layer.forward(inputs, slice).unwrap()
             } else {
-            	layer.forward(activations.last().unwrap(), slice).unwrap()
+                layer.forward(activations.last().unwrap(), slice).unwrap()
             };
 
             activations.push(output);
@@ -404,7 +399,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
 
     /// Forward propagation of the model weights to get the outputs.
     fn forward_prop(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
-        if self.layers.len() == 0 {
+        if self.layers.is_empty() {
             return Ok(inputs.clone());
         }
 
