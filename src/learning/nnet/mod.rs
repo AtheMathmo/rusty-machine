@@ -45,7 +45,7 @@
 
 pub mod net_layer;
 
-use linalg::{Matrix, MatrixSlice, BaseMatrixMut};
+use linalg::{Matrix, MatrixSlice};
 use rulinalg::utils;
 
 use learning::{LearningResult, SupModel};
@@ -383,7 +383,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
 
             let grad_params = &mut gradients[index..index+layer.num_params()];
             grad_params.copy_from_slice(&layer.back_params(&out_grad, activation, params[i]).data());
-            
+
             if self.criterion.is_regularized() {
                 utils::in_place_vec_bin_op(grad_params, self.criterion.reg_cost_grad(params[i]).data(), |x, &y| {
                     *x = *x + y
@@ -457,20 +457,8 @@ impl<T: Criterion> Optimizable for BaseNeuralNet<T> {
 ///
 /// Specifies an activation function and a cost function.
 pub trait Criterion {
-    /// The activation function for the criterion.
-    type ActFunc: ActivationFunc + Debug;
     /// The cost function for the criterion.
     type Cost: CostFunc<Matrix<f64>>;
-
-    /// The activation function applied to a matrix.
-    fn activate(&self, mat: Matrix<f64>) -> Matrix<f64> {
-        mat.apply(&Self::ActFunc::func)
-    }
-
-    /// The gradient of the activation function applied to a matrix.
-    fn grad_activ(&self, mat: Matrix<f64>) -> Matrix<f64> {
-        mat.apply(&Self::ActFunc::func_grad)
-    }
 
     /// The cost function.
     ///
@@ -534,7 +522,6 @@ pub struct BCECriterion {
 }
 
 impl Criterion for BCECriterion {
-    type ActFunc = activ_fn::Sigmoid;
     type Cost = cost_fn::CrossEntropyError;
 
     fn regularization(&self) -> Regularization<f64> {
@@ -576,7 +563,6 @@ pub struct MSECriterion {
 }
 
 impl Criterion for MSECriterion {
-    type ActFunc = activ_fn::Linear;
     type Cost = cost_fn::MeanSqError;
 
     fn regularization(&self) -> Regularization<f64> {
