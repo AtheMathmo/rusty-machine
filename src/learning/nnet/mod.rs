@@ -292,7 +292,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
 
     /// Adds the specified layer to the end of the network
     fn add<'a>(&'a mut self, layer: Box<NetLayer>) -> &'a mut BaseNeuralNet<T> {
-        self.weights.append(&mut layer.default_params());
+        self.weights.extend_from_slice(&layer.default_params());
         self.layers.push(layer);
         self
     }
