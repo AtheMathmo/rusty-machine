@@ -158,7 +158,7 @@ impl GaussianMixtureModel {
             model_means: None,
             model_covars: None,
             log_lik: 0f64,
-            bic: 0f64,
+            bic: 1f64,
             max_iters: 100,
             cov_option: CovOption::Full,
         }
@@ -201,7 +201,7 @@ impl GaussianMixtureModel {
                 model_means: None,
                 model_covars: None,
                 log_lik: 0f64,
-                bic: 0f64,
+                bic: 1f64,
                 max_iters: 100,
                 cov_option: CovOption::Full,
             })
@@ -393,7 +393,7 @@ mod tests {
     fn test_bic_none() {
         let mut model = GaussianMixtureModel::new(5);
 
-        assert_eq!(model.bic(), 0f64);
+        assert_eq!(model.bic(), 1f64);
     }
 
     #[test]
