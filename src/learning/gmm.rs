@@ -36,7 +36,7 @@ use rulinalg::utils;
 use learning::{LearningResult, UnSupModel};
 use learning::toolkit::rand_utils;
 use learning::error::{Error, ErrorKind};
-
+use std::f64;
 /// Covariance options for GMMs.
 ///
 /// - Full : The full covariance structure.
@@ -345,20 +345,22 @@ impl GaussianMixtureModel {
 
     ///Calculates the model's Bayesian Information Criterion (BIC)
     /// BIC = -2*log(l) + k * ln(n)
-    /// very useful for determining the optimal number of clusters when iteratively generating GMMs.
-    /// log_lik = log likelihood criterion for the model.
+    /// useful for determining the optimal number of clusters when iteratively generating GMMs.
+    /// log_lik = log likelihood criterion for the model, the calcaulated log_lik parameter is a sum so it needs to be divided by the total number of samples.
     /// num_clusters = the number of clusters created in the model.
     /// n = the total number of samples used to create the model.
-
     fn calculate_bic(&self, n: f64) -> f64 {
-        let num_clusters= self.comp_count as f64;
-        let log_lik = self.log_lik;
-        let log_samples = n.ln();
-        assert!(num_clusters != 0.0f64 / 0.0f64);
-        assert!(log_lik != 0.0f64 / 0.0f64);
-        assert!(log_samples != 0.0f64 / 0.0f64);
-        -2.0f64*log_lik + num_clusters * log_samples
+        let num_clusters:f64 = self.comp_count as f64;
+        let log_lik:f64 = self.log_lik / n;
+        let log_samples:f64 = n.ln();
+        assert!(!num_clusters.is_nan());
+        assert!(!log_lik.is_nan());
+        assert!(!log_samples.is_nan());
+//        println!("num clusters: {} \t log_lik: {} \t log_samples: {}", num_clusters, log_lik, log_samples);
+        let bic = -2.0f64*log_lik + num_clusters * log_samples;
+        bic
     }
+
 
     fn compute_cov(&self, diff: Matrix<f64>, weight: f64) -> Matrix<f64> {
         match self.cov_option {
@@ -412,8 +414,8 @@ mod tests {
     fn test_bic_works() {
         let mut model: GaussianMixtureModel = GaussianMixtureModel::new(2);
         let input = Matrix::new(4, 2, vec![1.0, 2.0, -3.0, -3.0, 0.1, 1.5, -5.0, -2.5]);
-        model.set_max_iters(10);
+        model.set_max_iters(100);
         model.train(&input);
-        assert!(model.bic() != 0.23/0.23);
+        assert!(!model.bic().is_nan());
     }
 }
