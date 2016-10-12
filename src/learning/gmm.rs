@@ -36,6 +36,7 @@ use rulinalg::utils;
 use learning::{LearningResult, UnSupModel};
 use learning::toolkit::rand_utils;
 use learning::error::{Error, ErrorKind};
+use std::f64;
 
 /// Covariance options for GMMs.
 ///
@@ -61,6 +62,7 @@ pub struct GaussianMixtureModel {
     model_means: Option<Matrix<f64>>,
     model_covars: Option<Vec<Matrix<f64>>>,
     log_lik: f64,
+    bic: f64,
     max_iters: usize,
     /// The covariance options for the GMM.
     pub cov_option: CovOption,
@@ -77,6 +79,8 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
 
         // Initialization:
         let k = self.comp_count;
+
+        let variance = try!(inputs.variance(Axes::Row));
 
         let cov_mat = match self.cov_option {
             CovOption::Diagonal => {
@@ -105,9 +109,10 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
         };
 
         self.model_covars = Some(vec![cov_mat; k]);
-
+//        let seed: &[usize] = &[1,2,3,4,5];
         let random_rows: Vec<usize> =
-            rand_utils::reservoir_sample(&(0..inputs.rows()).collect::<Vec<usize>>(), k);
+        rand_utils::reservoir_sample(&(0..inputs.rows()).collect::<Vec<usize>>(), k);
+        //            rand_utils::reservoir_sample_custom(&(0..inputs.rows()).collect::<Vec<usize>>(), k, seed);
         self.model_means = Some(inputs.select_rows(&random_rows));
 
         for _ in 0..self.max_iters {
@@ -118,7 +123,6 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
             if (log_lik_1 - log_lik_0).abs() < 1e-15 {
                 break;
             }
-
             self.log_lik = log_lik_1;
 
             self.update_params(inputs, weights);
@@ -157,8 +161,29 @@ impl GaussianMixtureModel {
             model_means: None,
             model_covars: None,
             log_lik: 0f64,
+            bic: 1f64,
             max_iters: 100,
             cov_option: CovOption::Full,
+        }
+    }
+
+    /// Constructs a Gaussian Mixture Model from components.
+    /// Useful for constructing a gmm from existing parts (IE json deserialization)
+    ///
+    pub fn deserialize(comp_count: usize,
+                       mix_weights: Vec<f64>,
+                       model_means: Option<Matrix<f64>>,
+                       model_covars: Option<Vec<Matrix<f64>>>,
+                       cov_option: CovOption) -> GaussianMixtureModel {
+        GaussianMixtureModel {
+            comp_count: comp_count,
+            mix_weights: Vector::new(mix_weights),
+            model_means: model_means,
+            model_covars: model_covars,
+            log_lik: 0f64,
+            bic: 1f64,
+            max_iters: 100,
+            cov_option: cov_option,
         }
     }
 
@@ -199,6 +224,7 @@ impl GaussianMixtureModel {
                 model_means: None,
                 model_covars: None,
                 log_lik: 0f64,
+                bic: 1f64,
                 max_iters: 100,
                 cov_option: CovOption::Full,
             })
@@ -246,6 +272,15 @@ impl GaussianMixtureModel {
         self.max_iters = iters;
     }
 
+    /// The model's Bayesian Information Criterion (BIC)
+    ///
+    /// returns an f64 containing the BIC.
+    /// Is calculated during model training, useful for
+    /// determining optimal k for a given dataset.
+    pub fn bic(&self) -> f64 {
+        self.bic
+    }
+
     fn membership_weights(&self, inputs: &Matrix<f64>) -> LearningResult<(Matrix<f64>, f64)> {
         let n = inputs.rows();
 
@@ -257,17 +292,16 @@ impl GaussianMixtureModel {
 
         if let Some(ref covars) = self.model_covars {
             for cov in covars {
-                // TODO: combine these. We compute det to get the inverse.
+                // TODO: Fix this, this breaks stuff.
                 let covar_det = cov.det();
                 let covar_inv = try!(cov.inverse().map_err(Error::from));
-
-                cov_sqrt_dets.push(covar_det.sqrt());
-                cov_invs.push(covar_inv);
+                    cov_sqrt_dets.push(covar_det.sqrt());
+                    cov_invs.push(covar_inv);
             }
         }
 
         let mut log_lik = 0f64;
-
+        //TODO: fix the broken pdf calculation
         // Now we compute the membership weights
         if let Some(ref means) = self.model_means {
             for i in 0..n {
@@ -277,18 +311,21 @@ impl GaussianMixtureModel {
                 for j in 0..self.comp_count {
                     let mu_j = MatrixSlice::from_matrix(means, [j, 0], 1, means.cols());
                     let diff = x_i - mu_j;
-
-                    let pdf = (&diff * &cov_invs[j] * diff.transpose() * -0.5).into_vec()[0]
-                        .exp() / cov_sqrt_dets[j];
-                    pdfs.push(pdf);
+                    assert!(!&cov_sqrt_dets[j].is_nan());
+                    let exp = (&diff * &cov_invs[j] * diff.transpose() * -0.5).into_vec()[0].exp();
+                    let determinate = cov_sqrt_dets[j];
+                    let pdf = exp / determinate;
+                    if pdf.is_finite(){
+                        pdfs.push(pdf);
+                    }
+                    else {
+                        pdfs.push(0f64);
+                    }
                 }
-
                 let weighted_pdf_sum = utils::dot(&pdfs, self.mix_weights.data());
-
                 for (idx, pdf) in pdfs.iter().enumerate() {
                     member_weights_data.push(self.mix_weights[idx] * pdf / (weighted_pdf_sum));
                 }
-
                 log_lik += weighted_pdf_sum.ln();
             }
         }
@@ -299,7 +336,7 @@ impl GaussianMixtureModel {
     fn update_params(&mut self, inputs: &Matrix<f64>, membership_weights: Matrix<f64>) {
         let n = membership_weights.rows();
         let d = inputs.cols();
-
+        let samples = inputs.rows() as f64;
         let sum_weights = membership_weights.sum_rows();
 
         self.mix_weights = &sum_weights / (n as f64);
@@ -326,10 +363,30 @@ impl GaussianMixtureModel {
             new_covs.push(cov_mat / sum_weights[k]);
 
         }
-
+        self.bic = self.calculate_bic(samples);
         self.model_means = Some(new_means);
         self.model_covars = Some(new_covs);
     }
+
+    /// # Information Criterions
+    ///Calculates the model's Bayesian Information Criterion (BIC)
+    /// `BIC = -2*log(l) + k * ln(n)`
+    /// useful for determining the optimal number of clusters when iteratively generating GMMs.
+    /// log_lik = log likelihood criterion for the model, the calcaulated log_lik parameter is a sum so it needs to be divided by the total number of samples.
+    /// num_clusters = the number of clusters created in the model.
+    /// n = the total number of samples used to create the model.
+    fn calculate_bic(&self, n: f64) -> f64 {
+        let num_clusters:f64 = self.comp_count as f64;
+        let log_lik:f64 = self.log_lik / n;
+        let log_samples:f64 = n.ln();
+        assert!(!num_clusters.is_nan());
+        assert!(!log_lik.is_nan());
+        assert!(!log_samples.is_nan());
+//        println!("num clusters: {} \t log_lik: {} \t log_samples: {}", num_clusters, log_lik, log_samples);
+        let bic = -2.0f64*log_lik + num_clusters * log_samples;
+        bic
+    }
+
 
     fn compute_cov(&self, diff: Matrix<f64>, weight: f64) -> Matrix<f64> {
         match self.cov_option {
@@ -343,8 +400,8 @@ impl GaussianMixtureModel {
 #[cfg(test)]
 mod tests {
     use super::GaussianMixtureModel;
-    use linalg::Vector;
-
+    use learning::UnSupModel;
+    use linalg::{Matrix, Vector};
     #[test]
     fn test_means_none() {
         let model = GaussianMixtureModel::new(5);
@@ -357,6 +414,12 @@ mod tests {
         let model = GaussianMixtureModel::new(5);
 
         assert_eq!(model.covariances(), None);
+    }
+    #[test]
+    fn test_bic_none() {
+        let mut model = GaussianMixtureModel::new(5);
+
+        assert_eq!(model.bic(), 1f64);
     }
 
     #[test]
@@ -371,5 +434,14 @@ mod tests {
         let mix_weights = Vector::new(vec![0.1, 0.25, 0.75, 0.5]);
         let gmm_res = GaussianMixtureModel::with_weights(3, mix_weights);
         assert!(gmm_res.is_err());
+    }
+
+    #[test]
+    fn test_bic_works() {
+        let mut model: GaussianMixtureModel = GaussianMixtureModel::new(2);
+        let input = Matrix::new(4, 2, vec![1.0, 2.0, -3.0, -3.0, 0.1, 1.5, -5.0, -2.5]);
+        model.set_max_iters(100);
+        model.train(&input);
+        assert!(!model.bic().is_nan());
     }
 }
