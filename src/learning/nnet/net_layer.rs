@@ -83,7 +83,7 @@ impl NetLayer for Linear {
             if input.cols()+1 != params.rows() {
                 Err(Error::new(ErrorKind::InvalidData, "The input had the wrong number of columns"))
             } else {
-                Ok(&input.hcat(&Matrix::ones(input.rows(), 1)) * &params)
+                Ok(&Matrix::ones(input.rows(), 1).hcat(input) * &params)
             }
         } else {
             if input.cols() != params.rows() {
@@ -100,7 +100,7 @@ impl NetLayer for Linear {
         if self.has_bias {
             let rows = gradient.rows();
             let cols = gradient.cols() - 1;
-            gradient.sub_slice([0, 0], rows, cols).into() 
+            gradient.sub_slice([0, 1], rows, cols).into() 
         } else {
             gradient
         }
@@ -109,7 +109,7 @@ impl NetLayer for Linear {
     fn back_params(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
         debug_assert_eq!(input.rows(), out_grad.rows());
         if self.has_bias {
-            &input.hcat(&Matrix::ones(input.rows(), 1)).transpose() * out_grad
+            &Matrix::ones(input.rows(), 1).hcat(input).transpose() * out_grad
         } else {
             &input.transpose() * out_grad
         }
