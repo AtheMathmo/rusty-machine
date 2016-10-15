@@ -37,6 +37,8 @@ use learning::{LearningResult, UnSupModel};
 use learning::toolkit::rand_utils;
 use learning::error::{Error, ErrorKind};
 
+const CONVERGENCE_EPS: f64 = 1.0e-15;
+
 /// Covariance options for GMMs.
 ///
 /// - Full : The full covariance structure.
@@ -92,7 +94,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
 
             let (weights, log_lik_1) = try!(self.membership_weights(inputs));
 
-            if (log_lik_1 - log_lik_0).abs() < 1e-15 {
+            if (log_lik_1 - log_lik_0).abs() < CONVERGENCE_EPS {
                 break;
             }
 
