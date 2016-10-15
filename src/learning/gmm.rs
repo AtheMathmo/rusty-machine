@@ -130,15 +130,7 @@ impl GaussianMixtureModel {
     /// let gmm = GaussianMixtureModel::new(3);
     /// ```
     pub fn new(k: usize) -> GaussianMixtureModel {
-        GaussianMixtureModel {
-            comp_count: k,
-            mix_weights: Vector::ones(k) / (k as f64),
-            model_means: None,
-            model_covars: None,
-            log_lik: 0f64,
-            max_iters: 100,
-            cov_option: CovOption::Full,
-        }
+        Self::with_weights(k, Vector::ones(k) / k as f64).unwrap()
     }
 
     /// Constructs a new GMM with the specified prior mixture weights.
