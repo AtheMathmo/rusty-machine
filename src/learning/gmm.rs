@@ -326,6 +326,11 @@ impl GaussianMixtureModel {
                 let diff = inputs_i - new_means_k;
                 cov_mat += self.compute_cov(diff, membership_weights[[i, k]]);
             }
+
+            if let CovOption::Regularized(eps) = self.cov_option {
+                cov_mat += Matrix::<f64>::identity(cov_mat.cols()) * eps;
+            }
+
             new_covs.push(cov_mat / sum_weights[k]);
 
         }
@@ -336,9 +341,7 @@ impl GaussianMixtureModel {
 
     fn compute_cov(&self, diff: Matrix<f64>, weight: f64) -> Matrix<f64> {
         match self.cov_option {
-            CovOption::Full => (diff.transpose() * diff) * weight,
-            CovOption::Regularized(eps) => (diff.transpose() * &diff) * weight +
-                Matrix::<f64>::identity(diff.cols()) * eps,
+            CovOption::Full | CovOption::Regularized(_) => (diff.transpose() * diff) * weight,
             CovOption::Diagonal => Matrix::from_diag(&diff.elemul(&diff).into_vec()) * weight,
         }
     }
