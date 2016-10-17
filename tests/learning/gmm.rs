@@ -40,16 +40,22 @@ fn generate_data(centroids: &Matrix<f64>, points_per_centroid: usize, noise: f64
 #[test]
 fn gmm_train() {
 
-    const SAMPLES_PER_CENTROID: usize = 500;
+    const SAMPLES_PER_CENTROID: usize = 2000;
     // Choose three cluster centers, at (-0.5, -0.5), (0, 0.5), (0.5, 0.5).
     let centroids = Matrix::new(3, 2, vec![-0.5, -0.5, 0.0, 0.5, 0.5, 0.0]);
 
     // Generate some data randomly around the centroids
-    let samples = generate_data(&centroids, SAMPLES_PER_CENTROID, 0.4);
+    let samples = generate_data(&centroids, SAMPLES_PER_CENTROID, 0.2);
     let mut model = GaussianMixtureModel::new(3);
     model.set_max_iters(100);
     match model.train(&samples) {
-        Ok(_) => println!("means: \n{:.4}", model.means().unwrap()),
+        Ok(_) => {
+            println!("means: \n{:.4}", model.means().unwrap());
+            println!("log_lik: \n{:.4}", model.log_lik());
+            for cov in model.covariances().as_ref().unwrap().iter() {
+                println!("cov: \n{:.4}", cov);
+            }
+        },
         Err(e) => println!("error: {}", e)
     }
 }

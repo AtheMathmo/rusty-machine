@@ -99,7 +99,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
 
         {
             use rand::distributions::{IndependentSample, Range};
-            let between = Range::new(0f64, 1.);
+            let between = Range::new(0.0f64, 1.);
             let mut rng = rand::thread_rng();
 
             self.model_means = Some(Matrix::new(inputs.cols(), self.comp_count, 
@@ -137,8 +137,8 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
             // Return to normal space
             for v in resp.iter_mut() { *v = v.exp(); }
 
-            println!("resp: \n{:.4}", &resp.select_rows(&[0, 1, 2, 3, 4]));
-            println!("mix_weights: {}", &self.mix_weights);
+            // println!("resp: \n{:.4}", &resp.select_rows(&[0, 1, 2, 3, 4]));
+            // println!("mix_weights: {}", &self.mix_weights);
             // m_step
             self.update_gaussian_parameters(inputs, resp);
             self.precisions_cholesky = Some(try!(self.compute_precision_cholesky()));
@@ -254,6 +254,13 @@ impl GaussianMixtureModel {
         &self.mix_weights
     }
 
+    /// The model mean likelihood
+    ///
+    /// Returns the mean log likelihood of the model
+    pub fn log_lik(&self) -> f64 {
+        self.log_lik
+    }
+
     /// Sets the max number of iterations for the EM algorithm.
     ///
     /// # Examples
@@ -306,12 +313,12 @@ impl GaussianMixtureModel {
             CovOption::Full | CovOption::Regularized(_) => {
                 let mut precisions_chol = Vec::<Matrix<f64>>::with_capacity(n_components);
                 for covariance in covariances {
+                    // println!("loop-cov: \n{:.4}", &covariance);
                     let mut cov_chol: Matrix<f64> = try!(covariance.cholesky());
                     // cholesky is correct
                     let half = (cov_chol.rows() as f64 / 2.0).floor() as usize;
                     let lower_rows = cov_chol.rows() - half - 1;
                     let n_col = cov_chol.cols() - 1;
-                    // println!("cov: \n{:.4}", &covariance);
                     // println!("cov_chol: \n{:.4}", &cov_chol);
 
                     // solve_l_triangular doesn't work with a matrix, so we have to do it 
@@ -371,10 +378,9 @@ impl GaussianMixtureModel {
         let mut log_prob = self.estimate_log_prob(&inputs);
         // println!("log_prob: \n{:.4}", log_prob.select_rows(&[0, 1, 2, 3, 4, 5, 6]));
         // println!("mix_weights: \n{:?}", &self.mix_weights);
-        let log_weights: Vec<f64> = self.mix_weights.iter().map(|w| w.ln()).collect();
-        // println!("log_weights: \n{:?}", &log_weights);
-        for (lp, lw) in log_prob.iter_mut().zip(log_weights.iter()) {
-            *lp *= *lw;
+        let log_weights = self.mix_weights.iter().map(|w| w.ln());
+        for (lp, lw) in log_prob.iter_mut().zip(log_weights) {
+            *lp *= lw;
         }
         log_prob
     }
@@ -400,7 +406,7 @@ impl GaussianMixtureModel {
             // println!("y: \n{:.4}", &y.select_rows(&[0, 1, 2, 3, 4, 5, 6]));
             // Matrix of shape [1, n_features]
             let z: Matrix<f64> = model_means.select_rows(&[k]) * prec;
-            println!("z: \n{:.4}", &z);
+            // println!("z: \n{:.4}", &z);
             
             // Subtract the mean of each column from the matrix y
             for col in 0..y.cols() {
@@ -434,13 +440,13 @@ impl GaussianMixtureModel {
                 a.ln()
             }).collect::<Vec<f64>>());
 
-        println!("log_prob_norm: \n{:.4}", &log_prob_norm.select(&[0, 1, 2, 3, 4, 5, 6]));
+        // println!("log_prob_norm: \n{:.4}", &log_prob_norm.select(&[0, 1, 2, 3, 4, 5, 6]));
         for row in 0..log_prob_norm.size() {
             for col in 0..weighted_log_prob.cols() {
                 weighted_log_prob[[row, col]] -= log_prob_norm[row];
             }
         }
-        println!("log_prob: \n{:.4}", weighted_log_prob.select_rows(&[0, 1, 2, 3, 4, 5, 6]));
+        // println!("log_prob: \n{:.4}", weighted_log_prob.select_rows(&[0, 1, 2, 3, 4, 5, 6]));
         (log_prob_norm, weighted_log_prob)
     }
 
@@ -488,6 +494,12 @@ impl GaussianMixtureModel {
             }
 
             *covariance = (diff_transpose.as_mut_slice() * diff) / self.mix_weights[k];
+
+            // Add the regularization value
+            for idx in 0..covariance.rows() {
+                covariance[[idx, idx]] += 0.03;
+            }
+
         }
 
         self.mix_weights /= inputs.rows() as f64;
