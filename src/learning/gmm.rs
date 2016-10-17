@@ -105,6 +105,8 @@ impl<T: Initializer> UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureMod
             self.update_gaussian_parameters(inputs, resp);
         }
 
+        println!("initialized means: \n{:.4}", self.model_means.as_ref().unwrap());
+
         for c in self.model_covars.as_ref().unwrap().iter() {
             // println!("covs: \n{:.4}", &c);
         }
