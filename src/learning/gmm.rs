@@ -343,7 +343,7 @@ impl<T: Initializer> GaussianMixtureModel<T> {
                 let n_features = covariances[0].cols();
                 for covariance in covariances {
                     for i in 0..covariance.cols() {
-                        if covariance[[i, i]] <= 0.0 {
+                        if covariance[[i, i]] < EPSILON {
                             return Err(Error::new(
                                     ErrorKind::InvalidState, 
                                     "Mixture model had zeros along the diagonals."));
