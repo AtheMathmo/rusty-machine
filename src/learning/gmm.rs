@@ -91,7 +91,6 @@ impl<T: Initializer> UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureMod
 
         // Initialization:
         let k = self.comp_count;
-        // println!("\n");
 
         self.model_covars = {
             let cov_mat = try!(self.initialize_covariances(inputs, reg_value));
@@ -105,31 +104,17 @@ impl<T: Initializer> UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureMod
             self.update_gaussian_parameters(inputs, resp);
         }
 
-        println!("initialized means: \n{:.4}", self.model_means.as_ref().unwrap());
-
-        for c in self.model_covars.as_ref().unwrap().iter() {
-            // println!("covs: \n{:.4}", &c);
-        }
-
         self.precisions_cholesky = Some(try!(self.compute_precision_cholesky()));
-        for c in self.precisions_cholesky.as_ref().unwrap().iter() {
-            // println!("prec: \n{:.4}", &c);
-        }
-
         self.log_lik = 0.;
 
         for iter in 0..self.max_iters {
             let log_lik_0 = self.log_lik;
-            // println!("\nIteration {}", iter);
-            // println!("cov:\n{:.4}", self.covariances().unwrap());
 
             // e_step
             let (log_prob_norm, mut resp) = self.estimate_log_prob_resp(inputs);
             // Return to normal space
             for v in resp.iter_mut() { *v = v.exp(); }
 
-            // println!("resp: \n{:.4}", &resp.select_rows(&[0, 1, 2, 3, 4]));
-            // println!("mix_weights: {}", &self.mix_weights);
             // m_step
             self.update_gaussian_parameters(inputs, resp);
             self.precisions_cholesky = Some(try!(self.compute_precision_cholesky()));
@@ -445,7 +430,6 @@ impl<T: Initializer> GaussianMixtureModel<T> {
     fn update_gaussian_parameters(&mut self, inputs: &Matrix<f64>, mut resp: Matrix<f64>) {
         let mut model_means = self.model_means.as_mut().unwrap();
 
-        // println!("resp: {}", resp);
         self.mix_weights = resp.iter_rows()
             .fold(Vector::new(vec![0.0; resp.cols()]), |mut acc, row| {
                 for (a, r) in acc.iter_mut().zip(row.iter()) {
@@ -455,12 +439,10 @@ impl<T: Initializer> GaussianMixtureModel<T> {
             })
             + 10.0 * EPSILON;
 
-        // println!("nk: \n{:.4}", &self.mix_weights);
         *model_means = resp.transpose() * inputs;
         for col in 0..model_means.cols() {
             let mm_rows = model_means.rows();
             let mut mm_col = model_means.sub_slice_mut([0, col], mm_rows, 1);
-
             let ref mix_weights = self.mix_weights;
             let div_mix_weights = |v| { v / mix_weights[col] };
             mm_col = mm_col.apply(&div_mix_weights);
@@ -468,35 +450,33 @@ impl<T: Initializer> GaussianMixtureModel<T> {
 
         let mut model_covars = self.model_covars.as_mut().unwrap();
 
-        // println!("means:\n{:.4}", &model_means);
         // Iterate through each component in the model covariances
         for (k, covariance) in model_covars.iter_mut().enumerate() {
             let mut diff: Matrix<f64> = inputs.clone();
             for (_, mut row) in diff.iter_rows_mut().enumerate() {
                 for (i, v) in row.iter_mut().enumerate() {
-                    *v = *v - model_means[[k, i]];
+                    *v -= model_means[[k, i]];
                 }
             }
 
             let mut diff_transpose = diff.transpose();
-
-            for row in 0..diff_transpose.rows() {
-                let mut dt = diff_transpose.sub_slice_mut([row, 0], 1, diff.rows());
-                dt *= resp[[row, k]];
+            let resp_transpose_row = resp.select_cols(&[k]);
+            for row in diff_transpose.iter_rows_mut() {
+                for (v, x) in row.iter_mut().zip(resp_transpose_row.iter()) {
+                    *v *= *x;
+                }
             }
 
-            *covariance = (diff_transpose.as_mut_slice() * diff) / self.mix_weights[k];
+            *covariance = (diff_transpose * diff) / self.mix_weights[k];
 
             // Add the regularization value
             for idx in 0..covariance.rows() {
-                covariance[[idx, idx]] += 0.08;
+                covariance[[idx, idx]] += 0.0;
             }
 
         }
 
         self.mix_weights /= inputs.rows() as f64;
-        // println!("mix_weights: {}", &self.mix_weights);
-
     }
 }
 
