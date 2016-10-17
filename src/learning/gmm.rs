@@ -6,14 +6,14 @@
 //!
 //! ```
 //! use rusty_machine::linalg::Matrix;
-//! use rusty_machine::learning::gmm::{CovOption, GaussianMixtureModel};
+//! use rusty_machine::learning::gmm::{CovOption, GaussianMixtureModel, Random};
 //! use rusty_machine::learning::UnSupModel;
 //!
 //! let inputs = Matrix::new(4, 2, vec![1.0, 2.0, -3.0, -3.0, 0.1, 1.5, -5.0, -2.5]);
 //! let test_inputs = Matrix::new(3, 2, vec![1.0, 2.0, 3.0, 2.9, -4.4, -2.5]);
 //!
 //! // Create gmm with k(=2) classes.
-//! let mut model = GaussianMixtureModel::new(2);
+//! let mut model: GaussianMixtureModel<Random> = GaussianMixtureModel::new(2);
 //! model.set_max_iters(10);
 //! model.cov_option = CovOption::Diagonal;
 //!
@@ -32,11 +32,9 @@
 //! ```
 extern crate rand;
 
-use linalg::{Matrix, MatrixSlice, Vector, BaseMatrix, BaseMatrixMut, Axes};
-use rulinalg::utils;
+use linalg::{Matrix, Vector, BaseMatrix, BaseMatrixMut, Axes};
 
 use learning::{LearningResult, UnSupModel};
-use learning::toolkit::rand_utils;
 use learning::error::{Error, ErrorKind};
 
 use std::f64::consts::PI;
@@ -107,7 +105,7 @@ impl<T: Initializer> UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureMod
         self.precisions_cholesky = Some(try!(self.compute_precision_cholesky()));
         self.log_lik = 0.;
 
-        for iter in 0..self.max_iters {
+        for _ in 0..self.max_iters {
             let log_lik_0 = self.log_lik;
 
             // e_step
@@ -151,9 +149,9 @@ impl<T: Initializer> GaussianMixtureModel<T> {
     ///
     /// # Examples
     /// ```
-    /// use rusty_machine::learning::gmm::GaussianMixtureModel;
+    /// use rusty_machine::learning::gmm::{GaussianMixtureModel, Random};
     ///
-    /// let gmm = GaussianMixtureModel::new(3);
+    /// let gmm: GaussianMixtureModel<Random> = GaussianMixtureModel::new(3);
     /// ```
     pub fn new(k: usize) -> Self {
         Self::with_weights(k, Vector::ones(k) / k as f64).unwrap()
@@ -167,12 +165,12 @@ impl<T: Initializer> GaussianMixtureModel<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::learning::gmm::GaussianMixtureModel;
+    /// use rusty_machine::learning::gmm::{GaussianMixtureModel, Random};
     /// use rusty_machine::linalg::Vector;
     ///
     /// let mix_weights = Vector::new(vec![0.25, 0.25, 0.5]);
     ///
-    /// let gmm = GaussianMixtureModel::with_weights(3, mix_weights).unwrap();
+    /// let gmm: GaussianMixtureModel<Random> = GaussianMixtureModel::with_weights(3, mix_weights).unwrap();
     /// ```
     ///
     /// # Failures
@@ -243,9 +241,9 @@ impl<T: Initializer> GaussianMixtureModel<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::learning::gmm::GaussianMixtureModel;
+    /// use rusty_machine::learning::gmm::{GaussianMixtureModel, Random};
     ///
-    /// let mut gmm = GaussianMixtureModel::new(2);
+    /// let mut gmm: GaussianMixtureModel<Random> = GaussianMixtureModel::new(2);
     /// gmm.set_max_iters(5);
     /// ```
     pub fn set_max_iters(&mut self, iters: usize) {
@@ -427,7 +425,7 @@ impl<T: Initializer> GaussianMixtureModel<T> {
         (log_prob_norm, weighted_log_prob)
     }
 
-    fn update_gaussian_parameters(&mut self, inputs: &Matrix<f64>, mut resp: Matrix<f64>) {
+    fn update_gaussian_parameters(&mut self, inputs: &Matrix<f64>, resp: Matrix<f64>) {
         let mut model_means = self.model_means.as_mut().unwrap();
 
         self.mix_weights = resp.iter_rows()
@@ -442,10 +440,10 @@ impl<T: Initializer> GaussianMixtureModel<T> {
         *model_means = resp.transpose() * inputs;
         for col in 0..model_means.cols() {
             let mm_rows = model_means.rows();
-            let mut mm_col = model_means.sub_slice_mut([0, col], mm_rows, 1);
+            let mm_col = model_means.sub_slice_mut([0, col], mm_rows, 1);
             let ref mix_weights = self.mix_weights;
             let div_mix_weights = |v| { v / mix_weights[col] };
-            mm_col = mm_col.apply(&div_mix_weights);
+            mm_col.apply(&div_mix_weights);
         }
 
         let mut model_covars = self.model_covars.as_mut().unwrap();
@@ -488,6 +486,7 @@ pub trait Initializer {
 }
 
 /// Initialize the responsibilities matrix using randomly generated values
+#[derive(Debug)]
 pub struct Random;
 
 impl Initializer for Random {
@@ -509,6 +508,7 @@ impl Initializer for Random {
 }
 
 /// Initialize the responsibilities matrix using k-means clustering
+#[derive(Debug)]
 pub struct KMeans;
 
 impl Initializer for KMeans {
@@ -528,8 +528,7 @@ impl Initializer for KMeans {
 #[cfg(test)]
 mod tests {
     use super::{GaussianMixtureModel, Random};
-    use learning::UnSupModel;
-    use linalg::{Vector, Matrix};
+    use linalg::Vector;
 
     #[test]
     fn test_means_none() {

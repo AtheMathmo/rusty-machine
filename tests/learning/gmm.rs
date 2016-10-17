@@ -1,7 +1,7 @@
 extern crate rand;
 
 use rm::linalg::{Matrix, BaseMatrix};
-use rm::learning::gmm::{GaussianMixtureModel, Random, KMeans};
+use rm::learning::gmm::{GaussianMixtureModel, KMeans};
 use rm::learning::UnSupModel;
 
 use self::rand::thread_rng;
