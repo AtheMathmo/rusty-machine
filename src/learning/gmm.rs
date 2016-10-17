@@ -30,12 +30,18 @@
 //! // Probabilities that each point comes from each Gaussian.
 //! println!("{:?}", post_probs.data());
 //! ```
+extern crate rand;
+
 use linalg::{Matrix, MatrixSlice, Vector, BaseMatrix, BaseMatrixMut, Axes};
 use rulinalg::utils;
 
 use learning::{LearningResult, UnSupModel};
 use learning::toolkit::rand_utils;
 use learning::error::{Error, ErrorKind};
+
+use std::f64::consts::PI;
+use std::f64::EPSILON;
+use std::mem;
 
 const CONVERGENCE_EPS: f64 = 1.0e-15;
 
@@ -59,10 +65,15 @@ pub enum CovOption {
 #[derive(Debug)]
 pub struct GaussianMixtureModel {
     comp_count: usize,
+    // [n_features]
     mix_weights: Vector<f64>,
+    // [n_components, n_features]
     model_means: Option<Matrix<f64>>,
+    // n_components elements: [n_features, n_features]
     model_covars: Option<Vec<Matrix<f64>>>,
-    log_lik: f64,
+    // n_components elements: [n_features, n_features]
+    precisions_cholesky: Option<Vec<Matrix<f64>>>,
+    log_lik: Vector<f64>,
     max_iters: usize,
     /// The covariance options for the GMM.
     pub cov_option: CovOption,
@@ -79,28 +90,66 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
 
         // Initialization:
         let k = self.comp_count;
+        // println!("\n");
 
         self.model_covars = {
             let cov_mat = try!(self.initialize_covariances(inputs, reg_value));
             Some(vec![cov_mat; k])
         };
 
-        let random_rows: Vec<usize> =
-            rand_utils::reservoir_sample(&(0..inputs.rows()).collect::<Vec<usize>>(), k);
-        self.model_means = Some(inputs.select_rows(&random_rows));
+        {
+            use rand::distributions::{IndependentSample, Range};
+            let between = Range::new(0f64, 1.);
+            let mut rng = rand::thread_rng();
 
-        for _ in 0..self.max_iters {
-            let log_lik_0 = self.log_lik;
+            self.model_means = Some(Matrix::new(inputs.cols(), self.comp_count, 
+                                                vec![0.; inputs.cols() * self.comp_count]));
+            let random_numbers: Vec<f64> = 
+                (0..(inputs.rows()*k)).map(|_| between.ind_sample(&mut rng).exp()).collect();
+            let mut resp = Matrix::new(inputs.rows(), k, random_numbers);
+            let sum = resp.sum_cols();
+            for row in resp.iter_rows_mut() {
+                for (v, s) in row.iter_mut().zip(sum.iter()) {
+                    *v /= *s;
+                }
+            }
+            self.update_gaussian_parameters(inputs, resp);
+        }
 
-            let (weights, log_lik_1) = try!(self.membership_weights(inputs));
+        for c in self.model_covars.as_ref().unwrap().iter() {
+            // println!("covs: \n{:.4}", &c);
+        }
 
-            if (log_lik_1 - log_lik_0).abs() < CONVERGENCE_EPS {
+        self.precisions_cholesky = Some(try!(self.compute_precision_cholesky()));
+        for c in self.precisions_cholesky.as_ref().unwrap().iter() {
+            // println!("prec: \n{:.4}", &c);
+        }
+
+        self.log_lik = Vector::new(vec![0.0; inputs.rows()]);
+        for iter in 0..self.max_iters {
+            let log_lik_0 = self.log_lik.clone();
+            // println!("\nIteration {}", iter);
+            // println!("cov:\n{:.4}", self.covariances().unwrap());
+
+            // e_step
+            let (log_prob_norm, mut resp) = self.estimate_log_prob_resp(inputs);
+            // Return to normal space
+            for v in resp.iter_mut() { *v = v.exp(); }
+
+            println!("resp: \n{:.4}", &resp.select_rows(&[0, 1, 2, 3, 4]));
+            println!("mix_weights: {}", &self.mix_weights);
+            // m_step
+            self.update_gaussian_parameters(inputs, resp);
+            self.precisions_cholesky = Some(try!(self.compute_precision_cholesky()));
+            // end of m_step
+            
+            let log_lik_1 = log_prob_norm;
+
+            if (log_lik_0 - &log_lik_1).iter().all(|v| v.abs() < CONVERGENCE_EPS) {
                 break;
             }
 
             self.log_lik = log_lik_1;
-
-            self.update_params(inputs, weights);
         }
 
         Ok(())
@@ -109,7 +158,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
     /// Predict output from inputs.
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
         if let (&Some(_), &Some(_)) = (&self.model_means, &self.model_covars) {
-            Ok(try!(self.membership_weights(inputs)).0)
+            Ok(self.estimate_weighted_log_prob(inputs))
         } else {
             Err(Error::new_untrained())
         }
@@ -169,7 +218,8 @@ impl GaussianMixtureModel {
                 mix_weights: normalized_weights,
                 model_means: None,
                 model_covars: None,
-                log_lik: 0f64,
+                precisions_cholesky: None,
+                log_lik: Vector::new(vec![]),
                 max_iters: 100,
                 cov_option: CovOption::Full,
             })
@@ -223,7 +273,6 @@ impl GaussianMixtureModel {
                 let variance = try!(inputs.variance(Axes::Row));
                 Ok(Matrix::from_diag(&variance.data()) * reg_value.sqrt())
             }
-
             CovOption::Full | CovOption::Regularized(_) => {
                 let means = inputs.mean(Axes::Row);
                 let mut cov_mat = Matrix::zeros(inputs.cols(), inputs.cols());
@@ -243,108 +292,214 @@ impl GaussianMixtureModel {
         }
     }
 
-    fn membership_weights(&self, inputs: &Matrix<f64>) -> LearningResult<(Matrix<f64>, f64)> {
-        let n = inputs.rows();
+    fn compute_precision_cholesky(&self) -> LearningResult<Vec<Matrix<f64>>> {
+        let &GaussianMixtureModel {
+            model_covars: ref covariances,
+            cov_option: ref covariance_type,
+            comp_count: n_components,
+            ..
+        } = self;
 
-        let mut member_weights_data = Vec::with_capacity(n * self.comp_count);
+        let covariances = covariances.as_ref().unwrap();
+        match *covariance_type {
+            CovOption::Full | CovOption::Regularized(_) => {
+                let mut precisions_chol = Vec::<Matrix<f64>>::with_capacity(n_components);
+                for covariance in covariances {
+                    let mut cov_chol: Matrix<f64> = try!(covariance.cholesky());
+                    // cholesky is correct
+                    let half = (cov_chol.rows() as f64 / 2.0).floor() as usize;
+                    let lower_rows = cov_chol.rows() - half - 1;
+                    let n_col = cov_chol.cols() - 1;
+                    // println!("cov: \n{:.4}", &covariance);
+                    // println!("cov_chol: \n{:.4}", &cov_chol);
 
-        // We compute the determinants and inverses now
-        let mut cov_sqrt_dets = Vec::with_capacity(self.comp_count);
-        let mut cov_invs = Vec::with_capacity(self.comp_count);
+                    // solve_l_triangular doesn't work with a matrix, so we have to do it 
+                    // the hard way.
+                    let det: f64 = cov_chol.det();
+                    cov_chol /= det;
 
-        if let Some(ref covars) = self.model_covars {
-            for cov in covars {
-                // TODO: combine these. We compute det to get the inverse.
-                let covar_det = cov.det();
-                let covar_inv = try!(cov.inverse().map_err(Error::from));
+                    for idx in 0..half {
+                        // Mirror along the diagonal
+                        let (mut upper, mut lower) = cov_chol.split_at_mut(half, Axes::Row);
+                        {
+                            let swap_row = lower_rows - idx;
+                            let swap_col = n_col - idx;
+                            mem::swap(&mut upper[[idx, idx]], &mut lower[[swap_row, swap_col]]);
+                        }
 
-                cov_sqrt_dets.push(covar_det.sqrt());
-                cov_invs.push(covar_inv);
+                        // Transpose and invert all other values
+                        for j in (idx+1)..(n_col+1) {
+                            let swap_row = lower_rows - idx;
+                            let swap_col = n_col - j;
+                            mem::swap(&mut upper[[idx, j]], &mut lower[[swap_row, swap_col]]);
+                            upper[[idx, j]] *= -1.0;
+                        }
+                    }
+                    precisions_chol.push(cov_chol);
+                }
+                Ok(precisions_chol)
+            },
+            CovOption::Diagonal => {
+                let n_features = covariances[0].cols();
+                for covariance in covariances {
+                    for i in 0..covariance.cols() {
+                        if covariance[[i, i]] <= 0.0 {
+                            return Err(Error::new(
+                                    ErrorKind::InvalidState, 
+                                    "Mixture model had zeros along the diagonals."));
+                        }
+                    }
+                }
+                let mut precisions_chol = Vec::<Matrix<f64>>::with_capacity(n_components);
+                for covariance in covariances {
+                    let v: Vec<f64> = covariance.iter().map(|v| 1.0 / v.sqrt()).collect();
+                    precisions_chol.push(Matrix::<f64>::new(n_features, n_features, v));
+                }
+                Ok(precisions_chol)
             }
         }
-
-        let mut log_lik = 0f64;
-
-        // Now we compute the membership weights
-        if let Some(ref means) = self.model_means {
-            for i in 0..n {
-                let mut pdfs = Vec::with_capacity(self.comp_count);
-                let x_i = MatrixSlice::from_matrix(inputs, [i, 0], 1, inputs.cols());
-
-                for j in 0..self.comp_count {
-                    let mu_j = MatrixSlice::from_matrix(means, [j, 0], 1, means.cols());
-                    let diff = x_i - mu_j;
-
-                    let pdf = (&diff * &cov_invs[j] * diff.transpose() * -0.5).into_vec()[0]
-                        .exp() / cov_sqrt_dets[j];
-                    pdfs.push(pdf);
-                }
-
-                let weighted_pdf_sum = utils::dot(&pdfs, self.mix_weights.data());
-
-                for (idx, pdf) in pdfs.iter().enumerate() {
-                    member_weights_data.push(self.mix_weights[idx] * pdf / (weighted_pdf_sum));
-                }
-
-                log_lik += weighted_pdf_sum.ln();
-            }
-        }
-
-        Ok((Matrix::new(n, self.comp_count, member_weights_data), log_lik))
     }
 
-    fn update_params(&mut self, inputs: &Matrix<f64>, membership_weights: Matrix<f64>) {
-        let n = membership_weights.rows();
-        let d = inputs.cols();
-
-        let sum_weights = membership_weights.sum_rows();
-
-        self.mix_weights = &sum_weights / (n as f64);
-
-        let mut new_means = membership_weights.transpose() * inputs;
-
-        for (mean, w) in new_means.iter_rows_mut().zip(sum_weights.data().iter()) {
-            for m in mean.iter_mut() {
-                *m /= *w;
-            }
+    // == Parameters
+    // inputs : [n_samples, n_features]
+    //
+    // == Returns
+    // weighted_log_prob : [n_features, n_components]
+    //
+    fn estimate_weighted_log_prob(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
+        let mut log_prob = self.estimate_log_prob(&inputs);
+        // println!("log_prob: \n{:.4}", log_prob.select_rows(&[0, 1, 2, 3, 4, 5, 6]));
+        // println!("mix_weights: \n{:?}", &self.mix_weights);
+        let log_weights: Vec<f64> = self.mix_weights.iter().map(|w| w.ln()).collect();
+        // println!("log_weights: \n{:?}", &log_weights);
+        for (lp, lw) in log_prob.iter_mut().zip(log_weights.iter()) {
+            *lp *= *lw;
         }
+        log_prob
+    }
 
-        let mut new_covs = Vec::with_capacity(self.comp_count);
+    // called estimate_log_gaussian_prob in scipy
+    //
+    // == Paramers
+    // inputs : [n_samples, n_features]
+    //
+    //
+    fn estimate_log_prob(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
+        let precisions_cholesky: &Vec<Matrix<f64>> = self.precisions_cholesky.as_ref().unwrap();
+        let ref model_means = self.model_means.as_ref().unwrap();
+        // The log of the determinant for each precision matrix
+        let log_det = precisions_cholesky.iter().map(|m| m.det().ln());
+        // println!("log_det: {:?}", log_det);
 
+        let mut log_prob = Matrix::zeros(inputs.rows(), self.comp_count);
         for k in 0..self.comp_count {
-            let mut cov_mat = Matrix::zeros(d, d);
-            let new_means_k = MatrixSlice::from_matrix(&new_means, [k, 0], 1, d);
-
-            for i in 0..n {
-                let inputs_i = MatrixSlice::from_matrix(inputs, [i, 0], 1, d);
-                let diff = inputs_i - new_means_k;
-                cov_mat += self.compute_cov(diff, membership_weights[[i, k]]);
+            let prec = &precisions_cholesky[k];
+            // y is a matrix of shape [n_samples, n_features]
+            let mut y = inputs * prec;
+            // println!("y: \n{:.4}", &y.select_rows(&[0, 1, 2, 3, 4, 5, 6]));
+            // Matrix of shape [1, n_features]
+            let z: Matrix<f64> = model_means.select_rows(&[k]) * prec;
+            println!("z: \n{:.4}", &z);
+            
+            // Subtract the mean of each column from the matrix y
+            for col in 0..y.cols() {
+                for row in 0..y.rows() {
+                    y[[row, col]] -= z[[0, col]];
+                }
             }
+            // println!("y: \n{:.4}", &y.select_rows(&[0, 1, 2, 3, 4, 5, 6]));
 
-            if let CovOption::Regularized(eps) = self.cov_option {
-                cov_mat += Matrix::<f64>::identity(cov_mat.cols()) * eps;
+            for (i, row) in y.iter_rows().enumerate() {
+                let sum_of_squares = row.iter().map(|v| v.powi(2)).sum();
+                log_prob[[i, k]] = sum_of_squares;
             }
-
-            new_covs.push(cov_mat / sum_weights[k]);
-
         }
 
-        self.model_means = Some(new_means);
-        self.model_covars = Some(new_covs);
+        log_prob = (log_prob + inputs.cols() as f64 * (2.0 * PI).ln()) * -0.5;
+        for (row, det) in log_prob.iter_rows_mut().zip(log_det) {
+            for v in row {
+                *v += det;
+            }
+        }
+        log_prob
     }
 
-    fn compute_cov(&self, diff: Matrix<f64>, weight: f64) -> Matrix<f64> {
-        match self.cov_option {
-            CovOption::Full | CovOption::Regularized(_) => (diff.transpose() * diff) * weight,
-            CovOption::Diagonal => Matrix::from_diag(&diff.elemul(&diff).into_vec()) * weight,
+    fn estimate_log_prob_resp(&self, inputs: &Matrix<f64>) -> (Vector<f64>, Matrix<f64>) {
+        let mut weighted_log_prob: Matrix<f64> = self.estimate_weighted_log_prob(inputs);
+        // length of n_samples
+        let log_prob_norm: Vector<f64> = 
+            Vector::new(weighted_log_prob.iter_rows().map(|row: &[f64]| {
+                let a: f64 = row.iter().map(|v| v.exp()).sum();
+                a.ln()
+            }).collect::<Vec<f64>>());
+
+        println!("log_prob_norm: \n{:.4}", &log_prob_norm.select(&[0, 1, 2, 3, 4, 5, 6]));
+        for row in 0..log_prob_norm.size() {
+            for col in 0..weighted_log_prob.cols() {
+                weighted_log_prob[[row, col]] -= log_prob_norm[row];
+            }
         }
+        println!("log_prob: \n{:.4}", weighted_log_prob.select_rows(&[0, 1, 2, 3, 4, 5, 6]));
+        (log_prob_norm, weighted_log_prob)
+    }
+
+    fn update_gaussian_parameters(&mut self, inputs: &Matrix<f64>, mut resp: Matrix<f64>) {
+        let mut model_means = self.model_means.as_mut().unwrap();
+
+        // println!("resp: {}", resp);
+        self.mix_weights = resp.iter_rows()
+            .fold(Vector::new(vec![0.0; resp.cols()]), |mut acc, row| {
+                for (a, r) in acc.iter_mut().zip(row.iter()) {
+                    *a += *r;
+                }
+                acc
+            })
+            + 10.0 * EPSILON;
+
+        // println!("nk: \n{:.4}", &self.mix_weights);
+        *model_means = resp.transpose() * inputs;
+        for col in 0..model_means.cols() {
+            let mm_rows = model_means.rows();
+            let mut mm_col = model_means.sub_slice_mut([0, col], mm_rows, 1);
+
+            let ref mix_weights = self.mix_weights;
+            let div_mix_weights = |v| { v / mix_weights[col] };
+            mm_col = mm_col.apply(&div_mix_weights);
+        }
+
+        let mut model_covars = self.model_covars.as_mut().unwrap();
+
+        // println!("means:\n{:.4}", &model_means);
+        // Iterate through each component in the model covariances
+        for (k, covariance) in model_covars.iter_mut().enumerate() {
+            let mut diff: Matrix<f64> = inputs.clone();
+            for (_, mut row) in diff.iter_rows_mut().enumerate() {
+                for (i, v) in row.iter_mut().enumerate() {
+                    *v = *v - model_means[[k, i]];
+                }
+            }
+
+            let mut diff_transpose = diff.transpose();
+
+            for row in 0..diff_transpose.rows() {
+                let mut dt = diff_transpose.sub_slice_mut([row, 0], 1, diff.rows());
+                dt *= resp[[row, k]];
+            }
+
+            *covariance = (diff_transpose.as_mut_slice() * diff) / self.mix_weights[k];
+        }
+
+        self.mix_weights /= inputs.rows() as f64;
+        // println!("mix_weights: {}", &self.mix_weights);
+
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::GaussianMixtureModel;
-    use linalg::Vector;
+    use learning::UnSupModel;
+    use linalg::{Vector, Matrix};
 
     #[test]
     fn test_means_none() {
