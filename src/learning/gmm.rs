@@ -73,7 +73,7 @@ pub struct GaussianMixtureModel {
     model_covars: Option<Vec<Matrix<f64>>>,
     // n_components elements: [n_features, n_features]
     precisions_cholesky: Option<Vec<Matrix<f64>>>,
-    log_lik: Vector<f64>,
+    log_lik: f64,
     max_iters: usize,
     /// The covariance options for the GMM.
     pub cov_option: CovOption,
@@ -125,9 +125,10 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
             // println!("prec: \n{:.4}", &c);
         }
 
-        self.log_lik = Vector::new(vec![0.0; inputs.rows()]);
+        self.log_lik = 0.;
+
         for iter in 0..self.max_iters {
-            let log_lik_0 = self.log_lik.clone();
+            let log_lik_0 = self.log_lik;
             // println!("\nIteration {}", iter);
             // println!("cov:\n{:.4}", self.covariances().unwrap());
 
@@ -143,9 +144,9 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
             self.precisions_cholesky = Some(try!(self.compute_precision_cholesky()));
             // end of m_step
             
-            let log_lik_1 = log_prob_norm;
+            let log_lik_1 = log_prob_norm.mean();
 
-            if (log_lik_0 - &log_lik_1).iter().all(|v| v.abs() < CONVERGENCE_EPS) {
+            if (log_lik_0 - log_lik_1).abs() < CONVERGENCE_EPS {
                 break;
             }
 
@@ -219,7 +220,7 @@ impl GaussianMixtureModel {
                 model_means: None,
                 model_covars: None,
                 precisions_cholesky: None,
-                log_lik: Vector::new(vec![]),
+                log_lik: 0.,
                 max_iters: 100,
                 cov_option: CovOption::Full,
             })
