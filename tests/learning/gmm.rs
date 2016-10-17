@@ -1,7 +1,7 @@
 extern crate rand;
 
 use rm::linalg::{Matrix, BaseMatrix};
-use rm::learning::gmm::GaussianMixtureModel;
+use rm::learning::gmm::{GaussianMixtureModel, Random, KMeans};
 use rm::learning::UnSupModel;
 
 use self::rand::thread_rng;
@@ -40,13 +40,13 @@ fn generate_data(centroids: &Matrix<f64>, points_per_centroid: usize, noise: f64
 #[test]
 fn gmm_train() {
 
-    const SAMPLES_PER_CENTROID: usize = 2000;
+    const SAMPLES_PER_CENTROID: usize = 500;
     // Choose three cluster centers, at (-0.5, -0.5), (0, 0.5), (0.5, 0.5).
     let centroids = Matrix::new(3, 2, vec![-0.5, -0.5, 0.0, 0.5, 0.5, 0.0]);
 
     // Generate some data randomly around the centroids
     let samples = generate_data(&centroids, SAMPLES_PER_CENTROID, 0.2);
-    let mut model = GaussianMixtureModel::new(3);
+    let mut model = GaussianMixtureModel::<KMeans>::new(3);
     model.set_max_iters(100);
     match model.train(&samples) {
         Ok(_) => {

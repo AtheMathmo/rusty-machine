@@ -42,6 +42,7 @@ use learning::error::{Error, ErrorKind};
 use std::f64::consts::PI;
 use std::f64::EPSILON;
 use std::mem;
+use std::marker::PhantomData;
 
 const CONVERGENCE_EPS: f64 = 1.0e-15;
 
@@ -60,10 +61,9 @@ pub enum CovOption {
     Diagonal,
 }
 
-
 /// A Gaussian Mixture Model
 #[derive(Debug)]
-pub struct GaussianMixtureModel {
+pub struct GaussianMixtureModel<T: Initializer> {
     comp_count: usize,
     // [n_features]
     mix_weights: Vector<f64>,
@@ -75,11 +75,12 @@ pub struct GaussianMixtureModel {
     precisions_cholesky: Option<Vec<Matrix<f64>>>,
     log_lik: f64,
     max_iters: usize,
+    phantom: PhantomData<T>,
     /// The covariance options for the GMM.
     pub cov_option: CovOption,
 }
 
-impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
+impl<T: Initializer> UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel<T> {
     /// Train the model using inputs.
     fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
         let reg_value = if inputs.rows() > 1 {
@@ -98,21 +99,9 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
         };
 
         {
-            use rand::distributions::{IndependentSample, Range};
-            let between = Range::new(0.0f64, 1.);
-            let mut rng = rand::thread_rng();
-
             self.model_means = Some(Matrix::new(inputs.cols(), self.comp_count, 
                                                 vec![0.; inputs.cols() * self.comp_count]));
-            let random_numbers: Vec<f64> = 
-                (0..(inputs.rows()*k)).map(|_| between.ind_sample(&mut rng).exp()).collect();
-            let mut resp = Matrix::new(inputs.rows(), k, random_numbers);
-            let sum = resp.sum_cols();
-            for row in resp.iter_rows_mut() {
-                for (v, s) in row.iter_mut().zip(sum.iter()) {
-                    *v /= *s;
-                }
-            }
+            let resp = try!(T::init_resp(k, inputs));
             self.update_gaussian_parameters(inputs, resp);
         }
 
@@ -167,7 +156,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
     }
 }
 
-impl GaussianMixtureModel {
+impl<T: Initializer> GaussianMixtureModel<T> {
     /// Constructs a new Gaussian Mixture Model
     ///
     /// Defaults to 100 maximum iterations and
@@ -179,7 +168,7 @@ impl GaussianMixtureModel {
     ///
     /// let gmm = GaussianMixtureModel::new(3);
     /// ```
-    pub fn new(k: usize) -> GaussianMixtureModel {
+    pub fn new(k: usize) -> Self {
         Self::with_weights(k, Vector::ones(k) / k as f64).unwrap()
     }
 
@@ -205,7 +194,7 @@ impl GaussianMixtureModel {
     ///
     /// - Mixture weights do not have length k.
     /// - Mixture weights have a negative entry.
-    pub fn with_weights(k: usize, mixture_weights: Vector<f64>) -> LearningResult<GaussianMixtureModel> {
+    pub fn with_weights(k: usize, mixture_weights: Vector<f64>) -> LearningResult<Self> {
         if mixture_weights.size() != k {
             Err(Error::new(ErrorKind::InvalidParameters, "Mixture weights must have length k."))
         } else if mixture_weights.data().iter().any(|&x| x < 0f64) {
@@ -223,6 +212,7 @@ impl GaussianMixtureModel {
                 log_lik: 0.,
                 max_iters: 100,
                 cov_option: CovOption::Full,
+                phantom: PhantomData,
             })
         }
     }
@@ -497,7 +487,7 @@ impl GaussianMixtureModel {
 
             // Add the regularization value
             for idx in 0..covariance.rows() {
-                covariance[[idx, idx]] += 0.03;
+                covariance[[idx, idx]] += 0.08;
             }
 
         }
@@ -508,22 +498,67 @@ impl GaussianMixtureModel {
     }
 }
 
+/// Trait for possible methods of initializing the responsibilities matrix
+pub trait Initializer {
+    /// Should return the responsibilities matrix: 
+    /// shape is [samples, components]
+    fn init_resp(k: usize, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>>;
+}
+
+/// Initialize the responsibilities matrix using randomly generated values
+pub struct Random;
+
+impl Initializer for Random {
+    fn init_resp(k: usize, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
+        use rand::distributions::{IndependentSample, Range};
+        let between = Range::new(0.0f64, 1.);
+        let mut rng = rand::thread_rng();
+        let random_numbers: Vec<f64> = 
+            (0..(inputs.rows()*k)).map(|_| between.ind_sample(&mut rng).exp()).collect();
+        let mut resp = Matrix::new(inputs.rows(), k, random_numbers);
+        let sum = resp.sum_cols();
+        for row in resp.iter_rows_mut() {
+            for (v, s) in row.iter_mut().zip(sum.iter()) {
+                *v /= *s;
+            }
+        }
+        Ok(resp)
+    }
+}
+
+/// Initialize the responsibilities matrix using k-means clustering
+pub struct KMeans;
+
+impl Initializer for KMeans {
+    fn init_resp(k: usize, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
+        use learning::k_means::KMeansClassifier;
+        let mut model = KMeansClassifier::new(k);
+        try!(model.train(inputs));
+        let classes = try!(model.predict(inputs));
+        let mut resp: Matrix<f64> = Matrix::zeros(inputs.rows(), k);
+        for (row, col) in classes.iter().enumerate() {
+            resp[[row, *col]] = 1.;
+        }
+        Ok(resp)
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::GaussianMixtureModel;
+    use super::{GaussianMixtureModel, Random};
     use learning::UnSupModel;
     use linalg::{Vector, Matrix};
 
     #[test]
     fn test_means_none() {
-        let model = GaussianMixtureModel::new(5);
+        let model = GaussianMixtureModel::<Random>::new(5);
 
         assert_eq!(model.means(), None);
     }
 
     #[test]
     fn test_covars_none() {
-        let model = GaussianMixtureModel::new(5);
+        let model = GaussianMixtureModel::<Random>::new(5);
 
         assert_eq!(model.covariances(), None);
     }
@@ -531,14 +566,14 @@ mod tests {
     #[test]
     fn test_negative_mixtures() {
         let mix_weights = Vector::new(vec![-0.25, 0.75, 0.5]);
-        let gmm_res = GaussianMixtureModel::with_weights(3, mix_weights);
+        let gmm_res = GaussianMixtureModel::<Random>::with_weights(3, mix_weights);
         assert!(gmm_res.is_err());
     }
 
     #[test]
     fn test_wrong_length_mixtures() {
         let mix_weights = Vector::new(vec![0.1, 0.25, 0.75, 0.5]);
-        let gmm_res = GaussianMixtureModel::with_weights(3, mix_weights);
+        let gmm_res = GaussianMixtureModel::<Random>::with_weights(3, mix_weights);
         assert!(gmm_res.is_err());
     }
 }
