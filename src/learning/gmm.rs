@@ -372,7 +372,7 @@ impl<T: Initializer> GaussianMixtureModel<T> {
         // println!("mix_weights: \n{:?}", &self.mix_weights);
         let log_weights = self.mix_weights.iter().map(|w| w.ln());
         for (lp, lw) in log_prob.iter_mut().zip(log_weights) {
-            *lp *= lw;
+            *lp += lw;
         }
         log_prob
     }
