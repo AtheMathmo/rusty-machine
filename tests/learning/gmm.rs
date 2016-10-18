@@ -42,7 +42,7 @@ fn gmm_train() {
 
     const SAMPLES_PER_CENTROID: usize = 500;
     // Choose three cluster centers, at (-0.5, -0.5), (0, 0.5), (0.5, 0.5).
-    let centroids = Matrix::new(3, 2, vec![-0.5, -0.5, 0.0, 0.5, 0.5, 0.0]);
+    let centroids = Matrix::new(2, 3, vec![-0.4, -0.6, 0.1, 0.6, 0.7, -0.3]);
 
     // Generate some data randomly around the centroids
     let samples = generate_data(&centroids, SAMPLES_PER_CENTROID, 0.2);
