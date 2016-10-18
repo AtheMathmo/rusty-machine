@@ -415,13 +415,12 @@ impl<T: Initializer> GaussianMixtureModel<T> {
                 a.ln()
             }).collect::<Vec<f64>>());
 
-        // println!("log_prob_norm: \n{:.4}", &log_prob_norm.select(&[0, 1, 2, 3, 4, 5, 6]));
         for row in 0..log_prob_norm.size() {
             for col in 0..weighted_log_prob.cols() {
                 weighted_log_prob[[row, col]] -= log_prob_norm[row];
             }
         }
-        // println!("log_prob: \n{:.4}", weighted_log_prob.select_rows(&[0, 1, 2, 3, 4, 5, 6]));
+
         (log_prob_norm, weighted_log_prob)
     }
 
@@ -466,7 +465,7 @@ impl<T: Initializer> GaussianMixtureModel<T> {
 
             // Add the regularization value
             for idx in 0..covariance.rows() {
-                covariance[[idx, idx]] += 0.05;
+                covariance[[idx, idx]] += 0.01;
             }
 
         }
