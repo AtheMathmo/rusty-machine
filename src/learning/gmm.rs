@@ -242,31 +242,6 @@ impl<T: Initializer> GaussianMixtureModel<T> {
         self.max_iters = iters;
     }
 
-    fn initialize_covariances(&self, inputs: &Matrix<f64>, reg_value: f64) -> LearningResult<Matrix<f64>> {
-        match self.cov_option {
-            CovOption::Diagonal => {
-                let variance = try!(inputs.variance(Axes::Row));
-                Ok(Matrix::from_diag(&variance.data()) * reg_value.sqrt())
-            }
-            CovOption::Full | CovOption::Regularized(_) => {
-                let means = inputs.mean(Axes::Row);
-                let mut cov_mat = Matrix::zeros(inputs.cols(), inputs.cols());
-                for (j, row) in cov_mat.iter_rows_mut().enumerate() {
-                    for (k, elem) in row.iter_mut().enumerate() {
-                        *elem = inputs.iter_rows().map(|r| {
-                            (r[j] - means[j]) * (r[k] - means[k])
-                        }).sum::<f64>();
-                    }
-                }
-                cov_mat *= reg_value;
-                if let CovOption::Regularized(eps) = self.cov_option {
-                    cov_mat += Matrix::<f64>::identity(cov_mat.cols()) * eps;
-                }
-                Ok(cov_mat)
-            }
-        }
-    }
-
     fn compute_precision_cholesky(&self) -> LearningResult<Vec<Matrix<f64>>> {
         let &GaussianMixtureModel {
             model_covars: ref covariances,
