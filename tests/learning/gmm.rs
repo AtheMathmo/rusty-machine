@@ -46,7 +46,7 @@ fn gmm_train() {
 
     // Generate some data randomly around the centroids
     let samples = generate_data(&centroids, SAMPLES_PER_CENTROID, 0.2);
-    let mut model = GaussianMixtureModel::<KMeans>::new(3);
+    let mut model = GaussianMixtureModel::<KMeans>::new(10);
     model.set_max_iters(100);
     match model.train(&samples) {
         Ok(_) => {
