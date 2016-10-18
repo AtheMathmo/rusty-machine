@@ -426,8 +426,6 @@ impl<T: Initializer> GaussianMixtureModel<T> {
     }
 
     fn update_gaussian_parameters(&mut self, inputs: &Matrix<f64>, resp: Matrix<f64>) {
-        let mut model_means = self.model_means.as_mut().unwrap();
-
         self.mix_weights = resp.iter_rows()
             .fold(Vector::new(vec![0.0; resp.cols()]), |mut acc, row| {
                 for (a, r) in acc.iter_mut().zip(row.iter()) {
@@ -436,17 +434,16 @@ impl<T: Initializer> GaussianMixtureModel<T> {
                 acc
             })
             + 10.0 * EPSILON;
-
-        *model_means = resp.transpose() * inputs;
-        for col in 0..model_means.cols() {
-            let mm_rows = model_means.rows();
-            let mm_col = model_means.sub_slice_mut([0, col], mm_rows, 1);
-            let ref mix_weights = self.mix_weights;
-            let div_mix_weights = |v| { v / mix_weights[col] };
-            mm_col.apply(&div_mix_weights);
-        }
-
+            
         let mut model_covars = self.model_covars.as_mut().unwrap();
+        let mut model_means = self.model_means.as_mut().unwrap();
+        *model_means = resp.transpose() * inputs;
+
+        for (nk, row) in self.mix_weights.iter().zip(model_means.iter_rows_mut()) {
+            for v in row {
+                *v /= *nk;
+            }
+        }
 
         // Iterate through each component in the model covariances
         for (k, covariance) in model_covars.iter_mut().enumerate() {
@@ -469,7 +466,7 @@ impl<T: Initializer> GaussianMixtureModel<T> {
 
             // Add the regularization value
             for idx in 0..covariance.rows() {
-                covariance[[idx, idx]] += 0.0;
+                covariance[[idx, idx]] += 0.05;
             }
 
         }
