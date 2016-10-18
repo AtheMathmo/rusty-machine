@@ -6,16 +6,15 @@
 //!
 //! ```
 //! use rusty_machine::linalg::Matrix;
-//! use rusty_machine::learning::gmm::{CovOption, GaussianMixtureModel, Random};
+//! use rusty_machine::learning::gmm::{CovOption, GaussianMixtureModel, Random, CholeskyFull, Diagonal};
 //! use rusty_machine::learning::UnSupModel;
 //!
 //! let inputs = Matrix::new(4, 2, vec![1.0, 2.0, -3.0, -3.0, 0.1, 1.5, -5.0, -2.5]);
 //! let test_inputs = Matrix::new(3, 2, vec![1.0, 2.0, 3.0, 2.9, -4.4, -2.5]);
 //!
 //! // Create gmm with k(=2) classes.
-//! let mut model: GaussianMixtureModel<Random> = GaussianMixtureModel::new(2);
+//! let mut model: GaussianMixtureModel<Random, Diagonal> = GaussianMixtureModel::new(2);
 //! model.set_max_iters(10);
-//! model.cov_option = CovOption::Diagonal;
 //!
 //! // Where inputs is a Matrix with features in columns.
 //! model.train(&inputs).unwrap();
@@ -44,24 +43,9 @@ use std::marker::PhantomData;
 
 const CONVERGENCE_EPS: f64 = 1.0e-15;
 
-/// Covariance options for GMMs.
-///
-/// - Full : The full covariance structure.
-/// - Regularized : Adds a regularization constant to the covariance diagonal.
-/// - Diagonal : Only the diagonal covariance structure.
-#[derive(Clone, Copy, Debug)]
-pub enum CovOption {
-    /// The full covariance structure.
-    Full,
-    /// Adds a regularization constant to the covariance diagonal.
-    Regularized(f64),
-    /// Only the diagonal covariance structure.
-    Diagonal,
-}
-
 /// A Gaussian Mixture Model
 #[derive(Debug)]
-pub struct GaussianMixtureModel<T: Initializer> {
+pub struct GaussianMixtureModel<T: Initializer, C: CovOption<T>> {
     comp_count: usize,
     // [n_features]
     mix_weights: Vector<f64>,
@@ -70,18 +54,21 @@ pub struct GaussianMixtureModel<T: Initializer> {
     // n_components elements: [n_features, n_features]
     model_covars: Option<Vec<Matrix<f64>>>,
     // n_components elements: [n_features, n_features]
-    precisions_cholesky: Option<Vec<Matrix<f64>>>,
+    precisions: Option<Vec<Matrix<f64>>>,
     log_lik: f64,
     max_iters: usize,
     phantom: PhantomData<T>,
-    /// The covariance options for the GMM.
-    pub cov_option: CovOption,
+    /// Struct that calculates covariance and gaussian parameters
+    pub cov_option: C,
 }
 
-impl<T: Initializer> UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel<T> {
+impl<T, C> UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel<T, C> 
+    where T: Initializer,
+          C: CovOption<T> + Default
+{
     /// Train the model using inputs.
     fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
-        // Move k to stack to appease the borrow checker
+        // Move k to stack to appease the borrow checker 
         let k = self.comp_count;
 
         // Initialize empty matrices for covariances and means
@@ -90,10 +77,10 @@ impl<T: Initializer> UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureMod
         self.model_means = Some(Matrix::zeros(inputs.cols(), k));
 
         // Initialize responsibitilies and calculate parameters
-        self.update_gaussian_parameters(
-            inputs, try!(T::init_resp(k, inputs)));
-        self.precisions_cholesky =
-            Some(try!(self.compute_precision_cholesky()));
+        self.update_gaussian_parameters(inputs, try!(T::init_resp(k, inputs)));
+        self.precisions =
+            Some(try!(self.cov_option.compute_precision(
+                        self.model_covars.as_ref().unwrap())));
 
         self.log_lik = 0.;
 
@@ -107,8 +94,9 @@ impl<T: Initializer> UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureMod
 
             // m_step
             self.update_gaussian_parameters(inputs, resp);
-            self.precisions_cholesky =
-                Some(try!(self.compute_precision_cholesky()));
+            self.precisions =
+                Some(try!(self.cov_option.compute_precision(
+                            self.model_covars.as_ref().unwrap())));
             
             // check for convergence
             let log_lik_1 = log_prob_norm.mean();
@@ -133,7 +121,10 @@ impl<T: Initializer> UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureMod
     }
 }
 
-impl<T: Initializer> GaussianMixtureModel<T> {
+impl<T, C> GaussianMixtureModel<T, C> 
+    where T: Initializer,
+          C: CovOption<T> + Default
+{
     /// Constructs a new Gaussian Mixture Model
     ///
     /// Defaults to 100 maximum iterations and
@@ -141,9 +132,9 @@ impl<T: Initializer> GaussianMixtureModel<T> {
     ///
     /// # Examples
     /// ```
-    /// use rusty_machine::learning::gmm::{GaussianMixtureModel, Random};
+    /// use rusty_machine::learning::gmm::{GaussianMixtureModel, Random, CholeskyFull};
     ///
-    /// let gmm: GaussianMixtureModel<Random> = GaussianMixtureModel::new(3);
+    /// let gmm: GaussianMixtureModel<Random, CholeskyFull> = GaussianMixtureModel::new(3);
     /// ```
     pub fn new(k: usize) -> Self {
         Self::with_weights(k, Vector::ones(k) / k as f64).unwrap()
@@ -157,12 +148,12 @@ impl<T: Initializer> GaussianMixtureModel<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::learning::gmm::{GaussianMixtureModel, Random};
+    /// use rusty_machine::learning::gmm::{GaussianMixtureModel, Random, CholeskyFull};
     /// use rusty_machine::linalg::Vector;
     ///
     /// let mix_weights = Vector::new(vec![0.25, 0.25, 0.5]);
     ///
-    /// let gmm: GaussianMixtureModel<Random> = GaussianMixtureModel::with_weights(3, mix_weights).unwrap();
+    /// let gmm: GaussianMixtureModel<Random, CholeskyFull> = GaussianMixtureModel::with_weights(3, mix_weights).unwrap();
     /// ```
     ///
     /// # Failures
@@ -185,10 +176,10 @@ impl<T: Initializer> GaussianMixtureModel<T> {
                 mix_weights: normalized_weights,
                 model_means: None,
                 model_covars: None,
-                precisions_cholesky: None,
+                precisions: None,
                 log_lik: 0.,
                 max_iters: 100,
-                cov_option: CovOption::Full,
+                cov_option: C::default(),
                 phantom: PhantomData,
             })
         }
@@ -233,81 +224,13 @@ impl<T: Initializer> GaussianMixtureModel<T> {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::learning::gmm::{GaussianMixtureModel, Random};
+    /// use rusty_machine::learning::gmm::{GaussianMixtureModel, Random, CholeskyFull};
     ///
-    /// let mut gmm: GaussianMixtureModel<Random> = GaussianMixtureModel::new(2);
+    /// let mut gmm: GaussianMixtureModel<Random, CholeskyFull> = GaussianMixtureModel::new(2);
     /// gmm.set_max_iters(5);
     /// ```
     pub fn set_max_iters(&mut self, iters: usize) {
         self.max_iters = iters;
-    }
-
-    fn compute_precision_cholesky(&self) -> LearningResult<Vec<Matrix<f64>>> {
-        let &GaussianMixtureModel {
-            model_covars: ref covariances,
-            cov_option: ref covariance_type,
-            comp_count: n_components,
-            ..
-        } = self;
-
-        let covariances = covariances.as_ref().unwrap();
-        match *covariance_type {
-            CovOption::Full | CovOption::Regularized(_) => {
-                let mut precisions_chol = Vec::<Matrix<f64>>::with_capacity(n_components);
-                for covariance in covariances {
-                    // println!("loop-cov: \n{:.4}", &covariance);
-                    let mut cov_chol: Matrix<f64> = try!(covariance.cholesky());
-                    // cholesky is correct
-                    let half = (cov_chol.rows() as f64 / 2.0).floor() as usize;
-                    let lower_rows = cov_chol.rows() - half - 1;
-                    let n_col = cov_chol.cols() - 1;
-                    // println!("cov_chol: \n{:.4}", &cov_chol);
-
-                    // solve_l_triangular doesn't work with a matrix, so we have to do it 
-                    // the hard way.
-                    let det: f64 = cov_chol.det();
-                    cov_chol /= det;
-
-                    for idx in 0..half {
-                        // Mirror along the diagonal
-                        let (mut upper, mut lower) = cov_chol.split_at_mut(half, Axes::Row);
-                        {
-                            let swap_row = lower_rows - idx;
-                            let swap_col = n_col - idx;
-                            mem::swap(&mut upper[[idx, idx]], &mut lower[[swap_row, swap_col]]);
-                        }
-
-                        // Transpose and invert all other values
-                        for j in (idx+1)..(n_col+1) {
-                            let swap_row = lower_rows - idx;
-                            let swap_col = n_col - j;
-                            mem::swap(&mut upper[[idx, j]], &mut lower[[swap_row, swap_col]]);
-                            upper[[idx, j]] *= -1.0;
-                        }
-                    }
-                    precisions_chol.push(cov_chol);
-                }
-                Ok(precisions_chol)
-            },
-            CovOption::Diagonal => {
-                let n_features = covariances[0].cols();
-                for covariance in covariances {
-                    for i in 0..covariance.cols() {
-                        if covariance[[i, i]] < EPSILON {
-                            return Err(Error::new(
-                                    ErrorKind::InvalidState, 
-                                    "Mixture model had zeros along the diagonals."));
-                        }
-                    }
-                }
-                let mut precisions_chol = Vec::<Matrix<f64>>::with_capacity(n_components);
-                for covariance in covariances {
-                    let v: Vec<f64> = covariance.iter().map(|v| 1.0 / v.sqrt()).collect();
-                    precisions_chol.push(Matrix::<f64>::new(n_features, n_features, v));
-                }
-                Ok(precisions_chol)
-            }
-        }
     }
 
     // == Parameters
@@ -334,15 +257,15 @@ impl<T: Initializer> GaussianMixtureModel<T> {
     //
     //
     fn estimate_log_prob(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
-        let precisions_cholesky: &Vec<Matrix<f64>> = self.precisions_cholesky.as_ref().unwrap();
+        let precisions: &Vec<Matrix<f64>> = self.precisions.as_ref().unwrap();
         let ref model_means = self.model_means.as_ref().unwrap();
         // The log of the determinant for each precision matrix
-        let log_det = precisions_cholesky.iter().map(|m| m.det().ln());
+        let log_det = precisions.iter().map(|m| m.det().ln());
         // println!("log_det: {:?}", log_det);
 
         let mut log_prob = Matrix::zeros(inputs.rows(), self.comp_count);
         for k in 0..self.comp_count {
-            let prec = &precisions_cholesky[k];
+            let prec = &precisions[k];
             // y is a matrix of shape [n_samples, n_features]
             let mut y = inputs * prec;
             // println!("y: \n{:.4}", &y.select_rows(&[0, 1, 2, 3, 4, 5, 6]));
@@ -401,7 +324,6 @@ impl<T: Initializer> GaussianMixtureModel<T> {
             })
             + 10.0 * EPSILON;
             
-        let mut model_covars = self.model_covars.as_mut().unwrap();
         let mut model_means = self.model_means.as_mut().unwrap();
         *model_means = resp.transpose() * inputs;
 
@@ -411,7 +333,109 @@ impl<T: Initializer> GaussianMixtureModel<T> {
             }
         }
 
-        // Iterate through each component in the model covariances
+        // Delegate updating the covariance matrices to the cov_option
+        let mut model_covars = self.model_covars.as_mut().unwrap();
+        self.cov_option.update_covars(model_covars, resp, inputs,
+                                      model_means, &self.mix_weights);
+
+        self.mix_weights /= inputs.rows() as f64;
+    }
+}
+
+/// Contains various methods for calculating covariances
+pub trait CovOption<T: Initializer> {
+    /// Calculate a precision matrix from a covariance matrix
+    fn compute_precision(&self, covariances: &Vec<Matrix<f64>>) -> 
+        LearningResult<Vec<Matrix<f64>>>;
+
+    /// Update covariance matrices
+    fn update_covars(&self, model_covars: &mut Vec<Matrix<f64>>, resp: Matrix<f64>,
+                     inputs: &Matrix<f64>, model_means: &Matrix<f64>,
+                     mix_weights: &Vector<f64>);
+
+    /// Regularization constant added along the diagonal
+    fn reg_covar(&self) -> f64 {
+        0.0
+    }
+}
+
+/// Performs calculations on a full covariance matrix using Cholesky factorization,
+/// adding a constant regularization factor along the diagonal to ensure stability.
+#[derive(Clone, Copy, Debug)]
+pub struct CholeskyFull {
+    /// Regularization constant
+    pub reg_covar: f64
+}
+
+/// Only calculates the diagonal (the variance). This assumes that all parameters 
+/// are uncorrelated. Adds a constant regularization factor (generally unnecessary).
+#[derive(Clone, Copy, Debug)]
+pub struct Diagonal {
+    /// Regularization constant
+    pub reg_covar: f64
+}
+
+impl CholeskyFull {
+    /// Initialize with a covariance regularization constant
+    pub fn new(reg_covar: f64) -> Self {
+        CholeskyFull { 
+            reg_covar: reg_covar 
+        }
+    }
+
+    /// Solves a system given the Cholesky decomposition of the lower triangular matrix
+    pub fn solve_cholesky_decomposition(mut cov_chol: Matrix<f64>) -> Matrix<f64> {
+        let half = (cov_chol.rows() as f64 / 2.0).floor() as usize;
+        let lower_rows = cov_chol.rows() - half - 1;
+        let n_col = cov_chol.cols() - 1;
+
+        let det: f64 = cov_chol.det();
+        cov_chol /= det;
+
+        for idx in 0..half {
+            // Mirror along the diagonal
+            let (mut upper, mut lower) = cov_chol.split_at_mut(half, Axes::Row);
+            {
+                let swap_row = lower_rows - idx;
+                let swap_col = n_col - idx;
+                mem::swap(&mut upper[[idx, idx]], &mut lower[[swap_row, swap_col]]);
+            }
+
+            // Transpose and invert all other values
+            for j in (idx+1)..(n_col+1) {
+                let swap_row = lower_rows - idx;
+                let swap_col = n_col - j;
+                mem::swap(&mut upper[[idx, j]], &mut lower[[swap_row, swap_col]]);
+                upper[[idx, j]] *= -1.0;
+            }
+        }
+        cov_chol
+    }
+}
+
+impl Default for CholeskyFull {
+    /// Initialize with a covariance regularization constant of 0.0
+    fn default() -> Self {
+        Self::new(0.0)
+    }
+}
+
+impl<T: Initializer> CovOption<T> for CholeskyFull {
+    fn compute_precision(&self, covariances: &Vec<Matrix<f64>>) -> LearningResult<Vec<Matrix<f64>>> {
+        let n_components = covariances.len();
+        let mut precisions_chol = Vec::<Matrix<f64>>::with_capacity(n_components);
+
+        for covariance in covariances {
+            let cov_chol: Matrix<f64> = try!(covariance.cholesky());
+            precisions_chol.push(Self::solve_cholesky_decomposition(cov_chol));
+        }
+
+        Ok(precisions_chol)
+    }
+
+    fn update_covars(&self, model_covars: &mut Vec<Matrix<f64>>, resp: Matrix<f64>,
+                     inputs: &Matrix<f64>, model_means: &Matrix<f64>,
+                     mix_weights: &Vector<f64>) {
         for (k, covariance) in model_covars.iter_mut().enumerate() {
             let mut diff: Matrix<f64> = inputs.clone();
             for (_, mut row) in diff.iter_rows_mut().enumerate() {
@@ -428,16 +452,84 @@ impl<T: Initializer> GaussianMixtureModel<T> {
                 }
             }
 
-            *covariance = (diff_transpose * diff) / self.mix_weights[k];
+            *covariance = (diff_transpose * diff) / mix_weights[k];
 
             // Add the regularization value
             for idx in 0..covariance.rows() {
-                covariance[[idx, idx]] += 0.01;
+                covariance[[idx, idx]] += self.reg_covar;
             }
+        }
+    }
 
+    fn reg_covar(&self) -> f64 {
+        self.reg_covar
+    }
+}
+
+impl Default for Diagonal {
+    /// Initialize with a covariance regularization constant of 0.0
+    fn default() -> Self {
+        Diagonal { 
+            reg_covar: 0.0
+        }
+    }
+}
+
+
+impl<T: Initializer> CovOption<T> for Diagonal {
+    fn compute_precision(&self, covariances: &Vec<Matrix<f64>>) -> LearningResult<Vec<Matrix<f64>>> {
+        let n_components = covariances.len();
+        let n_features = covariances[0].cols();
+        for covariance in covariances {
+            for i in 0..covariance.cols() {
+                if covariance[[i, i]] < EPSILON {
+                    return Err(Error::new(
+                            ErrorKind::InvalidState, 
+                            "Mixture model had zeros along the diagonals."));
+                }
+
+                if covariance[[i, i]].is_nan() {
+                    return Err(Error::new(
+                            ErrorKind::InvalidState, 
+                            "Mixture model had NaN along the diagonals."));
+                }
+            }
         }
 
-        self.mix_weights /= inputs.rows() as f64;
+        let mut precisions_chol = Vec::<Matrix<f64>>::with_capacity(n_components);
+        for covariance in covariances {
+            let v: Vec<f64> = covariance.iter().map(|v| {
+                if *v != 0.0 {
+                    1.0 / v.sqrt()
+                } else {
+                    0.0
+                }
+            }).collect();
+            precisions_chol.push(Matrix::<f64>::new(n_features, n_features, v));
+        }
+
+        Ok(precisions_chol)
+    }
+
+    fn update_covars(&self, model_covars: &mut Vec<Matrix<f64>>, _resp: Matrix<f64>,
+                     inputs: &Matrix<f64>, model_means: &Matrix<f64>,
+                     mix_weights: &Vector<f64>) {
+        for (k, covariance) in model_covars.iter_mut().enumerate() {
+            let mut diff: Matrix<f64> = inputs.clone();
+            for (_, mut row) in diff.iter_rows_mut().enumerate() {
+                for (i, v) in row.iter_mut().enumerate() {
+                    *v -= model_means[[k, i]];
+                }
+            }
+
+            *covariance = Matrix::from_diag(
+                &((diff.variance(Axes::Row).unwrap() / mix_weights[k]) 
+                 + self.reg_covar).data()[..]);
+        }
+    }
+
+    fn reg_covar(&self) -> f64 {
+        self.reg_covar
     }
 }
 
@@ -490,19 +582,19 @@ impl Initializer for KMeans {
 
 #[cfg(test)]
 mod tests {
-    use super::{GaussianMixtureModel, Random};
+    use super::{GaussianMixtureModel, Random, CholeskyFull};
     use linalg::Vector;
 
     #[test]
     fn test_means_none() {
-        let model = GaussianMixtureModel::<Random>::new(5);
+        let model = GaussianMixtureModel::<Random, CholeskyFull>::new(5);
 
         assert_eq!(model.means(), None);
     }
 
     #[test]
     fn test_covars_none() {
-        let model = GaussianMixtureModel::<Random>::new(5);
+        let model = GaussianMixtureModel::<Random, CholeskyFull>::new(5);
 
         assert_eq!(model.covariances(), None);
     }
@@ -510,14 +602,14 @@ mod tests {
     #[test]
     fn test_negative_mixtures() {
         let mix_weights = Vector::new(vec![-0.25, 0.75, 0.5]);
-        let gmm_res = GaussianMixtureModel::<Random>::with_weights(3, mix_weights);
+        let gmm_res = GaussianMixtureModel::<Random, CholeskyFull>::with_weights(3, mix_weights);
         assert!(gmm_res.is_err());
     }
 
     #[test]
     fn test_wrong_length_mixtures() {
         let mix_weights = Vector::new(vec![0.1, 0.25, 0.75, 0.5]);
-        let gmm_res = GaussianMixtureModel::<Random>::with_weights(3, mix_weights);
+        let gmm_res = GaussianMixtureModel::<Random, CholeskyFull>::with_weights(3, mix_weights);
         assert!(gmm_res.is_err());
     }
 }

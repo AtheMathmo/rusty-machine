@@ -1,7 +1,7 @@
 extern crate rand;
 
 use rm::linalg::{Matrix, BaseMatrix};
-use rm::learning::gmm::{GaussianMixtureModel, KMeans};
+use rm::learning::gmm::{GaussianMixtureModel, KMeans, CholeskyFull};
 use rm::learning::UnSupModel;
 
 use self::rand::thread_rng;
@@ -46,7 +46,8 @@ fn gmm_train() {
 
     // Generate some data randomly around the centroids
     let samples = generate_data(&centroids, SAMPLES_PER_CENTROID, 0.2);
-    let mut model = GaussianMixtureModel::<KMeans>::new(10);
+    let mut model = GaussianMixtureModel::<KMeans, CholeskyFull>::new(100);
+    model.cov_option.reg_covar = 0.0;
     model.set_max_iters(100);
     match model.train(&samples) {
         Ok(_) => {
