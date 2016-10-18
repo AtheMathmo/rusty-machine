@@ -81,28 +81,20 @@ pub struct GaussianMixtureModel<T: Initializer> {
 impl<T: Initializer> UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel<T> {
     /// Train the model using inputs.
     fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
-        let reg_value = if inputs.rows() > 1 {
-            1f64 / (inputs.rows() - 1) as f64
-        } else {
-            return Err(Error::new(ErrorKind::InvalidData, "Only one row of data provided."));
-        };
-
-        // Initialization:
+        // Move k to stack to appease the borrow checker
         let k = self.comp_count;
 
-        self.model_covars = {
-            let cov_mat = try!(self.initialize_covariances(inputs, reg_value));
-            Some(vec![cov_mat; k])
-        };
+        // Initialize empty matrices for covariances and means
+        self.model_covars = Some(
+            vec![Matrix::zeros(inputs.cols(), inputs.cols()); k]);
+        self.model_means = Some(Matrix::zeros(inputs.cols(), k));
 
-        {
-            self.model_means = Some(Matrix::new(inputs.cols(), self.comp_count, 
-                                                vec![0.; inputs.cols() * self.comp_count]));
-            let resp = try!(T::init_resp(k, inputs));
-            self.update_gaussian_parameters(inputs, resp);
-        }
+        // Initialize responsibitilies and calculate parameters
+        self.update_gaussian_parameters(
+            inputs, try!(T::init_resp(k, inputs)));
+        self.precisions_cholesky =
+            Some(try!(self.compute_precision_cholesky()));
 
-        self.precisions_cholesky = Some(try!(self.compute_precision_cholesky()));
         self.log_lik = 0.;
 
         for _ in 0..self.max_iters {
@@ -115,11 +107,11 @@ impl<T: Initializer> UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureMod
 
             // m_step
             self.update_gaussian_parameters(inputs, resp);
-            self.precisions_cholesky = Some(try!(self.compute_precision_cholesky()));
-            // end of m_step
+            self.precisions_cholesky =
+                Some(try!(self.compute_precision_cholesky()));
             
+            // check for convergence
             let log_lik_1 = log_prob_norm.mean();
-
             if (log_lik_0 - log_lik_1).abs() < CONVERGENCE_EPS {
                 break;
             }
