@@ -378,21 +378,19 @@ impl<T: Criterion> BaseNeuralNet<T> {
 
             let grad_params = &mut gradients[index..index+layer.num_params()];
             grad_params.copy_from_slice(&layer.back_params(&out_grad, activation, params[i]).data());
-
-            if self.criterion.is_regularized() {
-                utils::in_place_vec_bin_op(grad_params, self.criterion.reg_cost_grad(params[i]).data(), |x, &y| {
-                    *x = *x + y
-                });
-            }
             
             out_grad = layer.back_input(&out_grad, activation, params[i]);
         }
 
         let mut cost = self.criterion.cost(output, targets);
         if self.criterion.is_regularized() {
-            for i in 0..self.layers.len() {
-                cost += self.criterion.reg_cost(params[i]);
-            }
+            let all_params = unsafe {
+                MatrixSlice::from_raw_parts(weights.as_ptr(), weights.len(), 1, 1)
+            };
+            utils::in_place_vec_bin_op(&mut gradients,
+                                       self.criterion.reg_cost_grad(all_params).data(),
+                                       |x, &y| *x = *x + y);
+            cost += self.criterion.reg_cost(all_params);
         }
         (cost, gradients)
     }

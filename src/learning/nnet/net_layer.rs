@@ -132,7 +132,7 @@ impl NetLayer for Linear {
 }
 
 impl<T: ActivationFunc + Debug> NetLayer for T {
-    /// Applys the activation function to each element of the input
+    /// Applies the activation function to each element of the input
     fn forward(&self, input: &Matrix<f64>, _: MatrixSlice<f64>) -> LearningResult<Matrix<f64>> {
         Ok(input.clone().apply(&T::func))
     }
