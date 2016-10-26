@@ -78,33 +78,10 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
         // Initialization:
         let k = self.comp_count;
 
-        let cov_mat = match self.cov_option {
-            CovOption::Diagonal => {
-                let variance = try!(inputs.variance(Axes::Row));
-                Matrix::from_diag(&variance.data()) * reg_value.sqrt()
-            }
-
-            CovOption::Full | CovOption::Regularized(_) => {
-                let means = inputs.mean(Axes::Row);
-                let mut cov_mat = Matrix::zeros(inputs.cols(), inputs.cols());
-                for (j, row) in cov_mat.iter_rows_mut().enumerate() {
-                    for (k, elem) in row.iter_mut().enumerate() {
-                        *elem = inputs.iter_rows().map(|r| {
-                            (r[j] - means[j]) * (r[k] - means[k])
-                        }).sum::<f64>();
-                    }
-                }
-                cov_mat *= reg_value;
-
-                if let CovOption::Regularized(eps) = self.cov_option {
-                    cov_mat += Matrix::<f64>::identity(cov_mat.cols()) * eps;
-                }
-
-                cov_mat
-            }
+        self.model_covars = {
+            let cov_mat = try!(self.initialize_covariances(inputs, reg_value));
+            Some(vec![cov_mat; k])
         };
-
-        self.model_covars = Some(vec![cov_mat; k]);
 
         let random_rows: Vec<usize> =
             rand_utils::reservoir_sample(&(0..inputs.rows()).collect::<Vec<usize>>(), k);
@@ -246,6 +223,32 @@ impl GaussianMixtureModel {
         self.max_iters = iters;
     }
 
+    fn initialize_covariances(&self, inputs: &Matrix<f64>, reg_value: f64) -> LearningResult<Matrix<f64>> {
+        match self.cov_option {
+            CovOption::Diagonal => {
+                let variance = try!(inputs.variance(Axes::Row));
+                Ok(Matrix::from_diag(&variance.data()) * reg_value.sqrt())
+            }
+
+            CovOption::Full | CovOption::Regularized(_) => {
+                let means = inputs.mean(Axes::Row);
+                let mut cov_mat = Matrix::zeros(inputs.cols(), inputs.cols());
+                for (j, row) in cov_mat.iter_rows_mut().enumerate() {
+                    for (k, elem) in row.iter_mut().enumerate() {
+                        *elem = inputs.iter_rows().map(|r| {
+                            (r[j] - means[j]) * (r[k] - means[k])
+                        }).sum::<f64>();
+                    }
+                }
+                cov_mat *= reg_value;
+                if let CovOption::Regularized(eps) = self.cov_option {
+                    cov_mat += Matrix::<f64>::identity(cov_mat.cols()) * eps;
+                }
+                Ok(cov_mat)
+            }
+        }
+    }
+
     fn membership_weights(&self, inputs: &Matrix<f64>) -> LearningResult<(Matrix<f64>, f64)> {
         let n = inputs.rows();
 
@@ -323,6 +326,11 @@ impl GaussianMixtureModel {
                 let diff = inputs_i - new_means_k;
                 cov_mat += self.compute_cov(diff, membership_weights[[i, k]]);
             }
+
+            if let CovOption::Regularized(eps) = self.cov_option {
+                cov_mat += Matrix::<f64>::identity(cov_mat.cols()) * eps;
+            }
+
             new_covs.push(cov_mat / sum_weights[k]);
 
         }
@@ -333,8 +341,7 @@ impl GaussianMixtureModel {
 
     fn compute_cov(&self, diff: Matrix<f64>, weight: f64) -> Matrix<f64> {
         match self.cov_option {
-            CovOption::Full => (diff.transpose() * diff) * weight,
-            CovOption::Regularized(eps) => (diff.transpose() * diff) * weight + eps,
+            CovOption::Full | CovOption::Regularized(_) => (diff.transpose() * diff) * weight,
             CovOption::Diagonal => Matrix::from_diag(&diff.elemul(&diff).into_vec()) * weight,
         }
     }
