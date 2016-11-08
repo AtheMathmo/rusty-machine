@@ -276,7 +276,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
     } 
 
     /// Create a multilayer perceptron with the specified layer sizes.
-    fn mlp<'a, U>(layer_sizes: &[usize], criterion: T, activ_fn: U) -> BaseNeuralNet<T> 
+    fn mlp<U>(layer_sizes: &[usize], criterion: T, activ_fn: U) -> BaseNeuralNet<T> 
         where U: ActivationFunc + 'static {
         let mut mlp = BaseNeuralNet {
             layers: Vec::with_capacity(2*(layer_sizes.len()-1)),
@@ -365,7 +365,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
             params.push(slice);
             index += layer.num_params();
         }
-        let output = &activations[activations.len()-1];
+        let output = activations.last().unwrap();
 
         // Backward propagation
         
@@ -377,7 +377,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
             index -= layer.num_params();
 
             let grad_params = &mut gradients[index..index+layer.num_params()];
-            grad_params.copy_from_slice(&layer.back_params(&out_grad, activation, params[i]).data());
+            grad_params.copy_from_slice(layer.back_params(&out_grad, activation, params[i]).data());
             
             out_grad = layer.back_input(&out_grad, activation, params[i]);
         }

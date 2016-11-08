@@ -93,7 +93,7 @@ impl NetLayer for Linear {
             }
         }
     }
-
+    
     fn back_input(&self, out_grad: &Matrix<f64>, _: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64> {
         debug_assert_eq!(out_grad.cols(), params.cols());
         let gradient = out_grad * &params.transpose();
