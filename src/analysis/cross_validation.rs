@@ -3,7 +3,7 @@
 use std::cmp;
 use std::iter::Chain;
 use std::slice::Iter;
-use linalg::Matrix;
+use linalg::{BaseMatrix, Matrix};
 use learning::{LearningResult, SupModel};
 use learning::toolkit::rand_utils::in_place_fisher_yates;
 
@@ -23,7 +23,7 @@ use learning::toolkit::rand_utils::in_place_fisher_yates;
 /// use rusty_machine::analysis::cross_validation::k_fold_validate;
 /// use rusty_machine::analysis::score::row_accuracy;
 /// use rusty_machine::learning::naive_bayes::{NaiveBayes, Bernoulli};
-/// use rusty_machine::linalg::Matrix;
+/// use rusty_machine::linalg::{BaseMatrix, Matrix};
 ///
 /// let inputs = Matrix::new(3, 2, vec![1.0, 1.1,
 ///                                     5.2, 4.3,
@@ -61,10 +61,11 @@ pub fn k_fold_validate<M, S>(model: &mut M,
     let mut costs: Vec<f64> = Vec::new();
 
     for p in folds {
-        let train_inputs = copy_rows(&inputs, p.train_indices.clone());
-        let train_targets = copy_rows(&targets, p.train_indices.clone());
-        let test_inputs = copy_rows(&inputs, p.test_indices.clone());
-        let test_targets = copy_rows(&targets, p.test_indices.clone());
+        // TODO: don't allocate fresh buffers for every fold
+        let train_inputs = inputs.select_rows(p.train_indices_iter.clone());
+        let train_targets = targets.select_rows(p.train_indices_iter.clone());
+        let test_inputs = inputs.select_rows(p.test_indices_iter.clone());
+        let test_targets = targets.select_rows(p.test_indices_iter.clone());
 
         let _ = try!(model.train(&train_inputs, &train_targets));
         let outputs = try!(model.predict(&test_inputs));
@@ -72,23 +73,6 @@ pub fn k_fold_validate<M, S>(model: &mut M,
     }
 
     Ok(costs)
-}
-
-// TODO: Use a preallocated buffer for each fold.
-fn copy_rows<'a, I>(mat: &Matrix<f64>,
-                    rows: I) -> Matrix<f64>
-    where I: ExactSizeIterator<Item=&'a usize>
-{
-    let num_rows = rows.len();
-    let mut data = vec![0f64; num_rows * mat.cols()];
-    let mut idx = 0;
-    for &row in rows {
-        for col in 0..mat.cols(){
-            data[idx] = mat[[row, col]];
-            idx += 1;
-        }
-    }
-    Matrix::<f64>::new(num_rows, mat.cols(), data)
 }
 
 /// A permutation of 0..n.
@@ -104,8 +88,8 @@ fn create_shuffled_indices(num_samples: usize) -> ShuffledIndices {
 /// A partition of indices of all available samples into
 /// a training set and a test set.
 struct Partition<'a> {
-    train_indices: TrainingIndices<'a>,
-    test_indices: TestIndices<'a>
+    train_indices_iter: TrainingIndices<'a>,
+    test_indices_iter: TestIndices<'a>
 }
 
 #[derive(Clone)]
@@ -207,29 +191,15 @@ impl<'a> Iterator for Folds<'a> {
         let suffix = &self.indices[fold_end..];
         let infix = &self.indices[fold_start..fold_end];
         Some(Partition {
-            train_indices: TrainingIndices::new(prefix, suffix),
-            test_indices: TestIndices::new(infix)
+            train_indices_iter: TrainingIndices::new(prefix, suffix),
+            test_indices_iter: TestIndices::new(infix)
         })
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{copy_rows, ShuffledIndices, Folds};
-    use linalg::Matrix;
-
-    #[test]
-    fn test_copy_rows() {
-        let m = Matrix::new(4, 2, vec![ 0.0,  1.0,
-                                       10.0, 11.0,
-                                       20.0, 21.0,
-                                       30.0, 31.0]);
-
-        let s = copy_rows(&m, vec![0, 2].iter());
-
-        assert_eq!(s, Matrix::new(2, 2, vec![ 0.0,  1.0,
-                                             20.0, 21.0]));
-    }
+    use super::{ShuffledIndices, Folds};
 
     // k % n == 0
     #[test]
@@ -308,8 +278,8 @@ mod tests {
     fn collect_folds<'a>(folds: Folds<'a>) -> Vec<(Vec<usize>, Vec<usize>)> {
         folds
             .map(|p|
-                (p.train_indices.map(|x| *x).collect::<Vec<_>>(),
-                 p.test_indices.map(|x| *x).collect::<Vec<_>>()))
+                (p.train_indices_iter.map(|x| *x).collect::<Vec<_>>(),
+                 p.test_indices_iter.map(|x| *x).collect::<Vec<_>>()))
             .collect::<Vec<(Vec<usize>, Vec<usize>)>>()
     }
 }

@@ -27,11 +27,10 @@
 //! a future release.
 
 use learning::toolkit::kernel::{Kernel, SquaredExp};
+use linalg::{Matrix, BaseMatrix};
+use linalg::Vector;
 use learning::{LearningResult, SupModel};
 use learning::error::{Error, ErrorKind};
-
-use linalg::Matrix;
-use linalg::Vector;
 
 
 /// Trait for GP mean functions.

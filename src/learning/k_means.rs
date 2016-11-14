@@ -42,9 +42,7 @@
 //!
 //! The [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) scheme.
 
-use linalg::BaseSlice;
-use linalg::{Matrix, MatrixSlice, Axes};
-use linalg::Vector;
+use linalg::{Matrix, MatrixSlice, Axes, Vector, BaseMatrix};
 use learning::{LearningResult, UnSupModel};
 use learning::error::{Error, ErrorKind};
 
