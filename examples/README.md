@@ -152,16 +152,16 @@ Sample run:
 
 ```
 $ cargo run --example naive_bayes_dogs
-Predicted: White; Actual: White; Accurate? true
-Predicted: White; Actual: White; Accurate? true
-Predicted: White; Actual: White; Accurate? true
-Predicted: White; Actual: White; Accurate? true
+...
+Predicted: Red; Actual: Red; Accurate? true
+Predicted: Red; Actual: Red; Accurate? true
 Predicted: White; Actual: Red; Accurate? false
-Predicted: Red; Actual: Red; Accurate? true
-[redacted for brevity ...]
+Predicted: Red; Actual: White; Accurate? false
 Predicted: Red; Actual: Red; Accurate? true
 Predicted: White; Actual: White; Accurate? true
+Predicted: White; Actual: White; Accurate? true
+Predicted: White; Actual: White; Accurate? true
+Predicted: White; Actual: White; Accurate? true
 Predicted: Red; Actual: Red; Accurate? true
-Predicted: Red; Actual: White; Accurate? false
-Accuracy: 815/1000 = 81.5%
+Accuracy: 822/1000 = 82.2%
 ```

@@ -104,6 +104,20 @@ fn generate_dog_data(training_set_size: u32, test_set_size: u32)
     (training_matrix, target_matrix, test_matrix, test_dogs)
 }
 
+fn evaluate_prediction(hits: &mut u32, dog: &Dog, prediction: &[f64]) -> (Color, bool) {
+    let predicted_color = dog.color;
+    let actual_color = if prediction[0] == 1. {
+        Color::Red
+    } else {
+        Color::White
+    };
+    let accurate = predicted_color == actual_color;
+    if accurate {
+        *hits += 1;
+    }
+    (actual_color, accurate)
+}
+
 fn main() {
     let (training_set_size, test_set_size) = (1000, 1000);
     // Generate all of our train and test data
@@ -120,19 +134,19 @@ fn main() {
 
     // Score how well we did.
     let mut hits = 0;
-    for (dog, prediction) in test_dogs.iter().zip(predictions.iter_rows()) {
-        let predicted_color = dog.color;
-        let actual_color = if prediction[0] == 1. {
-            Color::Red
-        } else {
-            Color::White
-        };
-        let accurate = predicted_color == actual_color;
-        if accurate {
-            hits += 1;
-        }
+    let unprinted_total = test_set_size.saturating_sub(10) as usize;
+    for (dog, prediction) in test_dogs.iter().zip(predictions.iter_rows()).take(unprinted_total) {
+        evaluate_prediction(&mut hits, dog, prediction);
+    }
+    
+    if unprinted_total > 0 {
+        println!("...");
+    }
+    
+    for (dog, prediction) in test_dogs.iter().zip(predictions.iter_rows()).skip(unprinted_total) {
+        let (actual_color, accurate) = evaluate_prediction(&mut hits, dog, prediction);
         println!("Predicted: {:?}; Actual: {:?}; Accurate? {:?}",
-                 predicted_color, actual_color, accurate);
+                 dog.color, actual_color, accurate);
     }
 
     println!("Accuracy: {}/{} = {:.1}%", hits, test_set_size,
