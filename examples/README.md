@@ -1,5 +1,4 @@
-Sample Codes with rusty-machine
-===============================
+Examples with rusty-machine
 
 This directory gathers fully-fledged programs, each using a piece of
 `rusty-machine`'s API.
@@ -129,20 +128,40 @@ Accuracy: 100%
 
 #### Dog Classification
 
-Suppose we have a population composed of red dogs and white dogs, whose friendliness, furriness, and speed can be measured. The group of white dogs is friendlier, furrier, and slower than red dogs by one standard deviation (respectively), but given the color of a dog, friendliness, furriness, and speed are independent of each other. We can use a naïve Bayes model to try to predict dog color given friendliness, furriness, and speed as observations.
+Suppose we have a population composed of red dogs and white dogs,
+whose friendliness, furriness, and speed can be measured. In this
+example we train a Naïve Bayes model to determine whether
+a dog is white or red.
 
-Sample run (note the `--features stats` flag):
+The group of white dogs are friendlier, furrier, and slower than
+the red dogs. Given the color of a dog, friendliness, furriness,
+and speed are independent of each other (a requirement of the Naïve
+Bayes model).
+
+In the example code we will generate our own data and then train
+our model using it. This is a common technique used to validate
+a model. We generate the data by sampling each of the dogs features
+from Gaussian random variables. We will have a total of 6 Gaussian
+random variables representing three features for both colors of dog.
+As we are using Gaussian random variables we will use a Gaussian
+Naive Bayes model. Once we have generated our data we will convert
+it into `Matrix` structures and train our model.
+
+
+Sample run:
 
 ```
-$ cargo run --example naive_bayes_dogs --features stats
-   Compiling rusty-machine v0.4.4 (file:///[...]/rusty-machine)
-     Running `target/debug/examples/naive_bayes_dogs`
+$ cargo run --example naive_bayes_dogs
 Predicted: White; Actual: White; Accurate? true
 Predicted: White; Actual: White; Accurate? true
-[redacted for brevity ...]
+Predicted: White; Actual: White; Accurate? true
+Predicted: White; Actual: White; Accurate? true
 Predicted: White; Actual: Red; Accurate? false
+Predicted: Red; Actual: Red; Accurate? true
+[redacted for brevity ...]
+Predicted: Red; Actual: Red; Accurate? true
 Predicted: White; Actual: White; Accurate? true
 Predicted: Red; Actual: Red; Accurate? true
-Predicted: Red; Actual: Red; Accurate? true
-Accuracy: 805/1000 = 80.5%
+Predicted: Red; Actual: White; Accurate? false
+Accuracy: 815/1000 = 81.5%
 ```
