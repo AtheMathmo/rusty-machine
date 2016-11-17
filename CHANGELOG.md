@@ -2,6 +2,28 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.5.2
+
+### New Contributors
+
+- [scholtzan](https://github.com/scholtzan)
+
+### Breaking Changes
+
+- None
+
+### Features
+
+- None
+
+### Bug Fixes
+
+- Regularization constant for GMM is now only added to diagonal.
+
+### Minor Changes
+
+- Added some better `Result` handling to GMM.
+
 ## 0.5.1
 
 This version includes no changes but is a bump due to a
@@ -13,13 +35,13 @@ See the notes for 0.5.0 below.
 
 This is another fairly large release. Thank you to everyone who contributed!
 
-## New Contributors
+### New Contributors
 
 - [NivenT](https://github.com/NivenT)
 - [theotherphil](https://github.com/theotherphil)
 - [andrewcsmith](https://github.com/andrewcsmith)
 
-## Breaking Changes
+### Breaking Changes
 
 - The `SupModel` and `UnSupModel` traits now return
 `Result`s for the `train` and `predict` functions.
@@ -27,17 +49,17 @@ This is another fairly large release. Thank you to everyone who contributed!
 rulinalg changelog for
 details](https://github.com/AtheMathmo/rulinalg/blob/master/CHANGELOG.md#030)).
 
-## Features
+### Features
 
 - Adding RMSProp gradient descent algorithm. #121
 - Adding cross validation. #125
 - Adding a new `Shuffler` transformer. #135
 
-## Bug Fixes
+### Bug Fixes
 
 - None
 
-## Minor Changes
+### Minor Changes
 
 - Adding benchmarks
 - Initiate GMM with sample covariance of data (instead of identity matrix).
