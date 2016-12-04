@@ -2,6 +2,68 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.5.2
+
+### New Contributors
+
+- [scholtzan](https://github.com/scholtzan)
+
+### Breaking Changes
+
+- None
+
+### Features
+
+- None
+
+### Bug Fixes
+
+- Regularization constant for GMM is now only added to diagonal.
+
+### Minor Changes
+
+- Added some better `Result` handling to GMM.
+
+## 0.5.1
+
+This version includes no changes but is a bump due to a
+[crates bug](https://github.com/rust-lang/crates.io/issues/448#issuecomment-251037439).
+
+See the notes for 0.5.0 below.
+
+## 0.5.0
+
+This is another fairly large release. Thank you to everyone who contributed!
+
+### New Contributors
+
+- [NivenT](https://github.com/NivenT)
+- [theotherphil](https://github.com/theotherphil)
+- [andrewcsmith](https://github.com/andrewcsmith)
+
+### Breaking Changes
+
+- The `SupModel` and `UnSupModel` traits now return
+`Result`s for the `train` and `predict` functions.
+- Updated to [rulinalg](https://github.com/AtheMathmo/rulinalg) v0.3 ([see
+rulinalg changelog for
+details](https://github.com/AtheMathmo/rulinalg/blob/master/CHANGELOG.md#030)).
+
+### Features
+
+- Adding RMSProp gradient descent algorithm. #121
+- Adding cross validation. #125
+- Adding a new `Shuffler` transformer. #135
+
+### Bug Fixes
+
+- None
+
+### Minor Changes
+
+- Adding benchmarks
+- Initiate GMM with sample covariance of data (instead of identity matrix).
+
 ## 0.4.4
 
 ### Breaking Changes
