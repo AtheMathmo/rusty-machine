@@ -216,6 +216,7 @@ pub mod stats {
 
 /// Module for evaluating models.
 pub mod analysis {
+    pub mod confusion_matrix;
     pub mod cross_validation;
     pub mod score;
 }
