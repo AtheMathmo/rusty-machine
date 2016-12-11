@@ -105,6 +105,7 @@
 #![deny(missing_docs)]
 #![warn(missing_debug_implementations)]
 
+#[macro_use]
 extern crate rulinalg;
 extern crate num as libnum;
 extern crate rand;

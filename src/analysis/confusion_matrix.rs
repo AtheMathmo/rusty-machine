@@ -4,18 +4,21 @@ use std::hash::Hash;
 use std::collections::HashMap;
 use linalg::Matrix;
 
-/// Returns a matrix C where C_ij is the count of the samples which were
-/// predicted to lie in class j but actually lie in class i. (i.e.
-/// the row is the true class and the column is the predicted.).
+/// Returns a square matrix C where C_ij is the count of the samples which were
+/// predicted to lie in the class with jth label but actually lie in the class with
+/// ith label.
 ///
 /// # Arguments
 /// * `predictions` - A series of model predictions.
-/// * `targets` - A slice of equal length to predictions, containing the target results.
-/// * `labels` - If not provided then the returned matrix rows and columns correspond to
-///              the distinct elements of union(predictions, targets), in increasing
-///              order. If labels are provided then these are used instead, in the order
-///              provided. Note that this means that the confusion matrix will only contain
-///              entries for the elements of labels.
+/// * `targets`     - A slice of equal length to predictions, containing the
+///                   target results.
+/// * `labels`      - If None then the rows and columns of the returned matrix
+///                   correspond to the distinct labels appearing in either
+///                   predictions or targets, in increasing order.
+///                   If Some then the rows and columns correspond to the provided
+///                   labels, in the provided order. Note that in this case the
+///                   confusion matrix will only contain entries for the elements
+///                   of `labels`.
 ///
 /// # Examples
 /// ```
@@ -84,7 +87,6 @@ fn ordered_distinct<T: Ord + Eq + Copy>(xs: &[T], ys: &[T]) -> Vec<T> {
 #[cfg(test)]
 mod tests {
     use super::confusion_matrix;
-    use linalg::Matrix;
 
     #[test]
     fn confusion_matrix_no_labels() {
@@ -93,10 +95,9 @@ mod tests {
 
         let confusion = confusion_matrix(&predictions, &truth, None);
 
-        let expected = Matrix::new(3, 3, vec![
-            2, 0, 0,
-            0, 0, 1,
-            1, 0, 2]);
+        let expected = matrix!(2, 0, 0;
+                               0, 0, 1;
+                               1, 0, 2);
 
         assert_eq!(confusion, expected);
     }
@@ -109,10 +110,9 @@ mod tests {
         let labels = vec![2, 1, 0];
         let confusion = confusion_matrix(&predictions, &truth, Some(labels));
 
-        let expected = Matrix::new(3, 3, vec![
-            2, 0, 1,
-            1, 0, 0,
-            0, 0, 2]);
+        let expected = matrix!(2, 0, 1;
+                               1, 0, 0;
+                               0, 0, 2);
 
         assert_eq!(confusion, expected);
     }
@@ -125,9 +125,8 @@ mod tests {
         let labels = vec![1, 3];
         let confusion = confusion_matrix(&predictions, &truth, Some(labels));
 
-        let expected = Matrix::new(2, 2, vec![
-            0, 0,
-            0, 0]);
+        let expected = matrix!(0, 0;
+                               0, 0);
 
         assert_eq!(confusion, expected);
     }
@@ -140,9 +139,8 @@ mod tests {
         let labels = vec![1, 3];
         let confusion = confusion_matrix(&predictions, &truth, Some(labels));
 
-        let expected = Matrix::new(2, 2, vec![
-            0, 0,
-            0, 0]);
+        let expected = matrix!(0, 0;
+                               0, 0);
 
         assert_eq!(confusion, expected);
     }
@@ -155,9 +153,8 @@ mod tests {
         let labels = vec![4, 5];
         let confusion = confusion_matrix(&predictions, &truth, Some(labels));
 
-        let expected = Matrix::new(2, 2, vec![
-            0, 0,
-            0, 0]);
+        let expected = matrix!(0, 0;
+                               0, 0);
 
         assert_eq!(confusion, expected);
     }
