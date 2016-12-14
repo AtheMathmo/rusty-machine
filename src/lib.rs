@@ -25,6 +25,7 @@
 //! - Gaussian Mixture Models
 //! - Naive Bayes Classifiers
 //! - DBSCAN
+//! - Decision Tree Classifier
 //!
 //! ### linalg
 //!
@@ -138,6 +139,7 @@ pub mod learning {
     pub mod gp;
     pub mod svm;
     pub mod naive_bayes;
+    pub mod tree;
 
     pub mod error;
 
