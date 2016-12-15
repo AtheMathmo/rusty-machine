@@ -6,6 +6,7 @@ pub mod learning {
     mod lin_reg;
     mod k_means;
     mod gp;
+    mod pca;
 
     pub mod optim {
     	mod grad_desc;
