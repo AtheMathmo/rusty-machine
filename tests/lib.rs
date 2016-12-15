@@ -9,6 +9,7 @@ pub mod learning {
     mod k_means;
     mod gp;
     mod knn;
+    mod pca;
 
     pub mod optim {
     	mod grad_desc;

@@ -140,6 +140,7 @@ pub mod learning {
     pub mod svm;
     pub mod naive_bayes;
     pub mod knn;
+    pub mod pca;
 
     pub mod error;
 
