@@ -105,6 +105,7 @@
 #![deny(missing_docs)]
 #![warn(missing_debug_implementations)]
 
+#[macro_use]
 extern crate rulinalg;
 extern crate num as libnum;
 extern crate rand;
@@ -216,6 +217,7 @@ pub mod stats {
 
 /// Module for evaluating models.
 pub mod analysis {
+    pub mod confusion_matrix;
     pub mod cross_validation;
     pub mod score;
 }
