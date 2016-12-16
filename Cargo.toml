@@ -16,4 +16,4 @@ stats = []
 [dependencies]
 num = { version = "0.1.35", default-features = false }
 rand = "0.3.14"
-rulinalg = "0.3.3"
+rulinalg = "0.3.4"
