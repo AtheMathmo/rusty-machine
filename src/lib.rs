@@ -25,7 +25,7 @@
 //! - Gaussian Mixture Models
 //! - Naive Bayes Classifiers
 //! - DBSCAN
-//! - Decision Tree Classifier
+//! - Decision Tree Classifiers
 //!
 //! ### linalg
 //!
