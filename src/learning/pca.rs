@@ -107,14 +107,10 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for PCA {
             Some(ref comp) => {
 
                 if self.center == true {
-
                     match self.centers {
                         None => return Err(Error::new_untrained()),
                         Some(ref centers) => {
-                            let data = unsafe {
-                                Matrix::from_fn(inputs.rows(), inputs.cols(),
-                                                |c, r| inputs.get_unchecked([r, c])- centers[c])
-                            };
+                            let data = centering(inputs, &centers);
                             Ok(data * comp)
                         }
                     }
@@ -128,10 +124,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for PCA {
     fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
         let data = if self.center == true {
             let centers = inputs.mean(Axes::Row);
-            let m = unsafe {
-                Matrix::from_fn(inputs.rows(), inputs.cols(),
-                                |c, r| inputs.get_unchecked([r, c]) - centers[c])
-            };
+            let m = centering(inputs, &centers);
             self.centers = Some(centers);
             m
         } else {
@@ -141,4 +134,23 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for PCA {
         self.components = Some(v);
         Ok(())
     }
+}
+
+/// Subtract center Vector from each rows
+fn centering(inputs: &Matrix<f64>, centers: &Vector<f64>) -> Matrix<f64> {
+    unsafe {
+        Matrix::from_fn(inputs.rows(), inputs.cols(),
+                    |c, r| inputs.get_unchecked([r, c]) - centers.data().get_unchecked(c))
+    }
+}
+
+#[test]
+fn test_centering() {
+    let m = Matrix::new(2, 3, vec![1., 2., 3.,
+                                   2., 4., 4.]);
+    let centers = m.mean(Axes::Row);
+    assert_vector_eq!(centers, Vector::new(vec![1.5, 3., 3.5]), comp=abs, tol=1e-8);
+    let exp = Matrix::new(2, 3, vec![-0.5, -1., -0.5,
+                                     0.5, 1., 0.5]);
+    assert_matrix_eq!(centering(&m, &centers), exp, comp=abs, tol=1e-8);
 }

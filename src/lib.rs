@@ -25,6 +25,7 @@
 //! - Gaussian Mixture Models
 //! - Naive Bayes Classifiers
 //! - DBSCAN
+//! - Principal Component Analysis
 //!
 //! ### linalg
 //!
