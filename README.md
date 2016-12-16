@@ -57,6 +57,7 @@ This is fairly complete but there is still lots of room for optimization and we 
 - Naive Bayes Classifiers
 - DBSCAN
 - k-Nearest Neighbor Classifiers
+- Principal Component Analysis
 
 There is also a basic `stats` module behind a feature flag.
 

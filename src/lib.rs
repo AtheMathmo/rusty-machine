@@ -26,6 +26,7 @@
 //! - Naive Bayes Classifiers
 //! - DBSCAN
 //! - k-Nearest Neighbor Classifiers
+//! - Principal Component Analysis
 //!
 //! ### linalg
 //!
