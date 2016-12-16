@@ -221,3 +221,6 @@ pub mod analysis {
     pub mod cross_validation;
     pub mod score;
 }
+
+/// Module for datasets.
+pub mod datasets;
