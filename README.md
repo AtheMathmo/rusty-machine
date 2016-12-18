@@ -21,7 +21,7 @@ It aims to combine speed and ease of use - without requiring a huge number of ex
 This project began as a way for me to learn Rust and brush up on some less familiar machine learning algorithms and techniques.
 Now the project aims to provide a complete, easy to use, machine learning library for Rust.
 
-This library is still very much in early stages of development. Although there are a good number of algorithms many other 
+This library is still very much in early stages of development. Although there are a good number of algorithms many other
 things are missing. Rusty-machine is probably not the best choice for any serious projects - but hopefully that can change in the near future!
 
 #### Contributing
@@ -50,6 +50,7 @@ This is fairly complete but there is still lots of room for optimization and we 
 - Logistic Regression
 - Generalized Linear Models
 - K-Means Clustering
+- Agglomerative Clustering
 - Neural Networks
 - Gaussian Process Regression
 - Support Vector Machines

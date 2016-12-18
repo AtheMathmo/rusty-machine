@@ -19,6 +19,7 @@
 //! - Logistic Regression
 //! - Generalized Linear Models
 //! - K-Means Clustering
+//! - Agglomerative Clustering
 //! - Neural Networks
 //! - Gaussian Process Regression
 //! - Support Vector Machines
@@ -134,6 +135,7 @@ pub mod learning {
     pub mod lin_reg;
     pub mod logistic_reg;
     pub mod k_means;
+    pub mod agglomerative;
     pub mod nnet;
     pub mod gp;
     pub mod svm;
