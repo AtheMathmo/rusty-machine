@@ -17,18 +17,18 @@
 //! // Train the model
 //! pca.train(&inputs).unwrap();
 //!
-//! // Now we'll predict a new point
+//! // Mapping a new point to principal component space
 //! let new_data = Matrix::new(1, 2, vec![2., 0.1]);
 //! let output = pca.predict(&new_data).unwrap();
 //!
-//! assert_eq!(output[[0, 0]], -0.6686215718235227);
+//! assert_eq!(output, Matrix::new(1, 2, vec![-0.6686215718235227, 0.042826190364433595]));
 //! ```
 
 use linalg::{Matrix, BaseMatrix, Axes};
 use linalg::Vector;
 
 use learning::{LearningResult, UnSupModel};
-use learning::error::Error;
+use learning::error::{Error, ErrorKind};
 
 /// Principal Component Analysis
 ///
@@ -40,6 +40,8 @@ pub struct PCA {
     /// Flag whether to centering inputs
     center: bool,
 
+    // Number of original input
+    n_features: Option<usize>,
     // Center of inputs
     centers: Option<Vector<f64>>,
     // Principal components
@@ -69,6 +71,7 @@ impl PCA {
             n: Some(n),
             center: center,
 
+            n_features: None,
             centers: None,
             components: None
         }
@@ -105,6 +108,7 @@ impl Default for PCA {
             n: None,
             center: true,
 
+            n_features: None,
             centers: None,
             components: None
         }
@@ -120,8 +124,22 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for PCA {
             None => Err(Error::new_untrained()),
             Some(ref comp) => {
 
+                match self.n_features {
+                    // this can't happen
+                    None => {
+                        return Err(Error::new_untrained());
+                    },
+                    Some(f) => {
+                        if f != inputs.cols() {
+                            return Err(Error::new(ErrorKind::InvalidData,
+                                       "Input data does not have the same dimensions as training data"));
+                        }
+                    }
+                };
+
                 if self.center == true {
                     match self.centers {
+                        // this can't happen
                         None => return Err(Error::new_untrained()),
                         Some(ref centers) => {
                             let data = centering(inputs, &centers);
@@ -153,7 +171,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for PCA {
             },
             None => Some(v)
         };
-        // self.components = Some(v);
+        self.n_features = Some(inputs.cols());
         Ok(())
     }
 }
