@@ -222,5 +222,6 @@ pub mod analysis {
     pub mod score;
 }
 
+#[cfg(feature = "datasets")]
 /// Module for datasets.
 pub mod datasets;

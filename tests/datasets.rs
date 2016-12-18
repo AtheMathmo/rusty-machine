@@ -1,7 +1,7 @@
 extern crate rusty_machine as rm;
 
 use rm::datasets;
-use rm::prelude::*;
+use rm::linalg::BaseMatrix;
 
 #[test]
 fn test_iris() {

@@ -11,7 +11,10 @@ readme = "README.md"
 license = "MIT"
 
 [features]
+default = ["datasets"]
 stats = []
+datasets = []
+test = ["datasets"]
 
 [dependencies]
 num = { version = "0.1.35", default-features = false }
