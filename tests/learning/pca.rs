@@ -30,7 +30,7 @@ fn test_default() {
 
 #[test]
 fn test_not_centering() {
-    let mut model = PCA::new(false);
+    let mut model = PCA::new(3, false);
 
     let inputs = Matrix::new(7, 3, vec![8.3, 50., 23.,
                                         10.2, 55., 21.,
@@ -51,5 +51,31 @@ fn test_not_centering() {
     let outputs = model.predict(&new_data).unwrap();
 
     let exp = Matrix::new(1, 3, vec![50.468826978411926, 6.465874960225161, 1.0440136119105228]);
+    assert_matrix_eq!(outputs, exp, comp=abs, tol=1e-8);
+}
+
+#[test]
+fn test_filter_component() {
+    let mut model = PCA::new(2, false);
+
+    let inputs = Matrix::new(7, 3, vec![8.3, 50., 23.,
+                                        10.2, 55., 21.,
+                                        11.1, 57., 22.,
+                                        12.5, 60., 15.,
+                                        11.3, 59., 20.,
+                                        12.4, 61., 11.,
+                                        11.2, 58., 23.]);
+    model.train(&inputs).unwrap();
+
+    let cexp = Matrix::new(3, 2, vec![0.17994480617740657, -0.16908609066166264,
+                                      0.9326216647416523, -0.2839205184846983,
+                                      0.3127885822473139, 0.9438215049087068]);
+    let cmp = model.components().unwrap();
+    assert_matrix_eq!(cmp, cexp, comp=abs, tol=1e-8);
+
+    let new_data = Matrix::new(1, 3, vec![9., 45., 22.]);
+    let outputs = model.predict(&new_data).unwrap();
+
+    let exp = Matrix::new(1, 2, vec![50.468826978411926, 6.465874960225161]);
     assert_matrix_eq!(outputs, exp, comp=abs, tol=1e-8);
 }
