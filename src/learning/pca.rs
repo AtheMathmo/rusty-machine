@@ -31,9 +31,13 @@ use learning::{LearningResult, UnSupModel};
 use learning::error::Error;
 
 /// Principal Component Analysis
+///
+/// - PCA uses rulinalg SVD which is experimental (not yet work for large data)
 #[derive(Debug)]
 pub struct PCA {
-    // Flag whether to centering inputs
+    /// number of componentsc considered
+    n: Option<usize>,
+    /// Flag whether to centering inputs
     center: bool,
 
     // Center of inputs
@@ -46,17 +50,23 @@ impl PCA {
 
     /// Constructs untrained PCA model.
     ///
-    /// Requires flag whether centering inputs to be specified.
+    /// # Parameters
+    ///
+    /// - `n` : number of principal components
+    /// - `center` : flag whether centering inputs to be specified.
     ///
     /// # Examples
     ///
     /// ```
     /// use rusty_machine::learning::pca::PCA;
     ///
-    /// let model = PCA::new(true);
+    /// let model = PCA::new(3, true);
     /// ```
-    pub fn new(center: bool) -> PCA {
+    pub fn new(n: usize, center: bool) -> PCA {
+
         PCA {
+            // accept n as usize, user should know the number of columns
+            n: Some(n),
             center: center,
 
             centers: None,
@@ -75,8 +85,9 @@ impl PCA {
 
 /// The default PCA.
 ///
-/// The default is:
+/// Parameters:
 ///
+/// - `n` = `None` (keep all components)
 /// - `center` = `true`
 ///
 /// # Examples
@@ -89,6 +100,9 @@ impl PCA {
 impl Default for PCA {
     fn default() -> Self {
         PCA {
+            // because number of columns is unknown,
+            // return all components by default
+            n: None,
             center: true,
 
             centers: None,
@@ -131,7 +145,15 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for PCA {
             inputs.clone()
         };
         let (_, _, v) = data.svd().unwrap();
-        self.components = Some(v);
+
+        self.components = match self.n {
+            Some(c) => {
+                let slicer: Vec<usize> = (0..c).collect();
+                Some(v.select_cols(&slicer))
+            },
+            None => Some(v)
+        };
+        // self.components = Some(v);
         Ok(())
     }
 }
@@ -144,13 +166,20 @@ fn centering(inputs: &Matrix<f64>, centers: &Vector<f64>) -> Matrix<f64> {
     }
 }
 
-#[test]
-fn test_centering() {
-    let m = Matrix::new(2, 3, vec![1., 2., 3.,
-                                   2., 4., 4.]);
-    let centers = m.mean(Axes::Row);
-    assert_vector_eq!(centers, Vector::new(vec![1.5, 3., 3.5]), comp=abs, tol=1e-8);
-    let exp = Matrix::new(2, 3, vec![-0.5, -1., -0.5,
-                                     0.5, 1., 0.5]);
-    assert_matrix_eq!(centering(&m, &centers), exp, comp=abs, tol=1e-8);
+#[cfg(test)]
+mod tests {
+
+    use linalg::{Matrix, Axes, Vector};
+    use super::centering;
+
+    #[test]
+    fn test_centering() {
+        let m = Matrix::new(2, 3, vec![1., 2., 3.,
+                                       2., 4., 4.]);
+        let centers = m.mean(Axes::Row);
+        assert_vector_eq!(centers, Vector::new(vec![1.5, 3., 3.5]), comp=abs, tol=1e-8);
+        let exp = Matrix::new(2, 3, vec![-0.5, -1., -0.5,
+                                         0.5, 1., 0.5]);
+        assert_matrix_eq!(centering(&m, &centers), exp, comp=abs, tol=1e-8);
+    }
 }
