@@ -79,3 +79,25 @@ fn test_filter_component() {
     let exp = Matrix::new(1, 2, vec![50.468826978411926, 6.465874960225161]);
     assert_matrix_eq!(outputs, exp, comp=abs, tol=1e-8);
 }
+
+#[test]
+fn test_predict_different_dimension() {
+    let mut model = PCA::new(2, false);
+
+    let inputs = Matrix::new(7, 3, vec![8.3, 50., 23.,
+                                        10.2, 55., 21.,
+                                        11.1, 57., 22.,
+                                        12.5, 60., 15.,
+                                        11.3, 59., 20.,
+                                        12.4, 61., 11.,
+                                        11.2, 58., 23.]);
+    model.train(&inputs).unwrap();
+
+    let new_data = Matrix::new(1, 2, vec![1., 2.]);
+    let err = model.predict(&new_data);
+    assert!(err.is_err());
+
+    let new_data = Matrix::new(1, 4, vec![1., 2., 3., 4.]);
+    let err = model.predict(&new_data);
+    assert!(err.is_err());
+}
