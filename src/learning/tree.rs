@@ -64,7 +64,6 @@ pub struct DecisionTreeClassifier {
     max_depth: Option<usize>,
     min_samples_split: Option<usize>,
 
-
     // params set after train
     n_classes: usize,
     n_features: usize,
@@ -265,12 +264,6 @@ fn uniquify(values: &Vec<f64>) -> Vec<f64> {
     values
 }
 
-#[test]
-fn test_uniquify() {
-    assert_eq!(uniquify(&vec![0.1, 0.2, 0.1]), vec![0.1, 0.2]);
-    assert_eq!(uniquify(&vec![0.3, 0.1, 0.1, 0.1, 0.2, 0.2]), vec![0.1, 0.2, 0.3]);
-}
-
 /// Uniquify values, then get splitter values, i.e. midpoints of unique values
 fn get_splits(values: &Vec<f64>) -> Vec<f64> {
     let uniques = uniquify(values);
@@ -278,13 +271,6 @@ fn get_splits(values: &Vec<f64>) -> Vec<f64> {
                             .zip(uniques[1..].iter())
                             .map(|(&x, &y)| (x + y) / 2.)
                             .collect()
-}
-
-#[test]
-fn test_get_splits() {
-    assert_eq!(get_splits(&vec![0.1, 0.2, 0.1]), vec![0.15000000000000002]);
-    assert_eq!(get_splits(&vec![0.3, 0.1, 0.1, 0.1, 0.2, 0.2]), vec![0.15000000000000002, 0.25]);
-    assert_eq!(get_splits(&vec![1., 3., 7., 3., 7.]), vec![2., 5.]);
 }
 
 /// Split Vec to left and right, depending on given bool Vec values
@@ -303,29 +289,12 @@ fn split_slice<T: Copy>(values: &Vector<T>, bindexer: &Vec<bool>) -> (Vector<T>,
     (Vector::new(left), Vector::new(right))
 }
 
-#[test]
-fn test_split_slice() {
-    let (l, r) = split_slice(&Vector::new(vec![1, 2, 3]), &vec![true, false, true]);
-    assert_eq!(l, Vector::new(vec![1, 3]));
-    assert_eq!(r, Vector::new(vec![2]));
-
-    let (l, r) = split_slice(&Vector::new(vec![1, 2, 3]), &vec![true, true, true]);
-    assert_eq!(l, Vector::new(vec![1, 2, 3]));
-    assert_eq!(r, Vector::new(vec![]));
-}
-
 fn xlogy(x: f64, y: f64) -> f64 {
     if x == 0. {
         0.
     } else {
         x * y.ln()
     }
-}
-
-#[test]
-fn test_xlogy() {
-    assert_eq!(xlogy(3., 8.), 6.2383246250395068);
-    assert_eq!(xlogy(0., 100.), 0.);
 }
 
 /// Count target label frequencies
@@ -343,17 +312,6 @@ fn freq(labels: &Vector<usize>) -> (Vector<usize>, Vector<usize>) {
         counts.push(v);
     }
     (Vector::new(uniques), Vector::new(counts))
-}
-
-#[test]
-fn test_freq() {
-    let (uniques, counts) = freq(&Vector::new(vec![1, 2, 3, 1, 2, 4]));
-    assert_eq!(uniques, Vector::new(vec![1, 2, 3, 4]));
-    assert_eq!(counts, Vector::new(vec![2, 2, 1, 1]));
-
-    let (uniques, counts) = freq(&Vector::new(vec![1, 2, 2, 2, 2]));
-    assert_eq!(uniques, Vector::new(vec![1, 2]));
-    assert_eq!(counts, Vector::new(vec![1, 4]));
 }
 
 /// Split criterias
@@ -390,31 +348,80 @@ impl Metrics {
     }
 }
 
-#[test]
-fn test_entropy() {
-    assert_eq!(Metrics::Entropy.from_probas(&vec![1.]), 0.);
-    assert_eq!(Metrics::Entropy.from_probas(&vec![1., 0., 0.]), 0.);
-    assert_eq!(Metrics::Entropy.from_probas(&vec![0.5, 0.5]), 0.69314718055994529);
-    assert_eq!(Metrics::Entropy.from_probas(&vec![1. / 3., 1. / 3., 1. / 3.]), 1.0986122886681096);
-    assert_eq!(Metrics::Entropy.from_probas(&vec![0.4, 0.3, 0.3]), 1.0888999753452238);
-}
+#[cfg(test)]
+mod tests {
 
-#[test]
-fn test_gini_from_probas() {
-    assert_eq!(Metrics::Gini.from_probas(&vec![1., 0., 0.]), 0.);
-    assert_eq!(Metrics::Gini.from_probas(&vec![1. / 3., 1. / 3., 1. / 3.]), 0.6666666666666667);
-    assert_eq!(Metrics::Gini.from_probas(&vec![0., 1. / 46., 45. / 46.]), 0.04253308128544431);
-    assert_eq!(Metrics::Gini.from_probas(&vec![0., 49. / 54., 5. / 54.]), 0.16803840877914955);
-}
+    use linalg::Vector;
 
-#[test]
-fn test_entropy_from_labels() {
-    assert_eq!(Metrics::Entropy.from_labels(&Vector::new(vec![1, 2, 3])), 1.0986122886681096);
-    assert_eq!(Metrics::Entropy.from_labels(&Vector::new(vec![1, 1, 2, 2])), 0.69314718055994529);
-}
+    use super::{uniquify, get_splits, split_slice, xlogy, freq, Metrics};
 
-#[test]
-fn test_gini_from_labels() {
-    assert_eq!(Metrics::Gini.from_labels(&Vector::new(vec![1, 1, 1])), 0.);
-    assert_eq!(Metrics::Gini.from_labels(&Vector::new(vec![1, 1, 2, 2, 3, 3])), 0.6666666666666667);
+    #[test]
+    fn test_uniquify() {
+        assert_eq!(uniquify(&vec![0.1, 0.2, 0.1]), vec![0.1, 0.2]);
+        assert_eq!(uniquify(&vec![0.3, 0.1, 0.1, 0.1, 0.2, 0.2]), vec![0.1, 0.2, 0.3]);
+    }
+
+    #[test]
+    fn test_get_splits() {
+        assert_eq!(get_splits(&vec![0.1, 0.2, 0.1]), vec![0.15000000000000002]);
+        assert_eq!(get_splits(&vec![0.3, 0.1, 0.1, 0.1, 0.2, 0.2]), vec![0.15000000000000002, 0.25]);
+        assert_eq!(get_splits(&vec![1., 3., 7., 3., 7.]), vec![2., 5.]);
+    }
+
+    #[test]
+    fn test_split_slice() {
+        let (l, r) = split_slice(&Vector::new(vec![1, 2, 3]), &vec![true, false, true]);
+        assert_eq!(l, Vector::new(vec![1, 3]));
+        assert_eq!(r, Vector::new(vec![2]));
+
+        let (l, r) = split_slice(&Vector::new(vec![1, 2, 3]), &vec![true, true, true]);
+        assert_eq!(l, Vector::new(vec![1, 2, 3]));
+        assert_eq!(r, Vector::new(vec![]));
+    }
+
+    #[test]
+    fn test_xlogy() {
+        assert_eq!(xlogy(3., 8.), 6.2383246250395068);
+        assert_eq!(xlogy(0., 100.), 0.);
+    }
+
+    #[test]
+    fn test_freq() {
+        let (uniques, counts) = freq(&Vector::new(vec![1, 2, 3, 1, 2, 4]));
+        assert_eq!(uniques, Vector::new(vec![1, 2, 3, 4]));
+        assert_eq!(counts, Vector::new(vec![2, 2, 1, 1]));
+
+        let (uniques, counts) = freq(&Vector::new(vec![1, 2, 2, 2, 2]));
+        assert_eq!(uniques, Vector::new(vec![1, 2]));
+        assert_eq!(counts, Vector::new(vec![1, 4]));
+    }
+
+    #[test]
+    fn test_entropy() {
+        assert_eq!(Metrics::Entropy.from_probas(&vec![1.]), 0.);
+        assert_eq!(Metrics::Entropy.from_probas(&vec![1., 0., 0.]), 0.);
+        assert_eq!(Metrics::Entropy.from_probas(&vec![0.5, 0.5]), 0.69314718055994529);
+        assert_eq!(Metrics::Entropy.from_probas(&vec![1. / 3., 1. / 3., 1. / 3.]), 1.0986122886681096);
+        assert_eq!(Metrics::Entropy.from_probas(&vec![0.4, 0.3, 0.3]), 1.0888999753452238);
+    }
+
+    #[test]
+    fn test_gini_from_probas() {
+        assert_eq!(Metrics::Gini.from_probas(&vec![1., 0., 0.]), 0.);
+        assert_eq!(Metrics::Gini.from_probas(&vec![1. / 3., 1. / 3., 1. / 3.]), 0.6666666666666667);
+        assert_eq!(Metrics::Gini.from_probas(&vec![0., 1. / 46., 45. / 46.]), 0.04253308128544431);
+        assert_eq!(Metrics::Gini.from_probas(&vec![0., 49. / 54., 5. / 54.]), 0.16803840877914955);
+    }
+
+    #[test]
+    fn test_entropy_from_labels() {
+        assert_eq!(Metrics::Entropy.from_labels(&Vector::new(vec![1, 2, 3])), 1.0986122886681096);
+        assert_eq!(Metrics::Entropy.from_labels(&Vector::new(vec![1, 1, 2, 2])), 0.69314718055994529);
+    }
+
+    #[test]
+    fn test_gini_from_labels() {
+        assert_eq!(Metrics::Gini.from_labels(&Vector::new(vec![1, 1, 1])), 0.);
+        assert_eq!(Metrics::Gini.from_labels(&Vector::new(vec![1, 1, 2, 2, 3, 3])), 0.6666666666666667);
+    }
 }
