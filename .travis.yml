@@ -6,8 +6,17 @@ rust:
 matrix:
   allow_failures:
     - rust: nightly
+env:
+  matrix:
+    - OPTIONAL=true
+    - OPTIONAL=false
+
 script:
-  - cargo build --verbose
+  - if [ "$OPTIONAL" ]; then
+    cargo build --features 'datasets' --verbose;
+  else
+    cargo build --verbose;
+  fi
   - cargo test --verbose
   - cargo build --features stats
   - cargo test --features stats

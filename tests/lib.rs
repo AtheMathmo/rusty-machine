@@ -12,5 +12,5 @@ pub mod learning {
     }
 }
 
-#[cfg(feature = "datasets")]
+#[cfg(datasets)]
 pub mod datasets;
