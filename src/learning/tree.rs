@@ -172,6 +172,7 @@ impl DecisionTreeClassifier {
             let current_feature: Vec<f64> = inputs.select(remains.data(), &[i])
                                                   .into_vec();
 
+            // ToDo: avoid repeated sort
             for v in get_splits(&current_feature) {
                 let bindexer: Vec<bool> = current_feature.iter()
                                                          .map(|&x| x < v)
