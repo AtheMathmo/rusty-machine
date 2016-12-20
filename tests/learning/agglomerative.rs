@@ -1,5 +1,5 @@
 use rm::linalg::{Matrix, Vector};
-use rm::learning::agglomerative::{AgglomerativeClustering, Metrics};
+use rm::learning::agglomerative::{AgglomerativeClustering, Linkage};
 
 #[test]
 fn test_cluster() {
@@ -11,42 +11,42 @@ fn test_cluster() {
                                       55., 65., 80., 75., 85.,
                                       90., 85., 88., 92., 95.]);
 
-    let mut hclust = AgglomerativeClustering::new(3, Metrics::Single);
+    let mut hclust = AgglomerativeClustering::new(3, Linkage::Single);
     let res = hclust.train(&data);
     let exp = Vector::new(vec![1, 2, 1, 0, 1, 2, 2]);
     assert_eq!(res.unwrap(), exp);
 
-    let mut hclust = AgglomerativeClustering::new(3, Metrics::Complete);
+    let mut hclust = AgglomerativeClustering::new(3, Linkage::Complete);
     let res = hclust.train(&data);
     let exp = Vector::new(vec![1, 2, 1, 0, 1, 2, 2]);
     assert_eq!(res.unwrap(), exp);
 
-    let mut hclust = AgglomerativeClustering::new(3, Metrics::Average);
+    let mut hclust = AgglomerativeClustering::new(3, Linkage::Average);
     let res = hclust.train(&data);
     let exp = Vector::new(vec![1, 2, 1, 0, 1, 2, 2]);
     assert_eq!(res.unwrap(), exp);
 
-    let mut hclust = AgglomerativeClustering::new(3, Metrics::Centroid);
+    let mut hclust = AgglomerativeClustering::new(3, Linkage::Centroid);
     let res = hclust.train(&data);
     let exp = Vector::new(vec![1, 2, 1, 0, 1, 2, 2]);
     assert_eq!(res.unwrap(), exp);
 
-    let mut hclust = AgglomerativeClustering::new(3, Metrics::Median);
+    let mut hclust = AgglomerativeClustering::new(3, Linkage::Median);
     let res = hclust.train(&data);
     let exp = Vector::new(vec![1, 2, 1, 0, 1, 2, 2]);
     assert_eq!(res.unwrap(), exp);
 
-    let mut hclust = AgglomerativeClustering::new(3, Metrics::Ward1);
+    let mut hclust = AgglomerativeClustering::new(3, Linkage::Ward1);
     let res = hclust.train(&data);
     let exp = Vector::new(vec![1, 2, 1, 0, 1, 2, 2]);
     assert_eq!(res.unwrap(), exp);
 
-    let mut hclust = AgglomerativeClustering::new(3, Metrics::Ward2);
+    let mut hclust = AgglomerativeClustering::new(3, Linkage::Ward2);
     let res = hclust.train(&data);
     let exp = Vector::new(vec![1, 2, 1, 0, 1, 2, 2]);
     assert_eq!(res.unwrap(), exp);
 
-    let mut hclust = AgglomerativeClustering::new(3, Metrics::Ward);
+    let mut hclust = AgglomerativeClustering::new(3, Linkage::Ward);
     let res = hclust.train(&data);
     let exp = Vector::new(vec![1, 2, 1, 0, 1, 2, 2]);
     assert_eq!(res.unwrap(), exp);
