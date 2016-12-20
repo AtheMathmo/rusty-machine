@@ -10,7 +10,7 @@
 
 use learning::optim::{Optimizable, OptimAlgorithm};
 use linalg::Vector;
-use linalg::Matrix;
+use linalg::{Matrix, BaseMatrix};
 use rulinalg::utils;
 
 use learning::toolkit::rand_utils;
@@ -303,10 +303,123 @@ impl<M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>>> OptimAlgorithm
     }
 }
 
+/// RMSProp 
+///
+/// The RMSProp algorithm (Hinton et al. 2012).
+#[derive(Debug, Clone, Copy)]
+pub struct RMSProp {
+    /// The base step size of gradient descent steps 
+    learning_rate: f64,
+    /// Rate at which running total of average square gradients decays
+    decay_rate: f64,
+    /// Small value used to avoid divide by zero
+    epsilon: f64,
+    /// The number of passes through the data
+    iters: usize,
+}
+
+/// The default RMSProp configuration
+///
+/// The defaults are:
+///
+/// - learning_rate = 0.01
+/// - decay_rate = 0.9
+/// - epsilon = 1.0e-5
+/// - iters = 50
+impl Default for RMSProp {
+    fn default() -> RMSProp {
+        RMSProp {
+            learning_rate: 0.01,
+            decay_rate: 0.9,
+            epsilon: 1.0e-5,
+            iters: 50
+        }
+    }
+}
+
+impl RMSProp {
+    /// Construct an RMSProp algorithm.
+    ///
+    /// Requires learning rate, decay rate, epsilon, and iteration count.
+    ///
+    /// #Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::optim::grad_desc::RMSProp;
+    ///
+    /// let rms = RMSProp::new(0.99, 0.01, 1e-5, 20);
+    /// ```
+    pub fn new(learning_rate: f64, decay_rate: f64, epsilon: f64, iters: usize) -> RMSProp {
+        assert!(0f64 < learning_rate, "The learning rate must be positive");
+        assert!(0f64 < decay_rate && decay_rate < 1f64, "The decay rate must be between 0 and 1");
+        assert!(0f64 < epsilon, "Epsilon must be positive");
+
+        RMSProp {
+            decay_rate: decay_rate,
+            learning_rate: learning_rate,
+            epsilon: epsilon,
+            iters: iters
+        }
+    }
+}
+
+impl<M> OptimAlgorithm<M> for RMSProp
+    where M: Optimizable<Inputs = Matrix<f64>, Targets = Matrix<f64>> {
+    fn optimize(&self,
+                model: &M,
+                start: &[f64],
+                inputs: &M::Inputs,
+                targets: &M::Targets)
+                -> Vec<f64> {
+        // Initial parameters
+        let mut params = Vector::new(start.to_vec());
+        // Running average of squared gradients
+        let mut rmsprop_cache = Vector::zeros(start.len());
+
+        // Set up indices for permutation
+        let mut permutation = (0..inputs.rows()).collect::<Vec<_>>();
+        // The cost from the previous iteration
+        let mut prev_cost = 0f64;
+
+        for _ in 0..self.iters {
+            // The cost at end of each pass
+            let mut end_cost = 0f64;
+            // Permute the vertices
+            rand_utils::in_place_fisher_yates(&mut permutation);
+            for i in &permutation {
+                let (cost, grad) = model.compute_grad(params.data(),
+                                                      &inputs.select_rows(&[*i]),
+                                                      &targets.select_rows(&[*i]));
+
+                let mut grad = Vector::new(grad);
+                let grad_squared = grad.clone().apply(&|x| x*x);
+                // Update cached average of squared gradients
+                rmsprop_cache = &rmsprop_cache*self.decay_rate + &grad_squared*(1.0 - self.decay_rate);
+                // RMSProp update rule 
+                utils::in_place_vec_bin_op(grad.mut_data(), rmsprop_cache.data(), |x, &y| {
+                    *x = *x * self.learning_rate / (y + self.epsilon).sqrt();
+                });
+                params = &params - &grad;
+
+                end_cost += cost;
+            }
+            end_cost /= inputs.rows() as f64;
+
+            // Early stopping
+            if (prev_cost - end_cost).abs() < LEARNING_EPS {
+                break;
+            } else {
+                prev_cost = end_cost;
+            }
+        }
+        params.into_vec()
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
-    use super::{GradientDesc, StochasticGD, AdaGrad};
+    use super::{GradientDesc, StochasticGD, AdaGrad, RMSProp};
 
     #[test]
     #[should_panic]
@@ -338,4 +451,21 @@ mod tests {
         let _ = AdaGrad::new(0.5, -1f64, 0);
     }
 
+    #[test]
+    #[should_panic]
+    fn rmsprop_neg_decay_rate() {
+        let _ = RMSProp::new(-0.5, 0.005, 1.0e-5, 0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn rmsprop_neg_epsilon() {
+        let _ = RMSProp::new(0.5, 0.005, -1.0e-5, 0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn rmsprop_neg_learning_rate() {
+        let _ = RMSProp::new(0.5, -0.005, 1.0e-5, 0);
+    }
 }

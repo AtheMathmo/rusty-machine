@@ -25,8 +25,8 @@
 //! ```
 
 use learning::error::{Error, ErrorKind};
-use linalg::Matrix;
-use super::Transformer;
+use linalg::{Matrix, BaseMatrix, BaseMatrixMut};
+use super::{Invertible, Transformer};
 
 use rulinalg::utils;
 
@@ -145,7 +145,9 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
 
         Ok(inputs)
     }
+}
 
+impl<T: Float> Invertible<Matrix<T>> for MinMaxScaler<T> {
     fn inv_transform(&self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
         if let (&Some(ref scales), &Some(ref consts)) = (&self.scale_factors, &self.const_factors) {
 
@@ -171,7 +173,7 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::super::Transformer;
+    use super::super::{Transformer, Invertible};
     use linalg::Matrix;
     use std::f64;
 

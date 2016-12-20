@@ -1,5 +1,4 @@
-Sample Codes with rusty-machine
-===============================
+Examples with rusty-machine
 
 This directory gathers fully-fledged programs, each using a piece of
 `rusty-machine`'s API.
@@ -9,6 +8,7 @@ This directory gathers fully-fledged programs, each using a piece of
 * [K-Means](#k-means)
 * [SVM](#svm)
 * [Neural Networks](#neural-networks)
+* [Naïve Bayes](#naïve-bayes)
 
 ## The Examples
 
@@ -122,4 +122,46 @@ Got  Expected
 0.01  0
 Hits: 4, Misses: 0
 Accuracy: 100%
+```
+
+### Naïve Bayes
+
+#### Dog Classification
+
+Suppose we have a population composed of red dogs and white dogs,
+whose friendliness, furriness, and speed can be measured. In this
+example we train a Naïve Bayes model to determine whether
+a dog is white or red.
+
+The group of white dogs are friendlier, furrier, and slower than
+the red dogs. Given the color of a dog, friendliness, furriness,
+and speed are independent of each other (a requirement of the Naïve
+Bayes model).
+
+In the example code we will generate our own data and then train
+our model using it. This is a common technique used to validate
+a model. We generate the data by sampling each of the dogs features
+from Gaussian random variables. We will have a total of 6 Gaussian
+random variables representing three features for both colors of dog.
+As we are using Gaussian random variables we will use a Gaussian
+Naive Bayes model. Once we have generated our data we will convert
+it into `Matrix` structures and train our model.
+
+
+Sample run:
+
+```
+$ cargo run --example naive_bayes_dogs
+...
+Predicted: Red; Actual: Red; Accurate? true
+Predicted: Red; Actual: Red; Accurate? true
+Predicted: White; Actual: Red; Accurate? false
+Predicted: Red; Actual: White; Accurate? false
+Predicted: Red; Actual: Red; Accurate? true
+Predicted: White; Actual: White; Accurate? true
+Predicted: White; Actual: White; Accurate? true
+Predicted: White; Actual: White; Accurate? true
+Predicted: White; Actual: White; Accurate? true
+Predicted: Red; Actual: Red; Accurate? true
+Accuracy: 822/1000 = 82.2%
 ```

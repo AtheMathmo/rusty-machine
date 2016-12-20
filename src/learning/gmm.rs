@@ -18,24 +18,24 @@
 //! model.cov_option = CovOption::Diagonal;
 //!
 //! // Where inputs is a Matrix with features in columns.
-//! model.train(&inputs);
+//! model.train(&inputs).unwrap();
 //!
 //! // Print the means and covariances of the GMM
 //! println!("{:?}", model.means());
 //! println!("{:?}", model.covariances());
 //!
 //! // Where test_inputs is a Matrix with features in columns.
-//! let post_probs = model.predict(&test_inputs);
+//! let post_probs = model.predict(&test_inputs).unwrap();
 //!
 //! // Probabilities that each point comes from each Gaussian.
 //! println!("{:?}", post_probs.data());
 //! ```
-
-use linalg::{Matrix, MatrixSlice, Vector};
+use linalg::{Matrix, MatrixSlice, Vector, BaseMatrix, BaseMatrixMut, Axes};
 use rulinalg::utils;
 
-use learning::UnSupModel;
+use learning::{LearningResult, UnSupModel};
 use learning::toolkit::rand_utils;
+use learning::error::{Error, ErrorKind};
 
 /// Covariance options for GMMs.
 ///
@@ -68,18 +68,20 @@ pub struct GaussianMixtureModel {
 
 impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
     /// Train the model using inputs.
-    fn train(&mut self, inputs: &Matrix<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
+        let reg_value = if inputs.rows() > 1 {
+            1f64 / (inputs.rows() - 1) as f64
+        } else {
+            return Err(Error::new(ErrorKind::InvalidData, "Only one row of data provided."));
+        };
+
         // Initialization:
         let k = self.comp_count;
 
-        // TODO: Compute sample covariance of the data.
-        // https://en.wikipedia.org/wiki/Sample_mean_and_covariance#Sample_covariance
-        let mut cov_vec = Vec::with_capacity(k);
-        for _ in 0..k {
-            cov_vec.push(Matrix::identity(inputs.cols()));
-        }
-
-        self.model_covars = Some(cov_vec);
+        self.model_covars = {
+            let cov_mat = try!(self.initialize_covariances(inputs, reg_value));
+            Some(vec![cov_mat; k])
+        };
 
         let random_rows: Vec<usize> =
             rand_utils::reservoir_sample(&(0..inputs.rows()).collect::<Vec<usize>>(), k);
@@ -88,7 +90,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
         for _ in 0..self.max_iters {
             let log_lik_0 = self.log_lik;
 
-            let (weights, log_lik_1) = self.membership_weights(inputs);
+            let (weights, log_lik_1) = try!(self.membership_weights(inputs));
 
             if (log_lik_1 - log_lik_0).abs() < 1e-15 {
                 break;
@@ -98,14 +100,16 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
 
             self.update_params(inputs, weights);
         }
+
+        Ok(())
     }
 
     /// Predict output from inputs.
-    fn predict(&self, inputs: &Matrix<f64>) -> Matrix<f64> {
+    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
         if let (&Some(_), &Some(_)) = (&self.model_means, &self.model_covars) {
-            self.membership_weights(inputs).0
+            Ok(try!(self.membership_weights(inputs)).0)
         } else {
-            panic!("Model has not been trained.");
+            Err(Error::new_untrained())
         }
 
     }
@@ -148,32 +152,33 @@ impl GaussianMixtureModel {
     ///
     /// let mix_weights = Vector::new(vec![0.25, 0.25, 0.5]);
     ///
-    /// let _ = GaussianMixtureModel::with_weights(3, mix_weights);
+    /// let gmm = GaussianMixtureModel::with_weights(3, mix_weights).unwrap();
     /// ```
     ///
-    /// # Panics
+    /// # Failures
     ///
-    /// Panics if either of the following conditions are met:
+    /// Fails if either of the following conditions are met:
     ///
     /// - Mixture weights do not have length k.
     /// - Mixture weights have a negative entry.
-    pub fn with_weights(k: usize, mixture_weights: Vector<f64>) -> GaussianMixtureModel {
-        assert!(mixture_weights.size() == k,
-                "Mixture weights must have length k.");
-        assert!(!mixture_weights.data().iter().any(|&x| x < 0f64),
-                "Mixture weights must have only non-negative entries.");
+    pub fn with_weights(k: usize, mixture_weights: Vector<f64>) -> LearningResult<GaussianMixtureModel> {
+        if mixture_weights.size() != k {
+            Err(Error::new(ErrorKind::InvalidParameters, "Mixture weights must have length k."))
+        } else if mixture_weights.data().iter().any(|&x| x < 0f64) {
+            Err(Error::new(ErrorKind::InvalidParameters, "Mixture weights must have only non-negative entries.")) 
+        } else {
+            let sum = mixture_weights.sum();
+            let normalized_weights = mixture_weights / sum;
 
-        let sum = mixture_weights.sum();
-        let normalized_weights = mixture_weights / sum;
-
-        GaussianMixtureModel {
-            comp_count: k,
-            mix_weights: normalized_weights,
-            model_means: None,
-            model_covars: None,
-            log_lik: 0f64,
-            max_iters: 100,
-            cov_option: CovOption::Full,
+            Ok(GaussianMixtureModel {
+                comp_count: k,
+                mix_weights: normalized_weights,
+                model_means: None,
+                model_covars: None,
+                log_lik: 0f64,
+                max_iters: 100,
+                cov_option: CovOption::Full,
+            })
         }
     }
 
@@ -218,7 +223,33 @@ impl GaussianMixtureModel {
         self.max_iters = iters;
     }
 
-    fn membership_weights(&self, inputs: &Matrix<f64>) -> (Matrix<f64>, f64) {
+    fn initialize_covariances(&self, inputs: &Matrix<f64>, reg_value: f64) -> LearningResult<Matrix<f64>> {
+        match self.cov_option {
+            CovOption::Diagonal => {
+                let variance = try!(inputs.variance(Axes::Row));
+                Ok(Matrix::from_diag(&variance.data()) * reg_value.sqrt())
+            }
+
+            CovOption::Full | CovOption::Regularized(_) => {
+                let means = inputs.mean(Axes::Row);
+                let mut cov_mat = Matrix::zeros(inputs.cols(), inputs.cols());
+                for (j, row) in cov_mat.iter_rows_mut().enumerate() {
+                    for (k, elem) in row.iter_mut().enumerate() {
+                        *elem = inputs.iter_rows().map(|r| {
+                            (r[j] - means[j]) * (r[k] - means[k])
+                        }).sum::<f64>();
+                    }
+                }
+                cov_mat *= reg_value;
+                if let CovOption::Regularized(eps) = self.cov_option {
+                    cov_mat += Matrix::<f64>::identity(cov_mat.cols()) * eps;
+                }
+                Ok(cov_mat)
+            }
+        }
+    }
+
+    fn membership_weights(&self, inputs: &Matrix<f64>) -> LearningResult<(Matrix<f64>, f64)> {
         let n = inputs.rows();
 
         let mut member_weights_data = Vec::with_capacity(n * self.comp_count);
@@ -231,7 +262,7 @@ impl GaussianMixtureModel {
             for cov in covars {
                 // TODO: combine these. We compute det to get the inverse.
                 let covar_det = cov.det();
-                let covar_inv = cov.inverse().expect("Could not compute inverse of covariance.");
+                let covar_inv = try!(cov.inverse().map_err(Error::from));
 
                 cov_sqrt_dets.push(covar_det.sqrt());
                 cov_invs.push(covar_inv);
@@ -265,7 +296,7 @@ impl GaussianMixtureModel {
             }
         }
 
-        (Matrix::new(n, self.comp_count, member_weights_data), log_lik)
+        Ok((Matrix::new(n, self.comp_count, member_weights_data), log_lik))
     }
 
     fn update_params(&mut self, inputs: &Matrix<f64>, membership_weights: Matrix<f64>) {
@@ -292,9 +323,14 @@ impl GaussianMixtureModel {
 
             for i in 0..n {
                 let inputs_i = MatrixSlice::from_matrix(inputs, [i, 0], 1, d);
-                let diff = inputs_i - new_means_k; 
+                let diff = inputs_i - new_means_k;
                 cov_mat += self.compute_cov(diff, membership_weights[[i, k]]);
             }
+
+            if let CovOption::Regularized(eps) = self.cov_option {
+                cov_mat += Matrix::<f64>::identity(cov_mat.cols()) * eps;
+            }
+
             new_covs.push(cov_mat / sum_weights[k]);
 
         }
@@ -305,8 +341,7 @@ impl GaussianMixtureModel {
 
     fn compute_cov(&self, diff: Matrix<f64>, weight: f64) -> Matrix<f64> {
         match self.cov_option {
-            CovOption::Full => (diff.transpose() * diff) * weight,
-            CovOption::Regularized(eps) => (diff.transpose() * diff) * weight + eps,
+            CovOption::Full | CovOption::Regularized(_) => (diff.transpose() * diff) * weight,
             CovOption::Diagonal => Matrix::from_diag(&diff.elemul(&diff).into_vec()) * weight,
         }
     }
@@ -332,16 +367,16 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn test_negative_mixtures() {
         let mix_weights = Vector::new(vec![-0.25, 0.75, 0.5]);
-        let _ = GaussianMixtureModel::with_weights(3, mix_weights);
+        let gmm_res = GaussianMixtureModel::with_weights(3, mix_weights);
+        assert!(gmm_res.is_err());
     }
 
     #[test]
-    #[should_panic]
     fn test_wrong_length_mixtures() {
         let mix_weights = Vector::new(vec![0.1, 0.25, 0.75, 0.5]);
-        let _ = GaussianMixtureModel::with_weights(3, mix_weights);
+        let gmm_res = GaussianMixtureModel::with_weights(3, mix_weights);
+        assert!(gmm_res.is_err());
     }
 }

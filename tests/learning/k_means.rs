@@ -9,9 +9,9 @@ fn test_model_default() {
     let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
     let targets = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
 
-    model.train(&inputs);
+    model.train(&inputs).unwrap();
 
-    let outputs = model.predict(&targets);
+    let outputs = model.predict(&targets).unwrap();
 
     assert_eq!(outputs.size(), 3);
 }
@@ -23,9 +23,9 @@ fn test_model_iter() {
     let targets = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
 
     model.set_iters(1000);
-    model.train(&inputs);
+    model.train(&inputs).unwrap();
 
-    let outputs = model.predict(&targets);
+    let outputs = model.predict(&targets).unwrap();
 
     assert_eq!(outputs.size(), 3);
 }
@@ -36,9 +36,9 @@ fn test_model_forgy() {
     let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
     let targets = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
 
-    model.train(&inputs);
+    model.train(&inputs).unwrap();
 
-    let outputs = model.predict(&targets);
+    let outputs = model.predict(&targets).unwrap();
 
     assert_eq!(outputs.size(), 3);
 }
@@ -49,9 +49,9 @@ fn test_model_ran_partition() {
     let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
     let targets = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
 
-    model.train(&inputs);
+    model.train(&inputs).unwrap();
 
-    let outputs = model.predict(&targets);
+    let outputs = model.predict(&targets).unwrap();
 
     assert_eq!(outputs.size(), 3);
 }
@@ -62,9 +62,9 @@ fn test_model_kplusplus() {
     let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
     let targets = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
 
-    model.train(&inputs);
+    model.train(&inputs).unwrap();
 
-    let outputs = model.predict(&targets);
+    let outputs = model.predict(&targets).unwrap();
 
     assert_eq!(outputs.size(), 3);
 }
@@ -75,7 +75,7 @@ fn test_no_train_predict() {
     let model = KMeansClassifier::<KPlusPlus>::new(3);
     let inputs = Matrix::new(3, 2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
 
-    model.predict(&inputs);
+    model.predict(&inputs).unwrap();
 
 }
 
@@ -89,9 +89,9 @@ fn test_two_centroids() {
                                         314.59375, 174.6875,
                                         350.59375, 161.6875]);
 
-    model.train(&inputs);
+    model.train(&inputs).unwrap();
 
-    let classes = model.predict(&inputs);
+    let classes = model.predict(&inputs).unwrap();
     let class_a = classes[0];
 
     let class_b = if class_a == 0 { 1 } else { 0 };

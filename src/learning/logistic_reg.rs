@@ -20,11 +20,11 @@
 //! let mut log_mod = LogisticRegressor::default();
 //!
 //! // Train the model
-//! log_mod.train(&inputs, &targets);
+//! log_mod.train(&inputs, &targets).unwrap();
 //!
 //! // Now we'll predict a new point
 //! let new_point = Matrix::new(1,1,vec![10.]);
-//! let output = log_mod.predict(&new_point);
+//! let output = log_mod.predict(&new_point).unwrap();
 //!
 //! // Hopefully we classified our new point correctly!
 //! assert!(output[0] > 0.5, "Our classifier isn't very good!");
@@ -34,13 +34,14 @@
 //! by using the `new` constructor instead. This allows us to provide
 //! a `GradientDesc` object with custom parameters.
 
-use learning::SupModel;
-use linalg::Matrix;
+use linalg::{Matrix, BaseMatrix};
 use linalg::Vector;
+use learning::{LearningResult, SupModel};
 use learning::toolkit::activ_fn::{ActivationFunc, Sigmoid};
 use learning::toolkit::cost_fn::{CostFunc, CrossEntropyError};
 use learning::optim::grad_desc::GradientDesc;
 use learning::optim::{OptimAlgorithm, Optimizable};
+use learning::error::Error;
 
 /// Logistic Regression Model.
 ///
@@ -110,9 +111,9 @@ impl<A> SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor<A>
     /// let inputs = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);
     /// let targets = Vector::new(vec![5.0, 6.0, 7.0]);
     ///
-    /// logistic_mod.train(&inputs, &targets);
+    /// logistic_mod.train(&inputs, &targets).unwrap();
     /// ```
-    fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) {
+    fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) -> LearningResult<()> {
         let ones = Matrix::<f64>::ones(inputs.rows(), 1);
         let full_inputs = ones.hcat(inputs);
 
@@ -120,18 +121,19 @@ impl<A> SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor<A>
 
         let optimal_w = self.alg.optimize(&self.base, &initial_params[..], &full_inputs, targets);
         self.base.set_parameters(Vector::new(optimal_w));
+        Ok(())
     }
 
     /// Predict output value from input data.
     ///
     /// Model must be trained before prediction can be made.
-    fn predict(&self, inputs: &Matrix<f64>) -> Vector<f64> {
+    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<f64>> {
         if let Some(v) = self.base.parameters() {
             let ones = Matrix::<f64>::ones(inputs.rows(), 1);
             let full_inputs = ones.hcat(inputs);
-            (full_inputs * v).apply(&Sigmoid::func)
+            Ok((full_inputs * v).apply(&Sigmoid::func))
         } else {
-            panic!("Model has not been trained.");
+            Err(Error::new_untrained())
         }
     }
 }

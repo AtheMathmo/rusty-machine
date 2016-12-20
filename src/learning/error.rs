@@ -6,6 +6,8 @@ use std::error;
 use std::fmt;
 use std::marker::{Send, Sync};
 
+use rulinalg;
+
 /// An error related to the learning module.
 #[derive(Debug)]
 pub struct Error {
@@ -25,6 +27,10 @@ pub enum ErrorKind {
     InvalidData,
     /// The action could not be carried out as the model was in an invalid state.
     InvalidState,
+    /// The model has not been trained
+    UntrainedModel,
+    /// Linear algebra related error
+    LinearAlgebra
 }
 
 impl Error {
@@ -38,9 +44,22 @@ impl Error {
         }
     }
 
+    /// Returns a new error for an untrained model
+    ///
+    /// This function is unstable and may be removed with changes to the API.
+    pub fn new_untrained() -> Error {
+        Error::new(ErrorKind::UntrainedModel, "The model has not been trained.")
+    }
+
     /// Get the kind of this `Error`.
     pub fn kind(&self) -> &ErrorKind {
         &self.kind
+    }
+}
+
+impl From<rulinalg::error::Error> for Error {
+    fn from(e: rulinalg::error::Error) -> Error {
+        Error::new(ErrorKind::LinearAlgebra, <rulinalg::error::Error as error::Error>::description(&e))
     }
 }
 
