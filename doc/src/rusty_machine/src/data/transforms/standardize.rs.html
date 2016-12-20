@@ -260,6 +260,10 @@
 <span id="216">216</span>
 <span id="217">217</span>
 <span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The Standardizing Transformer</span>
 <span class='doccomment'>//!</span>
@@ -288,8 +292,8 @@
 <span class='doccomment'>//! ```</span>
 
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>error</span>::{<span class='ident'>Error</span>, <span class='ident'>ErrorKind</span>};
-<span class='kw'>use</span> <span class='ident'>linalg</span>::{<span class='ident'>Matrix</span>, <span class='ident'>Vector</span>, <span class='ident'>Axes</span>};
-<span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>Transformer</span>;
+<span class='kw'>use</span> <span class='ident'>linalg</span>::{<span class='ident'>Matrix</span>, <span class='ident'>Vector</span>, <span class='ident'>Axes</span>, <span class='ident'>BaseMatrix</span>, <span class='ident'>BaseMatrixMut</span>};
+<span class='kw'>use</span> <span class='kw'>super</span>::{<span class='ident'>Invertible</span>, <span class='ident'>Transformer</span>};
 
 <span class='kw'>use</span> <span class='ident'>rulinalg</span>::<span class='ident'>utils</span>;
 
@@ -356,7 +360,9 @@
                            <span class='string'>&quot;Cannot standardize data with only one row.&quot;</span>))
         } <span class='kw'>else</span> {
             <span class='kw'>let</span> <span class='ident'>mean</span> <span class='op'>=</span> <span class='ident'>inputs</span>.<span class='ident'>mean</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>);
-            <span class='kw'>let</span> <span class='ident'>variance</span> <span class='op'>=</span> <span class='ident'>inputs</span>.<span class='ident'>variance</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>);
+            <span class='kw'>let</span> <span class='ident'>variance</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>inputs</span>.<span class='ident'>variance</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>).<span class='ident'>map_err</span>(<span class='op'>|</span>_<span class='op'>|</span> {
+                <span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidData</span>, <span class='string'>&quot;Cannot compute variance of data.&quot;</span>)
+            }));
 
             <span class='kw'>if</span> <span class='ident'>mean</span>.<span class='ident'>data</span>().<span class='ident'>iter</span>().<span class='ident'>any</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='op'>!</span><span class='ident'>x</span>.<span class='ident'>is_finite</span>()) {
                 <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidData</span>, <span class='string'>&quot;Some data point is non-finite.&quot;</span>));
@@ -375,7 +381,9 @@
             <span class='prelude-val'>Ok</span>(<span class='ident'>inputs</span>)
         }
     }
+}
 
+<span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Float</span> <span class='op'>+</span> <span class='ident'>FromPrimitive</span><span class='op'>&gt;</span> <span class='ident'>Invertible</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Standardizer</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='kw'>fn</span> <span class='ident'>inv_transform</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>mut</span> <span class='ident'>inputs</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='kw'>let</span> (<span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>means</span>), <span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>variances</span>)) <span class='op'>=</span> (<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>means</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>variances</span>) {
 
@@ -404,7 +412,7 @@
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>tests</span> {
     <span class='kw'>use</span> <span class='kw'>super</span>::<span class='op'>*</span>;
-    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='kw'>super</span>::<span class='ident'>Transformer</span>;
+    <span class='kw'>use</span> <span class='kw'>super</span>::<span class='kw'>super</span>::{<span class='ident'>Transformer</span>, <span class='ident'>Invertible</span>};
     <span class='kw'>use</span> <span class='ident'>linalg</span>::{<span class='ident'>Axes</span>, <span class='ident'>Matrix</span>};
 
     <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>;
@@ -447,7 +455,7 @@
         <span class='kw'>let</span> <span class='ident'>transformed</span> <span class='op'>=</span> <span class='ident'>standardizer</span>.<span class='ident'>transform</span>(<span class='ident'>inputs</span>).<span class='ident'>unwrap</span>();
 
         <span class='kw'>let</span> <span class='ident'>new_mean</span> <span class='op'>=</span> <span class='ident'>transformed</span>.<span class='ident'>mean</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>);
-        <span class='kw'>let</span> <span class='ident'>new_var</span> <span class='op'>=</span> <span class='ident'>transformed</span>.<span class='ident'>variance</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>);
+        <span class='kw'>let</span> <span class='ident'>new_var</span> <span class='op'>=</span> <span class='ident'>transformed</span>.<span class='ident'>variance</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>).<span class='ident'>unwrap</span>();
 
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>new_mean</span>.<span class='ident'>data</span>().<span class='ident'>iter</span>().<span class='ident'>all</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span>.<span class='ident'>abs</span>() <span class='op'>&lt;</span> <span class='number'>1e-5</span>));
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>new_var</span>.<span class='ident'>data</span>().<span class='ident'>iter</span>().<span class='ident'>all</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> (<span class='ident'>x</span>.<span class='ident'>abs</span>() <span class='op'>-</span> <span class='number'>1.0</span>) <span class='op'>&lt;</span> <span class='number'>1e-5</span>));
@@ -461,7 +469,7 @@
         <span class='kw'>let</span> <span class='ident'>transformed</span> <span class='op'>=</span> <span class='ident'>standardizer</span>.<span class='ident'>transform</span>(<span class='ident'>inputs</span>).<span class='ident'>unwrap</span>();
 
         <span class='kw'>let</span> <span class='ident'>new_mean</span> <span class='op'>=</span> <span class='ident'>transformed</span>.<span class='ident'>mean</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>);
-        <span class='kw'>let</span> <span class='ident'>new_var</span> <span class='op'>=</span> <span class='ident'>transformed</span>.<span class='ident'>variance</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>);
+        <span class='kw'>let</span> <span class='ident'>new_var</span> <span class='op'>=</span> <span class='ident'>transformed</span>.<span class='ident'>variance</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>).<span class='ident'>unwrap</span>();
 
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>new_mean</span>.<span class='ident'>data</span>().<span class='ident'>iter</span>().<span class='ident'>all</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> (<span class='ident'>x</span>.<span class='ident'>abs</span>() <span class='op'>-</span> <span class='number'>1.0</span>) <span class='op'>&lt;</span> <span class='number'>1e-5</span>));
         <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>new_var</span>.<span class='ident'>data</span>().<span class='ident'>iter</span>().<span class='ident'>all</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> (<span class='ident'>x</span>.<span class='ident'>abs</span>() <span class='op'>-</span> <span class='number'>4.0</span>) <span class='op'>&lt;</span> <span class='number'>1e-5</span>));
@@ -478,7 +486,8 @@
 
         <span class='macro'>assert</span><span class='macro'>!</span>((<span class='ident'>inputs</span> <span class='op'>-</span> <span class='ident'>original</span>).<span class='ident'>data</span>().<span class='ident'>iter</span>().<span class='ident'>all</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='ident'>x</span>.<span class='ident'>abs</span>() <span class='op'>&lt;</span> <span class='number'>1e-5</span>));
     }
-}</pre>
+}
+</pre>
 </section>
     <section id='search' class="content hidden"></section>
 

@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-638' class='srclink' href='../../../src/rusty_machine/src/learning/lin_reg.rs.html#1-163' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-686' class='srclink' href='../../../src/rusty_machine/src/learning/lin_reg.rs.html#1-165' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Linear Regression module</p>
 
 <p>Contains implemention of linear regression using
@@ -69,20 +69,20 @@ so you do not need to format the input matrices yourself.</p>
 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>lin_mod</span> <span class='op'>=</span> <span class='ident'>LinRegressor</span>::<span class='ident'>default</span>();
 
 <span class='comment'>// Train the model</span>
-<span class='ident'>lin_mod</span>.<span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>, <span class='kw-2'>&amp;</span><span class='ident'>targets</span>);
+<span class='ident'>lin_mod</span>.<span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>, <span class='kw-2'>&amp;</span><span class='ident'>targets</span>).<span class='ident'>unwrap</span>();
 
 <span class='comment'>// Now we&#39;ll predict a new point</span>
 <span class='kw'>let</span> <span class='ident'>new_point</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>1</span>,<span class='number'>1</span>,<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>10.</span>]);
-<span class='kw'>let</span> <span class='ident'>output</span> <span class='op'>=</span> <span class='ident'>lin_mod</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>new_point</span>);
+<span class='kw'>let</span> <span class='ident'>output</span> <span class='op'>=</span> <span class='ident'>lin_mod</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>new_point</span>).<span class='ident'>unwrap</span>();
 
 <span class='comment'>// Hopefully we classified our new point correctly!</span>
-<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>output</span>[<span class='number'>0</span>] <span class='op'>&gt;</span> <span class='number'>17f64</span>, <span class='string'>&quot;Our regressor isn&#39;t very good!&quot;</span>);</pre>
+<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>output</span>[<span class='number'>0</span>] <span class='op'>&gt;</span> <span class='number'>17f64</span>, <span class='string'>&quot;Our regressor isn&#39;t very good!&quot;</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.LinRegressor.html'
                                   title='rusty_machine::learning::lin_reg::LinRegressor'>LinRegressor</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Linear Regression Model.</p>
                            </td>
                        </tr></table></section>

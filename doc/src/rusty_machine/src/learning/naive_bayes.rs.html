@@ -527,6 +527,26 @@
 <span id="483">483</span>
 <span id="484">484</span>
 <span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Naive Bayes Classifiers</span>
 <span class='doccomment'>//!</span>
@@ -561,18 +581,19 @@
 <span class='doccomment'>//! let mut model = NaiveBayes::&lt;Gaussian&gt;::new();</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Train the model.</span>
-<span class='doccomment'>//! model.train(&amp;inputs, &amp;targets);</span>
+<span class='doccomment'>//! model.train(&amp;inputs, &amp;targets).unwrap();</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Predict the classes on the input data</span>
-<span class='doccomment'>//! let outputs = model.predict(&amp;inputs);</span>
+<span class='doccomment'>//! let outputs = model.predict(&amp;inputs).unwrap();</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Will output the target classes - otherwise our classifier is bad!</span>
 <span class='doccomment'>//! println!(&quot;Final outputs --\n{}&quot;, outputs);</span>
 <span class='doccomment'>//! ```</span>
 
-<span class='kw'>use</span> <span class='ident'>linalg</span>::{<span class='ident'>Matrix</span>, <span class='ident'>Axes</span>};
+<span class='kw'>use</span> <span class='ident'>linalg</span>::{<span class='ident'>Matrix</span>, <span class='ident'>Axes</span>, <span class='ident'>BaseMatrix</span>, <span class='ident'>BaseMatrixMut</span>};
+<span class='kw'>use</span> <span class='ident'>learning</span>::{<span class='ident'>LearningResult</span>, <span class='ident'>SupModel</span>};
+<span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>error</span>::{<span class='ident'>Error</span>, <span class='ident'>ErrorKind</span>};
 <span class='kw'>use</span> <span class='ident'>rulinalg</span>::<span class='ident'>utils</span>;
-<span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>SupModel</span>;
 
 <span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>f64</span>::<span class='ident'>consts</span>::<span class='ident'>PI</span>;
 
@@ -635,14 +656,14 @@
 <span class='doccomment'>/// the input class. e.g. [[1,0,0],[0,0,1]] shows class 1 first, then class 3.</span>
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Distribution</span><span class='op'>&gt;</span> <span class='ident'>SupModel</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>NaiveBayes</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Train the model using inputs and targets.</span>
-    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
+    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>distr</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>T</span>::<span class='ident'>from_model_params</span>(<span class='ident'>targets</span>.<span class='ident'>cols</span>(), <span class='ident'>inputs</span>.<span class='ident'>cols</span>()));
-        <span class='self'>self</span>.<span class='ident'>update_params</span>(<span class='ident'>inputs</span>, <span class='ident'>targets</span>);
+        <span class='self'>self</span>.<span class='ident'>update_params</span>(<span class='ident'>inputs</span>, <span class='ident'>targets</span>)
     }
 
     <span class='doccomment'>/// Predict output from inputs.</span>
-    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-        <span class='kw'>let</span> <span class='ident'>log_probs</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>get_log_probs</span>(<span class='ident'>inputs</span>);
+    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
+        <span class='kw'>let</span> <span class='ident'>log_probs</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>get_log_probs</span>(<span class='ident'>inputs</span>));
         <span class='kw'>let</span> <span class='ident'>input_classes</span> <span class='op'>=</span> <span class='ident'>NaiveBayes</span>::<span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>::<span class='ident'>get_classes</span>(<span class='ident'>log_probs</span>);
 
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>cluster_count</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>cluster_count</span> {
@@ -655,26 +676,26 @@
                 <span class='ident'>class_data</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>row</span>);
             }
 
-            <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>inputs</span>.<span class='ident'>rows</span>(), <span class='ident'>cluster_count</span>, <span class='ident'>class_data</span>)
+            <span class='prelude-val'>Ok</span>(<span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>inputs</span>.<span class='ident'>rows</span>(), <span class='ident'>cluster_count</span>, <span class='ident'>class_data</span>))
         } <span class='kw'>else</span> {
-            <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;The model has not been trained.&quot;</span>);
+            <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>UntrainedModel</span>, <span class='string'>&quot;The model has not been trained.&quot;</span>))
         }
     }
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Distribution</span><span class='op'>&gt;</span> <span class='ident'>NaiveBayes</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Get the log-probabilities per class for each input.</span>
-    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_log_probs</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+    <span class='kw'>pub</span> <span class='kw'>fn</span> <span class='ident'>get_log_probs</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
 
         <span class='kw'>if</span> <span class='kw'>let</span> (<span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>distr</span>), <span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>prior</span>)) <span class='op'>=</span> (<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>distr</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>class_prior</span>) {
             <span class='comment'>// Get the joint log likelihood from the distribution</span>
             <span class='ident'>distr</span>.<span class='ident'>joint_log_lik</span>(<span class='ident'>inputs</span>, <span class='ident'>prior</span>)
         } <span class='kw'>else</span> {
-            <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Model has not been trained.&quot;</span>);
+            <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new_untrained</span>())
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
+    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>class_count</span> <span class='op'>=</span> <span class='ident'>targets</span>.<span class='ident'>cols</span>();
         <span class='kw'>let</span> <span class='ident'>total_data</span> <span class='op'>=</span> <span class='ident'>inputs</span>.<span class='ident'>rows</span>();
 
@@ -683,7 +704,7 @@
 
         <span class='kw'>for</span> (<span class='ident'>idx</span>, <span class='ident'>row</span>) <span class='kw'>in</span> <span class='ident'>targets</span>.<span class='ident'>iter_rows</span>().<span class='ident'>enumerate</span>() {
             <span class='comment'>// Find the class of this input</span>
-            <span class='kw'>let</span> <span class='ident'>class</span> <span class='op'>=</span> <span class='ident'>NaiveBayes</span>::<span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>::<span class='ident'>find_class</span>(<span class='ident'>row</span>);
+            <span class='kw'>let</span> <span class='ident'>class</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>NaiveBayes</span>::<span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>::<span class='ident'>find_class</span>(<span class='ident'>row</span>));
 
             <span class='comment'>// Note the class of the input</span>
             <span class='ident'>class_data</span>[<span class='ident'>class</span>].<span class='ident'>push</span>(<span class='ident'>idx</span>);
@@ -699,7 +720,7 @@
                     <span class='kw'>continue</span>;
                 }
                 <span class='comment'>// Update the parameters within this class</span>
-                <span class='ident'>distr</span>.<span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>c</span>), <span class='ident'>idx</span>);
+                <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>distr</span>.<span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='ident'>c</span>), <span class='ident'>idx</span>));
             }
         }
 
@@ -710,16 +731,19 @@
 
         <span class='self'>self</span>.<span class='ident'>class_prior</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>class_prior</span>);
         <span class='self'>self</span>.<span class='ident'>cluster_count</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>class_count</span>);
+        <span class='prelude-val'>Ok</span>(())
     }
 
-    <span class='kw'>fn</span> <span class='ident'>find_class</span>(<span class='ident'>row</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>]) <span class='op'>-&gt;</span> <span class='ident'>usize</span> {
+    <span class='kw'>fn</span> <span class='ident'>find_class</span>(<span class='ident'>row</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>]) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
         <span class='comment'>// Find the `1` entry in the row</span>
         <span class='kw'>for</span> (<span class='ident'>idx</span>, <span class='ident'>r</span>) <span class='kw'>in</span> <span class='ident'>row</span>.<span class='ident'>into_iter</span>().<span class='ident'>enumerate</span>() {
             <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>r</span> <span class='op'>==</span> <span class='number'>1f64</span> {
-                <span class='kw'>return</span> <span class='ident'>idx</span>;
+                <span class='kw'>return</span> <span class='prelude-val'>Ok</span>(<span class='ident'>idx</span>);
             }
         }
-        <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;No class found for entry in targets&quot;</span>);
+
+        <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidState</span>,
+                       <span class='string'>&quot;No class found for entry in targets&quot;</span>))
     }
 
     <span class='kw'>fn</span> <span class='ident'>get_classes</span>(<span class='ident'>log_probs</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>usize</span><span class='op'>&gt;</span> {
@@ -741,12 +765,15 @@
     <span class='kw'>fn</span> <span class='ident'>from_model_params</span>(<span class='ident'>class_count</span>: <span class='ident'>usize</span>, <span class='ident'>features</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='self'>Self</span>;
 
     <span class='doccomment'>/// Updates the distribution parameters.</span>
-    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>);
+    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span>;
 
     <span class='doccomment'>/// Compute the joint log likelihood of the data.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Returns a matrix with rows containing the probability that the input lies in each class.</span>
-    <span class='kw'>fn</span> <span class='ident'>joint_log_lik</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class_prior</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>]) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>;
+    <span class='kw'>fn</span> <span class='ident'>joint_log_lik</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>,
+                     <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>,
+                     <span class='ident'>class_prior</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>])
+                     <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span>;
 }
 
 <span class='doccomment'>/// The Gaussian Naive Bayes model distribution.</span>
@@ -785,10 +812,14 @@
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>) {
+    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
         <span class='comment'>// Compute mean and sample variance</span>
         <span class='kw'>let</span> <span class='ident'>mean</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>mean</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>).<span class='ident'>into_vec</span>();
-        <span class='kw'>let</span> <span class='ident'>var</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>variance</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>).<span class='ident'>into_vec</span>();
+        <span class='kw'>let</span> <span class='ident'>var</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='ident'>data</span>.<span class='ident'>variance</span>(<span class='ident'>Axes</span>::<span class='ident'>Row</span>).<span class='ident'>map_err</span>(<span class='op'>|</span>_<span class='op'>|</span> {
+                <span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidData</span>,
+                           <span class='string'>&quot;Cannot compute variance for Gaussian distribution.&quot;</span>)
+            }))
+            .<span class='ident'>into_vec</span>();
 
         <span class='kw'>let</span> <span class='ident'>features</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>cols</span>();
 
@@ -796,9 +827,14 @@
             <span class='self'>self</span>.<span class='ident'>theta</span>.<span class='ident'>mut_data</span>()[<span class='ident'>class</span> <span class='op'>*</span> <span class='ident'>features</span> <span class='op'>+</span> <span class='ident'>idx</span>] <span class='op'>=</span> <span class='ident'>m</span>;
             <span class='self'>self</span>.<span class='ident'>sigma</span>.<span class='ident'>mut_data</span>()[<span class='ident'>class</span> <span class='op'>*</span> <span class='ident'>features</span> <span class='op'>+</span> <span class='ident'>idx</span>] <span class='op'>=</span> <span class='ident'>v</span>;
         }
+
+        <span class='prelude-val'>Ok</span>(())
     }
 
-    <span class='kw'>fn</span> <span class='ident'>joint_log_lik</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class_prior</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>]) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>joint_log_lik</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>,
+                     <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>,
+                     <span class='ident'>class_prior</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>])
+                     <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>class_count</span> <span class='op'>=</span> <span class='ident'>class_prior</span>.<span class='ident'>len</span>();
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>log_lik</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>class_count</span>);
 
@@ -817,7 +853,7 @@
             <span class='ident'>log_lik</span>.<span class='ident'>append</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> (<span class='ident'>res</span> <span class='op'>+</span> <span class='ident'>joint_i</span>).<span class='ident'>into_vec</span>());
         }
 
-        <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>class_count</span>, <span class='ident'>data</span>.<span class='ident'>rows</span>(), <span class='ident'>log_lik</span>).<span class='ident'>transpose</span>()
+        <span class='prelude-val'>Ok</span>(<span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>class_count</span>, <span class='ident'>data</span>.<span class='ident'>rows</span>(), <span class='ident'>log_lik</span>).<span class='ident'>transpose</span>())
     }
 }
 
@@ -850,7 +886,7 @@
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>) {
+    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>features</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>cols</span>();
 
         <span class='comment'>// We add the pseudo count to the class count and feature count</span>
@@ -863,9 +899,14 @@
             <span class='self'>self</span>.<span class='ident'>log_probs</span>[[<span class='ident'>class</span>, <span class='ident'>i</span>]] <span class='op'>=</span> <span class='op'>*</span><span class='ident'>item</span>;
         }
 
+        <span class='prelude-val'>Ok</span>(())
+
     }
 
-    <span class='kw'>fn</span> <span class='ident'>joint_log_lik</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class_prior</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>]) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>joint_log_lik</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>,
+                     <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>,
+                     <span class='ident'>class_prior</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>])
+                     <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>class_count</span> <span class='op'>=</span> <span class='ident'>class_prior</span>.<span class='ident'>len</span>();
 
         <span class='kw'>let</span> <span class='ident'>neg_prob</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>log_probs</span>.<span class='ident'>clone</span>().<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> (<span class='number'>1f64</span> <span class='op'>-</span> <span class='ident'>x</span>.<span class='ident'>exp</span>()).<span class='ident'>ln</span>());
@@ -886,7 +927,7 @@
 
         <span class='kw'>let</span> <span class='ident'>class_row_mat</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>1</span>, <span class='ident'>class_count</span>, <span class='ident'>per_class_row</span>);
 
-        <span class='ident'>res</span> <span class='op'>+</span> <span class='ident'>class_row_mat</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0</span>; <span class='ident'>data</span>.<span class='ident'>rows</span>()])
+        <span class='prelude-val'>Ok</span>(<span class='ident'>res</span> <span class='op'>+</span> <span class='ident'>class_row_mat</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0</span>; <span class='ident'>data</span>.<span class='ident'>rows</span>()]))
     }
 }
 
@@ -918,7 +959,7 @@
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>) {
+    <span class='kw'>fn</span> <span class='ident'>update_params</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class</span>: <span class='ident'>usize</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>features</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>cols</span>();
 
         <span class='kw'>let</span> <span class='ident'>pseudo_fc</span> <span class='op'>=</span> <span class='ident'>data</span>.<span class='ident'>sum_rows</span>() <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>pseudo_count</span>;
@@ -930,9 +971,13 @@
             <span class='self'>self</span>.<span class='ident'>log_probs</span>[[<span class='ident'>class</span>, <span class='ident'>i</span>]] <span class='op'>=</span> <span class='op'>*</span><span class='ident'>item</span>;
         }
 
+        <span class='prelude-val'>Ok</span>(())
     }
 
-    <span class='kw'>fn</span> <span class='ident'>joint_log_lik</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>class_prior</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>]) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>joint_log_lik</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>,
+                     <span class='ident'>data</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>,
+                     <span class='ident'>class_prior</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>f64</span>])
+                     <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>class_count</span> <span class='op'>=</span> <span class='ident'>class_prior</span>.<span class='ident'>len</span>();
 
         <span class='kw'>let</span> <span class='ident'>res</span> <span class='op'>=</span> <span class='ident'>data</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>log_probs</span>.<span class='ident'>transpose</span>();
@@ -944,7 +989,7 @@
 
         <span class='kw'>let</span> <span class='ident'>class_row_mat</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>1</span>, <span class='ident'>class_count</span>, <span class='ident'>per_class_row</span>);
 
-        <span class='ident'>res</span> <span class='op'>+</span> <span class='ident'>class_row_mat</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0</span>; <span class='ident'>data</span>.<span class='ident'>rows</span>()])
+        <span class='prelude-val'>Ok</span>(<span class='ident'>res</span> <span class='op'>+</span> <span class='ident'>class_row_mat</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span><span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>0</span>; <span class='ident'>data</span>.<span class='ident'>rows</span>()]))
     }
 }
 
@@ -971,10 +1016,9 @@
                                        <span class='number'>0.0</span>, <span class='number'>0.0</span>, <span class='number'>0.0</span>, <span class='number'>1.0</span>, <span class='number'>0.0</span>, <span class='number'>0.0</span>, <span class='number'>1.0</span>]);
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>model</span> <span class='op'>=</span> <span class='ident'>NaiveBayes</span>::<span class='op'>&lt;</span><span class='ident'>Gaussian</span><span class='op'>&gt;</span>::<span class='ident'>new</span>();
-        <span class='ident'>model</span>.<span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>, <span class='kw-2'>&amp;</span><span class='ident'>targets</span>);
+        <span class='ident'>model</span>.<span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>, <span class='kw-2'>&amp;</span><span class='ident'>targets</span>).<span class='ident'>unwrap</span>();
 
-        <span class='kw'>let</span> <span class='ident'>outputs</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>);
-
+        <span class='kw'>let</span> <span class='ident'>outputs</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>).<span class='ident'>unwrap</span>();
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>outputs</span>.<span class='ident'>into_vec</span>(), <span class='ident'>targets</span>.<span class='ident'>into_vec</span>());
     }
 
@@ -987,11 +1031,9 @@
         <span class='kw'>let</span> <span class='ident'>targets</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>4</span>, <span class='number'>2</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>, <span class='number'>0.0</span>, <span class='number'>1.0</span>, <span class='number'>0.0</span>, <span class='number'>0.0</span>, <span class='number'>1.0</span>, <span class='number'>0.0</span>, <span class='number'>1.0</span>]);
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>model</span> <span class='op'>=</span> <span class='ident'>NaiveBayes</span>::<span class='op'>&lt;</span><span class='ident'>Bernoulli</span><span class='op'>&gt;</span>::<span class='ident'>new</span>();
-        <span class='ident'>model</span>.<span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>, <span class='kw-2'>&amp;</span><span class='ident'>targets</span>);
+        <span class='ident'>model</span>.<span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>, <span class='kw-2'>&amp;</span><span class='ident'>targets</span>).<span class='ident'>unwrap</span>();
 
-        <span class='kw'>let</span> <span class='ident'>outputs</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>);
-        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>outputs</span>);
-
+        <span class='kw'>let</span> <span class='ident'>outputs</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>).<span class='ident'>unwrap</span>();
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>outputs</span>.<span class='ident'>into_vec</span>(), <span class='ident'>targets</span>.<span class='ident'>into_vec</span>());
     }
 
@@ -1005,11 +1047,9 @@
         <span class='kw'>let</span> <span class='ident'>targets</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>4</span>, <span class='number'>2</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>, <span class='number'>0.0</span>, <span class='number'>1.0</span>, <span class='number'>0.0</span>, <span class='number'>0.0</span>, <span class='number'>1.0</span>, <span class='number'>0.0</span>, <span class='number'>1.0</span>]);
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>model</span> <span class='op'>=</span> <span class='ident'>NaiveBayes</span>::<span class='op'>&lt;</span><span class='ident'>Multinomial</span><span class='op'>&gt;</span>::<span class='ident'>new</span>();
-        <span class='ident'>model</span>.<span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>, <span class='kw-2'>&amp;</span><span class='ident'>targets</span>);
+        <span class='ident'>model</span>.<span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>, <span class='kw-2'>&amp;</span><span class='ident'>targets</span>).<span class='ident'>unwrap</span>();
 
-        <span class='kw'>let</span> <span class='ident'>outputs</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>);
-        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;{}&quot;</span>, <span class='ident'>outputs</span>);
-
+        <span class='kw'>let</span> <span class='ident'>outputs</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>).<span class='ident'>unwrap</span>();
         <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>outputs</span>.<span class='ident'>into_vec</span>(), <span class='ident'>targets</span>.<span class='ident'>into_vec</span>());
     }
 }

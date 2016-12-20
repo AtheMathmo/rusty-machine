@@ -69,10 +69,15 @@
 <span id="25">25</span>
 <span id="26">26</span>
 <span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The Transforms module</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! This module contains the `Transformer` trait and reexports</span>
+<span class='doccomment'>//! This module contains the `Transformer` and `Invertible` traits and reexports</span>
 <span class='doccomment'>//! the transformers from child modules.</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! The `Transformer` trait provides a shared interface for all of the</span>
@@ -83,17 +88,22 @@
 
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>minmax</span>;
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>standardize</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>shuffle</span>;
 
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>error</span>;
 
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>minmax</span>::<span class='ident'>MinMaxScaler</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>shuffle</span>::<span class='ident'>Shuffler</span>;
 <span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>standardize</span>::<span class='ident'>Standardizer</span>;
 
 <span class='doccomment'>/// Trait for data transformers</span>
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Transformer</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Transforms the inputs and stores the transformation in the Transformer</span>
     <span class='kw'>fn</span> <span class='ident'>transform</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span>;
+}
 
+<span class='doccomment'>/// Trait for invertible data transformers</span>
+<span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Invertible</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> : <span class='ident'>Transformer</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Maps the inputs using the inverse of the fitted transform.</span>
     <span class='kw'>fn</span> <span class='ident'>inv_transform</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span>;
 }</pre>

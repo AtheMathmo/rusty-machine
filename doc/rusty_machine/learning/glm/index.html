@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-262' class='srclink' href='../../../src/rusty_machine/src/learning/glm.rs.html#1-471' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-291' class='srclink' href='../../../src/rusty_machine/src/learning/glm.rs.html#1-475' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Generalized Linear Model module</p>
 
 <p><i>This model is likely to undergo changes in the near future.
@@ -74,69 +74,69 @@ input data.</p>
 <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>log_mod</span> <span class='op'>=</span> <span class='ident'>GenLinearModel</span>::<span class='ident'>new</span>(<span class='ident'>Bernoulli</span>);
 
 <span class='comment'>// Train the model</span>
-<span class='ident'>log_mod</span>.<span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>, <span class='kw-2'>&amp;</span><span class='ident'>targets</span>);
+<span class='ident'>log_mod</span>.<span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>, <span class='kw-2'>&amp;</span><span class='ident'>targets</span>).<span class='ident'>unwrap</span>();
 
 <span class='comment'>// Now we&#39;ll predict a new point</span>
 <span class='kw'>let</span> <span class='ident'>new_point</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>1</span>,<span class='number'>1</span>,<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>10.</span>]);
-<span class='kw'>let</span> <span class='ident'>output</span> <span class='op'>=</span> <span class='ident'>log_mod</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>new_point</span>);
+<span class='kw'>let</span> <span class='ident'>output</span> <span class='op'>=</span> <span class='ident'>log_mod</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>new_point</span>).<span class='ident'>unwrap</span>();
 
 <span class='comment'>// Hopefully we classified our new point correctly!</span>
-<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>output</span>[<span class='number'>0</span>] <span class='op'>&gt;</span> <span class='number'>0.5</span>, <span class='string'>&quot;Our classifier isn&#39;t very good!&quot;</span>);</pre>
+<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>output</span>[<span class='number'>0</span>] <span class='op'>&gt;</span> <span class='number'>0.5</span>, <span class='string'>&quot;Our classifier isn&#39;t very good!&quot;</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 </div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.Bernoulli.html'
                                   title='rusty_machine::learning::glm::Bernoulli'>Bernoulli</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>The Bernoulli regression family.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.Binomial.html'
                                   title='rusty_machine::learning::glm::Binomial'>Binomial</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>The Binomial regression family.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.GenLinearModel.html'
                                   title='rusty_machine::learning::glm::GenLinearModel'>GenLinearModel</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>The Generalized Linear Model</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.Identity.html'
                                   title='rusty_machine::learning::glm::Identity'>Identity</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>The Identity link function.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.Log.html'
                                   title='rusty_machine::learning::glm::Log'>Log</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>The log link function.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.Logit.html'
                                   title='rusty_machine::learning::glm::Logit'>Logit</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>The Logit link function.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.Normal.html'
                                   title='rusty_machine::learning::glm::Normal'>Normal</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>The Normal regression family.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='struct' href='struct.Poisson.html'
                                   title='rusty_machine::learning::glm::Poisson'>Poisson</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>The Poisson regression family.</p>
                            </td>
                        </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
@@ -144,14 +144,14 @@ input data.</p>
                        <tr class=' module-item'>
                            <td><a class='trait' href='trait.Criterion.html'
                                   title='rusty_machine::learning::glm::Criterion'>Criterion</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>The criterion for the Generalized Linear Model.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='trait' href='trait.LinkFunc.html'
                                   title='rusty_machine::learning::glm::LinkFunc'>LinkFunc</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Link functions.</p>
                            </td>
                        </tr></table></section>

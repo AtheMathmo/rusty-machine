@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["accuracy","Returns the fraction of outputs which match their target."],["neg_mean_squared_error","Returns the additive inverse of the mean-squared-error of the outputs. So higher is better, and the returned value is always negative."],["row_accuracy","Returns the fraction of outputs rows which match their target."]]});

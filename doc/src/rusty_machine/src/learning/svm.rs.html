@@ -208,6 +208,12 @@
 <span id="164">164</span>
 <span id="165">165</span>
 <span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Support Vector Machine Module</span>
 <span class='doccomment'>//!</span>
@@ -233,22 +239,23 @@
 <span class='doccomment'>//! let mut svm_mod = SVM::default();</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Train the model</span>
-<span class='doccomment'>//! svm_mod.train(&amp;inputs, &amp;targets);</span>
+<span class='doccomment'>//! svm_mod.train(&amp;inputs, &amp;targets).unwrap();</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Now we&#39;ll predict a new point</span>
 <span class='doccomment'>//! let new_point = Matrix::new(1,1,vec![10.]);</span>
-<span class='doccomment'>//! let output = svm_mod.predict(&amp;new_point);</span>
+<span class='doccomment'>//! let output = svm_mod.predict(&amp;new_point).unwrap();</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Hopefully we classified our new point correctly!</span>
 <span class='doccomment'>//! assert!(output[0] == 1f64, &quot;Our classifier isn&#39;t very good!&quot;);</span>
 <span class='doccomment'>//! ```</span>
 
 
-<span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>Matrix</span>;
+<span class='kw'>use</span> <span class='ident'>linalg</span>::{<span class='ident'>Matrix</span>, <span class='ident'>BaseMatrix</span>};
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>Vector</span>;
 
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>kernel</span>::{<span class='ident'>Kernel</span>, <span class='ident'>SquaredExp</span>};
-<span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>SupModel</span>;
+<span class='kw'>use</span> <span class='ident'>learning</span>::{<span class='ident'>LearningResult</span>, <span class='ident'>SupModel</span>};
+<span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>error</span>::{<span class='ident'>Error</span>, <span class='ident'>ErrorKind</span>};
 
 <span class='kw'>use</span> <span class='ident'>rand</span>;
 <span class='kw'>use</span> <span class='ident'>rand</span>::<span class='ident'>Rng</span>;
@@ -312,43 +319,46 @@
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>K</span>: <span class='ident'>Kernel</span><span class='op'>&gt;</span> <span class='ident'>SVM</span><span class='op'>&lt;</span><span class='ident'>K</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Construct a kernel matrix</span>
-    <span class='kw'>fn</span> <span class='ident'>ker_mat</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>m1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>m2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>m1</span>.<span class='ident'>cols</span>(), <span class='ident'>m2</span>.<span class='ident'>cols</span>());
+    <span class='kw'>fn</span> <span class='ident'>ker_mat</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>m1</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>m2</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
+        <span class='kw'>if</span> <span class='ident'>m1</span>.<span class='ident'>cols</span>() <span class='op'>!=</span> <span class='ident'>m2</span>.<span class='ident'>cols</span>() {
+            <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidState</span>,
+                           <span class='string'>&quot;Inputs to kernel matrices have different column counts.&quot;</span>))
+        } <span class='kw'>else</span> {
+            <span class='kw'>let</span> <span class='ident'>dim1</span> <span class='op'>=</span> <span class='ident'>m1</span>.<span class='ident'>rows</span>();
+            <span class='kw'>let</span> <span class='ident'>dim2</span> <span class='op'>=</span> <span class='ident'>m2</span>.<span class='ident'>rows</span>();
 
-        <span class='kw'>let</span> <span class='ident'>dim1</span> <span class='op'>=</span> <span class='ident'>m1</span>.<span class='ident'>rows</span>();
-        <span class='kw'>let</span> <span class='ident'>dim2</span> <span class='op'>=</span> <span class='ident'>m2</span>.<span class='ident'>rows</span>();
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ker_data</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>dim1</span> <span class='op'>*</span> <span class='ident'>dim2</span>);
+            <span class='ident'>ker_data</span>.<span class='ident'>extend</span>(<span class='ident'>m1</span>.<span class='ident'>iter_rows</span>().<span class='ident'>flat_map</span>(<span class='op'>|</span><span class='ident'>row1</span><span class='op'>|</span> {
+                <span class='ident'>m2</span>.<span class='ident'>iter_rows</span>()
+                    .<span class='ident'>map</span>(<span class='kw'>move</span> <span class='op'>|</span><span class='ident'>row2</span><span class='op'>|</span> <span class='self'>self</span>.<span class='ident'>ker</span>.<span class='ident'>kernel</span>(<span class='ident'>row1</span>, <span class='ident'>row2</span>))
+            }));
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>ker_data</span> <span class='op'>=</span> <span class='ident'>Vec</span>::<span class='ident'>with_capacity</span>(<span class='ident'>dim1</span> <span class='op'>*</span> <span class='ident'>dim2</span>);
-
-        <span class='ident'>ker_data</span>.<span class='ident'>extend</span>(
-            <span class='ident'>m1</span>.<span class='ident'>iter_rows</span>().<span class='ident'>flat_map</span>(<span class='op'>|</span><span class='ident'>row1</span><span class='op'>|</span> <span class='ident'>m2</span>.<span class='ident'>iter_rows</span>()
-                                    .<span class='ident'>map</span>(<span class='kw'>move</span> <span class='op'>|</span><span class='ident'>row2</span><span class='op'>|</span> <span class='self'>self</span>.<span class='ident'>ker</span>.<span class='ident'>kernel</span>(<span class='ident'>row1</span>, <span class='ident'>row2</span>))));
-
-        <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>dim1</span>, <span class='ident'>dim2</span>, <span class='ident'>ker_data</span>)
+            <span class='prelude-val'>Ok</span>(<span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='ident'>dim1</span>, <span class='ident'>dim2</span>, <span class='ident'>ker_data</span>))
+        }
     }
 }
 
 <span class='doccomment'>/// Train the model using the Pegasos algorithm and</span>
 <span class='doccomment'>/// predict the model output from new data.</span>
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>K</span>: <span class='ident'>Kernel</span><span class='op'>&gt;</span> <span class='ident'>SupModel</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>SVM</span><span class='op'>&lt;</span><span class='ident'>K</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>ones</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>::<span class='ident'>ones</span>(<span class='ident'>inputs</span>.<span class='ident'>rows</span>(), <span class='number'>1</span>);
         <span class='kw'>let</span> <span class='ident'>full_inputs</span> <span class='op'>=</span> <span class='ident'>ones</span>.<span class='ident'>hcat</span>(<span class='ident'>inputs</span>);
 
         <span class='kw'>if</span> <span class='kw'>let</span> (<span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>alpha</span>), <span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>train_inputs</span>), <span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>train_targets</span>)) <span class='op'>=</span>
                (<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>alpha</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>train_inputs</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>train_targets</span>) {
-            <span class='kw'>let</span> <span class='ident'>ker_mat</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>ker_mat</span>(<span class='kw-2'>&amp;</span><span class='ident'>full_inputs</span>, <span class='ident'>train_inputs</span>);
+            <span class='kw'>let</span> <span class='ident'>ker_mat</span> <span class='op'>=</span> <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>ker_mat</span>(<span class='kw-2'>&amp;</span><span class='ident'>full_inputs</span>, <span class='ident'>train_inputs</span>));
             <span class='kw'>let</span> <span class='ident'>weight_vec</span> <span class='op'>=</span> <span class='ident'>alpha</span>.<span class='ident'>elemul</span>(<span class='ident'>train_targets</span>) <span class='op'>/</span> <span class='self'>self</span>.<span class='ident'>lambda</span>;
 
             <span class='kw'>let</span> <span class='ident'>plane_dist</span> <span class='op'>=</span> <span class='ident'>ker_mat</span> <span class='op'>*</span> <span class='ident'>weight_vec</span>;
 
-            <span class='ident'>plane_dist</span>.<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='op'>|</span><span class='ident'>d</span><span class='op'>|</span> <span class='ident'>d</span>.<span class='ident'>signum</span>())
+            <span class='prelude-val'>Ok</span>(<span class='ident'>plane_dist</span>.<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='op'>|</span><span class='ident'>d</span><span class='op'>|</span> <span class='ident'>d</span>.<span class='ident'>signum</span>()))
         } <span class='kw'>else</span> {
-            <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Model has not been trained.&quot;</span>);
+            <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new_untrained</span>())
         }
     }
 
-    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
+    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>n</span> <span class='op'>=</span> <span class='ident'>inputs</span>.<span class='ident'>rows</span>();
 
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>rng</span> <span class='op'>=</span> <span class='ident'>rand</span>::<span class='ident'>thread_rng</span>();
@@ -361,9 +371,9 @@
         <span class='kw'>for</span> <span class='ident'>t</span> <span class='kw'>in</span> <span class='number'>0</span>..<span class='self'>self</span>.<span class='ident'>optim_iters</span> {
             <span class='kw'>let</span> <span class='ident'>i</span> <span class='op'>=</span> <span class='ident'>rng</span>.<span class='ident'>gen_range</span>(<span class='number'>0</span>, <span class='ident'>n</span>);
             <span class='kw'>let</span> <span class='ident'>row_i</span> <span class='op'>=</span> <span class='ident'>full_inputs</span>.<span class='ident'>select_rows</span>(<span class='kw-2'>&amp;</span>[<span class='ident'>i</span>]);
-            <span class='kw'>let</span> <span class='ident'>sum</span> <span class='op'>=</span>  <span class='ident'>full_inputs</span>.<span class='ident'>iter_rows</span>()
-                .<span class='ident'>fold</span>(<span class='number'>0f64</span>, <span class='op'>|</span><span class='ident'>sum</span>, <span class='ident'>row</span><span class='op'>|</span> <span class='ident'>sum</span> <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>ker</span>.<span class='ident'>kernel</span>(<span class='ident'>row_i</span>.<span class='ident'>data</span>(), <span class='ident'>row</span>)) <span class='op'>*</span> 
-                <span class='ident'>targets</span>[<span class='ident'>i</span>] <span class='op'>/</span> (<span class='self'>self</span>.<span class='ident'>lambda</span> <span class='op'>*</span> (<span class='ident'>t</span> <span class='kw'>as</span> <span class='ident'>f64</span>));
+            <span class='kw'>let</span> <span class='ident'>sum</span> <span class='op'>=</span> <span class='ident'>full_inputs</span>.<span class='ident'>iter_rows</span>()
+                .<span class='ident'>fold</span>(<span class='number'>0f64</span>, <span class='op'>|</span><span class='ident'>sum</span>, <span class='ident'>row</span><span class='op'>|</span> <span class='ident'>sum</span> <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>ker</span>.<span class='ident'>kernel</span>(<span class='ident'>row_i</span>.<span class='ident'>data</span>(), <span class='ident'>row</span>)) <span class='op'>*</span>
+                      <span class='ident'>targets</span>[<span class='ident'>i</span>] <span class='op'>/</span> (<span class='self'>self</span>.<span class='ident'>lambda</span> <span class='op'>*</span> (<span class='ident'>t</span> <span class='kw'>as</span> <span class='ident'>f64</span>));
 
             <span class='kw'>if</span> <span class='ident'>sum</span> <span class='op'>&lt;</span> <span class='number'>1f64</span> {
                 <span class='ident'>alpha</span>[<span class='ident'>i</span>] <span class='op'>+=</span> <span class='number'>1f64</span>;
@@ -373,6 +383,8 @@
         <span class='self'>self</span>.<span class='ident'>alpha</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>alpha</span>) <span class='op'>/</span> (<span class='self'>self</span>.<span class='ident'>optim_iters</span> <span class='kw'>as</span> <span class='ident'>f64</span>));
         <span class='self'>self</span>.<span class='ident'>train_inputs</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>full_inputs</span>);
         <span class='self'>self</span>.<span class='ident'>train_targets</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>targets</span>.<span class='ident'>clone</span>());
+
+        <span class='prelude-val'>Ok</span>(())
     }
 }
 </pre>

@@ -216,7 +216,6 @@
 <span id="172">172</span>
 <span id="173">173</span>
 <span id="174">174</span>
-<span id="175">175</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Regularization Module</span>
 <span class='doccomment'>//!</span>
@@ -235,8 +234,7 @@
 <span class='doccomment'>//! ```</span>
 
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>Metric</span>;
-<span class='kw'>use</span> <span class='ident'>linalg</span>::{<span class='ident'>Matrix</span>, <span class='ident'>MatrixSlice</span>};
-<span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>BaseSlice</span>;
+<span class='kw'>use</span> <span class='ident'>linalg</span>::{<span class='ident'>Matrix</span>, <span class='ident'>MatrixSlice</span>, <span class='ident'>BaseMatrix</span>};
 <span class='kw'>use</span> <span class='ident'>libnum</span>::{<span class='ident'>FromPrimitive</span>, <span class='ident'>Float</span>};
 
 <span class='doccomment'>/// Model Regularization</span>
@@ -310,7 +308,7 @@
 <span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>test</span>)]</span>
 <span class='kw'>mod</span> <span class='ident'>tests</span> {
     <span class='kw'>use</span> <span class='kw'>super</span>::<span class='ident'>Regularization</span>;
-    <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>Matrix</span>;
+    <span class='kw'>use</span> <span class='ident'>linalg</span>::{<span class='ident'>Matrix</span>, <span class='ident'>BaseMatrix</span>};
     <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>Metric</span>;
 
     <span class='attribute'>#[<span class='ident'>test</span>]</span>

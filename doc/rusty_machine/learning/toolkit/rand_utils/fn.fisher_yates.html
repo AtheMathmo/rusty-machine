@@ -47,8 +47,8 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-2345' class='srclink' href='../../../../src/rusty_machine/src/learning/toolkit/rand_utils.rs.html#56-84' title='goto source code'>[src]</a></span></h1>
-<pre class='rust fn'>pub fn fisher_yates&lt;T: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a>&gt;(arr: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a>T<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;</pre><div class='docblock'><p>The inside out Fisher-Yates algorithm.</p>
+               </span><a id='src-2409' class='srclink' href='../../../../src/rusty_machine/src/learning/toolkit/rand_utils.rs.html#56-84' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn fisher_yates&lt;T:&nbsp;<a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a>&gt;(arr: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[</a>T<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.slice.html'>]</a>) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;T&gt;</pre><div class='docblock'><p>The inside out Fisher-Yates algorithm.</p>
 
 <h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
 <pre class='rust rust-example-rendered'>
@@ -58,7 +58,7 @@
 <span class='kw'>let</span> <span class='ident'>a</span> <span class='op'>=</span> (<span class='number'>0</span>..<span class='number'>5</span>).<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>();
 
 <span class='comment'>// Perform a Fisher-Yates shuffle to get a random permutation</span>
-<span class='kw'>let</span> <span class='ident'>permutation</span> <span class='op'>=</span> <span class='ident'>rand_utils</span>::<span class='ident'>fisher_yates</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>);</pre>
+<span class='kw'>let</span> <span class='ident'>permutation</span> <span class='op'>=</span> <span class='ident'>rand_utils</span>::<span class='ident'>fisher_yates</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
 </div></section>
     <section id='search' class="content hidden"></section>
 

@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["k_fold_validate","Randomly splits the inputs into k 'folds'. For each fold a model is trained using all inputs except for that fold, and tested on the data in the fold. Returns the scores for each fold."]]});

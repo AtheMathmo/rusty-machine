@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `k_fold_validate` fn in crate `rusty_machine`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, k_fold_validate">
+
+    <title>rusty_machine::analysis::cross_validation::k_fold_validate - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>analysis</a>::<wbr><a href='index.html'>cross_validation</a></p><script>window.sidebarCurrent = {name: 'k_fold_validate', ty: 'fn', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content fn">
+<h1 class='fqn'><span class='in-band'>Function <a href='../../index.html'>rusty_machine</a>::<wbr><a href='../index.html'>analysis</a>::<wbr><a href='index.html'>cross_validation</a>::<wbr><a class='fn' href=''>k_fold_validate</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-2655' class='srclink' href='../../../src/rusty_machine/src/analysis/cross_validation.rs.html#48-76' title='goto source code'>[src]</a></span></h1>
+<pre class='rust fn'>pub fn k_fold_validate&lt;M,&nbsp;S&gt;(model: &amp;mut M, inputs: &amp;<a class='struct' href='../../../rusty_machine/linalg/struct.Matrix.html' title='rusty_machine::linalg::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;, targets: &amp;<a class='struct' href='../../../rusty_machine/linalg/struct.Matrix.html' title='rusty_machine::linalg::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;, k: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, score: S) -&gt; <a class='type' href='../../../rusty_machine/learning/type.LearningResult.html' title='rusty_machine::learning::LearningResult'>LearningResult</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;&gt; <span class='where'>where S: <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Fn.html' title='core::ops::Fn'>Fn</a>(&amp;<a class='struct' href='../../../rusty_machine/linalg/struct.Matrix.html' title='rusty_machine::linalg::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;, &amp;<a class='struct' href='../../../rusty_machine/linalg/struct.Matrix.html' title='rusty_machine::linalg::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;) -&gt; <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>, M: <a class='trait' href='../../../rusty_machine/learning/trait.SupModel.html' title='rusty_machine::learning::SupModel'>SupModel</a>&lt;<a class='struct' href='../../../rusty_machine/linalg/struct.Matrix.html' title='rusty_machine::linalg::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;,&nbsp;<a class='struct' href='../../../rusty_machine/linalg/struct.Matrix.html' title='rusty_machine::linalg::Matrix'>Matrix</a>&lt;<a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>&gt;&gt;</span></pre><div class='docblock'><p>Randomly splits the inputs into k &#39;folds&#39;. For each fold a model
+is trained using all inputs except for that fold, and tested on the
+data in the fold. Returns the scores for each fold.</p>
+
+<h1 id='arguments' class='section-header'><a href='#arguments'>Arguments</a></h1>
+<ul>
+<li><code>model</code> - Used to train and predict for each fold.</li>
+<li><code>inputs</code> - All input samples.</li>
+<li><code>targets</code> - All targets.</li>
+<li><code>k</code> - Number of folds to use.</li>
+<li><code>score</code> - Used to compare the outputs for each fold to the targets. Higher scores are better. See the <code>analysis::score</code> module for examples.</li>
+</ul>
+
+<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1>
+<pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>analysis</span>::<span class='ident'>cross_validation</span>::<span class='ident'>k_fold_validate</span>;
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>analysis</span>::<span class='ident'>score</span>::<span class='ident'>row_accuracy</span>;
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>learning</span>::<span class='ident'>naive_bayes</span>::{<span class='ident'>NaiveBayes</span>, <span class='ident'>Bernoulli</span>};
+<span class='kw'>use</span> <span class='ident'>rusty_machine</span>::<span class='ident'>linalg</span>::{<span class='ident'>BaseMatrix</span>, <span class='ident'>Matrix</span>};
+
+<span class='kw'>let</span> <span class='ident'>inputs</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>, <span class='number'>2</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>, <span class='number'>1.1</span>,
+                                    <span class='number'>5.2</span>, <span class='number'>4.3</span>,
+                                    <span class='number'>6.2</span>, <span class='number'>7.3</span>]);
+
+<span class='kw'>let</span> <span class='ident'>targets</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>3</span>, <span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.0</span>, <span class='number'>0.0</span>, <span class='number'>0.0</span>,
+                                     <span class='number'>0.0</span>, <span class='number'>0.0</span>, <span class='number'>1.0</span>,
+                                     <span class='number'>0.0</span>, <span class='number'>0.0</span>, <span class='number'>1.0</span>]);
+
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>model</span> <span class='op'>=</span> <span class='ident'>NaiveBayes</span>::<span class='op'>&lt;</span><span class='ident'>Bernoulli</span><span class='op'>&gt;</span>::<span class='ident'>new</span>();
+
+<span class='kw'>let</span> <span class='ident'>accuracy_per_fold</span>: <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> <span class='op'>=</span> <span class='ident'>k_fold_validate</span>(
+    <span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>model</span>,
+    <span class='kw-2'>&amp;</span><span class='ident'>inputs</span>,
+    <span class='kw-2'>&amp;</span><span class='ident'>targets</span>,
+    <span class='number'>3</span>,
+    <span class='comment'>// Score each fold by the fraction of test samples where</span>
+    <span class='comment'>// the model&#39;s prediction equals the target.</span>
+    <span class='ident'>row_accuracy</span>
+).<span class='ident'>unwrap</span>();<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../";
+        window.currentCrate = "rusty_machine";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../jquery.js"></script>
+    <script src="../../../main.js"></script>
+    
+    <script defer src="../../../search-index.js"></script>
+</body>
+</html>

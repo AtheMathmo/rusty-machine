@@ -575,6 +575,10 @@
 <span id="531">531</span>
 <span id="532">532</span>
 <span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Neural Network module</span>
 <span class='doccomment'>//!</span>
@@ -604,12 +608,12 @@
 <span class='doccomment'>//! let mut model = NeuralNet::new(layers, criterion, StochasticGD::default());</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Train the model!</span>
-<span class='doccomment'>//! model.train(&amp;inputs, &amp;targets);</span>
+<span class='doccomment'>//! model.train(&amp;inputs, &amp;targets).unwrap();</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! let test_inputs = Matrix::new(2,3, vec![1.5,1.5,1.5,5.1,5.1,5.1]);</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // And predict new output from the test inputs</span>
-<span class='doccomment'>//! model.predict(&amp;test_inputs);</span>
+<span class='doccomment'>//! let outputs = model.predict(&amp;test_inputs).unwrap();</span>
 <span class='doccomment'>//! ```</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! The neural networks are specified via a criterion - similar to</span>
@@ -619,10 +623,10 @@
 <span class='doccomment'>//! You can define your own criterion by implementing the `Criterion`</span>
 <span class='doccomment'>//! trait with a concrete `ActivationFunc` and `CostFunc`.</span>
 
-<span class='kw'>use</span> <span class='ident'>linalg</span>::{<span class='ident'>Matrix</span>, <span class='ident'>MatrixSlice</span>};
-<span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>BaseSlice</span>;
+<span class='kw'>use</span> <span class='ident'>linalg</span>::{<span class='ident'>Matrix</span>, <span class='ident'>MatrixSlice</span>, <span class='ident'>BaseMatrix</span>, <span class='ident'>BaseMatrixMut</span>};
 
-<span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>SupModel</span>;
+<span class='kw'>use</span> <span class='ident'>learning</span>::{<span class='ident'>LearningResult</span>, <span class='ident'>SupModel</span>};
+<span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>error</span>::{<span class='ident'>Error</span>, <span class='ident'>ErrorKind</span>};
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>activ_fn</span>;
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>activ_fn</span>::<span class='ident'>ActivationFunc</span>;
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>cost_fn</span>;
@@ -655,14 +659,15 @@
           <span class='ident'>A</span>: <span class='ident'>OptimAlgorithm</span><span class='op'>&lt;</span><span class='ident'>BaseNeuralNet</span><span class='op'>&lt;</span><span class='lifetime'>&#39;a</span>, <span class='ident'>T</span><span class='op'>&gt;&gt;</span>
 {
     <span class='doccomment'>/// Predict neural network output using forward propagation.</span>
-    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
         <span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>forward_prop</span>(<span class='ident'>inputs</span>)
     }
 
     <span class='doccomment'>/// Train the model using gradient optimization and back propagation.</span>
-    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
+    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>optimal_w</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>alg</span>.<span class='ident'>optimize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>base</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>weights</span>, <span class='ident'>inputs</span>, <span class='ident'>targets</span>);
         <span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>weights</span> <span class='op'>=</span> <span class='ident'>optimal_w</span>;
+        <span class='prelude-val'>Ok</span>(())
     }
 }
 
@@ -725,7 +730,7 @@
     <span class='doccomment'>/// # Examples</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// ```</span>
-    <span class='doccomment'>/// use rusty_machine::linalg::BaseSlice;</span>
+    <span class='doccomment'>/// use rusty_machine::linalg::BaseMatrix;</span>
     <span class='doccomment'>/// use rusty_machine::learning::nnet::NeuralNet;</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// // Create a neural net with 4 layers, 3 neurons in each.</span>
@@ -776,8 +781,7 @@
     <span class='kw'>fn</span> <span class='ident'>create_weights</span>(<span class='ident'>layer_sizes</span>: <span class='kw-2'>&amp;</span>[<span class='ident'>usize</span>]) <span class='op'>-&gt;</span> <span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>between</span> <span class='op'>=</span> <span class='ident'>range</span>::<span class='ident'>Range</span>::<span class='ident'>new</span>(<span class='number'>0f64</span>, <span class='number'>1f64</span>);
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>rng</span> <span class='op'>=</span> <span class='ident'>thread_rng</span>();
-        <span class='ident'>layer_sizes</span>
-            .<span class='ident'>windows</span>(<span class='number'>2</span>)
+        <span class='ident'>layer_sizes</span>.<span class='ident'>windows</span>(<span class='number'>2</span>)
             .<span class='ident'>flat_map</span>(<span class='op'>|</span><span class='ident'>w</span><span class='op'>|</span> {
                 <span class='kw'>let</span> <span class='ident'>l_in</span> <span class='op'>=</span> <span class='ident'>w</span>[<span class='number'>0</span>] <span class='op'>+</span> <span class='number'>1</span>;
                 <span class='kw'>let</span> <span class='ident'>l_out</span> <span class='op'>=</span> <span class='ident'>w</span>[<span class='number'>1</span>];
@@ -785,7 +789,8 @@
                 (<span class='number'>0</span>..<span class='ident'>l_in</span> <span class='op'>*</span> <span class='ident'>l_out</span>)
                     .<span class='ident'>map</span>(<span class='op'>|</span><span class='ident'>_i</span><span class='op'>|</span> (<span class='ident'>between</span>.<span class='ident'>sample</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='ident'>rng</span>) <span class='op'>*</span> <span class='number'>2f64</span> <span class='op'>*</span> <span class='ident'>eps_init</span>) <span class='op'>-</span> <span class='ident'>eps_init</span>)
                     .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>()
-            }).<span class='ident'>collect</span>()
+            })
+            .<span class='ident'>collect</span>()
     }
 
     <span class='doccomment'>/// Gets matrix of weights between specified layer and forward layer for the weights.</span>
@@ -920,22 +925,25 @@
     }
 
     <span class='doccomment'>/// Forward propagation of the model weights to get the outputs.</span>
-    <span class='kw'>fn</span> <span class='ident'>forward_prop</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
-        <span class='macro'>assert_eq</span><span class='macro'>!</span>(<span class='ident'>inputs</span>.<span class='ident'>cols</span>(), <span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='number'>0</span>]);
+    <span class='kw'>fn</span> <span class='ident'>forward_prop</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
+        <span class='kw'>if</span> <span class='ident'>inputs</span>.<span class='ident'>cols</span>() <span class='op'>!=</span> <span class='self'>self</span>.<span class='ident'>layer_sizes</span>[<span class='number'>0</span>] {
+            <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidData</span>,
+                           <span class='string'>&quot;The input data dimensions must match the first layer.&quot;</span>))
+        } <span class='kw'>else</span> {
+            <span class='kw'>let</span> <span class='ident'>net_data</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>ones</span>(<span class='ident'>inputs</span>.<span class='ident'>rows</span>(), <span class='number'>1</span>).<span class='ident'>hcat</span>(<span class='ident'>inputs</span>);
 
-        <span class='kw'>let</span> <span class='ident'>net_data</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>ones</span>(<span class='ident'>inputs</span>.<span class='ident'>rows</span>(), <span class='number'>1</span>).<span class='ident'>hcat</span>(<span class='ident'>inputs</span>);
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>z</span> <span class='op'>=</span> <span class='ident'>net_data</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>get_net_weights</span>(<span class='number'>0</span>);
+            <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>criterion</span>.<span class='ident'>activate</span>(<span class='ident'>z</span>.<span class='ident'>clone</span>());
 
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>z</span> <span class='op'>=</span> <span class='ident'>net_data</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>get_net_weights</span>(<span class='number'>0</span>);
-        <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>a</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>criterion</span>.<span class='ident'>activate</span>(<span class='ident'>z</span>.<span class='ident'>clone</span>());
+            <span class='kw'>for</span> <span class='ident'>l</span> <span class='kw'>in</span> <span class='number'>1</span>..<span class='self'>self</span>.<span class='ident'>layer_sizes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span> {
+                <span class='kw'>let</span> <span class='ident'>ones</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>ones</span>(<span class='ident'>a</span>.<span class='ident'>rows</span>(), <span class='number'>1</span>);
+                <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>ones</span>.<span class='ident'>hcat</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>);
+                <span class='ident'>z</span> <span class='op'>=</span> <span class='ident'>a</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>get_net_weights</span>(<span class='ident'>l</span>);
+                <span class='ident'>a</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>criterion</span>.<span class='ident'>activate</span>(<span class='ident'>z</span>.<span class='ident'>clone</span>());
+            }
 
-        <span class='kw'>for</span> <span class='ident'>l</span> <span class='kw'>in</span> <span class='number'>1</span>..<span class='self'>self</span>.<span class='ident'>layer_sizes</span>.<span class='ident'>len</span>() <span class='op'>-</span> <span class='number'>1</span> {
-            <span class='kw'>let</span> <span class='ident'>ones</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>ones</span>(<span class='ident'>a</span>.<span class='ident'>rows</span>(), <span class='number'>1</span>);
-            <span class='ident'>a</span> <span class='op'>=</span> <span class='ident'>ones</span>.<span class='ident'>hcat</span>(<span class='kw-2'>&amp;</span><span class='ident'>a</span>);
-            <span class='ident'>z</span> <span class='op'>=</span> <span class='ident'>a</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>get_net_weights</span>(<span class='ident'>l</span>);
-            <span class='ident'>a</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>criterion</span>.<span class='ident'>activate</span>(<span class='ident'>z</span>.<span class='ident'>clone</span>());
+            <span class='prelude-val'>Ok</span>(<span class='ident'>a</span>)
         }
-
-        <span class='ident'>a</span>
     }
 }
 
@@ -1000,8 +1008,8 @@
     <span class='doccomment'>/// Will return `false` by default.</span>
     <span class='kw'>fn</span> <span class='ident'>is_regularized</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>) <span class='op'>-&gt;</span> <span class='ident'>bool</span> {
         <span class='kw'>match</span> <span class='self'>self</span>.<span class='ident'>regularization</span>() {
-            <span class='ident'>Regularization</span>::<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='boolvalue'>false</span>,
-            _ <span class='op'>=&gt;</span> <span class='boolvalue'>true</span>,
+            <span class='ident'>Regularization</span>::<span class='prelude-val'>None</span> <span class='op'>=&gt;</span> <span class='bool-val'>false</span>,
+            _ <span class='op'>=&gt;</span> <span class='bool-val'>true</span>,
         }
     }
 

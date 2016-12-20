@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["confusion_matrix","Module to compute the confusion matrix of a set of predictions."],["cross_validation","Module for performing cross-validation of models."],["score","Functions for scoring a set of predictions, i.e. evaluating how close predictions and truth are. All functions in this module obey the convention that higher is better."]]});

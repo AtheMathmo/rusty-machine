@@ -235,6 +235,8 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! Logistic Regression module</span>
 <span class='doccomment'>//!</span>
@@ -258,11 +260,11 @@
 <span class='doccomment'>//! let mut log_mod = LogisticRegressor::default();</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Train the model</span>
-<span class='doccomment'>//! log_mod.train(&amp;inputs, &amp;targets);</span>
+<span class='doccomment'>//! log_mod.train(&amp;inputs, &amp;targets).unwrap();</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Now we&#39;ll predict a new point</span>
 <span class='doccomment'>//! let new_point = Matrix::new(1,1,vec![10.]);</span>
-<span class='doccomment'>//! let output = log_mod.predict(&amp;new_point);</span>
+<span class='doccomment'>//! let output = log_mod.predict(&amp;new_point).unwrap();</span>
 <span class='doccomment'>//!</span>
 <span class='doccomment'>//! // Hopefully we classified our new point correctly!</span>
 <span class='doccomment'>//! assert!(output[0] &gt; 0.5, &quot;Our classifier isn&#39;t very good!&quot;);</span>
@@ -272,13 +274,14 @@
 <span class='doccomment'>//! by using the `new` constructor instead. This allows us to provide</span>
 <span class='doccomment'>//! a `GradientDesc` object with custom parameters.</span>
 
-<span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>SupModel</span>;
-<span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>Matrix</span>;
+<span class='kw'>use</span> <span class='ident'>linalg</span>::{<span class='ident'>Matrix</span>, <span class='ident'>BaseMatrix</span>};
 <span class='kw'>use</span> <span class='ident'>linalg</span>::<span class='ident'>Vector</span>;
+<span class='kw'>use</span> <span class='ident'>learning</span>::{<span class='ident'>LearningResult</span>, <span class='ident'>SupModel</span>};
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>activ_fn</span>::{<span class='ident'>ActivationFunc</span>, <span class='ident'>Sigmoid</span>};
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>toolkit</span>::<span class='ident'>cost_fn</span>::{<span class='ident'>CostFunc</span>, <span class='ident'>CrossEntropyError</span>};
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>optim</span>::<span class='ident'>grad_desc</span>::<span class='ident'>GradientDesc</span>;
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>optim</span>::{<span class='ident'>OptimAlgorithm</span>, <span class='ident'>Optimizable</span>};
+<span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>error</span>::<span class='ident'>Error</span>;
 
 <span class='doccomment'>/// Logistic Regression Model.</span>
 <span class='doccomment'>///</span>
@@ -348,9 +351,9 @@
     <span class='doccomment'>/// let inputs = Matrix::new(3,2, vec![1.0, 2.0, 1.0, 3.0, 1.0, 4.0]);</span>
     <span class='doccomment'>/// let targets = Vector::new(vec![5.0, 6.0, 7.0]);</span>
     <span class='doccomment'>///</span>
-    <span class='doccomment'>/// logistic_mod.train(&amp;inputs, &amp;targets);</span>
+    <span class='doccomment'>/// logistic_mod.train(&amp;inputs, &amp;targets).unwrap();</span>
     <span class='doccomment'>/// ```</span>
-    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) {
+    <span class='kw'>fn</span> <span class='ident'>train</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>, <span class='ident'>targets</span>: <span class='kw-2'>&amp;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span>()<span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>ones</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>::<span class='ident'>ones</span>(<span class='ident'>inputs</span>.<span class='ident'>rows</span>(), <span class='number'>1</span>);
         <span class='kw'>let</span> <span class='ident'>full_inputs</span> <span class='op'>=</span> <span class='ident'>ones</span>.<span class='ident'>hcat</span>(<span class='ident'>inputs</span>);
 
@@ -358,18 +361,19 @@
 
         <span class='kw'>let</span> <span class='ident'>optimal_w</span> <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>alg</span>.<span class='ident'>optimize</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>base</span>, <span class='kw-2'>&amp;</span><span class='ident'>initial_params</span>[..], <span class='kw-2'>&amp;</span><span class='ident'>full_inputs</span>, <span class='ident'>targets</span>);
         <span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>set_parameters</span>(<span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>optimal_w</span>));
+        <span class='prelude-val'>Ok</span>(())
     }
 
     <span class='doccomment'>/// Predict output value from input data.</span>
     <span class='doccomment'>///</span>
     <span class='doccomment'>/// Model must be trained before prediction can be made.</span>
-    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span> {
+    <span class='kw'>fn</span> <span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='ident'>LearningResult</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;&gt;</span> {
         <span class='kw'>if</span> <span class='kw'>let</span> <span class='prelude-val'>Some</span>(<span class='ident'>v</span>) <span class='op'>=</span> <span class='self'>self</span>.<span class='ident'>base</span>.<span class='ident'>parameters</span>() {
             <span class='kw'>let</span> <span class='ident'>ones</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='op'>&lt;</span><span class='ident'>f64</span><span class='op'>&gt;</span>::<span class='ident'>ones</span>(<span class='ident'>inputs</span>.<span class='ident'>rows</span>(), <span class='number'>1</span>);
             <span class='kw'>let</span> <span class='ident'>full_inputs</span> <span class='op'>=</span> <span class='ident'>ones</span>.<span class='ident'>hcat</span>(<span class='ident'>inputs</span>);
-            (<span class='ident'>full_inputs</span> <span class='op'>*</span> <span class='ident'>v</span>).<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='ident'>Sigmoid</span>::<span class='ident'>func</span>)
+            <span class='prelude-val'>Ok</span>((<span class='ident'>full_inputs</span> <span class='op'>*</span> <span class='ident'>v</span>).<span class='ident'>apply</span>(<span class='kw-2'>&amp;</span><span class='ident'>Sigmoid</span>::<span class='ident'>func</span>))
         } <span class='kw'>else</span> {
-            <span class='macro'>panic</span><span class='macro'>!</span>(<span class='string'>&quot;Model has not been trained.&quot;</span>);
+            <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new_untrained</span>())
         }
     }
 }

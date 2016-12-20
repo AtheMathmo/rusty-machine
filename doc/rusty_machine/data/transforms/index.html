@@ -47,10 +47,10 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-23' class='srclink' href='../../../src/rusty_machine/src/data/transforms/mod.rs.html#1-27' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-18' class='srclink' href='../../../src/rusty_machine/src/data/transforms/mod.rs.html#1-32' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>The Transforms module</p>
 
-<p>This module contains the <code>Transformer</code> trait and reexports
+<p>This module contains the <code>Transformer</code> and <code>Invertible</code> traits and reexports
 the transformers from child modules.</p>
 
 <p>The <code>Transformer</code> trait provides a shared interface for all of the
@@ -61,27 +61,42 @@ commonly used in machine learning.</p>
 </div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
 <table><tr><td><code>pub use self::<a class='mod'
                                        href='./minmax/index.html'>minmax</a>::<a class='struct' href='../../../rusty_machine/data/transforms/minmax/struct.MinMaxScaler.html' title='rusty_machine::data::transforms::minmax::MinMaxScaler'>MinMaxScaler</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
+                                       href='./shuffle/index.html'>shuffle</a>::<a class='struct' href='../../../rusty_machine/data/transforms/shuffle/struct.Shuffler.html' title='rusty_machine::data::transforms::shuffle::Shuffler'>Shuffler</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
                                        href='./standardize/index.html'>standardize</a>::<a class='struct' href='../../../rusty_machine/data/transforms/standardize/struct.Standardizer.html' title='rusty_machine::data::transforms::standardize::Standardizer'>Standardizer</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table>
                        <tr class=' module-item'>
                            <td><a class='mod' href='minmax/index.html'
                                   title='rusty_machine::data::transforms::minmax'>minmax</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>The Min-Max transformer</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='mod' href='shuffle/index.html'
+                                  title='rusty_machine::data::transforms::shuffle'>shuffle</a></td>
+                           <td class='docblock-short'>
+                                <p>The Shuffler</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
                            <td><a class='mod' href='standardize/index.html'
                                   title='rusty_machine::data::transforms::standardize'>standardize</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>The Standardizing Transformer</p>
                            </td>
                        </tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
 <table>
                        <tr class=' module-item'>
+                           <td><a class='trait' href='trait.Invertible.html'
+                                  title='rusty_machine::data::transforms::Invertible'>Invertible</a></td>
+                           <td class='docblock-short'>
+                                <p>Trait for invertible data transformers</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
                            <td><a class='trait' href='trait.Transformer.html'
                                   title='rusty_machine::data::transforms::Transformer'>Transformer</a></td>
-                           <td class='docblock short'>
+                           <td class='docblock-short'>
                                 <p>Trait for data transformers</p>
                            </td>
                        </tr></table></section>
