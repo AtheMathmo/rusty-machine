@@ -2,6 +2,24 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.5.3
+
+### Breaking Changes
+
+- None
+
+### Features
+
+- Adding a new `confusion_matrix` module.
+
+### Bug Fixes
+
+- None
+
+### Minor Changes
+
+- Updated rulinalg dependency to `0.3.7`.
+
 ## 0.5.2
 
 ### New Contributors

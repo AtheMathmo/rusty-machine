@@ -2,7 +2,7 @@
 
 [![Join the chat at https://gitter.im/AtheMathmo/rusty-machine](https://badges.gitter.im/AtheMathmo/rusty-machine.svg)](https://gitter.im/AtheMathmo/rusty-machine?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://travis-ci.org/AtheMathmo/rusty-machine.svg?branch=master)](https://travis-ci.org/AtheMathmo/rusty-machine)
 
-The crate is currently on version [0.5.2](https://crates.io/crates/rusty-machine/).
+The crate is currently on version [0.5.3](https://crates.io/crates/rusty-machine/).
 
 Read the [API Documentation](https://AtheMathmo.github.io/rusty-machine/) to learn more.
 
@@ -72,7 +72,7 @@ The library is most easily used with [cargo](http://doc.crates.io/guide.html). S
 
 ```toml
 [dependencies]
-rusty-machine="0.5.2"
+rusty-machine="0.5.3"
 ```
 
 And then import the library using:
