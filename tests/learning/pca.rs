@@ -108,16 +108,20 @@ fn test_predict_different_dimension() {
 
 #[test]
 fn test_wide() {
-    /*
     let mut model = PCA::default();
 
     let inputs = Matrix::new(2, 4, vec![8.3, 50., 23., 2.,
                                         10.2, 55., 21., 3.]);
     model.train(&inputs).unwrap();
 
-    let cexp = Matrix::new(4, 2, vec![0.32773237, 0.86245362, -0.34498145, 0.17249072,
-                                      0.94101404, -0.26161813, 0.19193441, -0.0959672]);
+    let cexp = Matrix::new(2, 4, vec![0.3277323746171723, 0.8624536174136117, -0.3449814469654447, 0.17249072348272235,
+                                      0.933710591152088, -0.23345540994181946, 0.23959824886246414, -0.1275765757549414]);
     let cmp = model.components().unwrap();
     assert_matrix_eq!(cmp, cexp, comp=abs, tol=1e-8);
-    */
+
+    let new_data = Matrix::new(1, 4, vec![9., 45., 22., 2.5]);
+    let outputs = model.predict(&new_data).unwrap();
+
+    let exp = Matrix::new(1, 2, vec![-6.550335224256381, 1.517487926775624]);
+    assert_matrix_eq!(outputs, exp, comp=abs, tol=1e-8);
 }
