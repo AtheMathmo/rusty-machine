@@ -257,21 +257,25 @@ impl SupModel<Matrix<f64>, Vector<usize>> for DecisionTreeClassifier {
 }
 
 
-/// Uniquify Vec<f64>, result is sorted
-fn uniquify(values: &Vec<f64>) -> Vec<f64> {
-    let mut values = values.clone();
-    values.sort_by(|a, b| a.partial_cmp(b).unwrap());
-    values.dedup();
-    values
-}
-
 /// Uniquify values, then get splitter values, i.e. midpoints of unique values
 fn get_splits(values: &Vec<f64>) -> Vec<f64> {
-    let uniques = uniquify(values);
-    uniques[..uniques.len()].iter()
-                            .zip(uniques[1..].iter())
-                            .map(|(&x, &y)| (x + y) / 2.)
-                            .collect()
+    debug_assert!(values.len() > 0, "values can't be empty");
+
+    // ToDo: must avoid repeated sort
+    let mut values = values.clone();
+    values.sort_by(|a, b| a.partial_cmp(b).unwrap());
+
+    let mut splits: Vec<f64> = Vec::with_capacity(values.len());
+
+    let mut prev: f64 = unsafe {*values.get_unchecked(0) };
+    for &v in values.iter().skip(0) {
+        if prev != v {
+            splits.push((prev + v) / 2.);
+            prev = v;
+        }
+
+    }
+    splits
 }
 
 /// Split Vec to left and right, depending on given bool Vec values
@@ -354,19 +358,17 @@ mod tests {
 
     use linalg::Vector;
 
-    use super::{uniquify, get_splits, split_slice, xlogy, freq, Metrics};
-
-    #[test]
-    fn test_uniquify() {
-        assert_eq!(uniquify(&vec![0.1, 0.2, 0.1]), vec![0.1, 0.2]);
-        assert_eq!(uniquify(&vec![0.3, 0.1, 0.1, 0.1, 0.2, 0.2]), vec![0.1, 0.2, 0.3]);
-    }
+    use super::{get_splits, split_slice, xlogy, freq, Metrics};
 
     #[test]
     fn test_get_splits() {
         assert_eq!(get_splits(&vec![0.1, 0.2, 0.1]), vec![0.15000000000000002]);
         assert_eq!(get_splits(&vec![0.3, 0.1, 0.1, 0.1, 0.2, 0.2]), vec![0.15000000000000002, 0.25]);
         assert_eq!(get_splits(&vec![1., 3., 7., 3., 7.]), vec![2., 5.]);
+        assert_eq!(get_splits(&vec![0.1, 0.2, 0.1]), vec![0.15000000000000002]);
+        assert_eq!(get_splits(&vec![0.1, 0.2, 0.1, 0.1]), vec![0.15000000000000002]);
+        assert_eq!(get_splits(&vec![-1., -2., 1., -2.]), vec![-1.5, 0.]);
+        assert_eq!(get_splits(&vec![0.1, 0.1, 0.1]), vec![]);
     }
 
     #[test]
