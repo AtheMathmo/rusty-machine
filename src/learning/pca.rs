@@ -45,7 +45,9 @@ pub struct PCA {
     // Center of inputs
     centers: Option<Vector<f64>>,
     // Principal components
-    components: Option<Matrix<f64>>
+    components: Option<Matrix<f64>>,
+    // Whether components is inversed (trained with number of rows < cols data)
+    inv: bool
 }
 
 impl PCA {
@@ -73,7 +75,8 @@ impl PCA {
 
             n_features: None,
             centers: None,
-            components: None
+            components: None,
+            inv: false
         }
     }
 
@@ -110,7 +113,8 @@ impl Default for PCA {
 
             n_features: None,
             centers: None,
-            components: None
+            components: None,
+            inv: false
         }
     }
 }
@@ -120,34 +124,39 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for PCA {
 
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>>  {
 
+        match self.n_features {
+            None => { return Err(Error::new_untrained()); },
+            Some(f) => {
+                if f != inputs.cols() {
+                    return Err(Error::new(ErrorKind::InvalidData,
+                               "Input data must have the same number of columns as training data"));
+                }
+            }
+        };
+
         match self.components {
-            None => Err(Error::new_untrained()),
+            // this can't happen
+            None => { return Err(Error::new_untrained()); },
             Some(ref comp) => {
-
-                match self.n_features {
-                    // this can't happen
-                    None => {
-                        return Err(Error::new_untrained());
-                    },
-                    Some(f) => {
-                        if f != inputs.cols() {
-                            return Err(Error::new(ErrorKind::InvalidData,
-                                       "Input data must have the same number of columns as training data"));
-                        }
-                    }
-                };
-
                 if self.center == true {
                     match self.centers {
                         // this can't happen
                         None => return Err(Error::new_untrained()),
                         Some(ref centers) => {
                             let data = unsafe { centering(inputs, &centers) };
-                            Ok(data * comp)
+                            if self.inv == true {
+                                Ok(data * comp.transpose())
+                            } else {
+                                Ok(data * comp)
+                            }
                         }
                     }
                 } else {
-                    Ok(inputs * comp)
+                    if self.inv == true {
+                        Ok(inputs * comp.transpose())
+                    } else {
+                        Ok(inputs * comp)
+                    }
                 }
             }
         }
@@ -157,7 +166,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for PCA {
         match self.n {
             None => {},
             Some(n) => {
-                if n < inputs.cols() {
+                if n > inputs.cols() {
                     return Err(Error::new(ErrorKind::InvalidData,
                                "Input data must have equal or larger number of columns than n"));
                 }
@@ -172,11 +181,11 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for PCA {
         } else {
             inputs.clone()
         };
-        // let (_, _, v) = data.svd().unwrap();
-        let (t, u, v) = data.svd().unwrap();
-        println!("t {:?}", &t);
-        println!("u {:?}", &u);
-        println!("v {:?}", &v);
+        let (_, _, mut v) = data.svd().unwrap();
+        if inputs.cols() > inputs.rows() {
+            v = v.transpose();
+            self.inv = true;
+        }
 
         self.components = match self.n {
             Some(c) => {
