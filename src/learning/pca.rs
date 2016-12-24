@@ -132,7 +132,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for PCA {
                     Some(f) => {
                         if f != inputs.cols() {
                             return Err(Error::new(ErrorKind::InvalidData,
-                                       "Input data does not have the same dimensions as training data"));
+                                       "Input data must have the same number of columns as training data"));
                         }
                     }
                 };
@@ -142,7 +142,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for PCA {
                         // this can't happen
                         None => return Err(Error::new_untrained()),
                         Some(ref centers) => {
-                            let data = centering(inputs, &centers);
+                            let data = unsafe { centering(inputs, &centers) };
                             Ok(data * comp)
                         }
                     }
@@ -154,15 +154,29 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for PCA {
     }
 
     fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
+        match self.n {
+            None => {},
+            Some(n) => {
+                if n < inputs.cols() {
+                    return Err(Error::new(ErrorKind::InvalidData,
+                               "Input data must have equal or larger number of columns than n"));
+                }
+            }
+        }
+
         let data = if self.center == true {
             let centers = inputs.mean(Axes::Row);
-            let m = centering(inputs, &centers);
+            let m = unsafe { centering(inputs, &centers) };
             self.centers = Some(centers);
             m
         } else {
             inputs.clone()
         };
-        let (_, _, v) = data.svd().unwrap();
+        // let (_, _, v) = data.svd().unwrap();
+        let (t, u, v) = data.svd().unwrap();
+        println!("t {:?}", &t);
+        println!("u {:?}", &u);
+        println!("v {:?}", &v);
 
         self.components = match self.n {
             Some(c) => {
@@ -177,11 +191,10 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for PCA {
 }
 
 /// Subtract center Vector from each rows
-fn centering(inputs: &Matrix<f64>, centers: &Vector<f64>) -> Matrix<f64> {
-    unsafe {
-        Matrix::from_fn(inputs.rows(), inputs.cols(),
+unsafe fn centering(inputs: &Matrix<f64>, centers: &Vector<f64>) -> Matrix<f64> {
+    // Number of inputs columns and centers length must be the same
+    Matrix::from_fn(inputs.rows(), inputs.cols(),
                     |c, r| inputs.get_unchecked([r, c]) - centers.data().get_unchecked(c))
-    }
 }
 
 #[cfg(test)]
@@ -196,8 +209,10 @@ mod tests {
                                        2., 4., 4.]);
         let centers = m.mean(Axes::Row);
         assert_vector_eq!(centers, Vector::new(vec![1.5, 3., 3.5]), comp=abs, tol=1e-8);
+
+        let centered = unsafe { centering(&m, &centers) };
         let exp = Matrix::new(2, 3, vec![-0.5, -1., -0.5,
                                          0.5, 1., 0.5]);
-        assert_matrix_eq!(centering(&m, &centers), exp, comp=abs, tol=1e-8);
+        assert_matrix_eq!(centered, exp, comp=abs, tol=1e-8);
     }
 }

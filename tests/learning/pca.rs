@@ -100,4 +100,24 @@ fn test_predict_different_dimension() {
     let new_data = Matrix::new(1, 4, vec![1., 2., 3., 4.]);
     let err = model.predict(&new_data);
     assert!(err.is_err());
+
+    let mut model = PCA::new(5, false);
+    let err = model.train(&inputs);
+    assert!(err.is_err());
+}
+
+#[test]
+fn test_wide() {
+    /*
+    let mut model = PCA::default();
+
+    let inputs = Matrix::new(2, 4, vec![8.3, 50., 23., 2.,
+                                        10.2, 55., 21., 3.]);
+    model.train(&inputs).unwrap();
+
+    let cexp = Matrix::new(4, 2, vec![0.32773237, 0.86245362, -0.34498145, 0.17249072,
+                                      0.94101404, -0.26161813, 0.19193441, -0.0959672]);
+    let cmp = model.components().unwrap();
+    assert_matrix_eq!(cmp, cexp, comp=abs, tol=1e-8);
+    */
 }
