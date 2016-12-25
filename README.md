@@ -56,7 +56,7 @@ This is fairly complete but there is still lots of room for optimization and we 
 - Gaussian Mixture Models
 - Naive Bayes Classifiers
 - DBSCAN
-- k-Nearest Nerighbors
+- k-Nearest Neighbor Classifiers
 
 There is also a basic `stats` module behind a feature flag.
 

@@ -25,7 +25,7 @@
 //! - Gaussian Mixture Models
 //! - Naive Bayes Classifiers
 //! - DBSCAN
-//! - k-Nearest Nerighbors
+//! - k-Nearest Neighbor Classifiers
 //!
 //! ### linalg
 //!
