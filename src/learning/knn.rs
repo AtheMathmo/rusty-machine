@@ -223,19 +223,9 @@ impl KDTree {
         loop {
             // split columns which has the widest range
             let (dim, d) = (&dmax - &dmin).argmax();
-
             // ToDo: use unsafe get  (v0.4.0?)
             // https://github.com/AtheMathmo/rulinalg/pull/104
             let split = dmin[dim] + d / 2.0;
-
-            // new hyper-rectangle's min / max
-            let mut l_max = dmax.clone();
-            // ToDo: use unsafe mut (v0.4.0?)
-            // https://github.com/AtheMathmo/rulinalg/pull/104
-            l_max[dim] = split;
-
-            let mut r_min = dmin.clone();
-            r_min[dim] = split;
 
             // split remains
             let mut l_remains: Vec<usize> = Vec::with_capacity(remains.len());
@@ -255,13 +245,22 @@ impl KDTree {
             if l_remains.len() == 0 {
                 // all rows are in r_remains. re-split r_remains
                 remains = r_remains;
-                dmin = r_min;
-                // self.select_split(r_remains, &r_min, dmax)
+                dmin[dim] = split;
             } else if r_remains.len() == 0 {
                 // all rows are in l_remains. re-split l_remains
                 remains = l_remains;
-                dmax = l_max;
+                dmax[dim] = split;
             } else {
+
+                // new hyper-rectangle's min / max
+                let mut l_max = dmax.clone();
+                // ToDo: use unsafe mut (v0.4.0?)
+                // https://github.com/AtheMathmo/rulinalg/pull/104
+                l_max[dim] = split;
+
+                let mut r_min = dmin.clone();
+                r_min[dim] = split;
+
                 return (dim, split, l_remains, r_remains, l_max, r_min);
             }
         };
@@ -275,9 +274,9 @@ impl KDTree {
         } else {
 
             let (dim, split, l_remains, r_remains, l_max, r_min) = self.select_split(remains, dmin.clone(), dmax.clone());
+            // println!("create branch! {:?} {:?}", &dim, &split);
             let l_node = self.split_one(l_remains, dmin.clone(), l_max);
             let g_node = self.split_one(r_remains, r_min, dmax.clone());
-            // println!("create branch! {:?} {:?}", &dim, &split);
             Node::Branch(Branch::new(dim, split, dmin, dmax,
                                      l_node, g_node))
         }
@@ -289,7 +288,9 @@ impl KDTree {
 
         let mut distances: Vec<f64> = Vec::with_capacity(ids.len());
         for id in ids.iter() {
+            // ToDo: use .row(*id)
             let row: Vec<f64> = self.data.select_rows(&[*id]).into_vec();
+            // let row: Vec<f64> = self.data.row(*id).into_vec();
             let d = dist(point, &row);
             distances.push(d);
         }
@@ -299,28 +300,32 @@ impl KDTree {
     fn search_leaf<'s, 'p>(&'s self, point: &'p [f64], k: usize)
         -> (KNearest, VecDeque<&'s Node>) {
 
+
         match self.root {
             None => panic!("tree is not built"),
             Some(ref root) => {
 
                 let mut queue: VecDeque<&Node> = VecDeque::new();
-                queue.push_back(root);
+                queue.push_front(root);
 
                 loop {
-                    let current: &Node = queue.front().unwrap();
+                    // pop first element
+                    let current: &Node = queue.pop_front().unwrap();
                     match current {
                         &Node::Leaf(ref l) => {
-                            // remove first element
-                            queue.pop_front();
-
                             let distances = self.get_distances(point, &l.children);
                             let kn = KNearest::new(k, l.children.clone(), distances);
                             return (kn, queue);
                         },
                         &Node::Branch(ref b) => {
+                            // the current branch must contains target point.
+                            // store the child branch which contains target point to
+                            // the front, put other side on the back.
                             if point[b.dim] < b.split {
                                 queue.push_front(&b.left);
+                                queue.push_back(&b.right)
                             } else {
+                                queue.push_back(&b.left);
                                 queue.push_front(&b.right);
                             }
                         }
@@ -344,7 +349,7 @@ impl KDTree {
                 },
                 &Node::Branch(ref b) => {
                     let d = b.dist(&point);
-                    // println!("search branch! {:?} {:?}", &b.dim, &b.split);
+                    // println!("search branch! {:?} {:?} {:?}", &b.dim, &b.split, query.dist());
                     if d < query.dist() {
                         queue.push_back(&b.left);
                         queue.push_back(&b.right)
@@ -392,14 +397,18 @@ impl KNearest {
     fn add(&mut self, index: Vec<usize>, distances: Vec<f64>) {
         debug_assert!(index.len() == distances.len(), "index and distance must have the same length");
 
+        let current_dist = self.dist();
+
+
         self.pairs.reserve(index.len());
-        for (i, v) in index.into_iter().zip(distances.into_iter()) {
-            if self.pairs.iter().all(|x| x.0 != i) {
-                // ToDo: fix duplicate check
-                self.pairs.push((i, v));
+        for (i, d) in index.into_iter().zip(distances.into_iter()) {
+            // do not store pairs which exceeds current dist
+            if d < current_dist {
+                self.pairs.push((i, d));
             }
         }
-        // sort by distance, take k elements
+        // sort by distance, take k elements.
+        // may be optimized as self.pairs is already sorted.
         self.pairs.sort_by(|x, y| x.1.partial_cmp(&y.1).unwrap());
         self.pairs.truncate(self.k);
     }
@@ -534,6 +543,7 @@ mod tests {
         // search first leaf
         let (kn, _) = tree.search_leaf(&vec![3., 4.9], 1);
         assert_eq!(kn.pairs, vec![(0, (2.0f64 * 2.0f64 + 2.9f64 * 2.9f64).sqrt())]);
+
         // search tree
         let (ind, dist) = tree.search(&vec![3., 4.9], 1);
         assert_eq!(ind, vec![3]);
