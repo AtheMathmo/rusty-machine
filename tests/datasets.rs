@@ -4,12 +4,12 @@ extern crate rusty_machine as rm;
 #[cfg(datasets)]
 mod test {
 
-    use rm::datasets;
+    use rm::datasets::iris;
     use rm::linalg::BaseMatrix;
 
     #[test]
     fn test_iris() {
-        let dt = datasets::load_iris();
+        let dt = iris::load_();
         assert_eq!(dt.data().rows(), 150);
         assert_eq!(dt.data().cols(), 4);
 
