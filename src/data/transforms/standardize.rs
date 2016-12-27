@@ -87,7 +87,8 @@ impl<T: Float> Standardizer<T> {
 }
 
 impl<T: Float + FromPrimitive> Transformer<Matrix<T>> for Standardizer<T> {
-    fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
+
+    fn fit(&mut self, inputs: &Matrix<T>) -> Result<(), Error> {
         if inputs.rows() <= 1 {
             Err(Error::new(ErrorKind::InvalidData,
                            "Cannot standardize data with only one row."))
@@ -100,18 +101,43 @@ impl<T: Float + FromPrimitive> Transformer<Matrix<T>> for Standardizer<T> {
             if mean.data().iter().any(|x| !x.is_finite()) {
                 return Err(Error::new(ErrorKind::InvalidData, "Some data point is non-finite."));
             }
-
-            for row in inputs.iter_rows_mut() {
-                // Subtract the mean
-                utils::in_place_vec_bin_op(row, &mean.data(), |x, &y| *x = *x - y);
-                utils::in_place_vec_bin_op(row, &variance.data(), |x, &y| {
-                    *x = (*x * self.scaled_stdev / y.sqrt()) + self.scaled_mean
-                });
-            }
-
             self.means = Some(mean);
             self.variances = Some(variance);
-            Ok(inputs)
+            Ok(())
+        }
+    }
+
+    fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
+        match (&self.means, &self.variances) {
+            // if Transformer is not fitted to the data, fit for backward-compat.
+            (&None, &None) => {
+                let res = self.fit(&inputs);
+                match res {
+                    Err(err) => {
+                        return Err(err);
+                    },
+                    _ => {}
+                }
+            },
+            _ => {}
+        }
+
+        if let (&Some(ref means), &Some(ref variances)) = (&self.means, &self.variances) {
+            if means.size() != inputs.cols() {
+                Err(Error::new(ErrorKind::InvalidData,
+                               "Input data has different number of columns from fitted data."))
+            } else {
+                for row in inputs.iter_rows_mut() {
+                    // Subtract the mean
+                    utils::in_place_vec_bin_op(row, means.data(), |x, &y| *x = *x - y);
+                    utils::in_place_vec_bin_op(row, variances.data(), |x, &y| {
+                        *x = (*x * self.scaled_stdev / y.sqrt()) + self.scaled_mean
+                    });
+                }
+                Ok(inputs)
+            }
+        } else {
+            Err(Error::new(ErrorKind::InvalidState, "Transformer has not been fitted."))
         }
     }
 }

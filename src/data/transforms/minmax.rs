@@ -25,7 +25,7 @@
 //! ```
 
 use learning::error::{Error, ErrorKind};
-use linalg::{Matrix, BaseMatrix, BaseMatrixMut};
+use linalg::{Matrix, BaseMatrix, BaseMatrixMut, Vector};
 use super::{Invertible, Transformer};
 
 use rulinalg::utils;
@@ -42,9 +42,9 @@ use libnum::Float;
 #[derive(Debug)]
 pub struct MinMaxScaler<T: Float> {
     /// Values to scale each column by
-    scale_factors: Option<Vec<T>>,
+    scale_factors: Option<Vector<T>>,
     /// Values to add to each column after scaling
-    const_factors: Option<Vec<T>>,
+    const_factors: Option<Vector<T>>,
     /// The min of the new data (default 0)
     scaled_min: T,
     /// The max of the new data (default 1)
@@ -82,9 +82,12 @@ impl<T: Float> MinMaxScaler<T> {
 }
 
 impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
-    fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
+
+    fn fit(&mut self, inputs: &Matrix<T>) -> Result<(), Error> {
         let features = inputs.cols();
 
+        // ToDo: can use min, max
+        // https://github.com/AtheMathmo/rulinalg/pull/115
         let mut input_min_max = vec![(T::max_value(), T::min_value()); features];
 
         for row in inputs.iter_rows() {
@@ -95,18 +98,14 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
                                                    processed",
                                                   idx)));
                 }
-
                 // Update min
                 if *feature < min_max.0 {
                     min_max.0 = *feature;
                 }
-
                 // Update max
                 if *feature > min_max.1 {
                     min_max.1 = *feature;
                 }
-
-                
             }
         }
 
@@ -130,28 +129,55 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
             .map(|(&(_, x), &s)| self.scaled_max - x * s)
             .collect::<Vec<_>>();
 
-        for row in inputs.iter_rows_mut() {
-            utils::in_place_vec_bin_op(row, &scales, |x, &y| {
-                *x = *x * y;
-            });
+        self.scale_factors = Some(Vector::new(scales));
+        self.const_factors = Some(Vector::new(consts));
+        Ok(())
+    }
 
-            utils::in_place_vec_bin_op(row, &consts, |x, &y| {
-                *x = *x + y;
-            });
+    fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
+        match (&self.scale_factors, &self.const_factors) {
+            // if Transformer is not fitted to the data, fit for backward-compat.
+            (&None, &None) => {
+                let res = self.fit(&inputs);
+                match res {
+                    Err(err) => {
+                        return Err(err);
+                    },
+                    _ => {}
+                }
+            },
+            _ => {}
         }
 
-        self.scale_factors = Some(scales);
-        self.const_factors = Some(consts);
+        if let (&Some(ref scales), &Some(ref consts)) = (&self.scale_factors, &self.const_factors) {
+            if scales.size() != inputs.cols() {
+                Err(Error::new(ErrorKind::InvalidData,
+                               "Input data has different number of columns from fitted data."))
+            } else {
+                for row in inputs.iter_rows_mut() {
+                    utils::in_place_vec_bin_op(row, scales.data(), |x, &y| {
+                        *x = *x * y;
+                    });
 
-        Ok(inputs)
+                    utils::in_place_vec_bin_op(row, consts.data(), |x, &y| {
+                        *x = *x + y;
+                    });
+                }
+                Ok(inputs)
+            }
+        } else {
+            // can't happen
+            Err(Error::new(ErrorKind::InvalidState, "Transformer has not been fitted."))
+        }
     }
 }
 
 impl<T: Float> Invertible<Matrix<T>> for MinMaxScaler<T> {
+
     fn inv_transform(&self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
         if let (&Some(ref scales), &Some(ref consts)) = (&self.scale_factors, &self.const_factors) {
 
-            let features = scales.len();
+            let features = scales.size();
             if inputs.cols() != features {
                 return Err(Error::new(ErrorKind::InvalidData,
                                       "Inputs have different feature count than transformer."));

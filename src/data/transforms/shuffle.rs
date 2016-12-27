@@ -22,6 +22,7 @@
 //! ```
 
 use learning::LearningResult;
+use learning::error::Error;
 use linalg::{Matrix, BaseMatrix, BaseMatrixMut};
 use super::Transformer;
 
@@ -74,6 +75,12 @@ impl Default for Shuffler<ThreadRng> {
 ///
 /// Under the hood this uses a Fisher-Yates shuffle.
 impl<R: Rng, T> Transformer<Matrix<T>> for Shuffler<R> {
+
+    #[allow(unused_variables)]
+    fn fit(&mut self, inputs: &Matrix<T>) -> Result<(), Error> {
+        unimplemented!();
+    }
+
     fn transform(&mut self, mut inputs: Matrix<T>) -> LearningResult<Matrix<T>> {
         let n = inputs.rows();
 
