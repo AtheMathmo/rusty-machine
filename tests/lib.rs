@@ -14,5 +14,4 @@ pub mod learning {
     }
 }
 
-#[cfg(datasets)]
 pub mod datasets;
