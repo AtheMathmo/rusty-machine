@@ -101,10 +101,10 @@ impl<T: Float + FromPrimitive> Transformer<Matrix<T>> for Standardizer<T> {
                 return Err(Error::new(ErrorKind::InvalidData, "Some data point is non-finite."));
             }
 
-            for row in inputs.iter_rows_mut() {
+            for mut row in inputs.row_iter_mut() {
                 // Subtract the mean
-                utils::in_place_vec_bin_op(row, &mean.data(), |x, &y| *x = *x - y);
-                utils::in_place_vec_bin_op(row, &variance.data(), |x, &y| {
+                utils::in_place_vec_bin_op(&mut row.raw_slice_mut(), &mean.data(), |x, &y| *x = *x - y);
+                utils::in_place_vec_bin_op(&mut row.raw_slice_mut(), &variance.data(), |x, &y| {
                     *x = (*x * self.scaled_stdev / y.sqrt()) + self.scaled_mean
                 });
             }
@@ -126,13 +126,13 @@ impl<T: Float + FromPrimitive> Invertible<Matrix<T>> for Standardizer<T> {
                                       "Inputs have different feature count than transformer."));
             }
 
-            for row in inputs.iter_rows_mut() {
-                utils::in_place_vec_bin_op(row, &variances.data(), |x, &y| {
+            for mut row in inputs.row_iter_mut() {
+                utils::in_place_vec_bin_op(&mut row.raw_slice_mut(), &variances.data(), |x, &y| {
                     *x = (*x - self.scaled_mean) * y.sqrt() / self.scaled_stdev
                 });
 
                 // Add the mean
-                utils::in_place_vec_bin_op(row, &means.data(), |x, &y| *x = *x + y);
+                utils::in_place_vec_bin_op(&mut row.raw_slice_mut(), &means.data(), |x, &y| *x = *x + y);
             }
 
             Ok(inputs)
