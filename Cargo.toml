@@ -12,6 +12,7 @@ license = "MIT"
 
 [features]
 stats = []
+datasets = []
 
 [dependencies]
 num = { version = "0.1.35", default-features = false }

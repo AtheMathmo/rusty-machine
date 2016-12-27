@@ -11,3 +11,6 @@ pub mod learning {
     	mod grad_desc;
     }
 }
+
+#[cfg(datasets)]
+pub mod datasets;
