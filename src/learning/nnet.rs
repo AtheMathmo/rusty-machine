@@ -247,7 +247,7 @@ impl<'a, T: Criterion> BaseNeuralNet<'a, T> {
     /// Gets the weights for a layer excluding the bias weights.
     fn get_non_bias_weights(&self, weights: &[f64], idx: usize) -> MatrixSlice<f64> {
         let layer_weights = self.get_layer_weights(weights, idx);
-        layer_weights.reslice([1, 0], layer_weights.rows() - 1, layer_weights.cols())
+        layer_weights.sub_slice([1, 0], layer_weights.rows() - 1, layer_weights.cols())
     }
 
     /// Compute the gradient using the back propagation algorithm.

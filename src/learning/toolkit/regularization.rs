@@ -14,8 +14,8 @@
 //! let reg = Regularization::L1(0.5);
 //! ```
 
-use linalg::Metric;
 use linalg::{Matrix, MatrixSlice, BaseMatrix};
+use linalg::norm::Euclidean;
 use libnum::{FromPrimitive, Float};
 
 /// Model Regularization
@@ -78,7 +78,7 @@ impl<T: Float + FromPrimitive> Regularization<T> {
     }
 
     fn l2_reg_cost(mat: &MatrixSlice<T>, x: T) -> T {
-        mat.norm() * x / ((T::one() + T::one()) * FromPrimitive::from_usize(mat.rows()).unwrap())
+        mat.norm(Euclidean) * x / ((T::one() + T::one()) * FromPrimitive::from_usize(mat.rows()).unwrap())
     }
 
     fn l2_reg_grad(mat: &MatrixSlice<T>, x: T) -> Matrix<T> {
@@ -90,7 +90,7 @@ impl<T: Float + FromPrimitive> Regularization<T> {
 mod tests {
     use super::Regularization;
     use linalg::{Matrix, BaseMatrix};
-    use linalg::Metric;
+    use linalg::norm::Euclidean;
 
     #[test]
     fn test_no_reg() {
@@ -130,7 +130,9 @@ mod tests {
 
     #[test]
     fn test_l2_reg() {
-        let input_mat = Matrix::new(3, 4, (0..12).map(|x| x as f64 - 3f64).collect::<Vec<_>>());
+        let input_mat = matrix![-3., -2., -1., 0.;
+                                1., 2., 3., 4.;
+                                5., 6., 7., 8.];
         let mat_slice = input_mat.as_slice();
 
         let no_reg: Regularization<f64> = Regularization::L2(0.5);
@@ -138,7 +140,7 @@ mod tests {
         let a = no_reg.reg_cost(mat_slice);
         let b = no_reg.reg_grad(mat_slice);
 
-        assert!((a - (input_mat.norm() / 12f64)) < 1e-18);
+        assert!((a - (input_mat.norm(Euclidean) / 12f64)) < 1e-18);
 
         let true_grad = &input_mat / 6f64;
         for eps in (b - true_grad).into_vec() {
@@ -148,7 +150,9 @@ mod tests {
 
     #[test]
     fn test_elastic_net_reg() {
-        let input_mat = Matrix::new(3, 4, (0..12).map(|x| x as f64 - 3f64).collect::<Vec<_>>());
+        let input_mat = matrix![-3., -2., -1., 0.;
+                                1., 2., 3., 4.;
+                                5., 6., 7., 8.];
         let mat_slice = input_mat.as_slice();
 
         let no_reg: Regularization<f64> = Regularization::ElasticNet(0.5, 0.25);
@@ -156,7 +160,7 @@ mod tests {
         let a = no_reg.reg_cost(mat_slice);
         let b = no_reg.reg_grad(mat_slice);
 
-        assert!(a - ((input_mat.norm() / 24f64) + (42f64 / 12f64)) < 1e-18);
+        assert!(a - ((input_mat.norm(Euclidean) / 24f64) + (42f64 / 12f64)) < 1e-18);
 
         let l1_true_grad = Matrix::new(3, 4,
             vec![-1., -1., -1., 1., 1., 1., 1., 1., 1., 1., 1., 1.]
