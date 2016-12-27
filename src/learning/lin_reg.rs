@@ -88,7 +88,7 @@ impl SupModel<Matrix<f64>, Vector<f64>> for LinRegressor {
 
         let xt = full_inputs.transpose();
         self.parameters = Some((&xt * full_inputs).solve(&xt * targets)
-                                                  .expect("Could not solve equation."));
+                                                  .expect("Unable to solve linear equation."));
         Ok(())
     }
 
