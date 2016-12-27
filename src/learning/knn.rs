@@ -494,7 +494,7 @@ fn dist(v1: &[f64], v2: &[f64]) -> f64 {
 mod tests {
 
     use std::f64;
-    use linalg::{Vector, Matrix};
+    use linalg::{Vector, Matrix, BaseMatrix};
     use super::{KDTree, KNearest, min, max, dist};
 
     #[test]
@@ -563,7 +563,7 @@ mod tests {
         assert_eq!(dist, vec![1.0999999999999996, 3.5227829907617076]);
     }
 
-    #[cfg(datasets)]
+    #[cfg(feature = "datasets")]
     #[test]
     fn test_kdtree_search_iris() {
         use super::super::super::datasets::iris;

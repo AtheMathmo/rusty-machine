@@ -1,13 +1,12 @@
 
-#[cfg(datasets)]
-pub mod tests {
+#[cfg(feature = "datasets")]
+pub mod tests_datasets {
 
     use rm::linalg::{BaseMatrix, Vector};
     use rm::learning::SupModel;
     use rm::learning::knn::KNNClassifier;
     use rm::datasets::iris;
 
-    #[test]
     fn test_knn() {
         let dataset = iris::load();
         // slice first 2 columns
