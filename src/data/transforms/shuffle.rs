@@ -78,7 +78,7 @@ impl<R: Rng, T> Transformer<Matrix<T>> for Shuffler<R> {
 
     #[allow(unused_variables)]
     fn fit(&mut self, inputs: &Matrix<T>) -> Result<(), Error> {
-        unimplemented!();
+        Ok(())
     }
 
     fn transform(&mut self, mut inputs: Matrix<T>) -> LearningResult<Matrix<T>> {
@@ -123,5 +123,17 @@ mod tests {
 
         assert_eq!(shuffled.into_vec(),
                    vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]);
+    }
+
+    #[test]
+    fn shuffle_fit() {
+        let rng = StdRng::from_seed(&[1, 2, 3]);
+        let mut shuffler = Shuffler::new(rng);
+
+        // no op
+        let mat = Matrix::new(4, 2, vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]);
+        let res = shuffler.fit(&mat).unwrap();
+
+        assert_eq!(res, ());
     }
 }

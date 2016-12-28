@@ -135,18 +135,9 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
     }
 
     fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
-        match (&self.scale_factors, &self.const_factors) {
+        if let (&None, &None) = (&self.scale_factors, &self.const_factors) {
             // if Transformer is not fitted to the data, fit for backward-compat.
-            (&None, &None) => {
-                let res = self.fit(&inputs);
-                match res {
-                    Err(err) => {
-                        return Err(err);
-                    },
-                    _ => {}
-                }
-            },
-            _ => {}
+            try!(self.fit(&inputs));
         }
 
         if let (&Some(ref scales), &Some(ref consts)) = (&self.scale_factors, &self.const_factors) {

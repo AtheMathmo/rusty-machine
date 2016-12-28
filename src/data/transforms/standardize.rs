@@ -108,18 +108,9 @@ impl<T: Float + FromPrimitive> Transformer<Matrix<T>> for Standardizer<T> {
     }
 
     fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
-        match (&self.means, &self.variances) {
+        if let (&None, &None) = (&self.means, &self.variances) {
             // if Transformer is not fitted to the data, fit for backward-compat.
-            (&None, &None) => {
-                let res = self.fit(&inputs);
-                match res {
-                    Err(err) => {
-                        return Err(err);
-                    },
-                    _ => {}
-                }
-            },
-            _ => {}
+            try!(self.fit(&inputs));
         }
 
         if let (&Some(ref means), &Some(ref variances)) = (&self.means, &self.variances) {
