@@ -2,6 +2,8 @@ use std::fmt::Debug;
 
 /// Module for iris dataset.
 pub mod iris;
+/// Module for trees dataset.
+pub mod trees;
 
 /// Dataset container
 #[derive(Clone, Debug)]
