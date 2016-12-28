@@ -2,6 +2,8 @@
 //! how close predictions and truth are. All functions in this
 //! module obey the convention that higher is better.
 
+use libnum::{Zero, One};
+
 use linalg::{BaseMatrix, Matrix};
 use learning::toolkit::cost_fn::{CostFunc, MeanSqError};
 
@@ -30,17 +32,18 @@ pub fn row_accuracy(outputs: &Matrix<f64>, targets: &Matrix<f64>) -> f64 {
 
 /// Returns the precision score for 2 class classification.
 /// true-positive / (true-positive + false-positive)
-pub fn precision<'a, I>(outputs: I, targets: I) -> f64
-    where I: ExactSizeIterator<Item=&'a usize>
+pub fn precision<'a, I, T>(outputs: I, targets: I) -> f64
+    where I: ExactSizeIterator<Item=&'a T>,
+          T: 'a + PartialEq + Zero + One
 {
     assert!(outputs.len() == targets.len());
 
     let mut tpfp = 0.0f64;
     let mut tp = 0.0f64;
 
-    for (_, &t) in outputs.zip(targets).filter(|&(&o, _)| o == 1) {
+    for (_, ref t) in outputs.zip(targets).filter(|&(ref o, _)| *o == &T::one()) {
         tpfp += 1.0f64;
-        if t == 1 {
+        if *t == &T::one() {
             tp += 1.0f64;
         }
     }
@@ -49,17 +52,18 @@ pub fn precision<'a, I>(outputs: I, targets: I) -> f64
 
 /// Returns the recall score for 2 class classification.
 /// true-positive / (true-positive + false-negative)
-pub fn recall<'a, I>(outputs: I, targets: I) -> f64
-    where I: ExactSizeIterator<Item=&'a usize>
+pub fn recall<'a, I, T>(outputs: I, targets: I) -> f64
+    where I: ExactSizeIterator<Item=&'a T>,
+          T: 'a + PartialEq + Zero + One
 {
     assert!(outputs.len() == targets.len());
 
     let mut tpfn = 0.0f64;
     let mut tp = 0.0f64;
 
-    for (&o, _) in outputs.zip(targets).filter(|&(_, &t)| t == 1) {
+    for (ref o, _) in outputs.zip(targets).filter(|&(_, ref t)| *t == &T::one()) {
         tpfn += 1.0f64;
-        if o == 1 {
+        if *o == &T::one() {
             tp += 1.0f64;
         }
     }
@@ -68,8 +72,9 @@ pub fn recall<'a, I>(outputs: I, targets: I) -> f64
 
 /// Returns the f1 score for 2 class classification
 /// 2 * precision * recall / (precision + recall)
-pub fn f1<'a, I>(outputs: I, targets: I) -> f64
-    where I: ExactSizeIterator<Item=&'a usize>
+pub fn f1<'a, I, T>(outputs: I, targets: I) -> f64
+    where I: ExactSizeIterator<Item=&'a T>,
+          T: 'a + PartialEq + Zero + One
 {
     assert!(outputs.len() == targets.len());
 
@@ -77,12 +82,12 @@ pub fn f1<'a, I>(outputs: I, targets: I) -> f64
     let mut fpos = 0.0f64;
     let mut fneg = 0.0f64;
 
-    for (&o, &t) in outputs.zip(targets) {
-        if (o == 1) & (t == 1) {
+    for (ref o, ref t) in outputs.zip(targets) {
+        if (*o == &T::one()) & (*t == &T::one()) {
             tpos += 1.0f64;
-        } else if t == 1 {
+        } else if *t == &T::one() {
             fpos += 1.0f64;
-        } else if o == 1 {
+        } else if *o == &T::one() {
             fneg += 1.0f64;
         }
     }
@@ -124,7 +129,7 @@ mod tests {
     }
 
     #[test]
-    fn test_precision() {
+    fn test_precision_int() {
         let outputs = [1, 1, 1, 0, 0, 0];
         let targets = [1, 1, 0, 0, 1, 1];
         assert_eq!(precision(outputs.iter(), targets.iter()), 2.0f64 / 3.0f64);
