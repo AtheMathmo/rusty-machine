@@ -41,10 +41,16 @@ pub fn precision<'a, I, T>(outputs: I, targets: I) -> f64
     let mut tpfp = 0.0f64;
     let mut tp = 0.0f64;
 
-    for (_, ref t) in outputs.zip(targets).filter(|&(ref o, _)| *o == &T::one()) {
-        tpfp += 1.0f64;
-        if *t == &T::one() {
-            tp += 1.0f64;
+    for (ref o, ref t) in outputs.zip(targets) {
+        if *o == &T::one() {
+            tpfp += 1.0f64;
+            if *t == &T::one() {
+                tp += 1.0f64;
+            }
+        }
+        if ((*t != &T::zero()) & (*t != &T::one())) |
+           ((*o != &T::zero()) & (*o != &T::one())) {
+            panic!("precision must be used for 2 class classification")
         }
     }
     tp / tpfp
@@ -61,10 +67,16 @@ pub fn recall<'a, I, T>(outputs: I, targets: I) -> f64
     let mut tpfn = 0.0f64;
     let mut tp = 0.0f64;
 
-    for (ref o, _) in outputs.zip(targets).filter(|&(_, ref t)| *t == &T::one()) {
-        tpfn += 1.0f64;
-        if *o == &T::one() {
-            tp += 1.0f64;
+    for (ref o, ref t) in outputs.zip(targets) {
+        if *t == &T::one() {
+            tpfn += 1.0f64;
+            if *o == &T::one() {
+                tp += 1.0f64;
+            }
+        }
+        if ((*t != &T::zero()) & (*t != &T::one())) |
+           ((*o != &T::zero()) & (*o != &T::one())) {
+            panic!("recall must be used for 2 class classification")
         }
     }
     tp / tpfn
@@ -89,6 +101,10 @@ pub fn f1<'a, I, T>(outputs: I, targets: I) -> f64
             fpos += 1.0f64;
         } else if *o == &T::one() {
             fneg += 1.0f64;
+        }
+        if ((*t != &T::zero()) & (*t != &T::one())) |
+           ((*o != &T::zero()) & (*o != &T::one())) {
+            panic!("f1-score must be used for 2 class classification")
         }
     }
     // precision
@@ -129,7 +145,7 @@ mod tests {
     }
 
     #[test]
-    fn test_precision_int() {
+    fn test_precision() {
         let outputs = [1, 1, 1, 0, 0, 0];
         let targets = [1, 1, 0, 0, 1, 1];
         assert_eq!(precision(outputs.iter(), targets.iter()), 2.0f64 / 3.0f64);
@@ -145,6 +161,22 @@ mod tests {
         let outputs = [1, 1, 1, 1, 1, 0];
         let targets = [0, 0, 0, 1, 1, 1];
         assert_eq!(precision(outputs.iter(), targets.iter()), 0.4);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_precision_outputs_not_2class() {
+        let outputs = [1, 2, 1, 0, 0, 0];
+        let targets = [1, 1, 0, 0, 1, 1];
+        precision(outputs.iter(), targets.iter());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_precision_targets_not_2class() {
+        let outputs = [1, 0, 1, 0, 0, 0];
+        let targets = [1, 2, 0, 0, 1, 1];
+        precision(outputs.iter(), targets.iter());
     }
 
     #[test]
@@ -167,6 +199,22 @@ mod tests {
     }
 
     #[test]
+    #[should_panic]
+    fn test_recall_outputs_not_2class() {
+        let outputs = [1, 2, 1, 0, 0, 0];
+        let targets = [1, 1, 0, 0, 1, 1];
+        recall(outputs.iter(), targets.iter());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_recall_targets_not_2class() {
+        let outputs = [1, 0, 1, 0, 0, 0];
+        let targets = [1, 2, 0, 0, 1, 1];
+        recall(outputs.iter(), targets.iter());
+    }
+
+    #[test]
     fn test_f1() {
         let outputs = [1, 1, 1, 0, 0, 0];
         let targets = [1, 1, 0, 0, 1, 1];
@@ -183,6 +231,23 @@ mod tests {
         let outputs = [1, 1, 1, 1, 1, 0];
         let targets = [0, 0, 0, 1, 1, 1];
         assert_eq!(f1(outputs.iter(), targets.iter()), 0.5);
+    }
+
+
+    #[test]
+    #[should_panic]
+    fn test_f1_outputs_not_2class() {
+        let outputs = [1, 2, 1, 0, 0, 0];
+        let targets = [1, 1, 0, 0, 1, 1];
+        f1(outputs.iter(), targets.iter());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_f1_targets_not_2class() {
+        let outputs = [1, 0, 1, 0, 0, 0];
+        let targets = [1, 2, 0, 0, 1, 1];
+        f1(outputs.iter(), targets.iter());
     }
 
     #[test]
