@@ -1,83 +1,8 @@
-//! - k-Nearest Nerighbors
-
-use std::f64;
-use std::collections::{BTreeMap, VecDeque};
-
+//! KDTree implementations
+use std::collections::VecDeque;
 use linalg::{Matrix, BaseMatrix, Vector};
-use learning::{LearningResult, SupModel};
-use learning::error::{Error, ErrorKind};
 
-/// k-Nearest Neighbor Classifier
-#[derive(Debug)]
-pub struct KNNClassifier {
-    k: usize,
-    leafsize: usize,
-
-    // set after train
-    tree: Option<KDTree>,
-    target: Option<Vector<usize>>,
-}
-
-impl KNNClassifier {
-
-    /// Constructs an untrained KNN Classifier with specified
-    /// k and leafsize for KDTree.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::learning::knn::KNNClassifier;
-    /// let _ = KNNClassifier::new(3, 30);
-    /// ```
-    pub fn new(k: usize, leafsize: usize) -> Self {
-        KNNClassifier {
-            k: k,
-            leafsize: leafsize,
-
-            tree: None,
-            target: None
-        }
-    }
-}
-
-impl<'a> SupModel<Matrix<f64>, Vector<usize>> for KNNClassifier {
-
-    fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<usize>> {
-        match (&self.tree, &self.target) {
-            (&Some(ref tree), &Some(ref target)) => {
-
-                let mut results: Vec<usize> = Vec::with_capacity(inputs.rows());
-                for row in inputs.iter_rows() {
-                    let (idx, _) = tree.search(row, self.k);
-                    let res = target.select(&idx);
-                    let (uniques, counts) = freq(&res.data());
-                    let (id, _) = counts.argmax();
-                    results.push(uniques[id]);
-                }
-                Ok(Vector::new(results))
-            },
-            _ => Err(Error::new_untrained()),
-        }
-    }
-
-    fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<usize>) -> LearningResult<()> {
-
-        if inputs.rows() != targets.size() {
-            return Err(Error::new(ErrorKind::InvalidData,
-                                  "inputs and targets must be the same length"));
-        }
-
-        let mut tree = KDTree::new(inputs.clone(), self.leafsize);
-        tree.build();
-
-        self.tree = Some(tree);
-        self.target = Some(targets.clone());
-
-        Ok(())
-    }
-}
-
-/// KDTree implementations
+use super::{KNearest, KNearestSearch};
 
 /// KDTree Node (either branch or leaf)
 #[derive(Debug)]
@@ -87,8 +12,8 @@ enum Node {
 }
 
 impl Node {
-
     // return my leaf reference, for testing purpose
+    #[allow(dead_code)]
     fn as_leaf(&self) -> &Leaf {
         match self {
             &Node::Leaf(ref leaf) => leaf,
@@ -97,6 +22,7 @@ impl Node {
     }
 
     // return my branch reference, for testing purpose
+    #[allow(dead_code)]
     fn as_branch(&self) -> &Branch {
         match self {
             &Node::Branch(ref branch) => branch,
@@ -177,7 +103,7 @@ impl Leaf {
 
 /// KDTree
 #[derive(Debug)]
-struct KDTree {
+pub struct KDTree {
     data: Matrix<f64>,
 
     // KDTree leaf size
@@ -189,7 +115,7 @@ struct KDTree {
 impl KDTree {
 
     /// initialize KDTree, must call .build to actually built tree
-    fn new(data: Matrix<f64>, leafsize: usize) -> Self {
+    pub fn new(data: Matrix<f64>, leafsize: usize) -> Self {
 
         KDTree {
             data: data,
@@ -200,7 +126,7 @@ impl KDTree {
     }
 
     /// build KDTree using its data
-    fn build(&mut self) {
+    pub fn build(&mut self) {
         let remains: Vec<usize> = (0..self.data.rows()).collect();
 
         let dmin = min(&self.data);
@@ -251,7 +177,6 @@ impl KDTree {
                 remains = l_remains;
                 dmax[dim] = split;
             } else {
-
                 // new hyper-rectangle's min / max
                 let mut l_max = dmax.clone();
                 // ToDo: use unsafe mut (v0.4.0?)
@@ -267,14 +192,10 @@ impl KDTree {
     }
 
     fn split_one(&self, remains: Vec<usize>, dmin: Vector<f64>, dmax: Vector<f64>) -> Node {
-
         if remains.len() < self.leafsize {
-            // println!("create leaf! {:?}", &remains);
             Node::Leaf(Leaf::new(remains))
         } else {
-
             let (dim, split, l_remains, r_remains, l_max, r_min) = self.select_split(remains, dmin.clone(), dmax.clone());
-            // println!("create branch! {:?} {:?}", &dim, &split);
             let l_node = self.split_one(l_remains, dmin.clone(), l_max);
             let g_node = self.split_one(r_remains, r_min, dmax.clone());
             Node::Branch(Branch::new(dim, split, dmin, dmax,
@@ -299,7 +220,6 @@ impl KDTree {
 
     fn search_leaf<'s, 'p>(&'s self, point: &'p [f64], k: usize)
         -> (KNearest, VecDeque<&'s Node>) {
-
 
         match self.root {
             None => panic!("tree is not built"),
@@ -334,22 +254,23 @@ impl KDTree {
             }
         }
     }
+}
 
+/// Can search K-nearest items
+impl KNearestSearch for KDTree {
+    /// Serch k-nearest items close to the point
     fn search(&self, point: &[f64], k: usize) -> (Vec<usize>, Vec<f64>) {
-
         let (mut query, mut queue) = self.search_leaf(point, k);
         while queue.len() > 0 {
             let current = queue.pop_front().unwrap();
 
             match current {
                 &Node::Leaf(ref l) => {
-                    // println!("search leaf! {:?}", &l.children);
                     let distances = self.get_distances(point, &l.children);
                     query.add(l.children.clone(), distances);
                 },
                 &Node::Branch(ref b) => {
                     let d = b.dist(&point);
-                    // println!("search branch! {:?} {:?} {:?}", &b.dim, &b.split, query.dist());
                     if d < query.dist() {
                         queue.push_back(&b.left);
                         queue.push_back(&b.right)
@@ -366,64 +287,6 @@ impl KDTree {
         (indices, distances)
     }
 }
-
-/// Container for k-Nearest search result
-struct KNearest {
-    // number to search
-    k: usize,
-    // tuple of index and its distances, sorted by distances
-    pairs: Vec<(usize, f64)>,
-}
-
-impl KNearest {
-
-    fn new(k: usize, index: Vec<usize>, distances: Vec<f64>) -> Self {
-        debug_assert!(index.len() == distances.len(), "index and distance must have the same length");
-        let mut pairs: Vec<(usize, f64)> = index.into_iter()
-                                                .zip(distances.into_iter())
-                                                .collect();
-        // sort by distance, take k elements
-        pairs.sort_by(|x, y| x.1.partial_cmp(&y.1).unwrap());
-        pairs.truncate(k);
-
-        KNearest {
-            k: k,
-            pairs: pairs
-        }
-    }
-
-    /// add new index and distances to the container, keep first k elements which
-    /// distances are smaller
-    fn add(&mut self, index: Vec<usize>, distances: Vec<f64>) {
-        debug_assert!(index.len() == distances.len(), "index and distance must have the same length");
-
-        let current_dist = self.dist();
-
-
-        self.pairs.reserve(index.len());
-        for (i, d) in index.into_iter().zip(distances.into_iter()) {
-            // do not store pairs which exceeds current dist
-            if d < current_dist {
-                self.pairs.push((i, d));
-            }
-        }
-        // sort by distance, take k elements.
-        // may be optimized as self.pairs is already sorted.
-        self.pairs.sort_by(|x, y| x.1.partial_cmp(&y.1).unwrap());
-        self.pairs.truncate(self.k);
-    }
-
-    /// return the k-th distance with searching point
-    fn dist(&self) -> f64 {
-        // KNearest should gather k element at least
-        if self.pairs.len() < self.k {
-            f64::MAX
-        } else {
-            self.pairs.last().unwrap().1
-        }
-    }
-}
-
 
 /// min
 fn min(data: &Matrix<f64>) -> Vector<f64> {
@@ -463,24 +326,6 @@ fn max(data: &Matrix<f64>) -> Vector<f64> {
     Vector::new(results)
 }
 
-/// Count target label frequencies
-/// ToDo: Used in decisition tree, move impl to somewhere
-fn freq(labels: &[usize]) -> (Vector<usize>, Vector<usize>) {
-    let mut map: BTreeMap<usize, usize> = BTreeMap::new();
-    for l in labels {
-        let e = map.entry(*l).or_insert(0);
-        *e += 1;
-    }
-
-    let mut uniques: Vec<usize> = Vec::with_capacity(map.len());
-    let mut counts: Vec<usize> = Vec::with_capacity(map.len());
-    for (&k, &v) in map.iter() {
-        uniques.push(k);
-        counts.push(v);
-    }
-    (Vector::new(uniques), Vector::new(counts))
-}
-
 fn dist(v1: &[f64], v2: &[f64]) -> f64 {
     // ToDo: use metrics
     let d: f64 = v1.iter()
@@ -493,9 +338,9 @@ fn dist(v1: &[f64], v2: &[f64]) -> f64 {
 #[cfg(test)]
 mod tests {
 
-    use std::f64;
     use linalg::{Vector, Matrix, BaseMatrix};
-    use super::{KDTree, KNearest, min, max, dist};
+    use super::super::KNearestSearch;
+    use super::{KDTree, min, max};
 
     #[test]
     fn test_kdtree_construct() {
@@ -565,8 +410,8 @@ mod tests {
 
     #[cfg(feature = "datasets")]
     #[test]
-    fn test_kdtree_search_iris() {
-        use super::super::super::datasets::iris;
+    fn test_kdtree_search_iris_2cols() {
+        use super::super::super::super::datasets::iris;
 
         let dataset = iris::load();
         let data = dataset.data().select_cols(&[0, 1]);
@@ -582,6 +427,32 @@ mod tests {
         let (ind, dist) = tree.search(&vec![7.0, 2.6], 4);
         assert_eq!(ind, vec![76, 108, 102, 107]);
         assert_eq!(dist, vec![0.28284271247461895, 0.31622776601683783, 0.41231056256176585, 0.4242640687119283]);
+    }
+
+    #[cfg(feature = "datasets")]
+    #[test]
+    fn test_kdtree_search_iris() {
+        use super::super::super::super::datasets::iris;
+
+        let dataset = iris::load();
+        let data = dataset.data();
+
+        let mut tree = KDTree::new(data.clone(), 10);
+        tree.build();
+
+        // search tree
+        let (ind, dist) = tree.search(&vec![5.8, 3.1, 3.8, 1.2], 8);
+        assert_eq!(ind, vec![64, 88, 82, 95, 99, 96, 71, 61]);
+        assert_eq!(dist, vec![0.360555127546399, 0.3872983346207417, 0.41231056256176596,
+                              0.4242640687119288, 0.4472135954999579, 0.4690415759823433,
+                              0.4795831523312721, 0.5196152422706636]);
+
+        let (ind, dist) = tree.search(&vec![6.5, 3.5, 3.2, 1.3], 10);
+        assert_eq!(ind, vec![71, 64, 74, 79, 82, 61, 65, 97, 75, 51]);
+        assert_eq!(dist, vec![1.1357816691600549, 1.1532562594670799, 1.2569805089976533,
+                              1.2767145334803702, 1.2767145334803702, 1.284523257866513,
+                              1.2845232578665131, 1.2884098726725122, 1.3076696830622023,
+                              1.352774925846868]);
     }
 
     #[test]
@@ -653,53 +524,11 @@ mod tests {
     }
 
     #[test]
-    fn test_knearest() {
-        let mut kn = KNearest::new(2, vec![1, 2, 3], vec![3., 2., 1.]);
-        assert_eq!(kn.k, 2);
-        assert_eq!(kn.pairs, vec![(3, 1.), (2, 2.)]);
-        assert_eq!(kn.dist(), 2.);
-
-        // update KNearest
-        kn.add(vec![10, 11], vec![3., 0.]);
-        assert_eq!(kn.k, 2);
-        assert_eq!(kn.pairs, vec![(11, 0.), (3, 1.)]);
-        assert_eq!(kn.dist(), 1.);
-    }
-
-    #[test]
-    fn test_knearest2() {
-        let mut kn = KNearest::new(4, vec![1, 2, 3], vec![3., 2., 1.]);
-        assert_eq!(kn.k, 4);
-        assert_eq!(kn.pairs, vec![(3, 1.), (2, 2.), (1, 3.)]);
-        assert_eq!(kn.dist(), f64::MAX);
-
-        kn.add(vec![5, 6, 7], vec![1.5, 6., 0.5]);
-        assert_eq!(kn.k, 4);
-        assert_eq!(kn.pairs, vec![(7, 0.5), (3, 1.), (5, 1.5), (2, 2.)]);
-        assert_eq!(kn.dist(), 2.);
-    }
-
-    #[test]
     fn test_min_max() {
         let data = Matrix::new(3, 2, vec![1., 2.,
                                           2., 4.,
                                           3., 1.]);
         assert_eq!(min(&data), Vector::new(vec![1., 1.]));
         assert_eq!(max(&data), Vector::new(vec![3., 4.]));
-    }
-
-    #[test]
-    fn test_dist() {
-        let v1 = vec![1., 2., 3.];
-        let v2 = vec![1., 1., 1.];
-        assert_eq!(dist(&v1, &v2), 5.0f64.sqrt());
-
-        let v1 = vec![1., 2., 4.];
-        let v2 = vec![2., 1., 1.];
-        assert_eq!(dist(&v1, &v2), 11.0f64.sqrt());
-
-        let v1 = vec![1., 3., 5.];
-        let v2 = vec![2., 1., 1.];
-        assert_eq!(dist(&v1, &v2), 21.0f64.sqrt());
     }
 }

@@ -7,7 +7,7 @@ pub mod tests_datasets {
     use rm::learning::knn::KNNClassifier;
     use rm::datasets::iris;
 
-    fn test_knn() {
+    fn test_knn_iris_2cols() {
         let dataset = iris::load();
         // slice first 2 columns
         let data = dataset.data().select_cols(&[0, 1]);
@@ -31,5 +31,37 @@ pub mod tests_datasets {
         let _ = knn.train(&data, &dataset.target()).unwrap();
         let res = knn.predict(&matrix![7.1, 2.8]).unwrap();
         assert_eq!(res, Vector::new(vec![2]));
+    }
+
+    fn test_knn_iris() {
+        let dataset = iris::load();
+
+        let mut knn = KNNClassifier::new(3, 30);
+        let _ = knn.train(&dataset.data(), &dataset.target()).unwrap();
+        let res = knn.predict(&dataset.data()).unwrap();
+
+        let exp = vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1,
+                       1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                       2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+                       2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2,
+                       2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
+        assert_eq!(res, Vector::new(exp));
+
+        let mut knn = KNNClassifier::new(10, 30);
+        let _ = knn.train(&dataset.data(), &dataset.target()).unwrap();
+        let res = knn.predict(&dataset.data()).unwrap();
+
+        let exp = vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                       1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                       2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+                       2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2,
+                       2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
+        assert_eq!(res, Vector::new(exp));
     }
 }

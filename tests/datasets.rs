@@ -1,7 +1,7 @@
 extern crate rusty_machine as rm;
 
 #[cfg(feature = "datasets")]
-mod test {
+pub mod test {
 
     use rm::datasets;
     use rm::linalg::BaseMatrix;
