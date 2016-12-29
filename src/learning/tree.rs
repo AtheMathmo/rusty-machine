@@ -12,24 +12,23 @@
 //! use rusty_machine::learning::tree::DecisionTreeClassifier;
 //! use rusty_machine::learning::SupModel;
 //!
-//! use rusty_machine::linalg::Matrix;
-//! use rusty_machine::datasets::iris;
+//! use rusty_machine::linalg::{Matrix, Vector};
 //!
-//! let (inputs, targets) = iris::load_iris();
+//! let inputs = Matrix::new(3, 2, vec![1., 1., 1., 2., 2., 2.]);
+//! let targets = Vector::new(vec![0, 1, 1]);
 //! let mut tree = DecisionTreeClassifier::default();
 //!
 //! // Train the model
 //! tree.train(&inputs, &targets).unwrap();
 //!
 //! // Now we'll predict a new point
-//! let new_data = Matrix::new(1, 4, vec![4.2, 3.3, 1.6, 0.4]);
+//! let new_data = Matrix::new(1, 2, vec![1., 0.5]);
 //! let output = tree.predict(&new_data).unwrap();
 //!
 //! // Hopefully we classified our new point correctly!
 //! println!("{}", output[0]);
 //! assert!(output[0] == 0, "Our classifier isn't very good!");
 //! ```
-
 use std::collections::BTreeMap;
 
 use linalg::{Matrix, BaseMatrix};
@@ -117,7 +116,6 @@ impl DecisionTreeClassifier {
     /// Calculate metrics
     fn metrics_weighted(&self, target: &Vector<usize>) -> f64 {
         self.criterion.from_labels(target) * (target.size() as f64)
-        // ToDo: add other metrics
     }
 
     /// Check termination criteria
@@ -256,24 +254,21 @@ impl SupModel<Matrix<f64>, Vector<usize>> for DecisionTreeClassifier {
     }
 }
 
-
 /// Uniquify values, then get splitter values, i.e. midpoints of unique values
 fn get_splits(values: &Vec<f64>) -> Vec<f64> {
     debug_assert!(values.len() > 0, "values can't be empty");
 
-    // ToDo: must avoid repeated sort
     let mut values = values.clone();
     values.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
     let mut splits: Vec<f64> = Vec::with_capacity(values.len());
 
-    let mut prev: f64 = unsafe {*values.get_unchecked(0) };
-    for &v in values.iter().skip(0) {
+    let mut prev: f64 = unsafe { *values.get_unchecked(0) };
+    for v in values.into_iter().skip(0) {
         if prev != v {
             splits.push((prev + v) / 2.);
             prev = v;
         }
-
     }
     splits
 }
@@ -340,15 +335,15 @@ impl Metrics {
 
     /// calculate metrics from label probabilities
     pub fn from_probas(&self, probas: &Vec<f64>) -> f64 {
-      match self {
-          &Metrics::Entropy => {
-              let res: f64 = probas.iter().map(|&x| xlogy(x, x)).sum();
-              - res
-          },
-          &Metrics::Gini => {
-              let res: f64 =  probas.iter().map(|&x| x * x).sum();
-              1.0 - res
-          }
+        match self {
+            &Metrics::Entropy => {
+            let res: f64 = probas.iter().map(|&x| xlogy(x, x)).sum();
+            - res
+        },
+        &Metrics::Gini => {
+            let res: f64 =  probas.iter().map(|&x| x * x).sum();
+            1.0 - res
+        }
       }
     }
 }
