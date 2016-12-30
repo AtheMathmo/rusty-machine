@@ -116,23 +116,12 @@ impl KDTree {
 
     /// initialize KDTree, must call .build to actually built tree
     pub fn new(data: Matrix<f64>, leafsize: usize) -> Self {
-
         KDTree {
             data: data,
             leafsize: leafsize,
 
             root: None
         }
-    }
-
-    /// build KDTree using its data
-    pub fn build(&mut self) {
-        let remains: Vec<usize> = (0..self.data.rows()).collect();
-
-        let dmin = min(&self.data);
-        let dmax = max(&self.data);
-
-        self.root = Some(self.split_one(remains, dmin, dmax));
     }
 
     /// Select next split dimension and value. Returns tuple with 6 elements
@@ -258,6 +247,16 @@ impl KDTree {
 
 /// Can search K-nearest items
 impl KNearestSearch for KDTree {
+
+    /// build data structure for search optimization, used in KDTree
+    /// build KDTree using its data
+    fn build(&mut self) {
+        let remains: Vec<usize> = (0..self.data.rows()).collect();
+        let dmin = min(&self.data);
+        let dmax = max(&self.data);
+        self.root = Some(self.split_one(remains, dmin, dmax));
+    }
+
     /// Serch k-nearest items close to the point
     fn search(&self, point: &[f64], k: usize) -> (Vec<usize>, Vec<f64>) {
         let (mut query, mut queue) = self.search_leaf(point, k);
@@ -278,13 +277,7 @@ impl KNearestSearch for KDTree {
                 }
             }
         }
-        let mut indices: Vec<usize> = Vec::with_capacity(k);
-        let mut distances: Vec<f64> = Vec::with_capacity(k);
-        for (i, d) in query.pairs.into_iter() {
-            indices.push(i);
-            distances.push(d);
-        }
-        (indices, distances)
+        query.get_results()
     }
 }
 
