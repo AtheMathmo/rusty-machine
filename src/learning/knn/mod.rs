@@ -8,7 +8,7 @@ use learning::{LearningResult, SupModel};
 use learning::error::{Error, ErrorKind};
 
 pub mod kdtree;
-pub mod bruteforth;
+pub mod bruteforce;
 
 use self::kdtree::KDTree;
 
@@ -113,24 +113,43 @@ impl KNearest {
         }
     }
 
-    /// Add new index and distances to the container, keep first k elements which
-    /// distances are smaller
-    fn add(&mut self, index: Vec<usize>, distances: Vec<f64>) {
-        debug_assert!(index.len() == distances.len(), "index and distance must have the same length");
+    /// Add new index and distances to the container, keeping first k elements which
+    /// distances are smaller. Returns the updated farthest distance.
+    fn add(&mut self, index: usize, distance: f64) -> f64 {
 
-        let current_dist = self.dist();
+        // ToDo: use unsafe
+        let len = self.pairs.len();
 
-        self.pairs.reserve(index.len());
-        for (i, d) in index.into_iter().zip(distances.into_iter()) {
-            // do not store pairs which exceeds current dist
-            if d < current_dist {
-                self.pairs.push((i, d));
+        let farthest = self.pairs[len - 1].1;
+        if farthest < distance {
+            if len < self.k {
+                // append to the last
+                self.pairs.push((index, distance));
+                return distance;
+            }
+            return farthest;
+        } else {
+            // last element is already compared
+            if len >= self.k {
+                self.pairs.pop().unwrap();
+            }
+            for i in 2..(len + 1) {
+                if self.pairs[len - i].1 < distance {
+                    self.pairs.insert(len - i + 1, (index, distance));
+                    if len < self.k {
+                        return self.pairs[len].1;
+                    } else {
+                        return self.pairs[len - 1].1;
+                    }
+                }
+            }
+            self.pairs.insert(0, (index, distance));
+            if len < self.k {
+                return self.pairs[len].1;
+            } else {
+                return self.pairs[len - 1].1;
             }
         }
-        // sort by distance, take k elements.
-        // may be optimized as self.pairs is already sorted.
-        self.pairs.sort_by(|x, y| x.1.partial_cmp(&y.1).unwrap());
-        self.pairs.truncate(self.k);
     }
 
     /// Return the k-th distance with searching point
@@ -198,7 +217,14 @@ mod tests {
         assert_eq!(kn.dist(), 2.);
 
         // update KNearest
-        kn.add(vec![10, 11], vec![3., 0.]);
+        let res = kn.add(10, 3.);
+        assert_eq!(res, 2.);
+        assert_eq!(kn.k, 2);
+        assert_eq!(kn.pairs, vec![(3, 1.), (2, 2.)]);
+        assert_eq!(kn.dist(), 2.);
+
+        let res = kn.add(11, 0.);
+        assert_eq!(res, 1.);
         assert_eq!(kn.k, 2);
         assert_eq!(kn.pairs, vec![(11, 0.), (3, 1.)]);
         assert_eq!(kn.dist(), 1.);
@@ -211,7 +237,20 @@ mod tests {
         assert_eq!(kn.pairs, vec![(3, 1.), (2, 2.), (1, 3.)]);
         assert_eq!(kn.dist(), f64::MAX);
 
-        kn.add(vec![5, 6, 7], vec![1.5, 6., 0.5]);
+        let res = kn.add(5, 1.5);
+        assert_eq!(res, 3.);
+        assert_eq!(kn.k, 4);
+        assert_eq!(kn.pairs, vec![(3, 1.), (5, 1.5), (2, 2.), (1, 3.)]);
+        assert_eq!(kn.dist(), 3.);
+
+        let res = kn.add(6, 6.);
+        assert_eq!(res, 3.);
+        assert_eq!(kn.k, 4);
+        assert_eq!(kn.pairs, vec![(3, 1.), (5, 1.5), (2, 2.), (1, 3.)]);
+        assert_eq!(kn.dist(), 3.);
+
+        let res = kn.add(7, 0.5);
+        assert_eq!(res, 2.);
         assert_eq!(kn.k, 4);
         assert_eq!(kn.pairs, vec![(7, 0.5), (3, 1.), (5, 1.5), (2, 2.)]);
         assert_eq!(kn.dist(), 2.);

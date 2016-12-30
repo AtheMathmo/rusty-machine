@@ -266,7 +266,13 @@ impl KNearestSearch for KDTree {
             match current {
                 &Node::Leaf(ref l) => {
                     let distances = self.get_distances(point, &l.children);
-                    query.add(l.children.clone(), distances);
+                    let mut current_dist = query.dist();
+
+                    for (&i, d) in l.children.iter().zip(distances.into_iter()) {
+                        if d < current_dist {
+                            current_dist = query.add(i, d);
+                        }
+                    }
                 },
                 &Node::Branch(ref b) => {
                     let d = b.dist(&point);
@@ -441,7 +447,7 @@ mod tests {
                               0.4795831523312721, 0.5196152422706636]);
 
         let (ind, dist) = tree.search(&vec![6.5, 3.5, 3.2, 1.3], 10);
-        assert_eq!(ind, vec![71, 64, 74, 79, 82, 61, 65, 97, 75, 51]);
+        assert_eq!(ind, vec![71, 64, 74, 82, 79, 61, 65, 97, 75, 51]);
         assert_eq!(dist, vec![1.1357816691600549, 1.1532562594670799, 1.2569805089976533,
                               1.2767145334803702, 1.2767145334803702, 1.284523257866513,
                               1.2845232578665131, 1.2884098726725122, 1.3076696830622023,

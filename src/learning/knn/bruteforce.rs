@@ -1,17 +1,16 @@
-//! Bruteforth search implementations
-use std::collections::VecDeque;
-use linalg::{Matrix, BaseMatrix, Vector};
+//! Bruteforce search implementations
+use linalg::{Matrix, BaseMatrix};
 
 use super::{KNearest, KNearestSearch};
 
-struct BruteForth {
+struct BruteForce {
     data: Matrix<f64>,
 }
 
-impl BruteForth {
+impl BruteForce {
     /// initialize KDTree, must call .build to actually built tree
     pub fn new(data: Matrix<f64>) -> Self {
-        BruteForth {
+        BruteForce {
             data: data
         }
     }
@@ -34,13 +33,14 @@ impl BruteForth {
 }
 
 /// Can search K-nearest items
-impl KNearestSearch for BruteForth {
+impl KNearestSearch for BruteForce {
     /// Serch k-nearest items close to the point
     fn search(&self, point: &[f64], k: usize) -> (Vec<usize>, Vec<f64>) {
         let indices: Vec<usize> = (0..k).collect();
         let distances = self.get_distances(point, &indices);
 
         let mut query = KNearest::new(k, indices, distances);
+        let mut current_dist = query.dist();
 
         let mut i = k;
         for row in self.data.iter_rows().skip(k) {
@@ -48,7 +48,9 @@ impl KNearestSearch for BruteForth {
             let row: Vec<f64> = row.iter().cloned().collect();
             let d = dist(point, &row);
             // ToDo: rewrite to add single elements
-            query.add(vec![i], vec![d]);
+            if d < current_dist {
+                current_dist = query.add(i, d);
+            }
             i += 1;
         }
         query.get_results()
@@ -67,18 +69,18 @@ fn dist(v1: &[f64], v2: &[f64]) -> f64 {
 #[cfg(test)]
 mod tests {
 
-    use linalg::{Vector, Matrix, BaseMatrix};
+    use linalg::Matrix;
     use super::super::KNearestSearch;
-    use super::BruteForth;
+    use super::BruteForce;
 
     #[test]
-    fn test_bruteforth_search() {
+    fn test_bruteforce_search() {
         let m = Matrix::new(5, 2, vec![1., 2.,
                                        8., 0.,
                                        6., 10.,
                                        3., 6.,
                                        0., 3.]);
-        let mut b = BruteForth::new(m);
+        let mut b = BruteForce::new(m);
         b.build();  // no op
 
         let (ind, dist) = b.search(&vec![3., 4.9], 1);
