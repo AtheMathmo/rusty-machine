@@ -12,11 +12,30 @@ use learning::toolkit::cost_fn::{CostFunc, MeanSqError};
 // ************************************
 
 /// Returns the fraction of outputs which match their target.
+///
+/// # Arguments
+///
+/// * `outputs` - Iterator of output (predicted) labels.
+/// * `targets` - Iterator of expected (actual) labels.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::analysis::score::accuracy;
+/// let outputs = [1, 1, 1, 0, 0, 0];
+/// let targets = [1, 1, 0, 0, 1, 1];
+///
+/// assert_eq!(accuracy(outputs.iter(), targets.iter()), 0.5);
+/// ```
+///
+/// # Panics
+///
+/// - outputs and targets have different length
 pub fn accuracy<I>(outputs: I, targets: I) -> f64
     where I: ExactSizeIterator,
           I::Item: PartialEq
 {
-    assert!(outputs.len() == targets.len());
+    assert!(outputs.len() == targets.len(), "outputs and targets must have the same length");
     let len = outputs.len() as f64;
     let correct = outputs
         .zip(targets)
@@ -31,12 +50,33 @@ pub fn row_accuracy(outputs: &Matrix<f64>, targets: &Matrix<f64>) -> f64 {
 }
 
 /// Returns the precision score for 2 class classification.
-/// true-positive / (true-positive + false-positive)
+///
+/// Precision is calculated with true-positive / (true-positive + false-positive),
+/// see [Precision and Recall](https://en.wikipedia.org/wiki/Precision_and_recall) for details.
+///
+/// # Arguments
+///
+/// * `outputs` - Iterator of output (predicted) labels which only contains 0 or 1.
+/// * `targets` - Iterator of expected (actual) labels which only contains 0 or 1.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::analysis::score::precision;
+/// let outputs = [1, 1, 1, 0, 0, 0];
+/// let targets = [1, 1, 0, 0, 1, 1];
+///
+/// assert_eq!(precision(outputs.iter(), targets.iter()), 2.0f64 / 3.0f64);
+/// ```
+///
+/// # Panics
+///
+/// - outputs and targets have different length
 pub fn precision<'a, I, T>(outputs: I, targets: I) -> f64
     where I: ExactSizeIterator<Item=&'a T>,
           T: 'a + PartialEq + Zero + One
 {
-    assert!(outputs.len() == targets.len());
+    assert!(outputs.len() == targets.len(), "outputs and targets must have the same length");
 
     let mut tpfp = 0.0f64;
     let mut tp = 0.0f64;
@@ -57,12 +97,33 @@ pub fn precision<'a, I, T>(outputs: I, targets: I) -> f64
 }
 
 /// Returns the recall score for 2 class classification.
-/// true-positive / (true-positive + false-negative)
+///
+/// Recall is calculated with true-positive / (true-positive + false-negative),
+/// see [Precision and Recall](https://en.wikipedia.org/wiki/Precision_and_recall) for details.
+///
+/// # Arguments
+///
+/// * `outputs` - Iterator of output (predicted) labels which only contains 0 or 1.
+/// * `targets` - Iterator of expected (actual) labels which only contains 0 or 1.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::analysis::score::recall;
+/// let outputs = [1, 1, 1, 0, 0, 0];
+/// let targets = [1, 1, 0, 0, 1, 1];
+///
+/// assert_eq!(recall(outputs.iter(), targets.iter()), 0.5);
+/// ```
+///
+/// # Panics
+///
+/// - outputs and targets have different length
 pub fn recall<'a, I, T>(outputs: I, targets: I) -> f64
     where I: ExactSizeIterator<Item=&'a T>,
           T: 'a + PartialEq + Zero + One
 {
-    assert!(outputs.len() == targets.len());
+    assert!(outputs.len() == targets.len(), "outputs and targets must have the same length");
 
     let mut tpfn = 0.0f64;
     let mut tp = 0.0f64;
@@ -82,13 +143,34 @@ pub fn recall<'a, I, T>(outputs: I, targets: I) -> f64
     tp / tpfn
 }
 
-/// Returns the f1 score for 2 class classification
-/// 2 * precision * recall / (precision + recall)
+/// Returns the f1 score for 2 class classification.
+///
+/// F1-score is calculated with 2 * precision * recall / (precision + recall),
+/// see [F1 score](https://en.wikipedia.org/wiki/F1_score) for details.
+///
+/// # Arguments
+///
+/// * `outputs` - Iterator of output (predicted) labels which only contains 0 or 1.
+/// * `targets` - Iterator of expected (actual) labels which only contains 0 or 1.
+///
+/// # Examples
+///
+/// ```
+/// use rusty_machine::analysis::score::f1;
+/// let outputs = [1, 1, 1, 0, 0, 0];
+/// let targets = [1, 1, 0, 0, 1, 1];
+///
+/// assert_eq!(f1(outputs.iter(), targets.iter()), 0.5714285714285714);
+/// ```
+///
+/// # Panics
+///
+/// - outputs and targets have different length
 pub fn f1<'a, I, T>(outputs: I, targets: I) -> f64
     where I: ExactSizeIterator<Item=&'a T>,
           T: 'a + PartialEq + Zero + One
 {
-    assert!(outputs.len() == targets.len());
+    assert!(outputs.len() == targets.len(), "outputs and targets must have the same length");
 
     let mut tpos = 0.0f64;
     let mut fpos = 0.0f64;
@@ -107,11 +189,7 @@ pub fn f1<'a, I, T>(outputs: I, targets: I) -> f64
             panic!("f1-score must be used for 2 class classification")
         }
     }
-    // precision
-    let p = tpos / (tpos + fpos);
-    // recall
-    let r = tpos / (tpos + fneg);
-    2.0 * p * r / (p + r)
+    2.0f64 * tpos / (2.0f64 * tpos + fneg + fpos)
 }
 
 // ************************************
@@ -218,11 +296,11 @@ mod tests {
     fn test_f1() {
         let outputs = [1, 1, 1, 0, 0, 0];
         let targets = [1, 1, 0, 0, 1, 1];
-        assert_eq!(f1(outputs.iter(), targets.iter()), 0.57142857142857151);
+        assert_eq!(f1(outputs.iter(), targets.iter()), 0.5714285714285714);
 
         let outputs = [1, 1, 1, 0, 1, 1];
         let targets = [1, 1, 0, 0, 1, 1];
-        assert_eq!(f1(outputs.iter(), targets.iter()), 0.88888888888888895);
+        assert_eq!(f1(outputs.iter(), targets.iter()), 0.8888888888888888);
 
         let outputs = [0, 0, 0, 1, 1, 1];
         let targets = [1, 1, 1, 1, 1, 0];
