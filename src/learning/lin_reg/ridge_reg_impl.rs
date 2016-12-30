@@ -1,4 +1,4 @@
-use linalg::{Matrix, BaseMatrix};
+use linalg::{Matrix, BaseMatrix, BaseMatrixMut};
 use linalg::Vector;
 use learning::{LearningResult, SupModel};
 use learning::error::Error;
@@ -18,6 +18,8 @@ impl RidgeRegressor {
 
     /// Constructs untrained Ridge regression model.
     ///
+    /// Requires L2 regularization parameter (alpha).
+    ///
     /// # Examples
     ///
     /// ```
@@ -26,6 +28,7 @@ impl RidgeRegressor {
     /// let model = RidgeRegressor::new(1.0);
     /// ```
     pub fn new(alpha: f64) -> Self {
+        assert!(alpha >= 0., "alpha must be equal or larger than 0.");
         RidgeRegressor {
             alpha: alpha,
             parameters: None
@@ -48,16 +51,16 @@ impl SupModel<Matrix<f64>, Vector<f64>> for RidgeRegressor {
     /// # Examples
     ///
     /// ```
-    /// use rusty_machine::learning::lin_reg::LinRegressor;
+    /// use rusty_machine::learning::lin_reg::RidgeRegressor;
     /// use rusty_machine::linalg::Matrix;
     /// use rusty_machine::linalg::Vector;
     /// use rusty_machine::learning::SupModel;
     ///
-    /// let mut lin_mod = LinRegressor::default();
-    /// let inputs = Matrix::new(3,1, vec![2.0, 3.0, 4.0]);
-    /// let targets = Vector::new(vec![5.0, 6.0, 7.0]);
+    /// let mut model = RidgeRegressor::default();
+    /// let inputs = Matrix::new(3, 1, vec![2.0, 3.0, 4.0]);
+    /// let targets = Vector::new(vec![5.0, 10.0, 7.0]);
     ///
-    /// lin_mod.train(&inputs, &targets).unwrap();
+    /// model.train(&inputs, &targets).unwrap();
     /// ```
     fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<f64>) -> LearningResult<()> {
 
@@ -66,8 +69,9 @@ impl SupModel<Matrix<f64>, Vector<f64>> for RidgeRegressor {
         let xt = full_inputs.transpose();
         // cancel regularization of intercept
         let mut eye = Matrix::<f64>::identity(inputs.cols() + 1);
-        eye[[0, 0]] = 0.;
-
+        unsafe {
+            *eye.get_unchecked_mut([0, 0]) = 0.
+        }
         let left = &xt * full_inputs + eye * self.alpha;
         let right = &xt * targets;
         self.parameters = Some(left.solve(right).expect("Unable to solve linear equation."));
