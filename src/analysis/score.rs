@@ -72,6 +72,7 @@ pub fn row_accuracy(outputs: &Matrix<f64>, targets: &Matrix<f64>) -> f64 {
 /// # Panics
 ///
 /// - outputs and targets have different length
+/// - outputs or targets contains a value which is not 0 or 1
 pub fn precision<'a, I, T>(outputs: I, targets: I) -> f64
     where I: ExactSizeIterator<Item=&'a T>,
           T: 'a + PartialEq + Zero + One
@@ -119,6 +120,7 @@ pub fn precision<'a, I, T>(outputs: I, targets: I) -> f64
 /// # Panics
 ///
 /// - outputs and targets have different length
+/// - outputs or targets contains a value which is not 0 or 1
 pub fn recall<'a, I, T>(outputs: I, targets: I) -> f64
     where I: ExactSizeIterator<Item=&'a T>,
           T: 'a + PartialEq + Zero + One
@@ -166,6 +168,7 @@ pub fn recall<'a, I, T>(outputs: I, targets: I) -> f64
 /// # Panics
 ///
 /// - outputs and targets have different length
+/// - outputs or targets contains a value which is not 0 or 1
 pub fn f1<'a, I, T>(outputs: I, targets: I) -> f64
     where I: ExactSizeIterator<Item=&'a T>,
           T: 'a + PartialEq + Zero + One
