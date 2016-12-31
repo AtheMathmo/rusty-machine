@@ -1,5 +1,31 @@
 //! - k-Nearest Nerighbors
-
+//!
+//! Contains implemention of k-nearest search using
+//! kd-tree, ball-tree and brute-force.
+//!
+//! # Usage
+//!
+//! ```
+//! # #[macro_use] extern crate rulinalg; extern crate rusty_machine; fn main() {
+//! use rusty_machine::learning::knn::KNNClassifier;
+//! use rusty_machine::learning::SupModel;
+//! use rusty_machine::linalg::Vector;
+//!
+//! let data = matrix![1., 1., 1.;
+//!                    1., 2., 3.;
+//!                    2., 3., 1.;
+//!                    2., 2., 0.];
+//! let target = Vector::new(vec![0, 0, 1, 1]);
+//!
+//! // train the model to search 2-nearest
+//! let mut knn = KNNClassifier::new(2);
+//! knn.train(&data, &target).unwrap();
+//!
+//! // predict new points
+//! let res = knn.predict(&matrix![2., 3., 0.; 1., 1., 2.]).unwrap();
+//! assert_eq!(res, Vector::new(vec![1, 0]));
+//! # }
+//! ```
 use std::f64;
 use std::collections::BTreeMap;
 

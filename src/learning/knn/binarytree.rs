@@ -7,19 +7,19 @@ use learning::error::Error;
 
 use super::{KNearest, KNearestSearch, get_distances, dist};
 
-/// Binary Tree
+/// Binary tree
 #[derive(Debug)]
 pub struct BinaryTree<B: BinarySplit> {
-    // Binary Tree leaf size
+    // Binary tree leaf size
     leafsize: usize,
-    // Search Data
+    // Search data
     data: Option<Matrix<f64>>,
-    // Binary Tree
+    // Binary tree
     root: Option<Node<B>>
 }
 
 impl<B: BinarySplit> Default for BinaryTree<B> {
-    /// Constructs default binary-tree (KDTree or BallTree) seach.
+    /// Constructs default binary-tree (kd-tree or ball-tree) seach.
     /// Each leaf contains 30 elements at maximum.
     ///
     /// # Examples
@@ -61,7 +61,7 @@ pub trait BinarySplit: Sized {
     fn right(&self) -> &Node<Self>;
 }
 
-/// KDTree Branch
+/// Kd-tree branch
 #[derive(Debug)]
 pub struct KDTreeBranch {
     /// dimension (column) to split
@@ -82,7 +82,7 @@ pub struct KDTreeBranch {
     right: Box<Node<KDTreeBranch>>,
 }
 
-/// BallTree Branch
+/// Ball-tree branch
 #[derive(Debug)]
 pub struct BallTreeBranch {
     /// dimension (column) to split
@@ -99,10 +99,10 @@ pub struct BallTreeBranch {
     right: Box<Node<BallTreeBranch>>,
 }
 
-/// KDTree implementation
+/// Kd-tree implementation
 pub type KDTree = BinaryTree<KDTreeBranch>;
 
-/// BallTree implementation
+/// Ball-tree implementation
 pub type BallTree = BinaryTree<BallTreeBranch>;
 
 impl BinarySplit for KDTreeBranch {
@@ -223,16 +223,16 @@ impl BinarySplit for BallTreeBranch {
     }
 }
 
-/// Binary Tree Node (either branch or leaf)
+/// Binary tree node (either branch or leaf)
 #[derive(Debug)]
 pub enum Node<B: BinarySplit> {
-    /// Binary Tree branch
+    /// Binary tree branch
     Branch(B),
-    /// Binary Tree leaf
+    /// Binary tree leaf
     Leaf(Leaf)
 }
 
-/// Binary Tree Leaf
+/// Binary tree leaf
 #[derive(Debug)]
 pub struct Leaf {
     children: Vec<usize>
@@ -248,7 +248,7 @@ impl Leaf {
 
 impl<B: BinarySplit> BinaryTree<B> {
 
-    /// Constructs binary-tree (KDTree or BallTree) seach.
+    /// Constructs binary-tree (kd-tree or ball-tree) seach.
     /// Specify leafsize which is maximum number to be contained in each leaf.
     ///
     /// # Examples
@@ -379,7 +379,7 @@ impl<B: BinarySplit> BinaryTree<B> {
     }
 }
 
-/// Can search K-nearest items
+/// Can search k-nearest items
 impl<B: BinarySplit> KNearestSearch for BinaryTree<B> {
 
     /// build data structure for search optimization
@@ -436,10 +436,9 @@ fn min(data: &Matrix<f64>) -> Vector<f64> {
         results.push(data[[0, i]]);
     }
     for row in data.iter_rows() {
-        for (i, v) in row.iter().enumerate() {
-            let current = results[i];
-            if current > *v {
-                results[i] = *v;
+        for (r, v) in results.iter_mut().zip(row.iter()) {
+            if *r > *v {
+                *r = *v;
             }
         }
     }
@@ -455,10 +454,9 @@ fn max(data: &Matrix<f64>) -> Vector<f64> {
         results.push(data[[0, i]]);
     }
     for row in data.iter_rows() {
-        for (i, v) in row.iter().enumerate() {
-            let current = results[i];
-            if current < *v {
-                results[i] = *v;
+        for (r, v) in results.iter_mut().zip(row.iter()) {
+            if *r < *v {
+                *r = *v;
             }
         }
     }

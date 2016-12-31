@@ -1,6 +1,45 @@
-use rm::linalg::{BaseMatrix, Vector};
+use rm::linalg::{Matrix, Vector};
 use rm::learning::SupModel;
 use rm::learning::knn::KNNClassifier;
+
+#[test]
+fn test_knn() {
+    let data = matrix![1., 1., 1.;
+                       1., 2., 3.;
+                       2., 3., 1.;
+                       2., 2., 0.];
+    let target = Vector::new(vec![0, 0, 1, 1]);
+
+    let mut knn = KNNClassifier::new(2);
+    let _ = knn.train(&data, &target).unwrap();
+
+    let res = knn.predict(&matrix![2., 3., 0.; 1., 1., 2.]).unwrap();
+    let exp = Vector::new(vec![1, 0]);
+    assert_eq!(res, exp);
+}
+
+#[test]
+fn test_knn_long() {
+    let vals = (0..200000).map(|x: usize| x as f64).collect::<Vec<f64>>();
+    let data = Matrix::new(100000, 2, vals);
+
+    let mut tvals = vec![0; 50000];
+    tvals.extend(vec![1; 50000]);
+    let target = Vector::new(tvals);
+
+    // check stack doesn't overflow
+    let mut knn = KNNClassifier::new(10);
+    let _ = knn.train(&data, &target).unwrap();
+
+    let res = knn.predict(&matrix![5., 10.; 60000., 550000.]).unwrap();
+    let exp = Vector::new(vec![0, 1]);
+    assert_eq!(res, exp);
+
+    // check stack doesn't overflow
+    let mut knn = KNNClassifier::new(1000);
+    let _ = knn.train(&data, &target).unwrap();
+    assert_eq!(res, exp);
+}
 
 #[cfg(feature = "datasets")]
 pub mod tests_datasets {
