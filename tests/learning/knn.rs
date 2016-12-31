@@ -1,10 +1,13 @@
+use rm::linalg::{BaseMatrix, Vector};
+use rm::learning::SupModel;
+use rm::learning::knn::KNNClassifier;
 
 #[cfg(feature = "datasets")]
 pub mod tests_datasets {
 
     use rm::linalg::{BaseMatrix, Vector};
     use rm::learning::SupModel;
-    use rm::learning::knn::KNNClassifier;
+    use rm::learning::knn::{KNNClassifier, KDTree, BallTree, BruteForce};
     use rm::datasets::iris;
 
     #[test]
@@ -35,7 +38,26 @@ pub mod tests_datasets {
     }
 
     #[test]
-    fn test_knn_iris() {
+    fn test_knn_iris_default() {
+        let dataset = iris::load();
+
+        let mut knn = KNNClassifier::default();
+        let _ = knn.train(&dataset.data(), &dataset.target()).unwrap();
+        let res = knn.predict(&dataset.data()).unwrap();
+
+        let exp = vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1,
+                       1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                       2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+                       2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+                       2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
+        assert_eq!(res, Vector::new(exp));
+    }
+
+    #[test]
+    fn test_knn_iris_different_neighbors() {
         let dataset = iris::load();
 
         let mut knn = KNNClassifier::new(3);
@@ -65,5 +87,35 @@ pub mod tests_datasets {
                        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2,
                        2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
         assert_eq!(res, Vector::new(exp));
+    }
+
+    #[test]
+    fn test_knn_iris_new_specified() {
+        let dataset = iris::load();
+
+        let mut knn = KNNClassifier::new_specified(5, KDTree::default());
+        let _ = knn.train(&dataset.data(), &dataset.target()).unwrap();
+        let res = knn.predict(&dataset.data()).unwrap();
+
+        let exp = vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1,
+                       1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                       2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+                       2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+                       2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
+        let expv = Vector::new(exp);
+        assert_eq!(res, expv);
+
+        let mut knn = KNNClassifier::new_specified(5, BallTree::default());
+        let _ = knn.train(&dataset.data(), &dataset.target()).unwrap();
+        let res = knn.predict(&dataset.data()).unwrap();
+        assert_eq!(res, expv);
+
+        let mut knn = KNNClassifier::new_specified(5, BruteForce::default());
+        let _ = knn.train(&dataset.data(), &dataset.target()).unwrap();
+        let res = knn.predict(&dataset.data()).unwrap();
+        assert_eq!(res, expv);
     }
 }

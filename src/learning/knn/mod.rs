@@ -13,8 +13,6 @@ mod bruteforce;
 pub use self::binarytree::{KDTree, BallTree};
 pub use self::bruteforce::BruteForce;
 
-// use self::kdtree::KDTree;
-
 /// k-Nearest Neighbor Classifier
 #[derive(Debug)]
 pub struct KNNClassifier<S: KNearestSearch> {
@@ -25,6 +23,14 @@ pub struct KNNClassifier<S: KNearestSearch> {
 }
 
 impl Default for KNNClassifier<KDTree> {
+    /// Constructs an untrained KNN Classifier with searching 5 neighbors.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::knn::KNNClassifier;
+    /// let _ = KNNClassifier::default();
+    /// ```
     fn default() -> Self {
         KNNClassifier {
             k: 5,
@@ -36,7 +42,7 @@ impl Default for KNNClassifier<KDTree> {
 
 impl KNNClassifier<KDTree> {
     /// Constructs an untrained KNN Classifier with specified
-    /// k and leafsize for KDTree.
+    /// number of search neighbors.
     ///
     /// # Examples
     ///
@@ -53,6 +59,25 @@ impl KNNClassifier<KDTree> {
     }
 }
 
+impl<S: KNearestSearch> KNNClassifier<S> {
+    /// Constructs an untrained KNN Classifier with specified
+    /// k and leafsize for KDTree.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::knn::{KNNClassifier, BallTree};
+    /// let _ = KNNClassifier::new_specified(3, BallTree::new(10));
+    /// ```
+    pub fn new_specified(k: usize, searcher: S) -> Self {
+        KNNClassifier {
+            k: k,
+            searcher: searcher,
+            target: None
+        }
+    }
+}
+
 impl<'a, S: KNearestSearch> SupModel<Matrix<f64>, Vector<usize>> for KNNClassifier<S> {
 
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<usize>> {
@@ -61,7 +86,7 @@ impl<'a, S: KNearestSearch> SupModel<Matrix<f64>, Vector<usize>> for KNNClassifi
 
                 let mut results: Vec<usize> = Vec::with_capacity(inputs.rows());
                 for row in inputs.iter_rows() {
-                    let (idx, _) = self.searcher.search(row, self.k);
+                    let (idx, _) = try!(self.searcher.search(row, self.k));
                     let res = target.select(&idx);
                     let (uniques, counts) = freq(&res.data());
                     let (id, _) = counts.argmax();
@@ -100,7 +125,8 @@ impl KNearest {
 
     fn new(k: usize, index: Vec<usize>, distances: Vec<f64>) -> Self {
         debug_assert!(index.len() > 0, "index can't be empty");
-        debug_assert!(index.len() == distances.len(), "index and distance must have the same length");
+        debug_assert!(index.len() == distances.len(),
+                      "index and distance must have the same length");
 
         let mut pairs: Vec<(usize, f64)> = index.into_iter()
                                                 .zip(distances.into_iter())
@@ -187,7 +213,7 @@ pub trait KNearestSearch: Default{
 
     /// Serch k-nearest items close to the point
     /// Returns a tuple of searched item index and its distances
-    fn search(&self, point: &[f64], k: usize) -> (Vec<usize>, Vec<f64>);
+    fn search(&self, point: &[f64], k: usize) -> Result<(Vec<usize>, Vec<f64>), Error>;
 }
 
 /// Count target label frequencies

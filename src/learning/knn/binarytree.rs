@@ -1,7 +1,9 @@
 //! Binary Tree implementations
 use std::borrow::Borrow;
 use std::collections::VecDeque;
+
 use linalg::{Matrix, BaseMatrix, Vector};
+use learning::error::Error;
 
 use super::{KNearest, KNearestSearch, get_distances, dist};
 
@@ -17,6 +19,16 @@ pub struct BinaryTree<B: BinarySplit> {
 }
 
 impl<B: BinarySplit> Default for BinaryTree<B> {
+    /// Constructs default binary-tree (KDTree or BallTree) seach.
+    /// Each leaf contains 30 elements at maximum.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::knn::{KDTree, BallTree};
+    /// let _ = KDTree::default();
+    /// let _ = BallTree::default();
+    /// ```
     fn default() -> Self {
         BinaryTree {
             leafsize: 30,
@@ -150,7 +162,8 @@ impl BinarySplit for BallTreeBranch {
              dim: usize, split: f64, _: Vector<f64>, _: Vector<f64>,
              left: Node<Self>, right: Node<Self>) -> Node<Self> {
 
-        // temp, calculate centroid (mean)
+        // calculate centroid (mean)
+        // ToDo: cleanup using .row()
         let mut center: Vec<f64> = vec![0.; data.cols()];
         for &i in remains.iter() {
             let row: Vec<f64> = data.select_rows(&[i]).into_vec();
@@ -182,7 +195,9 @@ impl BinarySplit for BallTreeBranch {
         Node::Branch(b)
     }
 
-    unsafe fn maybe_close<'s, 'p>(&'s self, point: &'p [f64]) -> (&'s Node<Self>, &'s Node<Self>) {
+    unsafe fn maybe_close<'s, 'p>(&'s self, point: &'p [f64])
+        -> (&'s Node<Self>, &'s Node<Self>) {
+
         if *point.get_unchecked(self.dim) < self.split {
             (&self.left, &self.right)
         } else {
@@ -217,26 +232,6 @@ pub enum Node<B: BinarySplit> {
     Leaf(Leaf)
 }
 
-impl<B: BinarySplit> Node<B> {
-    // return my leaf reference, for testing purpose
-    #[allow(dead_code)]
-    fn as_leaf(&self) -> &Leaf {
-        match self {
-            &Node::Leaf(ref leaf) => leaf,
-            _ => panic!("Node is not leaf")
-        }
-    }
-
-    // return my branch reference, for testing purpose
-    #[allow(dead_code)]
-    fn as_branch(&self) -> &B {
-        match self {
-            &Node::Branch(ref branch) => branch,
-            _ => panic!("Node is not branch")
-        }
-    }
-}
-
 /// Binary Tree Leaf
 #[derive(Debug)]
 pub struct Leaf {
@@ -253,7 +248,17 @@ impl Leaf {
 
 impl<B: BinarySplit> BinaryTree<B> {
 
-    fn new(leafsize: usize) -> Self {
+    /// Constructs binary-tree (KDTree or BallTree) seach.
+    /// Specify leafsize which is maximum number to be contained in each leaf.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::knn::{KDTree, BallTree};
+    /// let _ = KDTree::new(10);
+    /// let _ = BallTree::new(50);
+    /// ```
+    pub fn new(leafsize: usize) -> Self {
         BinaryTree {
             leafsize: leafsize,
             data: None,
@@ -276,7 +281,7 @@ impl<B: BinarySplit> BinaryTree<B> {
         loop {
             // split columns which has the widest range
             let (dim, d) = (&dmax - &dmin).argmax();
-            // ToDo: use unsafe get  (v0.4.0?)
+            // ToDo: use unsafe get (v0.4.0?)
             // https://github.com/AtheMathmo/rulinalg/pull/104
             let split = unsafe {
                 dmin.data().get_unchecked(dim) + d / 2.0
@@ -340,7 +345,7 @@ impl<B: BinarySplit> BinaryTree<B> {
 
     /// find leaf contains search point
     fn search_leaf<'s, 'p>(&'s self, point: &'p [f64], k: usize)
-        -> (KNearest, VecDeque<&'s Node<B>>) {
+        -> Result<(KNearest, VecDeque<&'s Node<B>>), Error> {
 
         if let (&Some(ref root), &Some(ref data)) = (&self.root, &self.data) {
 
@@ -354,7 +359,7 @@ impl<B: BinarySplit> BinaryTree<B> {
                     &Node::Leaf(ref l) => {
                         let distances = get_distances(data, point, &l.children);
                         let kn = KNearest::new(k, l.children.clone(), distances);
-                        return (kn, queue);
+                        return Ok((kn, queue));
                     },
                     &Node::Branch(ref b) => {
                         // the current branch must contains target point.
@@ -369,7 +374,7 @@ impl<B: BinarySplit> BinaryTree<B> {
                 }
             }
         } else {
-            panic!("tree is not built")
+            Err(Error::new_untrained())
         }
     }
 }
@@ -387,10 +392,10 @@ impl<B: BinarySplit> KNearestSearch for BinaryTree<B> {
     }
 
     /// Serch k-nearest items close to the point
-    fn search(&self, point: &[f64], k: usize) -> (Vec<usize>, Vec<f64>) {
+    fn search(&self, point: &[f64], k: usize) -> Result<(Vec<usize>, Vec<f64>), Error> {
         // ToDo: should return Error
         if let &Some(ref data) = &self.data {
-            let (mut query, mut queue) = self.search_leaf(point, k);
+            let (mut query, mut queue) = try!(self.search_leaf(point, k));
             while queue.len() > 0 {
                 let current = queue.pop_front().unwrap();
 
@@ -414,9 +419,9 @@ impl<B: BinarySplit> KNearestSearch for BinaryTree<B> {
                     }
                 }
             }
-            query.get_results()
+            Ok(query.get_results())
         } else {
-            panic!("error")
+            Err(Error::new_untrained())
         }
     }
 }
@@ -467,6 +472,24 @@ mod tests {
     use super::super::KNearestSearch;
     use super::{KDTree, BallTree, min, max};
 
+    use super::{Node, BinarySplit, Leaf};
+
+    // return node's leaf reference, for testing purpose
+    fn as_leaf<B: BinarySplit>(n: &Node<B>) -> &Leaf {
+        match n {
+            &Node::Leaf(ref leaf) => leaf,
+            _ => panic!("Node is not leaf")
+        }
+    }
+
+    // return node's branch reference, for testing purpose
+    fn as_branch<B: BinarySplit>(n: &Node<B>) -> &B {
+        match n {
+            &Node::Branch(ref branch) => branch,
+            _ => panic!("Node is not branch")
+        }
+    }
+
     #[test]
     fn test_kdtree_construct() {
         let m = Matrix::new(5, 2, vec![1., 2.,
@@ -479,23 +502,23 @@ mod tests {
 
         // split to [0, 1, 4] and [2, 3] with columns #1
         let root = tree.root.unwrap();
-        let b = root.as_branch();
+        let b = as_branch(&root);
         assert_eq!(b.dim, 1);
         assert_eq!(b.split, 5.);
         assert_eq!(b.min, Vector::new(vec![0., 0.]));
         assert_eq!(b.max, Vector::new(vec![8., 10.]));
 
         // split to [0, 4] and [1] with columns #0
-        let bl = b.left.as_branch();
-        let br = b.right.as_leaf();
+        let bl = as_branch(b.left());
+        let br = as_leaf(b.right());
         assert_eq!(bl.dim, 0);
         assert_eq!(bl.split, 4.);
         assert_eq!(bl.min, Vector::new(vec![0., 0.]));
         assert_eq!(bl.max, Vector::new(vec![8., 5.]));
         assert_eq!(br.children, vec![2, 3]);
 
-        let bll = bl.left.as_leaf();
-        let blr = bl.right.as_leaf();
+        let bll = as_leaf(bl.left());
+        let blr = as_leaf(bl.right());
         assert_eq!(bll.children, vec![0, 4]);
         assert_eq!(blr.children, vec![1]);
     }
@@ -511,24 +534,24 @@ mod tests {
         tree.build(m);
 
         // search first leaf
-        let (kn, _) = tree.search_leaf(&vec![3., 4.9], 1);
+        let (kn, _) = tree.search_leaf(&vec![3., 4.9], 1).unwrap();
         assert_eq!(kn.pairs, vec![(0, (2.0f64 * 2.0f64 + 2.9f64 * 2.9f64).sqrt())]);
 
         // search tree
-        let (ind, dist) = tree.search(&vec![3., 4.9], 1);
+        let (ind, dist) = tree.search(&vec![3., 4.9], 1).unwrap();
         assert_eq!(ind, vec![3]);
         assert_eq!(dist, vec![1.0999999999999996]);
 
-        let (ind, dist) = tree.search(&vec![3., 4.9], 3);
+        let (ind, dist) = tree.search(&vec![3., 4.9], 3).unwrap();
         assert_eq!(ind, vec![3, 0, 4]);
         assert_eq!(dist, vec![1.0999999999999996, 3.5227829907617076, 3.551056180912941]);
 
         // search first leaf
-        let (kn, _) = tree.search_leaf(&vec![3., 4.9], 2);
+        let (kn, _) = tree.search_leaf(&vec![3., 4.9], 2).unwrap();
         assert_eq!(kn.pairs, vec![(0, (2.0f64 * 2.0f64 + 2.9f64 * 2.9f64).sqrt()),
                                   (4, (3.0f64 * 3.0f64 + (4.9f64 - 3.0f64) * (4.9f64 - 3.0f64)).sqrt())]);
         // search tree
-        let (ind, dist) = tree.search(&vec![3., 4.9], 2);
+        let (ind, dist) = tree.search(&vec![3., 4.9], 2).unwrap();
         assert_eq!(ind, vec![3, 0]);
         assert_eq!(dist, vec![1.0999999999999996, 3.5227829907617076]);
     }
@@ -545,11 +568,11 @@ mod tests {
         tree.build(data);
 
         // search tree
-        let (ind, dist) = tree.search(&vec![5.8, 3.6], 4);
+        let (ind, dist) = tree.search(&vec![5.8, 3.6], 4).unwrap();
         assert_eq!(ind, vec![18, 85, 36, 14]);
         assert_eq!(dist, vec![0.22360679774997858, 0.2828427124746193, 0.31622776601683783, 0.3999999999999999]);
 
-        let (ind, dist) = tree.search(&vec![7.0, 2.6], 4);
+        let (ind, dist) = tree.search(&vec![7.0, 2.6], 4).unwrap();
         assert_eq!(ind, vec![76, 108, 102, 107]);
         assert_eq!(dist, vec![0.28284271247461895, 0.31622776601683783, 0.41231056256176585, 0.4242640687119283]);
     }
@@ -566,13 +589,13 @@ mod tests {
         tree.build(data.clone());
 
         // search tree
-        let (ind, dist) = tree.search(&vec![5.8, 3.1, 3.8, 1.2], 8);
+        let (ind, dist) = tree.search(&vec![5.8, 3.1, 3.8, 1.2], 8).unwrap();
         assert_eq!(ind, vec![64, 88, 82, 95, 99, 96, 71, 61]);
         assert_eq!(dist, vec![0.360555127546399, 0.3872983346207417, 0.41231056256176596,
                               0.4242640687119288, 0.4472135954999579, 0.4690415759823433,
                               0.4795831523312721, 0.5196152422706636]);
 
-        let (ind, dist) = tree.search(&vec![6.5, 3.5, 3.2, 1.3], 10);
+        let (ind, dist) = tree.search(&vec![6.5, 3.5, 3.2, 1.3], 10).unwrap();
         assert_eq!(ind, vec![71, 64, 74, 82, 79, 61, 65, 97, 75, 51]);
         assert_eq!(dist, vec![1.1357816691600549, 1.1532562594670799, 1.2569805089976533,
                               1.2767145334803702, 1.2767145334803702, 1.284523257866513,
@@ -592,24 +615,24 @@ mod tests {
 
         // split to [0, 1, 4] and [2, 3] with columns #1
         let root = tree.root.unwrap();
-        let b = root.as_branch();
+        let b = as_branch(&root);
         assert_eq!(b.dim, 1);
         assert_eq!(b.split, 5.);
         assert_eq!(b.min, Vector::new(vec![1., 0.]));
         assert_eq!(b.max, Vector::new(vec![3., 10.]));
 
         // split to [0, 1] and [4] with columns #1
-        let bl = b.left.as_branch();
+        let bl = as_branch(b.left());
         assert_eq!(bl.dim, 1);
         assert_eq!(bl.split, 2.5);
         assert_eq!(bl.min, Vector::new(vec![1., 0.]));
         assert_eq!(bl.max, Vector::new(vec![3., 5.]));
 
-        let br = b.right.as_leaf();
+        let br = as_leaf(b.right());
         assert_eq!(br.children, vec![2, 3]);
 
-        let bll = bl.left.as_leaf();
-        let blr = bl.right.as_leaf();
+        let bll = as_leaf(bl.left());
+        let blr = as_leaf(bl.right());
         assert_eq!(bll.children, vec![0, 1]);
         assert_eq!(blr.children, vec![4]);
     }
@@ -626,26 +649,37 @@ mod tests {
 
         // split to [0, 1, 3, 4] and [2] with columns #1
         let root = tree.root.unwrap();
-        let b = root.as_branch();
+        let b = as_branch(&root);
         assert_eq!(b.dim, 1);
         assert_eq!(b.split, 10.);
         assert_eq!(b.min, Vector::new(vec![1., 0.]));
         assert_eq!(b.max, Vector::new(vec![3., 20.]));
 
         // split to [0, 4] and [1, 3] with columns #0
-        let bl = b.left.as_branch();
+        let bl = as_branch(b.left());
         assert_eq!(bl.dim, 0);
         assert_eq!(bl.split, 2.);
         assert_eq!(bl.min, Vector::new(vec![1., 0.]));
         assert_eq!(bl.max, Vector::new(vec![3., 10.]));
 
-        let br = b.right.as_leaf();
+        let br = as_leaf(b.right());
         assert_eq!(br.children, vec![2]);
 
-        let bll = bl.left.as_leaf();
-        let blr = bl.right.as_leaf();
+        let bll = as_leaf(bl.left());
+        let blr = as_leaf(bl.right());
         assert_eq!(bll.children, vec![0, 4]);
         assert_eq!(blr.children, vec![1, 3]);
+    }
+
+    #[test]
+    fn test_kdtree_untrained() {
+        let tree = KDTree::default();
+
+        let e = tree.search_leaf(&vec![3., 4.9], 1);
+        assert!(e.is_err());
+
+        let e = tree.search(&vec![3., 4.9], 1);
+        assert!(e.is_err());
     }
 
     #[test]
@@ -660,7 +694,7 @@ mod tests {
 
         // split to [0, 1, 4] and [2, 3] with columns #1
         let root = tree.root.unwrap();
-        let b = root.as_branch();
+        let b = as_branch(&root);
         assert_eq!(b.dim, 1);
         assert_eq!(b.split, 5.);
         assert_eq!(b.center, Vector::new(vec![18. / 5., 21. / 5.]));
@@ -669,8 +703,8 @@ mod tests {
         assert_eq!(b.radius, exp_d.sqrt());
 
         // split to [0, 4] and [1] with columns #0
-        let bl = b.left.as_branch();
-        let br = b.right.as_leaf();
+        let bl = as_branch(b.left());
+        let br = as_leaf(b.right());
         assert_eq!(bl.dim, 0);
         assert_eq!(bl.split, 4.);
         assert_eq!(bl.center, Vector::new(vec![3., 5. / 3.]));
@@ -679,8 +713,8 @@ mod tests {
         assert_eq!(bl.radius, exp_d.sqrt());
         assert_eq!(br.children, vec![2, 3]);
 
-        let bll = bl.left.as_leaf();
-        let blr = bl.right.as_leaf();
+        let bll = as_leaf(bl.left());
+        let blr = as_leaf(bl.right());
         assert_eq!(bll.children, vec![0, 4]);
         assert_eq!(blr.children, vec![1]);
     }
@@ -696,24 +730,24 @@ mod tests {
         tree.build(m);
 
         // search first leaf
-        let (kn, _) = tree.search_leaf(&vec![3., 4.9], 1);
+        let (kn, _) = tree.search_leaf(&vec![3., 4.9], 1).unwrap();
         assert_eq!(kn.pairs, vec![(0, (2.0f64 * 2.0f64 + 2.9f64 * 2.9f64).sqrt())]);
 
         // search tree
-        let (ind, dist) = tree.search(&vec![3., 4.9], 1);
+        let (ind, dist) = tree.search(&vec![3., 4.9], 1).unwrap();
         assert_eq!(ind, vec![3]);
         assert_eq!(dist, vec![1.0999999999999996]);
 
-        let (ind, dist) = tree.search(&vec![3., 4.9], 3);
+        let (ind, dist) = tree.search(&vec![3., 4.9], 3).unwrap();
         assert_eq!(ind, vec![3, 0, 4]);
         assert_eq!(dist, vec![1.0999999999999996, 3.5227829907617076, 3.551056180912941]);
 
         // search first leaf
-        let (kn, _) = tree.search_leaf(&vec![3., 4.9], 2);
+        let (kn, _) = tree.search_leaf(&vec![3., 4.9], 2).unwrap();
         assert_eq!(kn.pairs, vec![(0, (2.0f64 * 2.0f64 + 2.9f64 * 2.9f64).sqrt()),
                                   (4, (3.0f64 * 3.0f64 + (4.9f64 - 3.0f64) * (4.9f64 - 3.0f64)).sqrt())]);
         // search tree
-        let (ind, dist) = tree.search(&vec![3., 4.9], 2);
+        let (ind, dist) = tree.search(&vec![3., 4.9], 2).unwrap();
         assert_eq!(ind, vec![3, 0]);
         assert_eq!(dist, vec![1.0999999999999996, 3.5227829907617076]);
     }
@@ -730,13 +764,13 @@ mod tests {
         tree.build(data.clone());
 
         // search tree
-        let (ind, dist) = tree.search(&vec![5.8, 3.1, 3.8, 1.2], 8);
+        let (ind, dist) = tree.search(&vec![5.8, 3.1, 3.8, 1.2], 8).unwrap();
         assert_eq!(ind, vec![64, 88, 82, 95, 99, 96, 71, 61]);
         assert_eq!(dist, vec![0.360555127546399, 0.3872983346207417, 0.41231056256176596,
                               0.4242640687119288, 0.4472135954999579, 0.4690415759823433,
                               0.4795831523312721, 0.5196152422706636]);
 
-        let (ind, dist) = tree.search(&vec![6.5, 3.5, 3.2, 1.3], 10);
+        let (ind, dist) = tree.search(&vec![6.5, 3.5, 3.2, 1.3], 10).unwrap();
         assert_eq!(ind, vec![71, 64, 74, 82, 79, 61, 65, 97, 75, 51]);
         assert_eq!(dist, vec![1.1357816691600549, 1.1532562594670799, 1.2569805089976533,
                               1.2767145334803702, 1.2767145334803702, 1.284523257866513,
@@ -756,7 +790,7 @@ mod tests {
 
         // split to [0, 1, 3, 4] and [2] with columns #1
         let root = tree.root.unwrap();
-        let b = root.as_branch();
+        let b = as_branch(&root);
         assert_eq!(b.dim, 1);
         assert_eq!(b.split, 10.);
         assert_eq!(b.center, Vector::new(vec![10. / 5., 20. / 5.]));
@@ -765,7 +799,7 @@ mod tests {
         assert_eq!(b.radius, exp_d.sqrt());
 
         // split to [0, 4] and [1, 3] with columns #0
-        let bl = b.left.as_branch();
+        let bl = as_branch(b.left());
         assert_eq!(bl.dim, 0);
         assert_eq!(bl.split, 2.);
         assert_eq!(bl.center, Vector::new(vec![8. / 4., 0.]));
@@ -773,13 +807,24 @@ mod tests {
         let exp_d: f64 = (2. - 1.) * (2. - 1.);
         assert_eq!(bl.radius, exp_d.sqrt());
 
-        let br = b.right.as_leaf();
+        let br = as_leaf(b.right());
         assert_eq!(br.children, vec![2]);
 
-        let bll = bl.left.as_leaf();
-        let blr = bl.right.as_leaf();
+        let bll = as_leaf(bl.left());
+        let blr = as_leaf(bl.right());
         assert_eq!(bll.children, vec![0, 4]);
         assert_eq!(blr.children, vec![1, 3]);
+    }
+
+    #[test]
+    fn test_balltree_untrained() {
+        let tree = BallTree::default();
+
+        let e = tree.search_leaf(&vec![3., 4.9], 1);
+        assert!(e.is_err());
+
+        let e = tree.search(&vec![3., 4.9], 1);
+        assert!(e.is_err());
     }
 
     #[test]

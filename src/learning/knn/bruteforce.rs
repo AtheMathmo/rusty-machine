@@ -1,5 +1,6 @@
 //! Bruteforce search implementations
 use linalg::{Matrix, BaseMatrix};
+use learning::error::Error;
 
 use super::{KNearest, KNearestSearch, get_distances, dist};
 
@@ -10,6 +11,14 @@ pub struct BruteForce {
 }
 
 impl Default for BruteForce {
+    /// Constructs new brute-force search
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::knn::BruteForce;
+    /// let _ = BruteForce::default();
+    /// ```
     fn default() -> Self {
         BruteForce {
             data: None
@@ -18,7 +27,16 @@ impl Default for BruteForce {
 }
 
 impl BruteForce {
-    fn new() -> Self {
+    /// Constructs new brute-force search.
+    /// BruteForce accepts no parapeters.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::knn::BruteForce;
+    /// let _ = BruteForce::new();
+    /// ```
+    pub fn new() -> Self {
         BruteForce::default()
     }
 }
@@ -32,7 +50,7 @@ impl KNearestSearch for BruteForce {
     }
 
     /// Serch k-nearest items close to the point
-    fn search(&self, point: &[f64], k: usize) -> (Vec<usize>, Vec<f64>) {
+    fn search(&self, point: &[f64], k: usize) -> Result<(Vec<usize>, Vec<f64>), Error> {
         if let &Some(ref data) = &self.data {
             let indices: Vec<usize> = (0..k).collect();
             let distances = get_distances(data, point, &indices);
@@ -48,9 +66,9 @@ impl KNearestSearch for BruteForce {
                 }
                 i += 1;
             }
-            query.get_results()
+            Ok(query.get_results())
         } else {
-            panic!("error")
+            Err(Error::new_untrained())
         }
     }
 }
@@ -72,16 +90,23 @@ mod tests {
         let mut b = BruteForce::new();
         b.build(m);
 
-        let (ind, dist) = b.search(&vec![3., 4.9], 1);
+        let (ind, dist) = b.search(&vec![3., 4.9], 1).unwrap();
         assert_eq!(ind, vec![3]);
         assert_eq!(dist, vec![1.0999999999999996]);
 
-        let (ind, dist) = b.search(&vec![3., 4.9], 2);
+        let (ind, dist) = b.search(&vec![3., 4.9], 2).unwrap();
         assert_eq!(ind, vec![3, 0]);
         assert_eq!(dist, vec![1.0999999999999996, 3.5227829907617076]);
 
-        let (ind, dist) = b.search(&vec![3., 4.9], 3);
+        let (ind, dist) = b.search(&vec![3., 4.9], 3).unwrap();
         assert_eq!(ind, vec![3, 0, 4]);
         assert_eq!(dist, vec![1.0999999999999996, 3.5227829907617076, 3.551056180912941]);
+    }
+
+    #[test]
+    fn test_bruteforce_untrained() {
+        let b = BruteForce::new();
+        let e = b.search(&vec![3., 4.9], 1);
+        assert!(e.is_err());
     }
 }
