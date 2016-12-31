@@ -7,24 +7,34 @@ use linalg::{Matrix, BaseMatrix, Vector};
 use learning::{LearningResult, SupModel};
 use learning::error::{Error, ErrorKind};
 
-pub mod kdtree;
-pub mod bruteforce;
+mod kdtree;
+mod bruteforce;
 
-use self::kdtree::KDTree;
+pub use self::kdtree::{KDTree, BallTree};
+pub use self::bruteforce::BruteForce;
+
+// use self::kdtree::KDTree;
 
 /// k-Nearest Neighbor Classifier
 #[derive(Debug)]
-pub struct KNNClassifier {
+pub struct KNNClassifier<S: KNearestSearch> {
     k: usize,
-    leafsize: usize,
 
-    // set after train
-    tree: Option<KDTree>,
+    searcher: S,
     target: Option<Vector<usize>>,
 }
 
-impl KNNClassifier {
+impl Default for KNNClassifier<KDTree> {
+    fn default() -> Self {
+        KNNClassifier {
+            k: 5,
+            searcher: KDTree::default(),
+            target: None
+        }
+    }
+}
 
+impl KNNClassifier<KDTree> {
     /// Constructs an untrained KNN Classifier with specified
     /// k and leafsize for KDTree.
     ///
@@ -32,34 +42,30 @@ impl KNNClassifier {
     ///
     /// ```
     /// use rusty_machine::learning::knn::KNNClassifier;
-    /// let _ = KNNClassifier::new(3, 30);
+    /// let _ = KNNClassifier::new(3);
     /// ```
-    pub fn new(k: usize, leafsize: usize) -> Self {
+    pub fn new(k: usize) -> Self {
         KNNClassifier {
             k: k,
-            leafsize: leafsize,
-
-            tree: None,
+            searcher: KDTree::default(),
             target: None
         }
     }
 }
 
-impl<'a> SupModel<Matrix<f64>, Vector<usize>> for KNNClassifier {
+impl<'a, S: KNearestSearch> SupModel<Matrix<f64>, Vector<usize>> for KNNClassifier<S> {
 
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<usize>> {
-
         if inputs.rows() < self.k {
             return Err(Error::new(ErrorKind::InvalidData,
                                   "inputs number of rows must be equal or learger than k"));
         }
-
-        match (&self.tree, &self.target) {
-            (&Some(ref tree), &Some(ref target)) => {
+        match &self.target {
+            &Some(ref target) => {
 
                 let mut results: Vec<usize> = Vec::with_capacity(inputs.rows());
                 for row in inputs.iter_rows() {
-                    let (idx, _) = tree.search(row, self.k);
+                    let (idx, _) = self.searcher.search(row, self.k);
                     let res = target.select(&idx);
                     let (uniques, counts) = freq(&res.data());
                     let (id, _) = counts.argmax();
@@ -67,23 +73,17 @@ impl<'a> SupModel<Matrix<f64>, Vector<usize>> for KNNClassifier {
                 }
                 Ok(Vector::new(results))
             },
-            _ => Err(Error::new_untrained()),
+            _ => Err(Error::new_untrained())
         }
     }
 
     fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<usize>) -> LearningResult<()> {
-
         if inputs.rows() != targets.size() {
             return Err(Error::new(ErrorKind::InvalidData,
                                   "inputs and targets must be the same length"));
         }
-
-        let mut tree = KDTree::new(inputs.clone(), self.leafsize);
-        tree.build();
-
-        self.tree = Some(tree);
+        self.searcher.build(inputs.clone());
         self.target = Some(targets.clone());
-
         Ok(())
     }
 }
@@ -99,7 +99,9 @@ struct KNearest {
 impl KNearest {
 
     fn new(k: usize, index: Vec<usize>, distances: Vec<f64>) -> Self {
+        debug_assert!(index.len() > 0, "index can't be empty");
         debug_assert!(index.len() == distances.len(), "index and distance must have the same length");
+
         let mut pairs: Vec<(usize, f64)> = index.into_iter()
                                                 .zip(distances.into_iter())
                                                 .collect();
@@ -116,38 +118,38 @@ impl KNearest {
     /// Add new index and distances to the container, keeping first k elements which
     /// distances are smaller. Returns the updated farthest distance.
     fn add(&mut self, index: usize, distance: f64) -> f64 {
+        // self.pairs can't be empty
 
         // ToDo: use unsafe
         let len = self.pairs.len();
-
-        let farthest = self.pairs[len - 1].1;
-        if farthest < distance {
-            if len < self.k {
-                // append to the last
-                self.pairs.push((index, distance));
-                return distance;
-            }
-            return farthest;
+        // index of the last element after the query
+        let last_index: usize = if len < self.k {
+            len
         } else {
-            // last element is already compared
-            if len >= self.k {
-                self.pairs.pop().unwrap();
-            }
-            for i in 2..(len + 1) {
-                if self.pairs[len - i].1 < distance {
-                    self.pairs.insert(len - i + 1, (index, distance));
-                    if len < self.k {
-                        return self.pairs[len].1;
-                    } else {
-                        return self.pairs[len - 1].1;
+            len - 1
+        };
+
+        unsafe {
+            if self.pairs.get_unchecked(len - 1).1 < distance {
+                if len < self.k {
+                    // append to the last
+                    self.pairs.push((index, distance));
+                }
+                return self.pairs.get_unchecked(last_index).1;
+            } else {
+                // last element is already compared
+                if len >= self.k {
+                    self.pairs.pop().unwrap();
+                }
+
+                for i in 2..(len + 1) {
+                    if self.pairs.get_unchecked(len - i).1 < distance {
+                        self.pairs.insert(len - i + 1, (index, distance));
+                        return self.pairs.get_unchecked(last_index).1;
                     }
                 }
-            }
-            self.pairs.insert(0, (index, distance));
-            if len < self.k {
-                return self.pairs[len].1;
-            } else {
-                return self.pairs[len - 1].1;
+                self.pairs.insert(0, (index, distance));
+                return self.pairs.get_unchecked(last_index).1;
             }
         }
     }
@@ -155,10 +157,15 @@ impl KNearest {
     /// Return the k-th distance with searching point
     fn dist(&self) -> f64 {
         // KNearest should gather k element at least
-        if self.pairs.len() < self.k {
+        let len = self.pairs.len();
+        if len < self.k {
             f64::MAX
         } else {
-            self.pairs.last().unwrap().1
+            unsafe {
+                // unchecked ver of .last().unwrap(),
+                // because self.pairs can't be empty
+                self.pairs.get_unchecked(len - 1).1
+            }
         }
     }
 
@@ -175,11 +182,11 @@ impl KNearest {
 }
 
 /// Search K-nearest items
-pub trait KNearestSearch {
+pub trait KNearestSearch: Default{
 
     /// build data structure for search optimization
-    fn build(&mut self) {
-    }
+    fn build(&mut self, data: Matrix<f64>);
+
     /// Serch k-nearest items close to the point
     /// Returns a tuple of searched item index and its distances
     fn search(&self, point: &[f64], k: usize) -> (Vec<usize>, Vec<f64>);
@@ -201,6 +208,30 @@ fn freq(labels: &[usize]) -> (Vector<usize>, Vector<usize>) {
         counts.push(v);
     }
     (Vector::new(uniques), Vector::new(counts))
+}
+
+/// Return distances between given point and data specified with row ids
+fn get_distances(data: &Matrix<f64>, point: &[f64], ids: &[usize]) -> Vec<f64> {
+    assert!(ids.len() > 0, "target ids is empty");
+
+    let mut distances: Vec<f64> = Vec::with_capacity(ids.len());
+    for id in ids.iter() {
+        // ToDo: use .row(*id)
+        let row: Vec<f64> = data.select_rows(&[*id]).into_vec();
+        // let row: Vec<f64> = self.data.row(*id).into_vec();
+        let d = dist(point, &row);
+        distances.push(d);
+    }
+    distances
+}
+
+fn dist(v1: &[f64], v2: &[f64]) -> f64 {
+    // ToDo: use metrics
+    let d: f64 = v1.iter()
+                   .zip(v2.iter())
+                   .map(|(&x, &y)| (x - y) * (x - y))
+                   .fold(0., |s, v| s + v);
+    d.sqrt()
 }
 
 #[cfg(test)]

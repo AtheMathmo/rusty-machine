@@ -1,69 +1,58 @@
 //! Bruteforce search implementations
 use linalg::{Matrix, BaseMatrix};
 
-use super::{KNearest, KNearestSearch};
+use super::{KNearest, KNearestSearch, get_distances, dist};
 
-struct BruteForce {
-    data: Matrix<f64>,
+/// Perform brute-force search
+#[derive(Debug)]
+pub struct BruteForce {
+    data: Option<Matrix<f64>>,
+}
+
+impl Default for BruteForce {
+    fn default() -> Self {
+        BruteForce {
+            data: None
+        }
+    }
 }
 
 impl BruteForce {
-    /// initialize KDTree, must call .build to actually built tree
-    pub fn new(data: Matrix<f64>) -> Self {
-        BruteForce {
-            data: data
-        }
-    }
-
-    /// return distances between given point and data specified with row ids
-    fn get_distances(&self, point: &[f64], ids: &[usize]) -> Vec<f64> {
-        // ToDo: merge impl as KDTree
-        assert!(ids.len() > 0, "target ids is empty");
-
-        let mut distances: Vec<f64> = Vec::with_capacity(ids.len());
-        for id in ids.iter() {
-            // ToDo: use .row(*id)
-            let row: Vec<f64> = self.data.select_rows(&[*id]).into_vec();
-            // let row: Vec<f64> = self.data.row(*id).into_vec();
-            let d = dist(point, &row);
-            distances.push(d);
-        }
-        distances
+    fn new() -> Self {
+        BruteForce::default()
     }
 }
 
 /// Can search K-nearest items
 impl KNearestSearch for BruteForce {
+
+    /// initialize BruteForce Searcher
+    fn build(&mut self, data: Matrix<f64>) {
+        self.data = Some(data);
+    }
+
     /// Serch k-nearest items close to the point
     fn search(&self, point: &[f64], k: usize) -> (Vec<usize>, Vec<f64>) {
-        let indices: Vec<usize> = (0..k).collect();
-        let distances = self.get_distances(point, &indices);
+        if let &Some(ref data) = &self.data {
+            let indices: Vec<usize> = (0..k).collect();
+            let distances = get_distances(data, point, &indices);
 
-        let mut query = KNearest::new(k, indices, distances);
-        let mut current_dist = query.dist();
+            let mut query = KNearest::new(k, indices, distances);
+            let mut current_dist = query.dist();
 
-        let mut i = k;
-        for row in self.data.iter_rows().skip(k) {
-            // ToDo: Do not instanciate Vec
-            let row: Vec<f64> = row.iter().cloned().collect();
-            let d = dist(point, &row);
-            // ToDo: rewrite to add single elements
-            if d < current_dist {
-                current_dist = query.add(i, d);
+            let mut i = k;
+            for row in data.iter_rows().skip(k) {
+                let d = dist(point, &row);
+                if d < current_dist {
+                    current_dist = query.add(i, d);
+                }
+                i += 1;
             }
-            i += 1;
+            query.get_results()
+        } else {
+            panic!("error")
         }
-        query.get_results()
     }
-}
-
-fn dist(v1: &[f64], v2: &[f64]) -> f64 {
-    // ToDo: use metrics
-    let d: f64 = v1.iter()
-                   .zip(v2.iter())
-                   .map(|(&x, &y)| (x - y) * (x - y))
-                   .fold(0., |s, v| s + v);
-    d.sqrt()
 }
 
 #[cfg(test)]
@@ -80,8 +69,8 @@ mod tests {
                                        6., 10.,
                                        3., 6.,
                                        0., 3.]);
-        let mut b = BruteForce::new(m);
-        b.build();  // no op
+        let mut b = BruteForce::new();
+        b.build(m);
 
         let (ind, dist) = b.search(&vec![3., 4.9], 1);
         assert_eq!(ind, vec![3]);

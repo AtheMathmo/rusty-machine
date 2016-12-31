@@ -1,34 +1,52 @@
-//! KDTree implementations
+//! Binary Tree implementations
+use std::borrow::Borrow;
 use std::collections::VecDeque;
 use linalg::{Matrix, BaseMatrix, Vector};
 
-use super::{KNearest, KNearestSearch};
+use super::{KNearest, KNearestSearch, get_distances, dist};
 
 /// Binary Tree
 #[derive(Debug)]
 pub struct BinaryTree<B: BinarySplit> {
-    data: Matrix<f64>,
-
     // Binary Tree leaf size
     leafsize: usize,
+    // Search Data
+    data: Option<Matrix<f64>>,
     // Binary Tree
     root: Option<Node<B>>
+}
+
+impl<B: BinarySplit> Default for BinaryTree<B> {
+    fn default() -> Self {
+        BinaryTree {
+            leafsize: 10,
+            data: None,
+            root: None
+        }
+    }
 }
 
 /// Binary splittable
 pub trait BinarySplit: Sized {
 
     /// Build branch from passed args
-    fn build(dim: usize, split: f64, min: Vector<f64>, max: Vector<f64>,
+    fn build(data: &Matrix<f64>, remains: Vec<usize>,
+             dim: usize, split: f64, min: Vector<f64>, max: Vector<f64>,
              left: Node<Self>, right: Node<Self>)
         -> Node<Self>;
 
     /// Return a tuple of left and right node. First node is likely to be
     /// closer to the point
-    fn maybe_close<'s, 'p>(&'s self, point: &'p [f64]) -> (&'s Node<Self>, &'s Node<Self>);
+    unsafe fn maybe_close<'s, 'p>(&'s self, point: &'p [f64])
+        -> (&'s Node<Self>, &'s Node<Self>);
 
     /// Return distance between the point and myself
     fn dist(&self, point: &[f64]) -> f64;
+
+    /// Return left node
+    fn left(&self) -> &Node<Self>;
+    /// Return right node
+    fn right(&self) -> &Node<Self>;
 }
 
 /// KDTree Branch
@@ -77,7 +95,8 @@ pub type BallTree = BinaryTree<BallTreeBranch>;
 
 impl BinarySplit for KDTreeBranch {
 
-    fn build(dim: usize, split: f64, min: Vector<f64>, max: Vector<f64>,
+    fn build(_: &Matrix<f64>, _: Vec<usize>,
+             dim: usize, split: f64, min: Vector<f64>, max: Vector<f64>,
              left: Node<Self>, right: Node<Self>) -> Node<Self> {
 
         let b = KDTreeBranch {
@@ -91,9 +110,10 @@ impl BinarySplit for KDTreeBranch {
         Node::Branch(b)
     }
 
-    fn maybe_close<'s, 'p>(&'s self, point: &'p [f64]) -> (&'s Node<Self>, &'s Node<Self>) {
-        // ToDo: make unsafe
-        if point[self.dim] < self.split {
+    unsafe fn maybe_close<'s, 'p>(&'s self, point: &'p [f64])
+        -> (&'s Node<Self>, &'s Node<Self>) {
+
+        if *point.get_unchecked(self.dim) < self.split {
             (&self.left, &self.right)
         } else {
             (&self.right, &self.left)
@@ -114,26 +134,56 @@ impl BinarySplit for KDTreeBranch {
         }
         d.sqrt()
     }
+
+    fn left(&self) -> &Node<Self> {
+        self.left.borrow()
+    }
+
+    fn right(&self) -> &Node<Self> {
+        self.left.borrow()
+    }
 }
 
 impl BinarySplit for BallTreeBranch {
 
-    fn build(dim: usize, split: f64, min: Vector<f64>, max: Vector<f64>,
+    fn build(data: &Matrix<f64>, remains: Vec<usize>,
+             dim: usize, split: f64, _: Vector<f64>, _: Vector<f64>,
              left: Node<Self>, right: Node<Self>) -> Node<Self> {
+
+        // temp, calculate centroid (mean)
+        let mut center: Vec<f64> = vec![0.; data.cols()];
+        for &i in remains.iter() {
+            let row: Vec<f64> = data.select_rows(&[i]).into_vec();
+            for (c, r) in center.iter_mut().zip(row.iter()) {
+                *c = *c + r;
+            }
+        }
+        let len = remains.len() as f64;
+        for c in center.iter_mut() {
+            *c = *c / len;
+        }
+        let mut radius = 0.;
+        for &i in remains.iter() {
+            let row: Vec<f64> = data.select_rows(&[i]).into_vec();
+            let d = dist(&center, &row);
+            if d > radius {
+                radius = d;
+            }
+        }
 
         let b = BallTreeBranch {
             dim: dim,
             split: split,
-            center: min,
-            radius: 0.,
+            center: Vector::new(center),
+            radius: radius,
             left: Box::new(left),
             right: Box::new(right)
         };
         Node::Branch(b)
     }
 
-    fn maybe_close<'s, 'p>(&'s self, point: &'p [f64]) -> (&'s Node<Self>, &'s Node<Self>) {
-        if point[self.dim] < self.split {
+    unsafe fn maybe_close<'s, 'p>(&'s self, point: &'p [f64]) -> (&'s Node<Self>, &'s Node<Self>) {
+        if *point.get_unchecked(self.dim) < self.split {
             (&self.left, &self.right)
         } else {
             (&self.right, &self.left)
@@ -141,7 +191,20 @@ impl BinarySplit for BallTreeBranch {
     }
 
     fn dist(&self, point: &[f64]) -> f64 {
-        0.
+        let d = dist(&self.center.data(), point);
+        if d < self.radius {
+            0.
+        } else {
+            d - self.radius
+        }
+    }
+
+    fn left(&self) -> &Node<Self> {
+        self.left.borrow()
+    }
+
+    fn right(&self) -> &Node<Self> {
+        self.left.borrow()
     }
 }
 
@@ -190,12 +253,10 @@ impl Leaf {
 
 impl<B: BinarySplit> BinaryTree<B> {
 
-    /// initialize KDTree, must call .build to actually built tree
-    pub fn new(data: Matrix<f64>, leafsize: usize) -> Self {
+    fn new(leafsize: usize) -> Self {
         BinaryTree {
-            data: data,
             leafsize: leafsize,
-
+            data: None,
             root: None
         }
     }
@@ -217,7 +278,9 @@ impl<B: BinarySplit> BinaryTree<B> {
             let (dim, d) = (&dmax - &dmin).argmax();
             // ToDo: use unsafe get  (v0.4.0?)
             // https://github.com/AtheMathmo/rulinalg/pull/104
-            let split = dmin[dim] + d / 2.0;
+            let split = unsafe {
+                dmin.data().get_unchecked(dim) + d / 2.0
+            };
 
             // split remains
             let mut l_remains: Vec<usize> = Vec::with_capacity(remains.len());
@@ -265,12 +328,13 @@ impl<B: BinarySplit> BinaryTree<B> {
             Node::Leaf(Leaf::new(remains))
         } else {
 
+            // ToDo: avoid this clone
             let (dim, split, l_remains, r_remains, l_max, r_min) =
-                self.select_split(data, remains, dmin.clone(), dmax.clone());
+                self.select_split(data, remains.clone(), dmin.clone(), dmax.clone());
 
             let l_node = self.split(data, l_remains, dmin.clone(), l_max);
             let g_node = self.split(data, r_remains, r_min, dmax.clone());
-            B::build(dim, split, dmin, dmax, l_node, g_node)
+            B::build(data, remains, dim, split, dmin, dmax, l_node, g_node)
         }
     }
 
@@ -278,95 +342,85 @@ impl<B: BinarySplit> BinaryTree<B> {
     fn search_leaf<'s, 'p>(&'s self, point: &'p [f64], k: usize)
         -> (KNearest, VecDeque<&'s Node<B>>) {
 
-        // ToDo: merge to binary tree logic
+        if let (&Some(ref root), &Some(ref data)) = (&self.root, &self.data) {
 
-        match self.root {
-            None => panic!("tree is not built"),
-            Some(ref root) => {
+            let mut queue: VecDeque<&Node<B>> = VecDeque::new();
+            queue.push_front(root);
 
-                let mut queue: VecDeque<&Node<B>> = VecDeque::new();
-                queue.push_front(root);
-
-                loop {
-                    // pop first element
-                    let current: &Node<B> = queue.pop_front().unwrap();
-                    match current {
-                        &Node::Leaf(ref l) => {
-                            let distances = self.get_distances(point, &l.children);
-                            let kn = KNearest::new(k, l.children.clone(), distances);
-                            return (kn, queue);
-                        },
-                        &Node::Branch(ref b) => {
-                            // the current branch must contains target point.
-                            // store the child branch which contains target point to
-                            // the front, put other side on the back.
-                            let (close, far) = b.maybe_close(point);
-                            queue.push_front(close);
-                            queue.push_back(far);
-                        }
+            loop {
+                // pop first element
+                let current: &Node<B> = queue.pop_front().unwrap();
+                match current {
+                    &Node::Leaf(ref l) => {
+                        let distances = get_distances(data, point, &l.children);
+                        let kn = KNearest::new(k, l.children.clone(), distances);
+                        return (kn, queue);
+                    },
+                    &Node::Branch(ref b) => {
+                        // the current branch must contains target point.
+                        // store the child branch which contains target point to
+                        // the front, put other side on the back.
+                        let (close, far) = unsafe {
+                            b.maybe_close(point)
+                        };
+                        queue.push_front(close);
+                        queue.push_back(far);
                     }
                 }
             }
+        } else {
+            panic!("tree is not built")
         }
-    }
-
-    /// Return distances between given point and data specified with row ids
-    fn get_distances(&self, point: &[f64], ids: &[usize]) -> Vec<f64> {
-        assert!(ids.len() > 0, "target ids is empty");
-
-        let mut distances: Vec<f64> = Vec::with_capacity(ids.len());
-        for id in ids.iter() {
-            // ToDo: use .row(*id)
-            let row: Vec<f64> = self.data.select_rows(&[*id]).into_vec();
-            // let row: Vec<f64> = self.data.row(*id).into_vec();
-            let d = dist(point, &row);
-            distances.push(d);
-        }
-        distances
     }
 }
 
 /// Can search K-nearest items
-impl KNearestSearch for BinaryTree<KDTreeBranch> {
+impl<B: BinarySplit> KNearestSearch for BinaryTree<B> {
 
-    /// build data structure for search optimization, used in KDTree
-    /// build KDTree using its data
-    fn build(&mut self) {
-        let remains: Vec<usize> = (0..self.data.rows()).collect();
-        let dmin = min(&self.data);
-        let dmax = max(&self.data);
-        self.root = Some(self.split(&self.data, remains, dmin, dmax));
+    /// build data structure for search optimization
+    fn build(&mut self, data: Matrix<f64>) {
+        let remains: Vec<usize> = (0..data.rows()).collect();
+        let dmin = min(&data);
+        let dmax = max(&data);
+        self.root = Some(self.split(&data, remains, dmin, dmax));
+        self.data = Some(data);
     }
 
     /// Serch k-nearest items close to the point
     fn search(&self, point: &[f64], k: usize) -> (Vec<usize>, Vec<f64>) {
-        let (mut query, mut queue) = self.search_leaf(point, k);
-        while queue.len() > 0 {
-            let current = queue.pop_front().unwrap();
+        // ToDo: should return Error
+        if let &Some(ref data) = &self.data {
+            let (mut query, mut queue) = self.search_leaf(point, k);
+            while queue.len() > 0 {
+                let current = queue.pop_front().unwrap();
 
-            match current {
-                &Node::Leaf(ref l) => {
-                    let distances = self.get_distances(point, &l.children);
-                    let mut current_dist = query.dist();
+                match current {
+                    &Node::Leaf(ref l) => {
+                        let distances = get_distances(data, point, &l.children);
+                        let mut current_dist = query.dist();
 
-                    for (&i, d) in l.children.iter().zip(distances.into_iter()) {
-                        if d < current_dist {
-                            current_dist = query.add(i, d);
+                        for (&i, d) in l.children.iter().zip(distances.into_iter()) {
+                            if d < current_dist {
+                                current_dist = query.add(i, d);
+                            }
                         }
-                    }
-                },
-                &Node::Branch(ref b) => {
-                    let d = b.dist(&point);
-                    if d < query.dist() {
-                        queue.push_back(&b.left);
-                        queue.push_back(&b.right)
+                    },
+                    &Node::Branch(ref b) => {
+                        let d = b.dist(&point);
+                        if d < query.dist() {
+                            queue.push_back(b.left());
+                            queue.push_back(b.right());
+                        }
                     }
                 }
             }
+            query.get_results()
+        } else {
+            panic!("error")
         }
-        query.get_results()
     }
 }
+
 
 /// min
 fn min(data: &Matrix<f64>) -> Vector<f64> {
@@ -406,21 +460,12 @@ fn max(data: &Matrix<f64>) -> Vector<f64> {
     Vector::new(results)
 }
 
-fn dist(v1: &[f64], v2: &[f64]) -> f64 {
-    // ToDo: use metrics
-    let d: f64 = v1.iter()
-                   .zip(v2.iter())
-                   .map(|(&x, &y)| (x - y) * (x - y))
-                   .fold(0., |s, v| s + v);
-    d.sqrt()
-}
-
 #[cfg(test)]
 mod tests {
 
     use linalg::{Vector, Matrix, BaseMatrix};
     use super::super::KNearestSearch;
-    use super::{KDTree, min, max};
+    use super::{KDTree, BallTree, min, max};
 
     #[test]
     fn test_kdtree_construct() {
@@ -429,8 +474,8 @@ mod tests {
                                        6., 10.,
                                        3., 6.,
                                        0., 3.]);
-        let mut tree = KDTree::new(m, 3);
-        tree.build();
+        let mut tree = KDTree::new(3);
+        tree.build(m);
 
         // split to [0, 1, 4] and [2, 3] with columns #1
         let root = tree.root.unwrap();
@@ -462,8 +507,8 @@ mod tests {
                                        6., 10.,
                                        3., 6.,
                                        0., 3.]);
-        let mut tree = KDTree::new(m, 3);
-        tree.build();
+        let mut tree = KDTree::new(3);
+        tree.build(m);
 
         // search first leaf
         let (kn, _) = tree.search_leaf(&vec![3., 4.9], 1);
@@ -496,8 +541,8 @@ mod tests {
         let dataset = iris::load();
         let data = dataset.data().select_cols(&[0, 1]);
 
-        let mut tree = KDTree::new(data, 10);
-        tree.build();
+        let mut tree = KDTree::new(10);
+        tree.build(data);
 
         // search tree
         let (ind, dist) = tree.search(&vec![5.8, 3.6], 4);
@@ -517,8 +562,8 @@ mod tests {
         let dataset = iris::load();
         let data = dataset.data();
 
-        let mut tree = KDTree::new(data.clone(), 10);
-        tree.build();
+        let mut tree = KDTree::new(10);
+        tree.build(data.clone());
 
         // search tree
         let (ind, dist) = tree.search(&vec![5.8, 3.1, 3.8, 1.2], 8);
@@ -542,8 +587,8 @@ mod tests {
                                        2., 10.,
                                        3., 6.,
                                        1., 3.]);
-        let mut tree = KDTree::new(m, 3);
-        tree.build();
+        let mut tree = KDTree::new(3);
+        tree.build(m);
 
         // split to [0, 1, 4] and [2, 3] with columns #1
         let root = tree.root.unwrap();
@@ -576,8 +621,8 @@ mod tests {
                                        2., 20.,
                                        3., 0.,
                                        1., 0.]);
-        let mut tree = KDTree::new(m, 3);
-        tree.build();
+        let mut tree = KDTree::new(3);
+        tree.build(m);
 
         // split to [0, 1, 3, 4] and [2] with columns #1
         let root = tree.root.unwrap();
@@ -593,6 +638,140 @@ mod tests {
         assert_eq!(bl.split, 2.);
         assert_eq!(bl.min, Vector::new(vec![1., 0.]));
         assert_eq!(bl.max, Vector::new(vec![3., 10.]));
+
+        let br = b.right.as_leaf();
+        assert_eq!(br.children, vec![2]);
+
+        let bll = bl.left.as_leaf();
+        let blr = bl.right.as_leaf();
+        assert_eq!(bll.children, vec![0, 4]);
+        assert_eq!(blr.children, vec![1, 3]);
+    }
+
+    #[test]
+    fn test_balltree_construct() {
+        let m = Matrix::new(5, 2, vec![1., 2.,
+                                       8., 0.,
+                                       6., 10.,
+                                       3., 6.,
+                                       0., 3.]);
+        let mut tree = BallTree::new(3);
+        tree.build(m);
+
+        // split to [0, 1, 4] and [2, 3] with columns #1
+        let root = tree.root.unwrap();
+        let b = root.as_branch();
+        assert_eq!(b.dim, 1);
+        assert_eq!(b.split, 5.);
+        assert_eq!(b.center, Vector::new(vec![18. / 5., 21. / 5.]));
+        // distance between the center and [2]
+        let exp_d: f64 = (6. - 3.6) * (6. - 3.6) + (10. - 4.2) * (10. - 4.2);
+        assert_eq!(b.radius, exp_d.sqrt());
+
+        // split to [0, 4] and [1] with columns #0
+        let bl = b.left.as_branch();
+        let br = b.right.as_leaf();
+        assert_eq!(bl.dim, 0);
+        assert_eq!(bl.split, 4.);
+        assert_eq!(bl.center, Vector::new(vec![3., 5. / 3.]));
+        // distance between the center and [1]
+        let exp_d: f64 = (3. - 8.) * (3. - 8.) + 5. / 3. * 5. / 3.;
+        assert_eq!(bl.radius, exp_d.sqrt());
+        assert_eq!(br.children, vec![2, 3]);
+
+        let bll = bl.left.as_leaf();
+        let blr = bl.right.as_leaf();
+        assert_eq!(bll.children, vec![0, 4]);
+        assert_eq!(blr.children, vec![1]);
+    }
+
+    #[test]
+    fn test_balltree_search() {
+        let m = Matrix::new(5, 2, vec![1., 2.,
+                                       8., 0.,
+                                       6., 10.,
+                                       3., 6.,
+                                       0., 3.]);
+        let mut tree = BallTree::new(3);
+        tree.build(m);
+
+        // search first leaf
+        let (kn, _) = tree.search_leaf(&vec![3., 4.9], 1);
+        assert_eq!(kn.pairs, vec![(0, (2.0f64 * 2.0f64 + 2.9f64 * 2.9f64).sqrt())]);
+
+        // search tree
+        let (ind, dist) = tree.search(&vec![3., 4.9], 1);
+        assert_eq!(ind, vec![3]);
+        assert_eq!(dist, vec![1.0999999999999996]);
+
+        let (ind, dist) = tree.search(&vec![3., 4.9], 3);
+        assert_eq!(ind, vec![3, 0, 4]);
+        assert_eq!(dist, vec![1.0999999999999996, 3.5227829907617076, 3.551056180912941]);
+
+        // search first leaf
+        let (kn, _) = tree.search_leaf(&vec![3., 4.9], 2);
+        assert_eq!(kn.pairs, vec![(0, (2.0f64 * 2.0f64 + 2.9f64 * 2.9f64).sqrt()),
+                                  (4, (3.0f64 * 3.0f64 + (4.9f64 - 3.0f64) * (4.9f64 - 3.0f64)).sqrt())]);
+        // search tree
+        let (ind, dist) = tree.search(&vec![3., 4.9], 2);
+        assert_eq!(ind, vec![3, 0]);
+        assert_eq!(dist, vec![1.0999999999999996, 3.5227829907617076]);
+    }
+
+    #[cfg(feature = "datasets")]
+    #[test]
+    fn test_balltree_search_iris() {
+        use super::super::super::super::datasets::iris;
+
+        let dataset = iris::load();
+        let data = dataset.data();
+
+        let mut tree = BallTree::new(10);
+        tree.build(data.clone());
+
+        // search tree
+        let (ind, dist) = tree.search(&vec![5.8, 3.1, 3.8, 1.2], 8);
+        assert_eq!(ind, vec![64, 88, 82, 95, 99, 96, 71, 61]);
+        assert_eq!(dist, vec![0.360555127546399, 0.3872983346207417, 0.41231056256176596,
+                              0.4242640687119288, 0.4472135954999579, 0.4690415759823433,
+                              0.4795831523312721, 0.5196152422706636]);
+
+        let (ind, dist) = tree.search(&vec![6.5, 3.5, 3.2, 1.3], 10);
+        assert_eq!(ind, vec![71, 64, 74, 82, 79, 61, 65, 97, 75, 51]);
+        assert_eq!(dist, vec![1.1357816691600549, 1.1532562594670799, 1.2569805089976533,
+                              1.2767145334803702, 1.2767145334803702, 1.284523257866513,
+                              1.2845232578665131, 1.2884098726725122, 1.3076696830622023,
+                              1.352774925846868]);
+    }
+
+    #[test]
+    fn test_balltree_dim_selection_biased() {
+        let m = Matrix::new(5, 2, vec![1., 0.,
+                                       3., 0.,
+                                       2., 20.,
+                                       3., 0.,
+                                       1., 0.]);
+        let mut tree = BallTree::new(3);
+        tree.build(m);
+
+        // split to [0, 1, 3, 4] and [2] with columns #1
+        let root = tree.root.unwrap();
+        let b = root.as_branch();
+        assert_eq!(b.dim, 1);
+        assert_eq!(b.split, 10.);
+        assert_eq!(b.center, Vector::new(vec![10. / 5., 20. / 5.]));
+        // distance between the center and [2]
+        let exp_d: f64 = (2. - 2.) * (2. - 2.) + (4. - 20.) * (4. - 20.);
+        assert_eq!(b.radius, exp_d.sqrt());
+
+        // split to [0, 4] and [1, 3] with columns #0
+        let bl = b.left.as_branch();
+        assert_eq!(bl.dim, 0);
+        assert_eq!(bl.split, 2.);
+        assert_eq!(bl.center, Vector::new(vec![8. / 4., 0.]));
+        // distance between the center and [0]
+        let exp_d: f64 = (2. - 1.) * (2. - 1.);
+        assert_eq!(bl.radius, exp_d.sqrt());
 
         let br = b.right.as_leaf();
         assert_eq!(br.children, vec![2]);
