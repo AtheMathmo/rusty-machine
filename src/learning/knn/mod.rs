@@ -7,10 +7,10 @@ use linalg::{Matrix, BaseMatrix, Vector};
 use learning::{LearningResult, SupModel};
 use learning::error::{Error, ErrorKind};
 
-mod kdtree;
+mod binarytree;
 mod bruteforce;
 
-pub use self::kdtree::{KDTree, BallTree};
+pub use self::binarytree::{KDTree, BallTree};
 pub use self::bruteforce::BruteForce;
 
 // use self::kdtree::KDTree;
@@ -56,10 +56,6 @@ impl KNNClassifier<KDTree> {
 impl<'a, S: KNearestSearch> SupModel<Matrix<f64>, Vector<usize>> for KNNClassifier<S> {
 
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<usize>> {
-        if inputs.rows() < self.k {
-            return Err(Error::new(ErrorKind::InvalidData,
-                                  "inputs number of rows must be equal or learger than k"));
-        }
         match &self.target {
             &Some(ref target) => {
 
@@ -81,6 +77,10 @@ impl<'a, S: KNearestSearch> SupModel<Matrix<f64>, Vector<usize>> for KNNClassifi
         if inputs.rows() != targets.size() {
             return Err(Error::new(ErrorKind::InvalidData,
                                   "inputs and targets must be the same length"));
+        }
+        if inputs.rows() < self.k {
+            return Err(Error::new(ErrorKind::InvalidData,
+                                  "inputs number of rows must be equal or learger than k"));
         }
         self.searcher.build(inputs.clone());
         self.target = Some(targets.clone());
@@ -119,8 +119,6 @@ impl KNearest {
     /// distances are smaller. Returns the updated farthest distance.
     fn add(&mut self, index: usize, distance: f64) -> f64 {
         // self.pairs can't be empty
-
-        // ToDo: use unsafe
         let len = self.pairs.len();
         // index of the last element after the query
         let last_index: usize = if len < self.k {

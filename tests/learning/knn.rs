@@ -7,6 +7,7 @@ pub mod tests_datasets {
     use rm::learning::knn::KNNClassifier;
     use rm::datasets::iris;
 
+    #[test]
     fn test_knn_iris_2cols() {
         let dataset = iris::load();
         // slice first 2 columns
@@ -33,6 +34,7 @@ pub mod tests_datasets {
         assert_eq!(res, Vector::new(vec![2]));
     }
 
+    #[test]
     fn test_knn_iris() {
         let dataset = iris::load();
 

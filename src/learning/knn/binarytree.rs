@@ -19,7 +19,7 @@ pub struct BinaryTree<B: BinarySplit> {
 impl<B: BinarySplit> Default for BinaryTree<B> {
     fn default() -> Self {
         BinaryTree {
-            leafsize: 10,
+            leafsize: 30,
             data: None,
             root: None
         }
@@ -140,7 +140,7 @@ impl BinarySplit for KDTreeBranch {
     }
 
     fn right(&self) -> &Node<Self> {
-        self.left.borrow()
+        self.right.borrow()
     }
 }
 
@@ -204,7 +204,7 @@ impl BinarySplit for BallTreeBranch {
     }
 
     fn right(&self) -> &Node<Self> {
-        self.left.borrow()
+        self.right.borrow()
     }
 }
 
