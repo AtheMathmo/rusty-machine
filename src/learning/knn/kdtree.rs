@@ -4,36 +4,36 @@ use linalg::{Matrix, BaseMatrix, Vector};
 
 use super::{KNearest, KNearestSearch};
 
-/// KDTree Node (either branch or leaf)
+/// Binary Tree
 #[derive(Debug)]
-enum Node {
-    Branch(Branch),
-    Leaf(Leaf)
+pub struct BinaryTree<B: BinarySplit> {
+    data: Matrix<f64>,
+
+    // Binary Tree leaf size
+    leafsize: usize,
+    // Binary Tree
+    root: Option<Node<B>>
 }
 
-impl Node {
-    // return my leaf reference, for testing purpose
-    #[allow(dead_code)]
-    fn as_leaf(&self) -> &Leaf {
-        match self {
-            &Node::Leaf(ref leaf) => leaf,
-            _ => panic!("Node is not leaf")
-        }
-    }
+/// Binary splittable
+pub trait BinarySplit: Sized {
 
-    // return my branch reference, for testing purpose
-    #[allow(dead_code)]
-    fn as_branch(&self) -> &Branch {
-        match self {
-            &Node::Branch(ref branch) => branch,
-            _ => panic!("Node is not branch")
-        }
-    }
+    /// Build branch from passed args
+    fn build(dim: usize, split: f64, min: Vector<f64>, max: Vector<f64>,
+             left: Node<Self>, right: Node<Self>)
+        -> Node<Self>;
+
+    /// Return a tuple of left and right node. First node is likely to be
+    /// closer to the point
+    fn maybe_close<'s, 'p>(&'s self, point: &'p [f64]) -> (&'s Node<Self>, &'s Node<Self>);
+
+    /// Return distance between the point and myself
+    fn dist(&self, point: &[f64]) -> f64;
 }
 
 /// KDTree Branch
 #[derive(Debug)]
-struct Branch {
+pub struct KDTreeBranch {
     /// dimension (column) to split
     dim: usize,
     /// split value
@@ -44,30 +44,59 @@ struct Branch {
     min: Vector<f64>,
     max: Vector<f64>,
 
-    /// left node
-    left: Box<Node>,
-    /// right node
-    right: Box<Node>,
+    // link to left / right node
+    // - left node contains rows which the column specified with
+    //   ``dim`` is less than ``split`` value.
+    // - right node contains greater than or equal to ``split`` value
+    left: Box<Node<KDTreeBranch>>,
+    right: Box<Node<KDTreeBranch>>,
 }
 
-impl Branch {
-    fn new(dim: usize, split: f64,
-           min: Vector<f64>, max: Vector<f64>,
-           left: Node, right: Node) -> Self {
+/// BallTree Branch
+#[derive(Debug)]
+pub struct BallTreeBranch {
+    /// dimension (column) to split
+    dim: usize,
+    /// split value
+    split: f64,
 
-        Branch {
+    /// ball centroid and its radius
+    center: Vector<f64>,
+    radius: f64,
+
+    // link to left / right node, see KDTreeBranch comment
+    left: Box<Node<BallTreeBranch>>,
+    right: Box<Node<BallTreeBranch>>,
+}
+
+/// KDTree implementation
+pub type KDTree = BinaryTree<KDTreeBranch>;
+
+/// BallTree implementation
+pub type BallTree = BinaryTree<BallTreeBranch>;
+
+impl BinarySplit for KDTreeBranch {
+
+    fn build(dim: usize, split: f64, min: Vector<f64>, max: Vector<f64>,
+             left: Node<Self>, right: Node<Self>) -> Node<Self> {
+
+        let b = KDTreeBranch {
             dim: dim,
             split: split,
-
             min: min,
             max: max,
-
-            // link to left / right node
-            // - left node contains rows which the column specified with
-            //   ``dim`` is less than ``split`` value.
-            // - right node contains greater than or equal to ``split`` value
             left: Box::new(left),
             right: Box::new(right)
+        };
+        Node::Branch(b)
+    }
+
+    fn maybe_close<'s, 'p>(&'s self, point: &'p [f64]) -> (&'s Node<Self>, &'s Node<Self>) {
+        // ToDo: make unsafe
+        if point[self.dim] < self.split {
+            (&self.left, &self.right)
+        } else {
+            (&self.right, &self.left)
         }
     }
 
@@ -87,9 +116,67 @@ impl Branch {
     }
 }
 
-/// KDTree Leaf
+impl BinarySplit for BallTreeBranch {
+
+    fn build(dim: usize, split: f64, min: Vector<f64>, max: Vector<f64>,
+             left: Node<Self>, right: Node<Self>) -> Node<Self> {
+
+        let b = BallTreeBranch {
+            dim: dim,
+            split: split,
+            center: min,
+            radius: 0.,
+            left: Box::new(left),
+            right: Box::new(right)
+        };
+        Node::Branch(b)
+    }
+
+    fn maybe_close<'s, 'p>(&'s self, point: &'p [f64]) -> (&'s Node<Self>, &'s Node<Self>) {
+        if point[self.dim] < self.split {
+            (&self.left, &self.right)
+        } else {
+            (&self.right, &self.left)
+        }
+    }
+
+    fn dist(&self, point: &[f64]) -> f64 {
+        0.
+    }
+}
+
+/// Binary Tree Node (either branch or leaf)
 #[derive(Debug)]
-struct Leaf {
+pub enum Node<B: BinarySplit> {
+    /// Binary Tree branch
+    Branch(B),
+    /// Binary Tree leaf
+    Leaf(Leaf)
+}
+
+impl<B: BinarySplit> Node<B> {
+    // return my leaf reference, for testing purpose
+    #[allow(dead_code)]
+    fn as_leaf(&self) -> &Leaf {
+        match self {
+            &Node::Leaf(ref leaf) => leaf,
+            _ => panic!("Node is not leaf")
+        }
+    }
+
+    // return my branch reference, for testing purpose
+    #[allow(dead_code)]
+    fn as_branch(&self) -> &B {
+        match self {
+            &Node::Branch(ref branch) => branch,
+            _ => panic!("Node is not branch")
+        }
+    }
+}
+
+/// Binary Tree Leaf
+#[derive(Debug)]
+pub struct Leaf {
     children: Vec<usize>
 }
 
@@ -101,22 +188,11 @@ impl Leaf {
     }
 }
 
-/// KDTree
-#[derive(Debug)]
-pub struct KDTree {
-    data: Matrix<f64>,
-
-    // KDTree leaf size
-    leafsize: usize,
-    // KDTree
-    root: Option<Node>
-}
-
-impl KDTree {
+impl<B: BinarySplit> BinaryTree<B> {
 
     /// initialize KDTree, must call .build to actually built tree
     pub fn new(data: Matrix<f64>, leafsize: usize) -> Self {
-        KDTree {
+        BinaryTree {
             data: data,
             leafsize: leafsize,
 
@@ -131,7 +207,8 @@ impl KDTree {
     /// - remains for right node
     /// - updated max for left node
     /// - updated min for right node
-    fn select_split(&self, mut remains: Vec<usize>, mut dmin: Vector<f64>, mut dmax: Vector<f64>)
+    fn select_split(&self, data: &Matrix<f64>, mut remains: Vec<usize>,
+                    mut dmin: Vector<f64>, mut dmax: Vector<f64>)
         -> (usize, f64, Vec<usize>, Vec<usize>, Vector<f64>, Vector<f64>){
 
         // avoid recursive call
@@ -147,7 +224,7 @@ impl KDTree {
             let mut r_remains: Vec<usize> = Vec::with_capacity(remains.len());
             unsafe {
                 for r in remains {
-                    if *self.data.get_unchecked([r, dim]) < split {
+                    if *data.get_unchecked([r, dim]) < split {
                         l_remains.push(r);
                     } else {
                         r_remains.push(r);
@@ -180,19 +257,60 @@ impl KDTree {
         };
     }
 
-    fn split_one(&self, remains: Vec<usize>, dmin: Vector<f64>, dmax: Vector<f64>) -> Node {
+    /// find next binary split
+    fn split(&self, data: &Matrix<f64>, remains: Vec<usize>,
+             dmin: Vector<f64>, dmax: Vector<f64>) -> Node<B> {
+
         if remains.len() < self.leafsize {
             Node::Leaf(Leaf::new(remains))
         } else {
-            let (dim, split, l_remains, r_remains, l_max, r_min) = self.select_split(remains, dmin.clone(), dmax.clone());
-            let l_node = self.split_one(l_remains, dmin.clone(), l_max);
-            let g_node = self.split_one(r_remains, r_min, dmax.clone());
-            Node::Branch(Branch::new(dim, split, dmin, dmax,
-                                     l_node, g_node))
+
+            let (dim, split, l_remains, r_remains, l_max, r_min) =
+                self.select_split(data, remains, dmin.clone(), dmax.clone());
+
+            let l_node = self.split(data, l_remains, dmin.clone(), l_max);
+            let g_node = self.split(data, r_remains, r_min, dmax.clone());
+            B::build(dim, split, dmin, dmax, l_node, g_node)
         }
     }
 
-    /// return distances between given point and data specified with row ids
+    /// find leaf contains search point
+    fn search_leaf<'s, 'p>(&'s self, point: &'p [f64], k: usize)
+        -> (KNearest, VecDeque<&'s Node<B>>) {
+
+        // ToDo: merge to binary tree logic
+
+        match self.root {
+            None => panic!("tree is not built"),
+            Some(ref root) => {
+
+                let mut queue: VecDeque<&Node<B>> = VecDeque::new();
+                queue.push_front(root);
+
+                loop {
+                    // pop first element
+                    let current: &Node<B> = queue.pop_front().unwrap();
+                    match current {
+                        &Node::Leaf(ref l) => {
+                            let distances = self.get_distances(point, &l.children);
+                            let kn = KNearest::new(k, l.children.clone(), distances);
+                            return (kn, queue);
+                        },
+                        &Node::Branch(ref b) => {
+                            // the current branch must contains target point.
+                            // store the child branch which contains target point to
+                            // the front, put other side on the back.
+                            let (close, far) = b.maybe_close(point);
+                            queue.push_front(close);
+                            queue.push_back(far);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Return distances between given point and data specified with row ids
     fn get_distances(&self, point: &[f64], ids: &[usize]) -> Vec<f64> {
         assert!(ids.len() > 0, "target ids is empty");
 
@@ -206,47 +324,10 @@ impl KDTree {
         }
         distances
     }
-
-    fn search_leaf<'s, 'p>(&'s self, point: &'p [f64], k: usize)
-        -> (KNearest, VecDeque<&'s Node>) {
-
-        match self.root {
-            None => panic!("tree is not built"),
-            Some(ref root) => {
-
-                let mut queue: VecDeque<&Node> = VecDeque::new();
-                queue.push_front(root);
-
-                loop {
-                    // pop first element
-                    let current: &Node = queue.pop_front().unwrap();
-                    match current {
-                        &Node::Leaf(ref l) => {
-                            let distances = self.get_distances(point, &l.children);
-                            let kn = KNearest::new(k, l.children.clone(), distances);
-                            return (kn, queue);
-                        },
-                        &Node::Branch(ref b) => {
-                            // the current branch must contains target point.
-                            // store the child branch which contains target point to
-                            // the front, put other side on the back.
-                            if point[b.dim] < b.split {
-                                queue.push_front(&b.left);
-                                queue.push_back(&b.right)
-                            } else {
-                                queue.push_back(&b.left);
-                                queue.push_front(&b.right);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
 
 /// Can search K-nearest items
-impl KNearestSearch for KDTree {
+impl KNearestSearch for BinaryTree<KDTreeBranch> {
 
     /// build data structure for search optimization, used in KDTree
     /// build KDTree using its data
@@ -254,7 +335,7 @@ impl KNearestSearch for KDTree {
         let remains: Vec<usize> = (0..self.data.rows()).collect();
         let dmin = min(&self.data);
         let dmax = max(&self.data);
-        self.root = Some(self.split_one(remains, dmin, dmax));
+        self.root = Some(self.split(&self.data, remains, dmin, dmax));
     }
 
     /// Serch k-nearest items close to the point
