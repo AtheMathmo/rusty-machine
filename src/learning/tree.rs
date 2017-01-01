@@ -115,11 +115,13 @@ impl DecisionTreeClassifier {
 
     /// Calculate metrics
     fn metrics_weighted(&self, target: &Vector<usize>) -> f64 {
-        self.criterion.from_labels(target) * (target.size() as f64)
+        self.criterion.from_labels(target, self.n_classes) * (target.size() as f64)
     }
 
     /// Check termination criteria
     fn can_split(&self, current_target: &Vector<usize>, depth: usize) -> bool {
+
+        // Avoid to match every time
         match self.max_depth {
             None => {},
             Some(max_depth) => {
@@ -149,12 +151,13 @@ impl DecisionTreeClassifier {
              remains: &Vector<usize>, depth: usize) -> Link {
 
         let current_target: Vector<usize> = target.select(&remains.data());
-        let (labels, counts) = freq(&current_target);
 
+        // ToDo: skip label_counts to simply check self.can_split
+        let counts: Vector<f64> = label_counts(&current_target, self.n_classes);
+        let (idx, max) = counts.argmax();
         // stop splitting
-        if counts.size() == 1 || !self.can_split(&current_target, depth) {
-            let label = labels[counts.argmax().0];
-            return Link::Leaf(label)
+        if (max == current_target.size() as f64) | !self.can_split(&current_target, depth) {
+            return Link::Leaf(idx)
         }
 
         let mut split_col: usize = 0;
@@ -172,6 +175,7 @@ impl DecisionTreeClassifier {
 
             // ToDo: avoid repeated sort
             for v in get_splits(&current_feature) {
+
                 let bindexer: Vec<bool> = current_feature.iter()
                                                          .map(|&x| x < v)
                                                          .collect();
@@ -272,8 +276,15 @@ impl SupModel<Matrix<f64>, Vector<usize>> for DecisionTreeClassifier {
 
     fn train(&mut self, data: &Matrix<f64>, target: &Vector<usize>) -> LearningResult<()> {
         // set feature and target params
-        let (uniques, _) = freq(target);
-        self.n_classes = uniques.size();
+
+        if data.rows() != target.size() {
+            panic!("error");
+        }
+        if target.size() == 0 {
+            panic!("error");
+        }
+
+        self.n_classes = *target.iter().max().unwrap() + 1;
         self.n_features = data.cols();
 
         let all: Vec<usize> = (0..target.size()).collect();
@@ -282,6 +293,9 @@ impl SupModel<Matrix<f64>, Vector<usize>> for DecisionTreeClassifier {
         Ok(())
     }
 }
+
+
+
 
 /// Uniquify values, then get splitter values, i.e. midpoints of unique values
 fn get_splits(values: &Vec<f64>) -> Vec<f64> {
@@ -343,6 +357,20 @@ fn freq(labels: &Vector<usize>) -> (Vector<usize>, Vector<usize>) {
     (Vector::new(uniques), Vector::new(counts))
 }
 
+fn label_counts(labels: &Vector<usize>, n_classes: usize) -> Vector<f64> {
+    debug_assert!(n_classes >= 1);
+    debug_assert!(*labels.iter().max().unwrap() <= n_classes - 1);
+
+    let mut counts: Vec<f64> = vec![0.0f64; n_classes];
+
+    unsafe {
+        for &label in labels.iter() {
+            *counts.get_unchecked_mut(label) += 1.;
+        }
+    }
+    Vector::new(counts)
+}
+
 /// Split criterias
 #[derive(Debug)]
 pub enum Metrics {
@@ -355,11 +383,11 @@ pub enum Metrics {
 impl Metrics {
 
     /// calculate metrics from target labels
-    pub fn from_labels(&self, labels: &Vector<usize>) -> f64 {
-        let (_, counts) = freq(labels);
+    pub fn from_labels(&self, labels: &Vector<usize>, n_classes: usize) -> f64 {
+        let counts = label_counts(labels, n_classes);
         let sum: f64 = labels.size() as f64;
-        let probas: Vec<f64> = counts.iter().map(|&x| x as f64 / sum).collect();
-        self.from_probas(&probas)
+        let probas: Vector<f64> = counts / sum;
+        self.from_probas(&probas.data())
     }
 
     /// calculate metrics from label probabilities
@@ -442,13 +470,14 @@ mod tests {
 
     #[test]
     fn test_entropy_from_labels() {
-        assert_eq!(Metrics::Entropy.from_labels(&Vector::new(vec![1, 2, 3])), 1.0986122886681096);
-        assert_eq!(Metrics::Entropy.from_labels(&Vector::new(vec![1, 1, 2, 2])), 0.69314718055994529);
+        assert_eq!(Metrics::Entropy.from_labels(&Vector::new(vec![0, 1, 2]), 3), 1.0986122886681096);
+        assert_eq!(Metrics::Entropy.from_labels(&Vector::new(vec![0, 0, 1, 1]), 2), 0.69314718055994529);
     }
 
     #[test]
     fn test_gini_from_labels() {
-        assert_eq!(Metrics::Gini.from_labels(&Vector::new(vec![1, 1, 1])), 0.);
-        assert_eq!(Metrics::Gini.from_labels(&Vector::new(vec![1, 1, 2, 2, 3, 3])), 0.6666666666666667);
+        assert_eq!(Metrics::Gini.from_labels(&Vector::new(vec![1, 1, 1]), 2), 0.);
+        assert_eq!(Metrics::Gini.from_labels(&Vector::new(vec![0, 0, 0]), 2), 0.);
+        assert_eq!(Metrics::Gini.from_labels(&Vector::new(vec![0, 0, 1, 1, 2, 2]), 3), 0.6666666666666667);
     }
 }
