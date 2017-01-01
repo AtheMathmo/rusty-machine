@@ -104,7 +104,7 @@ impl<S: KNearestSearch> KNNClassifier<S> {
     }
 }
 
-impl<'a, S: KNearestSearch> SupModel<Matrix<f64>, Vector<usize>> for KNNClassifier<S> {
+impl<S: KNearestSearch> SupModel<Matrix<f64>, Vector<usize>> for KNNClassifier<S> {
 
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<usize>> {
         match &self.target {

@@ -281,6 +281,9 @@ impl<B: BinarySplit> BinaryTree<B> {
         loop {
             // split columns which has the widest range
             let (dim, d) = (&dmax - &dmin).argmax();
+
+            // Use midpoint rule, see "On the Efficiency of Nearest Neighbor Searching
+            // with Data Clustered in Lower Dimensions (Maneewongvatan and Mount, 1999)"
             // ToDo: use unsafe get (v0.4.0?)
             // https://github.com/AtheMathmo/rulinalg/pull/104
             let split = unsafe {
@@ -393,7 +396,6 @@ impl<B: BinarySplit> KNearestSearch for BinaryTree<B> {
 
     /// Serch k-nearest items close to the point
     fn search(&self, point: &[f64], k: usize) -> Result<(Vec<usize>, Vec<f64>), Error> {
-        // ToDo: should return Error
         if let &Some(ref data) = &self.data {
             let (mut query, mut queue) = try!(self.search_leaf(point, k));
             while queue.len() > 0 {
