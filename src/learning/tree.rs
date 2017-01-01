@@ -207,14 +207,43 @@ impl DecisionTreeClassifier {
         loop {
             match current {
                 &Link::Leaf(label) => return label,
-                &Link::Branch(ref n) => {
-                    if row[n.feature_index] < n.threshold {
+                &Link::Branch(ref n) => unsafe {
+                    if *row.get_unchecked(n.feature_index) < n.threshold {
                         current = &n.left
                     } else {
                         current = &n.right
                     }
                 }
             };
+        }
+    }
+
+    /// Desciribe tree structure
+    pub fn describe(&self) -> Result<(), Error> {
+        match self.root {
+            None => Err(Error::new_untrained()),
+            Some(ref root) => {
+                self.describe_node(root);
+                Ok(())
+            }
+        }
+    }
+
+    /// Desciribe tree node
+    ///
+    /// - `current` - Reference to the root link.
+    /// - `row` - Reference to the single row (row slice of the input Matrix).
+    fn describe_node(&self, current: &Link) {
+        match current {
+            &Link::Leaf(label) => {
+                println!("label contains: {}", label);
+                return;
+            },
+            &Link::Branch(ref n) => {
+                println!("branch splits {} < {}", n.feature_index, n.threshold);
+                self.describe_node(&n.left);
+                self.describe_node(&n.right);
+            }
         }
     }
 }
@@ -274,7 +303,7 @@ fn get_splits(values: &Vec<f64>) -> Vec<f64> {
 }
 
 /// Split Vec to left and right, depending on given bool Vec values
-fn split_slice<T: Copy>(values: &Vector<T>, bindexer: &Vec<bool>) -> (Vector<T>, Vector<T>) {
+fn split_slice<T: Copy>(values: &Vector<T>, bindexer: &[bool]) -> (Vector<T>, Vector<T>) {
     let mut left: Vec<T> = Vec::with_capacity(values.size());
     let mut right: Vec<T> = Vec::with_capacity(values.size());
     for (&v, &flag) in values.iter().zip(bindexer.iter()) {
@@ -334,7 +363,7 @@ impl Metrics {
     }
 
     /// calculate metrics from label probabilities
-    pub fn from_probas(&self, probas: &Vec<f64>) -> f64 {
+    pub fn from_probas(&self, probas: &[f64]) -> f64 {
         match self {
             &Metrics::Entropy => {
             let res: f64 = probas.iter().map(|&x| xlogy(x, x)).sum();
