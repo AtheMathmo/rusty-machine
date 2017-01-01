@@ -147,8 +147,9 @@ impl DecisionTreeClassifier {
     /// - `target` - Reference to the original target.
     /// - `remains` - Index of rows to be considered.
     /// - `depth` - Depth of the node.
+    /// - `criteria` - Parent node's criteria value
     fn split(&self, inputs: &Matrix<f64>, target: &Vector<usize>,
-             remains: &Vector<usize>, depth: usize) -> Link {
+             remains: &Vector<usize>, depth: usize, prev_criteria: f64) -> Link {
 
         let current_target: Vector<usize> = target.select(&remains.data());
 
@@ -163,7 +164,9 @@ impl DecisionTreeClassifier {
         let mut split_col: usize = 0;
         let mut split_val: f64 = 0.;
 
-        let mut criteria: f64 = self.metrics_weighted(&current_target);
+        let mut criteria = prev_criteria;
+        let mut criteria_left: f64 = 0.;
+        let mut criteria_right: f64 = 0.;
 
         // define indexer for reusing after loop
         let mut split_indexer: Vec<bool> = vec![];
@@ -186,8 +189,11 @@ impl DecisionTreeClassifier {
                 let cr = lc + rc;
                 // update splitter
                 if cr < criteria {
+                    // println!("  split by {} {}", split_col, split_val);
                     split_col = i;
                     split_val = v;
+                    criteria_left = lc;
+                    criteria_right = rc;
                     criteria = cr;
                     split_indexer = bindexer;
                 }
@@ -195,8 +201,8 @@ impl DecisionTreeClassifier {
         }
         let (li, ri) = split_slice(remains, &split_indexer);
 
-        let ln = self.split(inputs, target, &li, depth + 1);
-        let rn = self.split(inputs, target, &ri, depth + 1);
+        let ln = self.split(inputs, target, &li, depth + 1, criteria_left);
+        let rn = self.split(inputs, target, &ri, depth + 1, criteria_right);
         Link::Branch(Box::new(Node{ feature_index: split_col,
                                     threshold: split_val,
                                     left: ln,
@@ -227,7 +233,7 @@ impl DecisionTreeClassifier {
         match self.root {
             None => Err(Error::new_untrained()),
             Some(ref root) => {
-                self.describe_node(root);
+                self.describe_node(root, 0, 0);
                 Ok(())
             }
         }
@@ -237,16 +243,18 @@ impl DecisionTreeClassifier {
     ///
     /// - `current` - Reference to the root link.
     /// - `row` - Reference to the single row (row slice of the input Matrix).
-    fn describe_node(&self, current: &Link) {
+    fn describe_node(&self, current: &Link, previd: usize, mut curid: usize) -> usize {
         match current {
             &Link::Leaf(label) => {
-                println!("label contains: {}", label);
-                return;
+                println!("node{}[label=\"label={}\"];", curid, label);
+                println!("node{} -> node{};", previd, curid + 1);
+                return curid + 1;
             },
             &Link::Branch(ref n) => {
-                println!("branch splits {} < {}", n.feature_index, n.threshold);
-                self.describe_node(&n.left);
-                self.describe_node(&n.right);
+                println!("node{}[label=\"col {} < {}\"];", curid, n.feature_index, n.threshold);
+                println!("node{} -> node{};", previd, curid + 1);
+                let nid = self.describe_node(&n.left, curid + 1, curid + 1);
+                self.describe_node(&n.right, curid, nid)
             }
         }
     }
@@ -288,13 +296,12 @@ impl SupModel<Matrix<f64>, Vector<usize>> for DecisionTreeClassifier {
         self.n_features = data.cols();
 
         let all: Vec<usize> = (0..target.size()).collect();
-        let root = self.split(data, target, &Vector::new(all), 0);
+        let c = self.metrics_weighted(&target);
+        let root = self.split(data, target, &Vector::new(all), 0, c);
         self.root = Some(root);
         Ok(())
     }
 }
-
-
 
 
 /// Uniquify values, then get splitter values, i.e. midpoints of unique values
