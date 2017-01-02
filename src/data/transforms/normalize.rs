@@ -4,7 +4,7 @@
 //!
 //! The `Normalizer` transformer is used to transform input data
 //! so that the l2 norm of each rows are all equal to 1.
-//! If input data has a row with all 0, `Normalizer`` keeps the row as it is.
+//! If input data has a row with all 0, `Normalizer` keeps the row as it is.
 //!
 //! Because transformation is performed per row independently,
 //! inverse transformation is not supported.
