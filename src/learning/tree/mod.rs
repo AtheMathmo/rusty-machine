@@ -29,13 +29,16 @@
 //! println!("{}", output[0]);
 //! assert!(output[0] == 0, "Our classifier isn't very good!");
 //! ```
-use std::collections::BTreeMap;
-
 use linalg::{Matrix, BaseMatrix};
 use linalg::Vector;
 
 use learning::{LearningResult, SupModel};
 use learning::error::{Error, ErrorKind};
+
+mod criterion;
+
+pub use self::criterion::Metrics;
+use self::criterion::{label_counts, Splitter};
 
 /// Tree node
 #[derive(Debug)]
@@ -149,9 +152,9 @@ impl DecisionTreeClassifier {
     /// - `depth` - Depth of the node.
     /// - `criteria` - Parent node's criteria value
     fn split(&self, inputs: &Matrix<f64>, target: &Vector<usize>,
-             remains: &Vector<usize>, depth: usize, prev_criteria: f64) -> Link {
+             remains: &[usize], depth: usize, prev_criteria: f64) -> Link {
 
-        let current_target: Vector<usize> = target.select(&remains.data());
+        let current_target: Vector<usize> = target.select(remains);
 
         // ToDo: skip label_counts to simply check self.can_split
         let counts: Vector<f64> = label_counts(&current_target, self.n_classes);
@@ -168,41 +171,36 @@ impl DecisionTreeClassifier {
         let mut criteria_left: f64 = 0.;
         let mut criteria_right: f64 = 0.;
 
-        // define indexer for reusing after loop
-        let mut split_indexer: Vec<bool> = vec![];
-
         for i in 0..inputs.cols() {
             // target feature
-            let current_feature: Vec<f64> = inputs.select(remains.data(), &[i])
+            let current_feature: Vec<f64> = inputs.select(remains, &[i])
                                                   .into_vec();
 
-            // ToDo: avoid repeated sort
-            for v in get_splits(&current_feature) {
+            let s = Splitter::new(&current_feature,
+                                  &current_target, &counts.data());
 
-                let bindexer: Vec<bool> = current_feature.iter()
-                                                         .map(|&x| x < v)
-                                                         .collect();
-                let (l, r) = split_slice(&current_target, &bindexer);
-                let lc = self.metrics_weighted(&l);
-                let rc = self.metrics_weighted(&r);
-
-                let cr = lc + rc;
-                // update splitter
+            for (v, cr) in s.get_max_splits(&self.criterion).into_iter() {
                 if cr < criteria {
-                    // println!("  split by {} {}", split_col, split_val);
                     split_col = i;
                     split_val = v;
-                    criteria_left = lc;
-                    criteria_right = rc;
-                    criteria = cr;
-                    split_indexer = bindexer;
+                    criteria = cr
                 }
             }
-        }
-        let (li, ri) = split_slice(remains, &split_indexer);
 
-        let ln = self.split(inputs, target, &li, depth + 1, criteria_left);
-        let rn = self.split(inputs, target, &ri, depth + 1, criteria_right);
+        }
+        // ToDo: possible to optimize to remember split location
+        let mut li: Vec<usize> = Vec::with_capacity(remains.len());
+        let mut ri: Vec<usize> = Vec::with_capacity(remains.len());
+        for (&v, &r) in inputs.select(remains, &[split_col]).iter().zip(remains.iter()) {
+            if v < split_val {
+                li.push(r);
+            } else {
+                ri.push(r);
+            }
+        }
+
+        let ln = self.split(inputs, target, &li, depth + 1, criteria); //criteria_left);
+        let rn = self.split(inputs, target, &ri, depth + 1, criteria); //criteria_right);
         Link::Branch(Box::new(Node{ feature_index: split_col,
                                     threshold: split_val,
                                     left: ln,
@@ -229,11 +227,11 @@ impl DecisionTreeClassifier {
     }
 
     /// Desciribe tree structure
-    pub fn describe(&self) -> Result<(), Error> {
+    pub fn to_graphviz(&self) -> Result<(), Error> {
         match self.root {
             None => Err(Error::new_untrained()),
             Some(ref root) => {
-                self.describe_node(root, 0, 0);
+                self.to_graphviz_node(root, 0, 0);
                 Ok(())
             }
         }
@@ -243,7 +241,7 @@ impl DecisionTreeClassifier {
     ///
     /// - `current` - Reference to the root link.
     /// - `row` - Reference to the single row (row slice of the input Matrix).
-    fn describe_node(&self, current: &Link, previd: usize, mut curid: usize) -> usize {
+    fn to_graphviz_node(&self, current: &Link, previd: usize, mut curid: usize) -> usize {
         match current {
             &Link::Leaf(label) => {
                 println!("node{}[label=\"label={}\"];", curid, label);
@@ -253,13 +251,12 @@ impl DecisionTreeClassifier {
             &Link::Branch(ref n) => {
                 println!("node{}[label=\"col {} < {}\"];", curid, n.feature_index, n.threshold);
                 println!("node{} -> node{};", previd, curid + 1);
-                let nid = self.describe_node(&n.left, curid + 1, curid + 1);
-                self.describe_node(&n.right, curid, nid)
+                let nid = self.to_graphviz_node(&n.left, curid + 1, curid + 1);
+                self.to_graphviz_node(&n.right, curid, nid)
             }
         }
     }
 }
-
 
 /// Train the model and predict the model output from new data.
 impl SupModel<Matrix<f64>, Vector<usize>> for DecisionTreeClassifier {
@@ -297,194 +294,20 @@ impl SupModel<Matrix<f64>, Vector<usize>> for DecisionTreeClassifier {
 
         let all: Vec<usize> = (0..target.size()).collect();
         let c = self.metrics_weighted(&target);
-        let root = self.split(data, target, &Vector::new(all), 0, c);
+        let root = self.split(data, target, &all, 0, c);
         self.root = Some(root);
         Ok(())
     }
 }
 
 
-/// Uniquify values, then get splitter values, i.e. midpoints of unique values
-fn get_splits(values: &Vec<f64>) -> Vec<f64> {
-    debug_assert!(values.len() > 0, "values can't be empty");
-
-    let mut values = values.clone();
-    values.sort_by(|a, b| a.partial_cmp(b).unwrap());
-
-    let mut splits: Vec<f64> = Vec::with_capacity(values.len());
-
-    let mut prev: f64 = unsafe { *values.get_unchecked(0) };
-    for v in values.into_iter().skip(0) {
-        if prev != v {
-            splits.push((prev + v) / 2.);
-            prev = v;
-        }
-    }
-    splits
-}
-
-/// Split Vec to left and right, depending on given bool Vec values
-fn split_slice<T: Copy>(values: &Vector<T>, bindexer: &[bool]) -> (Vector<T>, Vector<T>) {
-    let mut left: Vec<T> = Vec::with_capacity(values.size());
-    let mut right: Vec<T> = Vec::with_capacity(values.size());
-    for (&v, &flag) in values.iter().zip(bindexer.iter()) {
-        if flag {
-            left.push(v);
-        } else {
-            right.push(v);
-        }
-    }
-    left.shrink_to_fit();
-    right.shrink_to_fit();
-    (Vector::new(left), Vector::new(right))
-}
-
-fn xlogy(x: f64, y: f64) -> f64 {
-    if x == 0. {
-        0.
-    } else {
-        x * y.ln()
-    }
-}
-
-/// Count target label frequencies
-fn freq(labels: &Vector<usize>) -> (Vector<usize>, Vector<usize>) {
-    let mut map: BTreeMap<usize, usize> = BTreeMap::new();
-    for l in labels {
-        let e = map.entry(*l).or_insert(0);
-        *e += 1;
-    }
-
-    let mut uniques: Vec<usize> = Vec::with_capacity(map.len());
-    let mut counts: Vec<usize> = Vec::with_capacity(map.len());
-    for (&k, &v) in map.iter() {
-        uniques.push(k);
-        counts.push(v);
-    }
-    (Vector::new(uniques), Vector::new(counts))
-}
-
-fn label_counts(labels: &Vector<usize>, n_classes: usize) -> Vector<f64> {
-    debug_assert!(n_classes >= 1);
-    debug_assert!(*labels.iter().max().unwrap() <= n_classes - 1);
-
-    let mut counts: Vec<f64> = vec![0.0f64; n_classes];
-
-    unsafe {
-        for &label in labels.iter() {
-            *counts.get_unchecked_mut(label) += 1.;
-        }
-    }
-    Vector::new(counts)
-}
-
-/// Split criterias
-#[derive(Debug)]
-pub enum Metrics {
-    /// Gini impurity
-    Gini,
-    /// Information gain
-    Entropy
-}
-
-impl Metrics {
-
-    /// calculate metrics from target labels
-    pub fn from_labels(&self, labels: &Vector<usize>, n_classes: usize) -> f64 {
-        let counts = label_counts(labels, n_classes);
-        let sum: f64 = labels.size() as f64;
-        let probas: Vector<f64> = counts / sum;
-        self.from_probas(&probas.data())
-    }
-
-    /// calculate metrics from label probabilities
-    pub fn from_probas(&self, probas: &[f64]) -> f64 {
-        match self {
-            &Metrics::Entropy => {
-            let res: f64 = probas.iter().map(|&x| xlogy(x, x)).sum();
-            - res
-        },
-        &Metrics::Gini => {
-            let res: f64 =  probas.iter().map(|&x| x * x).sum();
-            1.0 - res
-        }
-      }
-    }
-}
-
 #[cfg(test)]
 mod tests {
 
     use linalg::Vector;
 
-    use super::{get_splits, split_slice, xlogy, freq, Metrics};
-
     #[test]
-    fn test_get_splits() {
-        assert_eq!(get_splits(&vec![0.1, 0.2, 0.1]), vec![0.15000000000000002]);
-        assert_eq!(get_splits(&vec![0.3, 0.1, 0.1, 0.1, 0.2, 0.2]), vec![0.15000000000000002, 0.25]);
-        assert_eq!(get_splits(&vec![1., 3., 7., 3., 7.]), vec![2., 5.]);
-        assert_eq!(get_splits(&vec![0.1, 0.2, 0.1]), vec![0.15000000000000002]);
-        assert_eq!(get_splits(&vec![0.1, 0.2, 0.1, 0.1]), vec![0.15000000000000002]);
-        assert_eq!(get_splits(&vec![-1., -2., 1., -2.]), vec![-1.5, 0.]);
-        assert_eq!(get_splits(&vec![0.1, 0.1, 0.1]), vec![]);
-    }
+    fn test_xxx() {
 
-    #[test]
-    fn test_split_slice() {
-        let (l, r) = split_slice(&Vector::new(vec![1, 2, 3]), &vec![true, false, true]);
-        assert_eq!(l, Vector::new(vec![1, 3]));
-        assert_eq!(r, Vector::new(vec![2]));
-
-        let (l, r) = split_slice(&Vector::new(vec![1, 2, 3]), &vec![true, true, true]);
-        assert_eq!(l, Vector::new(vec![1, 2, 3]));
-        assert_eq!(r, Vector::new(vec![]));
-    }
-
-    #[test]
-    fn test_xlogy() {
-        assert_eq!(xlogy(3., 8.), 6.2383246250395068);
-        assert_eq!(xlogy(0., 100.), 0.);
-    }
-
-    #[test]
-    fn test_freq() {
-        let (uniques, counts) = freq(&Vector::new(vec![1, 2, 3, 1, 2, 4]));
-        assert_eq!(uniques, Vector::new(vec![1, 2, 3, 4]));
-        assert_eq!(counts, Vector::new(vec![2, 2, 1, 1]));
-
-        let (uniques, counts) = freq(&Vector::new(vec![1, 2, 2, 2, 2]));
-        assert_eq!(uniques, Vector::new(vec![1, 2]));
-        assert_eq!(counts, Vector::new(vec![1, 4]));
-    }
-
-    #[test]
-    fn test_entropy() {
-        assert_eq!(Metrics::Entropy.from_probas(&vec![1.]), 0.);
-        assert_eq!(Metrics::Entropy.from_probas(&vec![1., 0., 0.]), 0.);
-        assert_eq!(Metrics::Entropy.from_probas(&vec![0.5, 0.5]), 0.69314718055994529);
-        assert_eq!(Metrics::Entropy.from_probas(&vec![1. / 3., 1. / 3., 1. / 3.]), 1.0986122886681096);
-        assert_eq!(Metrics::Entropy.from_probas(&vec![0.4, 0.3, 0.3]), 1.0888999753452238);
-    }
-
-    #[test]
-    fn test_gini_from_probas() {
-        assert_eq!(Metrics::Gini.from_probas(&vec![1., 0., 0.]), 0.);
-        assert_eq!(Metrics::Gini.from_probas(&vec![1. / 3., 1. / 3., 1. / 3.]), 0.6666666666666667);
-        assert_eq!(Metrics::Gini.from_probas(&vec![0., 1. / 46., 45. / 46.]), 0.04253308128544431);
-        assert_eq!(Metrics::Gini.from_probas(&vec![0., 49. / 54., 5. / 54.]), 0.16803840877914955);
-    }
-
-    #[test]
-    fn test_entropy_from_labels() {
-        assert_eq!(Metrics::Entropy.from_labels(&Vector::new(vec![0, 1, 2]), 3), 1.0986122886681096);
-        assert_eq!(Metrics::Entropy.from_labels(&Vector::new(vec![0, 0, 1, 1]), 2), 0.69314718055994529);
-    }
-
-    #[test]
-    fn test_gini_from_labels() {
-        assert_eq!(Metrics::Gini.from_labels(&Vector::new(vec![1, 1, 1]), 2), 0.);
-        assert_eq!(Metrics::Gini.from_labels(&Vector::new(vec![0, 0, 0]), 2), 0.);
-        assert_eq!(Metrics::Gini.from_labels(&Vector::new(vec![0, 0, 1, 1, 2, 2]), 3), 0.6666666666666667);
     }
 }
