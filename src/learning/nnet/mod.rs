@@ -58,8 +58,6 @@ use learning::toolkit::regularization::Regularization;
 use learning::optim::{Optimizable, OptimAlgorithm};
 use learning::optim::grad_desc::StochasticGD;
 
-use std::fmt::Debug;
-
 use self::net_layer::NetLayer;
 
 /// Neural Network Model
@@ -259,7 +257,7 @@ pub struct BaseNeuralNet<T: Criterion> {
 impl BaseNeuralNet<BCECriterion> {
     /// Creates a base neural network with the specified layer sizes.
     fn default<U>(layer_sizes: &[usize], activ_fn: U) -> BaseNeuralNet<BCECriterion>
-        where U: ActivationFunc + Debug + 'static {
+        where U: ActivationFunc + 'static {
         BaseNeuralNet::mlp(layer_sizes, BCECriterion::default(), activ_fn)
     }
 }
