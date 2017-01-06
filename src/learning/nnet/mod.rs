@@ -372,12 +372,13 @@ impl<T: Criterion> BaseNeuralNet<T> {
         // at this point index == weights.len()
         for (i, layer) in self.layers.iter().enumerate().rev() {
             let activation = if i == 0 {inputs} else {&activations[i-1]};
+            let result = &activations[i];
             index -= layer.num_params();
 
             let grad_params = &mut gradients[index..index+layer.num_params()];
-            grad_params.copy_from_slice(layer.back_params(&out_grad, activation, params[i]).data());
+            grad_params.copy_from_slice(layer.back_params(&out_grad, activation, result, params[i]).data());
             
-            out_grad = layer.back_input(&out_grad, activation, params[i]);
+            out_grad = layer.back_input(&out_grad, activation, result, params[i]);
         }
 
         let mut cost = self.criterion.cost(output, targets);

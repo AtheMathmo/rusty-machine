@@ -1,7 +1,6 @@
 //! Neural Network Layers
 
-use linalg::{Matrix, MatrixSlice, BaseMatrix, BaseMatrixMut};
-use rulinalg::utils;
+use linalg::{Matrix, MatrixSlice, BaseMatrix};
 
 use learning::LearningResult;
 use learning::error::{Error, ErrorKind};
@@ -19,10 +18,10 @@ pub trait NetLayer : Debug {
     fn forward(&self, input: &Matrix<f64>, params: MatrixSlice<f64>) -> LearningResult<Matrix<f64>>;
 
     /// The gradient of the output of this layer with respect to its input
-    fn back_input(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64>;
+    fn back_input(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, output: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64>;
     
     /// The gradient of the output of this layer with respect to its parameters
-    fn back_params(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64>;
+    fn back_params(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, output: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64>;
 
     /// The default value of the parameters of this layer before training
     fn default_params(&self) -> Vec<f64>;
@@ -94,7 +93,7 @@ impl NetLayer for Linear {
         }
     }
     
-    fn back_input(&self, out_grad: &Matrix<f64>, _: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64> {
+    fn back_input(&self, out_grad: &Matrix<f64>, _: &Matrix<f64>, _: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64> {
         debug_assert_eq!(out_grad.cols(), params.cols());
         let gradient = out_grad * &params.transpose();
         if self.has_bias {
@@ -106,7 +105,7 @@ impl NetLayer for Linear {
         }
     }
     
-    fn back_params(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
+    fn back_params(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, _: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
         debug_assert_eq!(input.rows(), out_grad.rows());
         if self.has_bias {
             &Matrix::ones(input.rows(), 1).hcat(input).transpose() * out_grad
@@ -134,18 +133,22 @@ impl NetLayer for Linear {
 impl<T: ActivationFunc> NetLayer for T {
     /// Applies the activation function to each element of the input
     fn forward(&self, input: &Matrix<f64>, _: MatrixSlice<f64>) -> LearningResult<Matrix<f64>> {
-        Ok(input.clone().apply(&T::func))
+        let mut output = Vec::with_capacity(input.rows()*input.cols());
+        for val in input.data() {
+            output.push(T::func(*val));
+        }
+        Ok(Matrix::new(input.rows(), input.cols(), output))
     }
 
-    fn back_input(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
-        let mut in_grad = input.clone();
-        utils::in_place_vec_bin_op(in_grad.mut_data(), out_grad.data(), |x, &y| {
-            *x = T::func_grad(*x) * y
-        });
-        in_grad
+    fn back_input(&self, out_grad: &Matrix<f64>, _: &Matrix<f64>, output: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
+        let mut in_grad = Vec::with_capacity(output.rows()*output.cols());
+        for (y, g) in output.data().iter().zip(out_grad.data()) {
+            in_grad.push(T::func_grad_from_output(*y) * g);
+        }
+        Matrix::new(output.rows(), output.cols(), in_grad)
     }
     
-    fn back_params(&self, _: &Matrix<f64>, _: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
+    fn back_params(&self, _: &Matrix<f64>, _: &Matrix<f64>, _: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
         Matrix::new(0, 0, Vec::new())
     }
 
