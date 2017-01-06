@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-1226' class='srclink' href='../../../src/rusty_machine/src/learning/gp.rs.html#1-212' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-892' class='srclink' href='../../../src/rusty_machine/src/learning/gp.rs.html#1-212' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Gaussian Processes</p>
 
 <p>Provides implementation of gaussian process regression.</p>
@@ -69,7 +69,7 @@
 
 <span class='kw'>let</span> <span class='ident'>test_data</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>5</span>,<span class='number'>1</span>,<span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>2.3</span>,<span class='number'>4.4</span>,<span class='number'>5.1</span>,<span class='number'>6.2</span>,<span class='number'>7.1</span>]);
 
-<span class='kw'>let</span> <span class='ident'>outputs</span> <span class='op'>=</span> <span class='ident'>gaussp</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>test_data</span>).<span class='ident'>unwrap</span>();<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='kw'>let</span> <span class='ident'>outputs</span> <span class='op'>=</span> <span class='ident'>gaussp</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>test_data</span>).<span class='ident'>unwrap</span>();</pre>
 
 <p>Alternatively one could use <code>gaussp.get_posterior()</code> which would return both
 the predictive mean and covariance. However, this is likely to change in
@@ -153,11 +153,9 @@ a future release.</p>
     <script>
         window.rootPath = "../../../";
         window.currentCrate = "rusty_machine";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
-    
     <script defer src="../../../search-index.js"></script>
 </body>
 </html>

@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-2766' class='srclink' href='../../../src/rusty_machine/src/analysis/score.rs.html#1-70' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-1888' class='srclink' href='../../../src/rusty_machine/src/analysis/score.rs.html#1-355' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Functions for scoring a set of predictions, i.e. evaluating
 how close predictions and truth are. All functions in this
 module obey the convention that higher is better.</p>
@@ -61,12 +61,33 @@ module obey the convention that higher is better.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
+                           <td><a class='fn' href='fn.f1.html'
+                                  title='rusty_machine::analysis::score::f1'>f1</a></td>
+                           <td class='docblock-short'>
+                                <p>Returns the f1 score for 2 class classification.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
                            <td><a class='fn' href='fn.neg_mean_squared_error.html'
                                   title='rusty_machine::analysis::score::neg_mean_squared_error'>neg_mean_squared_error</a></td>
                            <td class='docblock-short'>
                                 <p>Returns the additive inverse of the mean-squared-error of the
 outputs. So higher is better, and the returned value is always
 negative.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.precision.html'
+                                  title='rusty_machine::analysis::score::precision'>precision</a></td>
+                           <td class='docblock-short'>
+                                <p>Returns the precision score for 2 class classification.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class='fn' href='fn.recall.html'
+                                  title='rusty_machine::analysis::score::recall'>recall</a></td>
+                           <td class='docblock-short'>
+                                <p>Returns the recall score for 2 class classification.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
@@ -131,11 +152,9 @@ negative.</p>
     <script>
         window.rootPath = "../../../";
         window.currentCrate = "rusty_machine";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
-    
     <script defer src="../../../search-index.js"></script>
 </body>
 </html>

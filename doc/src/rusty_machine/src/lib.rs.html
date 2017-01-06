@@ -265,6 +265,10 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! # The rusty-machine crate.</span>
 <span class='doccomment'>//!</span>
@@ -489,6 +493,10 @@
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>cross_validation</span>;
     <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>score</span>;
 }
+
+<span class='attribute'>#[<span class='ident'>cfg</span>(<span class='ident'>feature</span> <span class='op'>=</span> <span class='string'>&quot;datasets&quot;</span>)]</span>
+<span class='doccomment'>/// Module for datasets.</span>
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>datasets</span>;
 </pre>
 </section>
     <section id='search' class="content hidden"></section>
@@ -546,11 +554,9 @@
     <script>
         window.rootPath = "../../../";
         window.currentCrate = "rusty_machine";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
-    
     <script defer src="../../../search-index.js"></script>
 </body>
 </html>

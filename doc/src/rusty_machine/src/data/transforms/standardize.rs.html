@@ -264,6 +264,23 @@
 <span id="220">220</span>
 <span id="221">221</span>
 <span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The Standardizing Transformer</span>
 <span class='doccomment'>//!</span>
@@ -354,7 +371,8 @@
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Float</span> <span class='op'>+</span> <span class='ident'>FromPrimitive</span><span class='op'>&gt;</span> <span class='ident'>Transformer</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>Standardizer</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>transform</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>mut</span> <span class='ident'>inputs</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
+
+    <span class='kw'>fn</span> <span class='ident'>fit</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='ident'>inputs</span>.<span class='ident'>rows</span>() <span class='op'>&lt;=</span> <span class='number'>1</span> {
             <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidData</span>,
                            <span class='string'>&quot;Cannot standardize data with only one row.&quot;</span>))
@@ -367,18 +385,34 @@
             <span class='kw'>if</span> <span class='ident'>mean</span>.<span class='ident'>data</span>().<span class='ident'>iter</span>().<span class='ident'>any</span>(<span class='op'>|</span><span class='ident'>x</span><span class='op'>|</span> <span class='op'>!</span><span class='ident'>x</span>.<span class='ident'>is_finite</span>()) {
                 <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidData</span>, <span class='string'>&quot;Some data point is non-finite.&quot;</span>));
             }
-
-            <span class='kw'>for</span> <span class='ident'>row</span> <span class='kw'>in</span> <span class='ident'>inputs</span>.<span class='ident'>iter_rows_mut</span>() {
-                <span class='comment'>// Subtract the mean</span>
-                <span class='ident'>utils</span>::<span class='ident'>in_place_vec_bin_op</span>(<span class='ident'>row</span>, <span class='kw-2'>&amp;</span><span class='ident'>mean</span>.<span class='ident'>data</span>(), <span class='op'>|</span><span class='ident'>x</span>, <span class='kw-2'>&amp;</span><span class='ident'>y</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>-</span> <span class='ident'>y</span>);
-                <span class='ident'>utils</span>::<span class='ident'>in_place_vec_bin_op</span>(<span class='ident'>row</span>, <span class='kw-2'>&amp;</span><span class='ident'>variance</span>.<span class='ident'>data</span>(), <span class='op'>|</span><span class='ident'>x</span>, <span class='kw-2'>&amp;</span><span class='ident'>y</span><span class='op'>|</span> {
-                    <span class='op'>*</span><span class='ident'>x</span> <span class='op'>=</span> (<span class='op'>*</span><span class='ident'>x</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>scaled_stdev</span> <span class='op'>/</span> <span class='ident'>y</span>.<span class='ident'>sqrt</span>()) <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>scaled_mean</span>
-                });
-            }
-
             <span class='self'>self</span>.<span class='ident'>means</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>mean</span>);
             <span class='self'>self</span>.<span class='ident'>variances</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>variance</span>);
-            <span class='prelude-val'>Ok</span>(<span class='ident'>inputs</span>)
+            <span class='prelude-val'>Ok</span>(())
+        }
+    }
+
+    <span class='kw'>fn</span> <span class='ident'>transform</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>mut</span> <span class='ident'>inputs</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>if</span> <span class='kw'>let</span> (<span class='kw-2'>&amp;</span><span class='prelude-val'>None</span>, <span class='kw-2'>&amp;</span><span class='prelude-val'>None</span>) <span class='op'>=</span> (<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>means</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>variances</span>) {
+            <span class='comment'>// if Transformer is not fitted to the data, fit for backward-compat.</span>
+            <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>fit</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>));
+        }
+
+        <span class='kw'>if</span> <span class='kw'>let</span> (<span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>means</span>), <span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>variances</span>)) <span class='op'>=</span> (<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>means</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>variances</span>) {
+            <span class='kw'>if</span> <span class='ident'>means</span>.<span class='ident'>size</span>() <span class='op'>!=</span> <span class='ident'>inputs</span>.<span class='ident'>cols</span>() {
+                <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidData</span>,
+                               <span class='string'>&quot;Input data has different number of columns from fitted data.&quot;</span>))
+            } <span class='kw'>else</span> {
+                <span class='kw'>for</span> <span class='ident'>row</span> <span class='kw'>in</span> <span class='ident'>inputs</span>.<span class='ident'>iter_rows_mut</span>() {
+                    <span class='comment'>// Subtract the mean</span>
+                    <span class='ident'>utils</span>::<span class='ident'>in_place_vec_bin_op</span>(<span class='ident'>row</span>, <span class='ident'>means</span>.<span class='ident'>data</span>(), <span class='op'>|</span><span class='ident'>x</span>, <span class='kw-2'>&amp;</span><span class='ident'>y</span><span class='op'>|</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>-</span> <span class='ident'>y</span>);
+                    <span class='ident'>utils</span>::<span class='ident'>in_place_vec_bin_op</span>(<span class='ident'>row</span>, <span class='ident'>variances</span>.<span class='ident'>data</span>(), <span class='op'>|</span><span class='ident'>x</span>, <span class='kw-2'>&amp;</span><span class='ident'>y</span><span class='op'>|</span> {
+                        <span class='op'>*</span><span class='ident'>x</span> <span class='op'>=</span> (<span class='op'>*</span><span class='ident'>x</span> <span class='op'>*</span> <span class='self'>self</span>.<span class='ident'>scaled_stdev</span> <span class='op'>/</span> <span class='ident'>y</span>.<span class='ident'>sqrt</span>()) <span class='op'>+</span> <span class='self'>self</span>.<span class='ident'>scaled_mean</span>
+                    });
+                }
+                <span class='prelude-val'>Ok</span>(<span class='ident'>inputs</span>)
+            }
+        } <span class='kw'>else</span> {
+            <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidState</span>, <span class='string'>&quot;Transformer has not been fitted.&quot;</span>))
         }
     }
 }
@@ -544,11 +578,9 @@
     <script>
         window.rootPath = "../../../../../";
         window.currentCrate = "rusty_machine";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../../../jquery.js"></script>
     <script src="../../../../../main.js"></script>
-    
     <script defer src="../../../../../search-index.js"></script>
 </body>
 </html>

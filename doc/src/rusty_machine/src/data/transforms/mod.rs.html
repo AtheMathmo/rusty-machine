@@ -74,6 +74,8 @@
 <span id="30">30</span>
 <span id="31">31</span>
 <span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The Transforms module</span>
 <span class='doccomment'>//!</span>
@@ -83,7 +85,7 @@
 <span class='doccomment'>//! The `Transformer` trait provides a shared interface for all of the</span>
 <span class='doccomment'>//! data preprocessing transformations in rusty-machine.</span>
 <span class='doccomment'>//!</span>
-<span class='doccomment'>//! The transformers provide preprocessing transformations which are </span>
+<span class='doccomment'>//! The transformers provide preprocessing transformations which are</span>
 <span class='doccomment'>//! commonly used in machine learning.</span>
 
 <span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>minmax</span>;
@@ -98,6 +100,8 @@
 
 <span class='doccomment'>/// Trait for data transformers</span>
 <span class='kw'>pub</span> <span class='kw'>trait</span> <span class='ident'>Transformer</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+    <span class='doccomment'>/// Fit Transformer to input data, and stores the transformation in the Transformer</span>
+    <span class='kw'>fn</span> <span class='ident'>fit</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span>;
     <span class='doccomment'>/// Transforms the inputs and stores the transformation in the Transformer</span>
     <span class='kw'>fn</span> <span class='ident'>transform</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='ident'>T</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>T</span>, <span class='ident'>error</span>::<span class='ident'>Error</span><span class='op'>&gt;</span>;
 }
@@ -163,11 +167,9 @@
     <script>
         window.rootPath = "../../../../../";
         window.currentCrate = "rusty_machine";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../../../jquery.js"></script>
     <script src="../../../../../main.js"></script>
-    
     <script defer src="../../../../../search-index.js"></script>
 </body>
 </html>

@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-744' class='srclink' href='../../../src/rusty_machine/src/learning/logistic_reg.rs.html#1-195' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-547' class='srclink' href='../../../src/rusty_machine/src/learning/logistic_reg.rs.html#1-195' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Logistic Regression module</p>
 
 <p>Contains implemention of logistic regression using
@@ -76,7 +76,7 @@ so you do not need to format the input matrices yourself.</p>
 <span class='kw'>let</span> <span class='ident'>output</span> <span class='op'>=</span> <span class='ident'>log_mod</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>new_point</span>).<span class='ident'>unwrap</span>();
 
 <span class='comment'>// Hopefully we classified our new point correctly!</span>
-<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>output</span>[<span class='number'>0</span>] <span class='op'>&gt;</span> <span class='number'>0.5</span>, <span class='string'>&quot;Our classifier isn&#39;t very good!&quot;</span>);<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>output</span>[<span class='number'>0</span>] <span class='op'>&gt;</span> <span class='number'>0.5</span>, <span class='string'>&quot;Our classifier isn&#39;t very good!&quot;</span>);</pre>
 
 <p>We could have been more specific about the learning of the model
 by using the <code>new</code> constructor instead. This allows us to provide
@@ -152,11 +152,9 @@ a <code>GradientDesc</code> object with custom parameters.</p>
     <script>
         window.rootPath = "../../../";
         window.currentCrate = "rusty_machine";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
-    
     <script defer src="../../../search-index.js"></script>
 </body>
 </html>

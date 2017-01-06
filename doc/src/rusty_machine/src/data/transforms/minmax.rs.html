@@ -297,6 +297,23 @@
 <span id="253">253</span>
 <span id="254">254</span>
 <span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
 </pre><pre class='rust '>
 <span class='doccomment'>//! The Min-Max transformer</span>
 <span class='doccomment'>//!</span>
@@ -325,7 +342,7 @@
 <span class='doccomment'>//! ```</span>
 
 <span class='kw'>use</span> <span class='ident'>learning</span>::<span class='ident'>error</span>::{<span class='ident'>Error</span>, <span class='ident'>ErrorKind</span>};
-<span class='kw'>use</span> <span class='ident'>linalg</span>::{<span class='ident'>Matrix</span>, <span class='ident'>BaseMatrix</span>, <span class='ident'>BaseMatrixMut</span>};
+<span class='kw'>use</span> <span class='ident'>linalg</span>::{<span class='ident'>Matrix</span>, <span class='ident'>BaseMatrix</span>, <span class='ident'>BaseMatrixMut</span>, <span class='ident'>Vector</span>};
 <span class='kw'>use</span> <span class='kw'>super</span>::{<span class='ident'>Invertible</span>, <span class='ident'>Transformer</span>};
 
 <span class='kw'>use</span> <span class='ident'>rulinalg</span>::<span class='ident'>utils</span>;
@@ -342,9 +359,9 @@
 <span class='attribute'>#[<span class='ident'>derive</span>(<span class='ident'>Debug</span>)]</span>
 <span class='kw'>pub</span> <span class='kw'>struct</span> <span class='ident'>MinMaxScaler</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Float</span><span class='op'>&gt;</span> {
     <span class='doccomment'>/// Values to scale each column by</span>
-    <span class='ident'>scale_factors</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span>,
+    <span class='ident'>scale_factors</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span>,
     <span class='doccomment'>/// Values to add to each column after scaling</span>
-    <span class='ident'>const_factors</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span>,
+    <span class='ident'>const_factors</span>: <span class='prelude-ty'>Option</span><span class='op'>&lt;</span><span class='ident'>Vector</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span>,
     <span class='doccomment'>/// The min of the new data (default 0)</span>
     <span class='ident'>scaled_min</span>: <span class='ident'>T</span>,
     <span class='doccomment'>/// The max of the new data (default 1)</span>
@@ -382,9 +399,12 @@
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Float</span><span class='op'>&gt;</span> <span class='ident'>Transformer</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>MinMaxScaler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
-    <span class='kw'>fn</span> <span class='ident'>transform</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>mut</span> <span class='ident'>inputs</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
+
+    <span class='kw'>fn</span> <span class='ident'>fit</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='ident'>inputs</span>: <span class='kw-2'>&amp;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span>(), <span class='ident'>Error</span><span class='op'>&gt;</span> {
         <span class='kw'>let</span> <span class='ident'>features</span> <span class='op'>=</span> <span class='ident'>inputs</span>.<span class='ident'>cols</span>();
 
+        <span class='comment'>// ToDo: can use min, max</span>
+        <span class='comment'>// https://github.com/AtheMathmo/rulinalg/pull/115</span>
         <span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>input_min_max</span> <span class='op'>=</span> <span class='macro'>vec</span><span class='macro'>!</span>[(<span class='ident'>T</span>::<span class='ident'>max_value</span>(), <span class='ident'>T</span>::<span class='ident'>min_value</span>()); <span class='ident'>features</span>];
 
         <span class='kw'>for</span> <span class='ident'>row</span> <span class='kw'>in</span> <span class='ident'>inputs</span>.<span class='ident'>iter_rows</span>() {
@@ -395,18 +415,14 @@
                                                    processed&quot;</span>,
                                                   <span class='ident'>idx</span>)));
                 }
-
                 <span class='comment'>// Update min</span>
                 <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>feature</span> <span class='op'>&lt;</span> <span class='ident'>min_max</span>.<span class='number'>0</span> {
                     <span class='ident'>min_max</span>.<span class='number'>0</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>feature</span>;
                 }
-
                 <span class='comment'>// Update max</span>
                 <span class='kw'>if</span> <span class='op'>*</span><span class='ident'>feature</span> <span class='op'>&gt;</span> <span class='ident'>min_max</span>.<span class='number'>1</span> {
                     <span class='ident'>min_max</span>.<span class='number'>1</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>feature</span>;
                 }
-
-                
             }
         }
 
@@ -430,28 +446,46 @@
             .<span class='ident'>map</span>(<span class='op'>|</span>(<span class='kw-2'>&amp;</span>(_, <span class='ident'>x</span>), <span class='kw-2'>&amp;</span><span class='ident'>s</span>)<span class='op'>|</span> <span class='self'>self</span>.<span class='ident'>scaled_max</span> <span class='op'>-</span> <span class='ident'>x</span> <span class='op'>*</span> <span class='ident'>s</span>)
             .<span class='ident'>collect</span>::<span class='op'>&lt;</span><span class='ident'>Vec</span><span class='op'>&lt;</span>_<span class='op'>&gt;&gt;</span>();
 
-        <span class='kw'>for</span> <span class='ident'>row</span> <span class='kw'>in</span> <span class='ident'>inputs</span>.<span class='ident'>iter_rows_mut</span>() {
-            <span class='ident'>utils</span>::<span class='ident'>in_place_vec_bin_op</span>(<span class='ident'>row</span>, <span class='kw-2'>&amp;</span><span class='ident'>scales</span>, <span class='op'>|</span><span class='ident'>x</span>, <span class='kw-2'>&amp;</span><span class='ident'>y</span><span class='op'>|</span> {
-                <span class='op'>*</span><span class='ident'>x</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>*</span> <span class='ident'>y</span>;
-            });
+        <span class='self'>self</span>.<span class='ident'>scale_factors</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>scales</span>));
+        <span class='self'>self</span>.<span class='ident'>const_factors</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>Vector</span>::<span class='ident'>new</span>(<span class='ident'>consts</span>));
+        <span class='prelude-val'>Ok</span>(())
+    }
 
-            <span class='ident'>utils</span>::<span class='ident'>in_place_vec_bin_op</span>(<span class='ident'>row</span>, <span class='kw-2'>&amp;</span><span class='ident'>consts</span>, <span class='op'>|</span><span class='ident'>x</span>, <span class='kw-2'>&amp;</span><span class='ident'>y</span><span class='op'>|</span> {
-                <span class='op'>*</span><span class='ident'>x</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>+</span> <span class='ident'>y</span>;
-            });
+    <span class='kw'>fn</span> <span class='ident'>transform</span>(<span class='kw-2'>&amp;</span><span class='kw-2'>mut</span> <span class='self'>self</span>, <span class='kw-2'>mut</span> <span class='ident'>inputs</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
+        <span class='kw'>if</span> <span class='kw'>let</span> (<span class='kw-2'>&amp;</span><span class='prelude-val'>None</span>, <span class='kw-2'>&amp;</span><span class='prelude-val'>None</span>) <span class='op'>=</span> (<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>scale_factors</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>const_factors</span>) {
+            <span class='comment'>// if Transformer is not fitted to the data, fit for backward-compat.</span>
+            <span class='macro'>try</span><span class='macro'>!</span>(<span class='self'>self</span>.<span class='ident'>fit</span>(<span class='kw-2'>&amp;</span><span class='ident'>inputs</span>));
         }
 
-        <span class='self'>self</span>.<span class='ident'>scale_factors</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>scales</span>);
-        <span class='self'>self</span>.<span class='ident'>const_factors</span> <span class='op'>=</span> <span class='prelude-val'>Some</span>(<span class='ident'>consts</span>);
+        <span class='kw'>if</span> <span class='kw'>let</span> (<span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>scales</span>), <span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>consts</span>)) <span class='op'>=</span> (<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>scale_factors</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>const_factors</span>) {
+            <span class='kw'>if</span> <span class='ident'>scales</span>.<span class='ident'>size</span>() <span class='op'>!=</span> <span class='ident'>inputs</span>.<span class='ident'>cols</span>() {
+                <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidData</span>,
+                               <span class='string'>&quot;Input data has different number of columns from fitted data.&quot;</span>))
+            } <span class='kw'>else</span> {
+                <span class='kw'>for</span> <span class='ident'>row</span> <span class='kw'>in</span> <span class='ident'>inputs</span>.<span class='ident'>iter_rows_mut</span>() {
+                    <span class='ident'>utils</span>::<span class='ident'>in_place_vec_bin_op</span>(<span class='ident'>row</span>, <span class='ident'>scales</span>.<span class='ident'>data</span>(), <span class='op'>|</span><span class='ident'>x</span>, <span class='kw-2'>&amp;</span><span class='ident'>y</span><span class='op'>|</span> {
+                        <span class='op'>*</span><span class='ident'>x</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>*</span> <span class='ident'>y</span>;
+                    });
 
-        <span class='prelude-val'>Ok</span>(<span class='ident'>inputs</span>)
+                    <span class='ident'>utils</span>::<span class='ident'>in_place_vec_bin_op</span>(<span class='ident'>row</span>, <span class='ident'>consts</span>.<span class='ident'>data</span>(), <span class='op'>|</span><span class='ident'>x</span>, <span class='kw-2'>&amp;</span><span class='ident'>y</span><span class='op'>|</span> {
+                        <span class='op'>*</span><span class='ident'>x</span> <span class='op'>=</span> <span class='op'>*</span><span class='ident'>x</span> <span class='op'>+</span> <span class='ident'>y</span>;
+                    });
+                }
+                <span class='prelude-val'>Ok</span>(<span class='ident'>inputs</span>)
+            }
+        } <span class='kw'>else</span> {
+            <span class='comment'>// can&#39;t happen</span>
+            <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidState</span>, <span class='string'>&quot;Transformer has not been fitted.&quot;</span>))
+        }
     }
 }
 
 <span class='kw'>impl</span><span class='op'>&lt;</span><span class='ident'>T</span>: <span class='ident'>Float</span><span class='op'>&gt;</span> <span class='ident'>Invertible</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;&gt;</span> <span class='kw'>for</span> <span class='ident'>MinMaxScaler</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span> {
+
     <span class='kw'>fn</span> <span class='ident'>inv_transform</span>(<span class='kw-2'>&amp;</span><span class='self'>self</span>, <span class='kw-2'>mut</span> <span class='ident'>inputs</span>: <span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>) <span class='op'>-&gt;</span> <span class='prelude-ty'>Result</span><span class='op'>&lt;</span><span class='ident'>Matrix</span><span class='op'>&lt;</span><span class='ident'>T</span><span class='op'>&gt;</span>, <span class='ident'>Error</span><span class='op'>&gt;</span> {
         <span class='kw'>if</span> <span class='kw'>let</span> (<span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>scales</span>), <span class='kw-2'>&amp;</span><span class='prelude-val'>Some</span>(<span class='kw-2'>ref</span> <span class='ident'>consts</span>)) <span class='op'>=</span> (<span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>scale_factors</span>, <span class='kw-2'>&amp;</span><span class='self'>self</span>.<span class='ident'>const_factors</span>) {
 
-            <span class='kw'>let</span> <span class='ident'>features</span> <span class='op'>=</span> <span class='ident'>scales</span>.<span class='ident'>len</span>();
+            <span class='kw'>let</span> <span class='ident'>features</span> <span class='op'>=</span> <span class='ident'>scales</span>.<span class='ident'>size</span>();
             <span class='kw'>if</span> <span class='ident'>inputs</span>.<span class='ident'>cols</span>() <span class='op'>!=</span> <span class='ident'>features</span> {
                 <span class='kw'>return</span> <span class='prelude-val'>Err</span>(<span class='ident'>Error</span>::<span class='ident'>new</span>(<span class='ident'>ErrorKind</span>::<span class='ident'>InvalidData</span>,
                                       <span class='string'>&quot;Inputs have different feature count than transformer.&quot;</span>));
@@ -610,11 +644,9 @@
     <script>
         window.rootPath = "../../../../../";
         window.currentCrate = "rusty_machine";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../../../jquery.js"></script>
     <script src="../../../../../main.js"></script>
-    
     <script defer src="../../../../../search-index.js"></script>
 </body>
 </html>

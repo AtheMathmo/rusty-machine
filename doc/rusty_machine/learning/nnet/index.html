@@ -47,7 +47,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a id='src-985' class='srclink' href='../../../src/rusty_machine/src/learning/nnet.rs.html#1-537' title='goto source code'>[src]</a></span></h1>
+               </span><a id='src-720' class='srclink' href='../../../src/rusty_machine/src/learning/nnet.rs.html#1-537' title='goto source code'>[src]</a></span></h1>
 <div class='docblock'><p>Neural Network module</p>
 
 <p>Contains implementation of simple feed forward neural network.</p>
@@ -80,7 +80,7 @@
 <span class='kw'>let</span> <span class='ident'>test_inputs</span> <span class='op'>=</span> <span class='ident'>Matrix</span>::<span class='ident'>new</span>(<span class='number'>2</span>,<span class='number'>3</span>, <span class='macro'>vec</span><span class='macro'>!</span>[<span class='number'>1.5</span>,<span class='number'>1.5</span>,<span class='number'>1.5</span>,<span class='number'>5.1</span>,<span class='number'>5.1</span>,<span class='number'>5.1</span>]);
 
 <span class='comment'>// And predict new output from the test inputs</span>
-<span class='kw'>let</span> <span class='ident'>outputs</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>test_inputs</span>).<span class='ident'>unwrap</span>();<a class='test-arrow' target='_blank' href=''>Run</a></pre>
+<span class='kw'>let</span> <span class='ident'>outputs</span> <span class='op'>=</span> <span class='ident'>model</span>.<span class='ident'>predict</span>(<span class='kw-2'>&amp;</span><span class='ident'>test_inputs</span>).<span class='ident'>unwrap</span>();</pre>
 
 <p>The neural networks are specified via a criterion - similar to
 <a href="https://github.com/torch/nn/blob/master/doc/criterion.md">Torch</a>.
@@ -181,11 +181,9 @@ trait with a concrete <code>ActivationFunc</code> and <code>CostFunc</code>.</p>
     <script>
         window.rootPath = "../../../";
         window.currentCrate = "rusty_machine";
-        window.playgroundUrl = "";
     </script>
     <script src="../../../jquery.js"></script>
     <script src="../../../main.js"></script>
-    
     <script defer src="../../../search-index.js"></script>
 </body>
 </html>
