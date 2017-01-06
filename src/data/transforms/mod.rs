@@ -6,7 +6,7 @@
 //! The `Transformer` trait provides a shared interface for all of the
 //! data preprocessing transformations in rusty-machine.
 //!
-//! The transformers provide preprocessing transformations which are 
+//! The transformers provide preprocessing transformations which are
 //! commonly used in machine learning.
 
 pub mod minmax;
@@ -21,6 +21,8 @@ pub use self::standardize::Standardizer;
 
 /// Trait for data transformers
 pub trait Transformer<T> {
+    /// Fit Transformer to input data, and stores the transformation in the Transformer
+    fn fit(&mut self, inputs: &T) -> Result<(), error::Error>;
     /// Transforms the inputs and stores the transformation in the Transformer
     fn transform(&mut self, inputs: T) -> Result<T, error::Error>;
 }
