@@ -2,6 +2,32 @@
 
 This document will be used to keep track of changes made between release versions. I'll do my best to note any breaking changes!
 
+## 0.5.4
+
+### New Contributors
+
+- [sinhrks](https://github.com/sinhrks)
+
+### Breaking Changes
+
+- None
+
+### Features
+
+- Add a new `datasets` module behind a `datasets` feature flag.
+- Add new classification scores: `precision`, `recall`, and `f1`.
+- Add a new `Transformer::fit` function to allow prefitting of a
+`Transformer` before use.
+
+### Bug Fixes
+
+- None
+
+### Minor Changes
+
+- `LinRegressor` now uses `solve` instead of `inverse` for improved
+accuracy and stability.
+
 ## 0.5.3
 
 ### Breaking Changes
