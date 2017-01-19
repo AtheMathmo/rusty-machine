@@ -138,6 +138,7 @@ pub mod learning {
     pub mod gp;
     pub mod svm;
     pub mod naive_bayes;
+    pub mod lda;
 
     pub mod error;
 
