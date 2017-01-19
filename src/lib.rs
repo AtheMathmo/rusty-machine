@@ -25,6 +25,7 @@
 //! - Gaussian Mixture Models
 //! - Naive Bayes Classifiers
 //! - DBSCAN
+//! - Latent Dirichlet Allocation
 //!
 //! ### linalg
 //!
