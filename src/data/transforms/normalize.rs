@@ -64,7 +64,7 @@ impl Normalizer {
 
 impl<T: Float> Transformer<Matrix<T>> for Normalizer {
     fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
-        let dists: Vec<T> = inputs.iter_rows().map(|x| dist(x)).collect();
+        let dists: Vec<T> = inputs.iter_rows().map(dist).collect();
         for (row, &d) in inputs.iter_rows_mut().zip(dists.iter()) {
 
             if !d.is_finite() {
