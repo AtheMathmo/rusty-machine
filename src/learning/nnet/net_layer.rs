@@ -62,7 +62,7 @@ impl Linear {
         }
     }
 
-    /// Construct a Linear layer with a bias term
+    /// Construct a Linear layer without a bias term
     pub fn without_bias(input_size: usize, output_size: usize) -> Linear {
         Linear {
             input_size: input_size, 
