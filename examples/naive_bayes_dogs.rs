@@ -135,16 +135,16 @@ fn main() {
     // Score how well we did.
     let mut hits = 0;
     let unprinted_total = test_set_size.saturating_sub(10) as usize;
-    for (dog, prediction) in test_dogs.iter().zip(predictions.iter_rows()).take(unprinted_total) {
-        evaluate_prediction(&mut hits, dog, prediction);
+    for (dog, prediction) in test_dogs.iter().zip(predictions.row_iter()).take(unprinted_total) {
+        evaluate_prediction(&mut hits, dog, prediction.raw_slice());
     }
-    
+
     if unprinted_total > 0 {
         println!("...");
     }
-    
-    for (dog, prediction) in test_dogs.iter().zip(predictions.iter_rows()).skip(unprinted_total) {
-        let (actual_color, accurate) = evaluate_prediction(&mut hits, dog, prediction);
+
+    for (dog, prediction) in test_dogs.iter().zip(predictions.row_iter()).skip(unprinted_total) {
+        let (actual_color, accurate) = evaluate_prediction(&mut hits, dog, prediction.raw_slice());
         println!("Predicted: {:?}; Actual: {:?}; Accurate? {:?}",
                  dog.color, actual_color, accurate);
     }

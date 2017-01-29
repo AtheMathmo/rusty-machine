@@ -165,7 +165,7 @@ impl GaussianMixtureModel {
         if mixture_weights.size() != k {
             Err(Error::new(ErrorKind::InvalidParameters, "Mixture weights must have length k."))
         } else if mixture_weights.data().iter().any(|&x| x < 0f64) {
-            Err(Error::new(ErrorKind::InvalidParameters, "Mixture weights must have only non-negative entries.")) 
+            Err(Error::new(ErrorKind::InvalidParameters, "Mixture weights must have only non-negative entries."))
         } else {
             let sum = mixture_weights.sum();
             let normalized_weights = mixture_weights / sum;
@@ -233,9 +233,9 @@ impl GaussianMixtureModel {
             CovOption::Full | CovOption::Regularized(_) => {
                 let means = inputs.mean(Axes::Row);
                 let mut cov_mat = Matrix::zeros(inputs.cols(), inputs.cols());
-                for (j, row) in cov_mat.iter_rows_mut().enumerate() {
+                for (j, mut row) in cov_mat.row_iter_mut().enumerate() {
                     for (k, elem) in row.iter_mut().enumerate() {
-                        *elem = inputs.iter_rows().map(|r| {
+                        *elem = inputs.row_iter().map(|r| {
                             (r[j] - means[j]) * (r[k] - means[k])
                         }).sum::<f64>();
                     }
@@ -259,10 +259,10 @@ impl GaussianMixtureModel {
         let mut cov_invs = Vec::with_capacity(self.comp_count);
 
         if let Some(ref covars) = self.model_covars {
-            for cov in covars {
+            for cov in covars.iter() {
                 // TODO: combine these. We compute det to get the inverse.
-                let covar_det = cov.det();
-                let covar_inv = try!(cov.inverse().map_err(Error::from));
+                let covar_det = cov.clone().det();
+                let covar_inv = try!(cov.clone().inverse().map_err(Error::from));
 
                 cov_sqrt_dets.push(covar_det.sqrt());
                 cov_invs.push(covar_inv);
@@ -309,7 +309,7 @@ impl GaussianMixtureModel {
 
         let mut new_means = membership_weights.transpose() * inputs;
 
-        for (mean, w) in new_means.iter_rows_mut().zip(sum_weights.data().iter()) {
+        for (mut mean, w) in new_means.row_iter_mut().zip(sum_weights.data().iter()) {
             for m in mean.iter_mut() {
                 *m /= *w;
             }

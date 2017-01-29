@@ -90,7 +90,7 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
         // https://github.com/AtheMathmo/rulinalg/pull/115
         let mut input_min_max = vec![(T::max_value(), T::min_value()); features];
 
-        for row in inputs.iter_rows() {
+        for row in inputs.row_iter() {
             for (idx, (feature, min_max)) in row.into_iter().zip(input_min_max.iter_mut()).enumerate() {
                 if !feature.is_finite() {
                     return Err(Error::new(ErrorKind::InvalidData,
@@ -129,6 +129,7 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
             .map(|(&(_, x), &s)| self.scaled_max - x * s)
             .collect::<Vec<_>>();
 
+<<<<<<< HEAD
         self.scale_factors = Some(Vector::new(scales));
         self.const_factors = Some(Vector::new(consts));
         Ok(())
@@ -145,15 +146,14 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
                 Err(Error::new(ErrorKind::InvalidData,
                                "Input data has different number of columns from fitted data."))
             } else {
-                for row in inputs.iter_rows_mut() {
-                    utils::in_place_vec_bin_op(row, scales.data(), |x, &y| {
+                for mut row in inputs.row_iter_mut() {
+                    utils::in_place_vec_bin_op(&mut row.raw_slice_mut(), &scales, |x, &y| {
                         *x = *x * y;
                     });
 
-                    utils::in_place_vec_bin_op(row, consts.data(), |x, &y| {
+                    utils::in_place_vec_bin_op(&mut row.raw_slice_mut(), &consts, |x, &y| {
                         *x = *x + y;
                     });
-                }
                 Ok(inputs)
             }
         } else {
@@ -174,7 +174,7 @@ impl<T: Float> Invertible<Matrix<T>> for MinMaxScaler<T> {
                                       "Inputs have different feature count than transformer."));
             }
 
-            for row in inputs.iter_rows_mut() {
+            for mut row in inputs.row_iter_mut() {
                 for i in 0..features {
                     row[i] = (row[i] - consts[i]) / scales[i];
                 }
