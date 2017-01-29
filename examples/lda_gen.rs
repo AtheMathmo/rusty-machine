@@ -1,3 +1,14 @@
+/// An example of how Latent Diriclhet Allocation (LDA) can be used.  This example begins by
+/// generating a distribution of words to categories.  This distribution is creatred so that
+/// there are 10 topics.  Each of the 25 words are assigned to two topics with equal probability.
+/// (The distribution of words is printed to the screen as a chart.  Each entry in the chart
+///corresponds to a word in the vocabulary, arranged into a square for easy viewing).  Documents
+/// are then generated based on these distributions (each topic is assumed equally likely to be
+/// assigned to a document, but each document has only one topic).
+///
+/// Once the documents are created, then the example uses LDA to attempt to reverse engineer the
+/// distrbution of words, and prints the results to the screen for comparison.
+
 extern crate rusty_machine;
 extern crate rand;
 extern crate rulinalg;
@@ -8,6 +19,8 @@ use rusty_machine::learning::lda::LDA;
 
 use rand::{thread_rng, Rng};
 use rand::distributions::{gamma, IndependentSample};
+
+use std::cmp::max;
 
 /// Given `topic_count` topics, this function will create a distrbution of words for each
 /// topic.  For simplicity, this function assumes that the total number of words in the corpus
@@ -69,29 +82,10 @@ fn generate_documents(word_distribution: &Matrix<f64>, topic_count: usize, vocab
     Matrix::new(document_count, vocab_size, documents)
 }
 
-/// Displays the distrbution of words to a topic as a square graph
-fn display_topic(topic: &Vector<f64>, width: usize) {
-    let max = topic.iter().fold(0.0, |a, b|{
-         if a > *b {
-            a
-        } else {
-            *b
-        }
-    });
-    for (index, element) in topic.iter().enumerate() {
-        let col = index % width;
-        let out = element / max * 9.0;
-        print!("{}", out as usize);
-        if col == width - 1 {
-            print!("\n");
-        }
-    }
-}
-
 /// Chooses from a vector of probailities.
 fn choose_from(probability: &Vector<f64>) -> usize {
     let mut rng = thread_rng();
-    let selection:f64 = rng.gen_range(0.0, 1.0);
+    let selection:f64 = rng.next_f64();
     let mut total:f64 = 0.0;
     for (index, p) in probability.iter().enumerate() {
         total += *p;
@@ -102,24 +96,96 @@ fn choose_from(probability: &Vector<f64>) -> usize {
     return probability.size() - 1;
 }
 
+/// Displays the distrbution of words to a topic as a square graph
+fn topic_to_string(topic: &Vector<f64>, width: usize, topic_index: usize) -> String {
+    let max = topic.iter().fold(0.0, |a, b|{
+        if a > *b {
+            a
+        } else {
+            *b
+        }
+    });
+    let mut result = String::with_capacity(topic.size() * (topic.size()/width) + 18);
+    result.push_str(&format!("Topic {}\n", topic_index));
+    result.push_str("-------\n");
+    for (index, element) in topic.iter().enumerate() {
+        let col = index % width;
+        let out = element / max * 9.0;
+        if out >= 1.0 {
+            result.push_str(&(out as u32).to_string());
+        } else {
+            result.push('.');
+        }
+        if col == width - 1 {
+            result.push('\n');
+        }
+    }
+    result
+}
+
+
+/// Prints a collection of multiline strings in columns
+fn print_multi_line(o: &Vec<String>, column_width: usize) {
+    let o_split:Vec<_> = o.iter().map(|col| {col.split('\n').collect::<Vec<_>>()}).collect();
+    let mut still_printing = true;
+    let mut line_index = 0;
+    while still_printing {
+        let mut gap = 0;
+        still_printing = false;
+        for col in o_split.iter() {
+            if col.len() > line_index {
+                if gap > 0 {
+                    print!("{:width$}", "", width=column_width * gap);
+                    gap = 0;
+                }
+                let line = col[line_index];
+                print!("{:width$}", line, width=column_width);
+                still_printing = true;
+            } else {
+                gap += 1;
+            }
+        }
+        print!("\n");
+        line_index += 1
+
+    }
+}
+
+
+/// Prints the word distribution within topics
+fn print_topic_distribution(dist: &Matrix<f64>, topic_count: usize, width: usize) {
+    let top_strings = &dist.row_iter().take(topic_count/2).enumerate().map(|(topic_index, topic)|topic_to_string(&topic.into(), width, topic_index + 1)).collect();
+    let bottom_strings = &dist.row_iter().skip(topic_count/2).enumerate().map(|(topic_index, topic)|topic_to_string(&topic.into(), width, topic_index + 1 + topic_count / 2)).collect();
+
+    print_multi_line(top_strings, max(12, width + 1));
+    print_multi_line(bottom_strings, max(12, width + 1));
+}
+
 pub fn main() {
-    let topic_count = 10;
+    // Set initial constants
+    // These can be changed as you wish
+    let topic_count = 28;
     let document_length = 100;
     let document_count = 500;
     let alpha = 0.1;
+
+    // Don't change these though; they are calculated based on the above
     let width = topic_count / 2;
     let vocab_count = width * width;
-    println!("Generating documents");
+    println!("Creating word distribution");
     let word_distribution = generate_word_distribution(topic_count);
+    println!("Distrbution generated:");
+    print_topic_distribution(&word_distribution, topic_count, width);
+    println!("Generating documents");
     let input = generate_documents(&word_distribution, topic_count, vocab_count, document_count, document_length, alpha);
     let lda = LDA::new(topic_count, alpha, 0.1);
-    println!("Predicting");
+    println!("Predicting word distrbution from generated documents");
     let result =  lda.predict(&(input, 30)).unwrap();
     let dist = result.phi();
-    println!("Prediction completed");
-    for (topic, row) in dist.row_iter().enumerate() {
-        println!("\nTopic {}", topic);
-        display_topic(&row.into(), width);
-    }
+    println!("Prediction completed.  Predicted word distribution:");
+    println!("(Should be similar generated distribution above)", );
+
+    print_topic_distribution(&dist, topic_count, width);
+
 
 }
