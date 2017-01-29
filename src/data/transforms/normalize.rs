@@ -63,6 +63,12 @@ impl Normalizer {
 }
 
 impl<T: Float> Transformer<Matrix<T>> for Normalizer {
+
+    fn fit(&mut self, _: &Matrix<T>) -> Result<(), Error> {
+        // no op, because it has no parameter to fit
+        Ok(())
+    }
+
     fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
         let dists: Vec<T> = inputs.iter_rows().map(dist).collect();
         for (row, &d) in inputs.iter_rows_mut().zip(dists.iter()) {
