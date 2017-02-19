@@ -41,6 +41,7 @@ use learning::error::{Error, ErrorKind};
 
 use linalg::{Matrix, Vector, BaseMatrix};
 use rulinalg::utils;
+use rulinalg::matrix::Row;
 
 /// DBSCAN Model
 ///
@@ -86,7 +87,7 @@ impl UnSupModel<Matrix<f64>, Vector<Option<usize>>> for DBSCAN {
             if !visited {
                 self._visited[idx] = true;
 
-                let neighbours = self.region_query(point.raw_slice(), inputs);
+                let neighbours = self.region_query(point, inputs);
 
                 if neighbours.len() >= self.min_points {
                     self.expand_cluster(inputs, idx, neighbours, cluster);
@@ -183,7 +184,7 @@ impl DBSCAN {
             if !visited {
                 self._visited[*data_point_idx] = true;
                 let data_point_row = unsafe { inputs.row_unchecked(*data_point_idx) };
-                let sub_neighbours = self.region_query(data_point_row.raw_slice(), inputs);
+                let sub_neighbours = self.region_query(data_point_row, inputs);
 
                 if sub_neighbours.len() >= self.min_points {
                     self.expand_cluster(inputs, *data_point_idx, sub_neighbours, cluster);
@@ -193,13 +194,14 @@ impl DBSCAN {
     }
 
 
-    fn region_query(&self, point: &[f64], inputs: &Matrix<f64>) -> Vec<usize> {
-        debug_assert!(point.len() == inputs.cols(),
+    fn region_query(&self, point: Row<f64>, inputs: &Matrix<f64>) -> Vec<usize> {
+        debug_assert!(point.cols() == inputs.cols(),
                       "point must be of same dimension as inputs");
 
         let mut in_neighbourhood = Vec::new();
         for (idx, data_point) in inputs.row_iter().enumerate() {
-            let point_distance = utils::vec_bin_op(data_point.raw_slice(), point, |x, y| x - y);
+            //TODO: Use `MatrixMetric` when rulinalg#154 is fixed.
+            let point_distance = utils::vec_bin_op(data_point.raw_slice(), point.raw_slice(), |x, y| x - y);
             let dist = utils::dot(&point_distance, &point_distance).sqrt();
 
             if dist < self.eps {
@@ -227,7 +229,7 @@ impl DBSCAN {
 #[cfg(test)]
 mod tests {
     use super::DBSCAN;
-    use linalg::Matrix;
+    use linalg::{Matrix, BaseMatrix};
 
     #[test]
     fn test_region_query() {
@@ -235,7 +237,9 @@ mod tests {
 
         let inputs = Matrix::new(3, 2, vec![1.0, 1.0, 1.1, 1.9, 3.0, 3.0]);
 
-        let neighbours = model.region_query(&[1.0, 1.0], &inputs);
+        let m = matrix![1.0, 1.0];
+        let row = m.row(0);
+        let neighbours = model.region_query(row, &inputs);
 
         assert!(neighbours.len() == 2);
     }
@@ -246,7 +250,9 @@ mod tests {
 
         let inputs = Matrix::new(3, 2, vec![1.0, 1.0, 1.1, 1.9, 1.1, 1.1]);
 
-        let neighbours = model.region_query(&[1.0, 1.0], &inputs);
+        let m = matrix![1.0, 1.0];
+        let row = m.row(0);
+        let neighbours = model.region_query(row, &inputs);
 
         assert!(neighbours.len() == 1);
     }
