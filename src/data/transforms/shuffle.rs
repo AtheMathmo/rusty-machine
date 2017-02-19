@@ -12,7 +12,9 @@
 //! use rusty_machine::data::transforms::shuffle::Shuffler;
 //!
 //! // Create an input matrix that we want to shuffle
-//! let mat = Matrix::new(3, 2, vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
+//! let mat = Matrix::new(3, 2, vec![1.0, 2.0,
+//!                                  3.0, 4.0,
+//!                                  5.0, 6.0]);
 //!
 //! // Create a new shuffler
 //! let mut shuffler = Shuffler::default();
@@ -22,7 +24,6 @@
 //! ```
 
 use learning::LearningResult;
-use learning::error::Error;
 use linalg::{Matrix, BaseMatrix, BaseMatrixMut};
 use super::Transformer;
 
@@ -75,12 +76,6 @@ impl Default for Shuffler<ThreadRng> {
 ///
 /// Under the hood this uses a Fisher-Yates shuffle.
 impl<R: Rng, T> Transformer<Matrix<T>> for Shuffler<R> {
-
-    #[allow(unused_variables)]
-    fn fit(&mut self, inputs: &Matrix<T>) -> Result<(), Error> {
-        Ok(())
-    }
-
     fn transform(&mut self, mut inputs: Matrix<T>) -> LearningResult<Matrix<T>> {
         let n = inputs.rows();
 
@@ -89,7 +84,6 @@ impl<R: Rng, T> Transformer<Matrix<T>> for Shuffler<R> {
             let j = self.rng.gen_range(0, n - i);
             inputs.swap_rows(i, i + j);
         }
-
         Ok(inputs)
     }
 }
@@ -123,17 +117,5 @@ mod tests {
 
         assert_eq!(shuffled.into_vec(),
                    vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]);
-    }
-
-    #[test]
-    fn shuffle_fit() {
-        let rng = StdRng::from_seed(&[1, 2, 3]);
-        let mut shuffler = Shuffler::new(rng);
-
-        // no op
-        let mat = Matrix::new(4, 2, vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]);
-        let res = shuffler.fit(&mat).unwrap();
-
-        assert_eq!(res, ());
     }
 }
