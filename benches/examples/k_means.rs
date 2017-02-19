@@ -20,10 +20,10 @@ fn generate_data(centroids: &Matrix<f64>, points_per_centroid: usize, noise: f64
 
     for _ in 0..points_per_centroid {
         // Generate points from each centroid
-        for centroid in centroids.iter_rows() {
+        for centroid in centroids.row_iter() {
             // Generate a point randomly around the centroid
             let mut point = Vec::with_capacity(centroids.cols());
-            for feature in centroid {
+            for feature in centroid.iter() {
                 point.push(feature + normal_rv.ind_sample(&mut rng));
             }
 
