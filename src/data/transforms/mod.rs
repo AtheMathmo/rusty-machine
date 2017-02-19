@@ -10,12 +10,14 @@
 //! commonly used in machine learning.
 
 pub mod minmax;
+pub mod normalize;
 pub mod standardize;
 pub mod shuffle;
 
 use learning::error;
 
 pub use self::minmax::MinMaxScaler;
+pub use self::normalize::Normalizer;
 pub use self::shuffle::Shuffler;
 pub use self::standardize::Standardizer;
 

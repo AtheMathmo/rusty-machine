@@ -5,12 +5,12 @@ use rm::learning::UnSupModel;
 
 #[test]
 fn test_basic_clusters() {
-    let inputs = Matrix::new(6, 2, vec![1.0, 2.0,
-                                        1.1, 2.2,
-                                        0.9, 1.9,
-                                        1.0, 2.1,
-                                        -2.0, 3.0,
-                                        -2.2, 3.1]);
+    let inputs = matrix![1.0, 2.0;
+                         1.1, 2.2;
+                         0.9, 1.9;
+                         1.0, 2.1;
+                        -2.0, 3.0;
+                        -2.2, 3.1];
 
     let mut model = DBSCAN::new(0.5, 2);
     model.train(&inputs).unwrap();
@@ -24,12 +24,12 @@ fn test_basic_clusters() {
 
 #[test]
 fn test_basic_prediction() {
-    let inputs = Matrix::new(6, 2, vec![1.0, 2.0,
-                                        1.1, 2.2,
-                                        0.9, 1.9,
-                                        1.0, 2.1,
-                                        -2.0, 3.0,
-                                        -2.2, 3.1]);
+    let inputs = matrix![1.0, 2.0;
+                         1.1, 2.2;
+                         0.9, 1.9;
+                         1.0, 2.1;
+                        -2.0, 3.0;
+                        -2.2, 3.1];
 
     let mut model = DBSCAN::new(0.5, 2);
     model.set_predictive(true);
