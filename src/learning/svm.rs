@@ -111,9 +111,9 @@ impl<K: Kernel> SVM<K> {
             let dim2 = m2.rows();
 
             let mut ker_data = Vec::with_capacity(dim1 * dim2);
-            ker_data.extend(m1.iter_rows().flat_map(|row1| {
-                m2.iter_rows()
-                    .map(move |row2| self.ker.kernel(row1, row2))
+            ker_data.extend(m1.row_iter().flat_map(|row1| {
+                m2.row_iter()
+                    .map(move |row2| self.ker.kernel(row1.raw_slice(), row2.raw_slice()))
             }));
 
             Ok(Matrix::new(dim1, dim2, ker_data))
@@ -154,8 +154,8 @@ impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
         for t in 0..self.optim_iters {
             let i = rng.gen_range(0, n);
             let row_i = full_inputs.select_rows(&[i]);
-            let sum = full_inputs.iter_rows()
-                .fold(0f64, |sum, row| sum + self.ker.kernel(row_i.data(), row)) *
+            let sum = full_inputs.row_iter()
+                .fold(0f64, |sum, row| sum + self.ker.kernel(row_i.data(), row.raw_slice())) *
                       targets[i] / (self.lambda * (t as f64));
 
             if sum < 1f64 {

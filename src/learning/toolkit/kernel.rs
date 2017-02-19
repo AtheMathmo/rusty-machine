@@ -5,7 +5,7 @@
 use std::ops::{Add, Mul};
 
 use linalg::Vector;
-use linalg::Metric;
+use linalg::norm::{Euclidean, VectorNorm, VectorMetric};
 use rulinalg::utils;
 
 /// The Kernel trait
@@ -350,7 +350,7 @@ impl Kernel for Exponential {
 
         let diff = Vector::new(x1.to_vec()) - Vector::new(x2.to_vec());
 
-        let x = -diff.norm() / (2f64 * self.ls * self.ls);
+        let x = -Euclidean.norm(&diff) / (2f64 * self.ls * self.ls);
         (self.ampl * x.exp())
     }
 }
@@ -452,9 +452,7 @@ impl Kernel for Multiquadric {
     fn kernel(&self, x1: &[f64], x2: &[f64]) -> f64 {
         assert_eq!(x1.len(), x2.len());
 
-        let diff = Vector::new(x1.to_vec()) - Vector::new(x2.to_vec());
-
-        diff.norm().hypot(self.c)
+        Euclidean.metric(&(x1.into()), &(x2.into())).hypot(self.c)
     }
 }
 

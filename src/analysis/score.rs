@@ -31,9 +31,10 @@ use learning::toolkit::cost_fn::{CostFunc, MeanSqError};
 /// # Panics
 ///
 /// - outputs and targets have different length
-pub fn accuracy<I>(outputs: I, targets: I) -> f64
-    where I: ExactSizeIterator,
-          I::Item: PartialEq
+pub fn accuracy<I1, I2, T>(outputs: I1, targets: I2) -> f64
+    where T: PartialEq,
+          I1: ExactSizeIterator + Iterator<Item=T>,
+          I2: ExactSizeIterator + Iterator<Item=T>
 {
     assert!(outputs.len() == targets.len(), "outputs and targets must have the same length");
     let len = outputs.len() as f64;
@@ -46,7 +47,8 @@ pub fn accuracy<I>(outputs: I, targets: I) -> f64
 
 /// Returns the fraction of outputs rows which match their target.
 pub fn row_accuracy(outputs: &Matrix<f64>, targets: &Matrix<f64>) -> f64 {
-    accuracy(outputs.iter_rows(), targets.iter_rows())
+    accuracy(outputs.row_iter().map(|r| r.raw_slice()),
+             targets.row_iter().map(|r| r.raw_slice()))
 }
 
 /// Returns the precision score for 2 class classification.
