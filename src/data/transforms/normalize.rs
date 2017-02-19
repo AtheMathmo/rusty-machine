@@ -3,7 +3,9 @@
 //! This module contains the `Normalizer` transformer.
 //!
 //! The `Normalizer` transformer is used to transform input data
-//! so that the l2 norm of each rows are all equal to 1.
+//! so that the norm of each row is equal to 1. By default the
+//! `Normalizer` uses the `Euclidean` norm.
+//!
 //! If input data has a row with all 0, `Normalizer` keeps the row as it is.
 //!
 //! Because transformation is performed per row independently,
@@ -25,44 +27,66 @@
 //! ```
 
 use learning::error::{Error, ErrorKind};
-use linalg::{Matrix, BaseMatrix, BaseMatrixMut};
+use linalg::{Matrix, MatrixSlice, BaseMatrix, BaseMatrixMut};
+use rulinalg::norm::{MatrixNorm, Euclidean};
+
 use super::Transformer;
 
 use libnum::Float;
 
+use std::marker::PhantomData;
+
 /// The Normalizer
 ///
 /// The Normalizer provides an implementation of `Transformer`
-/// which allows us to transform the all rows to have the same l2 norm (1).
+/// which allows us to transform the all rows to have the same norm.
+///
+/// The default `Normalizer` will use the `Euclidean` norm.
 ///
 /// See the module description for more information.
 #[derive(Debug)]
-pub struct Normalizer;
+pub struct Normalizer<T: Float, M>
+    where for<'a> M: MatrixNorm<T, MatrixSlice<'a, T>>
+{
+    norm: M,
+    _marker: PhantomData<T>
+}
 
-/// Create a `Normalizer`.
-impl Default for Normalizer {
+/// Create a `Normalizer` with a Euclidean norm.
+impl<T: Float> Default for Normalizer<T, Euclidean> {
     fn default() -> Self {
-        Normalizer {}
+        Normalizer {
+            norm: Euclidean,
+            _marker: PhantomData,
+        }
     }
 }
 
-impl Normalizer {
-    /// Constructs a new `Normalizer`, `Normalizer` takes no parameters for initialization.
+impl<T: Float, M> Normalizer<T, M>
+    where for<'a> M: MatrixNorm<T, MatrixSlice<'a, T>>
+{
+    /// Constructs a new `Normalizer` with given norm.
     ///
     /// # Examples
     ///
     /// ```
     /// use rusty_machine::data::transforms::Normalizer;
+    /// use rusty_machine::linalg::norm::Euclidean;
     ///
     /// // Constructs a new `Normalizer`
-    /// let _ = Normalizer::new();
+    /// let _ = Normalizer::<f64, Euclidean>::new(Euclidean);
     /// ```
-    pub fn new() -> Self {
-        Normalizer::default()
+    pub fn new(norm: M) -> Self {
+        Normalizer {
+            norm: norm,
+            _marker: PhantomData
+        }
     }
 }
 
-impl<T: Float> Transformer<Matrix<T>> for Normalizer {
+impl<T: Float, M> Transformer<Matrix<T>> for Normalizer<T, M>
+    where for<'a> M: MatrixNorm<T, MatrixSlice<'a, T>>
+{
 
     fn fit(&mut self, _: &Matrix<T>) -> Result<(), Error> {
         // no op, because it has no parameter to fit
@@ -70,25 +94,19 @@ impl<T: Float> Transformer<Matrix<T>> for Normalizer {
     }
 
     fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
-        let dists: Vec<T> = inputs.iter_rows().map(dist).collect();
-        for (row, &d) in inputs.iter_rows_mut().zip(dists.iter()) {
+        let dists: Vec<T> = inputs.row_iter().map(|m| self.norm.norm(&*m)).collect();
+        for (mut row, &d) in inputs.row_iter_mut().zip(dists.iter()) {
 
             if !d.is_finite() {
                 return Err(Error::new(ErrorKind::InvalidData,
                                       "Some data point is non-finite."));
             } else if d != T::zero() {
                 // no change if distance is 0
-                for r in row.iter_mut() {
-                    *r = *r / d;
-                }
+                *row /= d;
             }
         }
         Ok(inputs)
     }
-}
-
-fn dist<T: Float>(values: &[T]) -> T {
-    values.iter().fold(T::zero(), |x, &y| x + y * y).sqrt()
 }
 
 
