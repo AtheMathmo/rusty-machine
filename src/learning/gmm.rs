@@ -261,7 +261,7 @@ impl GaussianMixtureModel {
 
         if let Some(ref covars) = self.model_covars {
             for cov in covars {
-                let lup = PartialPivLu::decompose(cov.clone()).expect("Covariance was not invertible");
+                let lup = PartialPivLu::decompose(cov.clone()).expect("Covariance could not be lup decomposed");
                 let covar_det = lup.det();
                 // TODO: We can probably remove this inverse for a more stable solve elsewhere.
                 let covar_inv = try!(lup.inverse().map_err(Error::from));
