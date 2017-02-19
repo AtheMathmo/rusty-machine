@@ -28,7 +28,7 @@ struct DummyModel {
 impl SupModel<Matrix<f64>, Matrix<f64>> for DummyModel {
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
         let predictions: Vec<f64> = inputs
-            .iter_rows()
+            .row_iter()
             .map(|row| { self.sum + sum(row.iter()) })
             .collect();
         Ok(Matrix::new(inputs.rows(), 1, predictions))
