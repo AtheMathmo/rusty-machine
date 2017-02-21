@@ -19,13 +19,13 @@
 //! ```
 //! #[allow(unused_variables)]
 //! use rusty_machine::linalg::Matrix;
-//! use rusty_machine::data::transforms::{LDA, Transformer, TransformFitter};
+//! use rusty_machine::data::transforms::{LDAFitter, Transformer, TransformFitter};
 //!
 //! // Create a basic input array with 4 documents and 3 words
 //! let input = Matrix::ones(4, 3);
 //!
 //! // Create a model that will find 5 topics, with parameters alpha=0.1, beta=0.1
-//! let lda = LDA::new(5, 0.1, 0.1, 10);
+//! let lda = LDAFitter::new(5, 0.1, 0.1, 10);
 //!
 //! // Fit the model to the input
 //! let mut result = lda.fit(&input).unwrap();
@@ -103,10 +103,10 @@ impl LDAModel {
         let vocab_count = input.cols();
         let mut topics = Vec::with_capacity(document_count);
         let mut result = LDAModel {
-            document_topic_count: Matrix::zeros(document_count, topic_count),
-            topic_word_count: Matrix::zeros(topic_count, vocab_count),
-            topic_total_by_document: Vector::zeros(document_count),
-            word_total_by_topic: Vector::zeros(topic_count,),
+            document_topic_count: Matrix::new(document_count, topic_count, vec![alpha; document_count * topic_count]),
+            topic_word_count: Matrix::new(vocab_count, topic_count, vec![beta; topic_count * vocab_count]),
+            topic_total_by_document: Vector::new(vec![alpha * topic_count as f64; document_count]),
+            word_total_by_topic: Vector::new(vec![beta * vocab_count as f64; topic_count]),
             alpha: alpha,
             beta: beta
         };
@@ -120,7 +120,7 @@ impl LDAModel {
                     let topic = rng.gen_range(0, topic_count);
                     result.document_topic_count[[document, topic]] += 1.0;
                     result.topic_total_by_document[document] += 1.0;
-                    result.topic_word_count[[topic, word]] += 1.0;
+                    result.topic_word_count[[word, topic]] += 1.0;
                     result.word_total_by_topic[topic] += 1.0;
                     document_topics.push(topic);
                 }
@@ -131,10 +131,10 @@ impl LDAModel {
     }
 
     /// Find the distribution of words over topics.  This gives a matrix where the rows are
-    /// topics and the columns are words.  Each entry `topic, word)`` gives the probability of
+    /// topics and the columns are words.  Each entry `(topic, word)` gives the probability of
     /// `word` given `topic`.
     pub fn word_distribution(&self) -> Matrix<f64> {
-        let mut distribution = self.topic_word_count.clone() + self.beta;
+        let mut distribution = self.topic_word_count.transpose();
         let row_sum = distribution.sum_rows();
         // XXX To my knowledge, there is not presently a way in rulinalg to divide a matrix
         // by a vector, so I do it with a loop here.
@@ -143,25 +143,36 @@ impl LDAModel {
         }
         distribution
     }
+
+    /// Finds the distribution of cateogries across the documents originally used to
+    /// fit the model.  This gives a matrix where the rows are documents and the columns are
+    /// topics.  Each entry `(document, topic)` gives the probability of `topic` given `word`
+    pub fn category_distribution(&self) -> Matrix<f64> {
+        let mut distribution = self.document_topic_count.clone();
+        for (document, mut row) in distribution.row_iter_mut().enumerate() {
+            for c in row.iter_mut() {
+                *c /= self.topic_total_by_document[document];
+            }
+        }
+        distribution
+    }
+
 }
 
 impl LDAFitter {
-    fn conditional_distribution(&self, result: &LDAModel, document: usize, word: usize, vocab_count: f64, topic_count: f64) -> Vector<f64> {
+    fn conditional_distribution(&self, result: &LDAModel, document: usize, word: usize) -> Vector<f64> {
 
         // Convert the column of the word count by topic into a vector
-        let word_topic_count:Vector<f64> = result.topic_word_count.col(word).into();
+        let word_topic_count:Vector<f64> = unsafe {result.topic_word_count.row_unchecked(word)}.into();
 
         // Calculate the proportion of this word's contribution to each topic
-        let left:Vector<f64> = (word_topic_count + self.beta).elediv(
-            &(result.word_total_by_topic.clone() + self.beta * vocab_count)
-        );
+        let left:Vector<f64> = (word_topic_count).elediv(&result.word_total_by_topic);
 
         // Convert the row of the topic count by document into a vector
-        let topic_document_count:Vector<f64> = result.document_topic_count.row(document).into();
+        let topic_document_count:Vector<f64> = unsafe{result.document_topic_count.row_unchecked(document)}.into();
 
         // Calculate the proportion of each topic's contribution to this document
-        let right:Vector<f64> =  (topic_document_count + self.alpha) /
-            (result.topic_total_by_document[document] + self.alpha * topic_count);
+        let right:Vector<f64> =  topic_document_count / result.topic_total_by_document[document];
 
         // Multiply the proportions together to this word's contribution to the document by topic
         let mut probability:Vector<f64> = left.elemul(&right);
@@ -176,8 +187,6 @@ impl TransformFitter<Matrix<usize>, Matrix<f64>, LDAModel> for LDAFitter {
     /// Predict categories from the input matrix.
         fn fit(self, inputs: &Matrix<usize>) -> LearningResult<LDAModel> {
             let (mut result, mut topics) = LDAModel::new(inputs, self.topic_count, self.alpha, self.beta);
-            let vocab_count = inputs.cols() as f64;
-            let topic_count = self.topic_count as f64;
             let mut word_index:usize;
             for _ in 0..self.iterations {
                 for (document, row) in inputs.row_iter().enumerate() {
@@ -189,12 +198,12 @@ impl TransformFitter<Matrix<usize>, Matrix<f64>, LDAModel> for LDAFitter {
                             let mut topic = *unsafe{document_topics.get_unchecked(word_index)};
                             result.document_topic_count[[document, topic]] -= 1.0;
                             result.topic_total_by_document[document] -= 1.0;
-                            result.topic_word_count[[topic, word]] -= 1.0;
+                            result.topic_word_count[[word, topic]] -= 1.0;
                             result.word_total_by_topic[topic] -= 1.0;
 
                             // Find the probability of that word being a part of each topic
                             // based on the other words in the present document
-                            let probability = self.conditional_distribution(&result, document, word, vocab_count, topic_count);
+                            let probability = self.conditional_distribution(&result, document, word);
 
                             // Aandomly assign a new topic based on the probabilities from above
                             topic = choose_from(probability);
@@ -202,7 +211,7 @@ impl TransformFitter<Matrix<usize>, Matrix<f64>, LDAModel> for LDAFitter {
                             // Update the counts with the new topic
                             result.document_topic_count[[document, topic]] += 1.0;
                             result.topic_total_by_document[document] += 1.0;
-                            result.topic_word_count[[topic, word]] += 1.0;
+                            result.topic_word_count[[word, topic]] += 1.0;
                             result.word_total_by_topic[topic] += 1.0;
                             document_topics[word_index] = topic;
                             word_index += 1;
@@ -220,7 +229,7 @@ impl Transformer<Matrix<usize>, Matrix<f64>> for LDAModel {
         let input = Matrix::from_fn(input.rows(), input.cols(), |col, row| {
             input[[row, col]] as f64
         });
-        let mut distribution = input * self.topic_word_count.transpose();
+        let mut distribution = input * &self.topic_word_count;
 
         let row_sum = distribution.sum_rows();
         for (mut row, sum) in distribution.row_iter_mut().zip(row_sum.iter()) {
@@ -256,18 +265,19 @@ mod test {
     #[test]
     fn test_conditional_distribution() {
         let result = LDAModel {
-            topic_word_count: Matrix::new(3, 4, vec![3.0, 3.0, 5.0, 0.0,
-                                                     0.0, 1.0, 1.0, 0.0,
-                                                     0.0, 0.0, 5.0, 2.0]),
-            word_total_by_topic: Vector::new(vec![11.0, 2.0, 7.0]),
-            document_topic_count: Matrix::new(2, 3, vec![1.0, 2.0, 3.0,
-                                                         5.0, 5.0, 4.0]),
-            topic_total_by_document: Vector::new(vec![6.0, 14.0]),
+            topic_word_count: Matrix::new(4, 3, vec![3.1, 0.1, 0.1,
+                                                     3.1, 1.1, 0.1,
+                                                     5.1, 1.1, 5.1,
+                                                     0.1, 0.1, 2.1]),
+            word_total_by_topic: Vector::new(vec![11.4, 2.4, 7.4]),
+            document_topic_count: Matrix::new(2, 3, vec![1.1, 2.1, 3.1,
+                                                         5.1, 5.1, 4.1]),
+            topic_total_by_document: Vector::new(vec![6.3, 14.3]),
             alpha: 0.1,
             beta: 0.1,
         };
         let lda = LDAFitter::new(3, 0.1, 0.1, 1);
-        let probability = lda.conditional_distribution(& result, 0, 2, 4.0, 3.0);
+        let probability = lda.conditional_distribution(&result, 0, 2);
 
         // Calculated by hand and verified using https://gist.github.com/mblondel/542786
         assert_eq!(probability,
