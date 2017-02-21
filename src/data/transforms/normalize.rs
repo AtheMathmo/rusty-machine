@@ -87,12 +87,6 @@ impl<T: Float, M> Normalizer<T, M>
 impl<T: Float, M> Transformer<Matrix<T>> for Normalizer<T, M>
     where for<'a> M: MatrixNorm<T, MatrixSlice<'a, T>>
 {
-
-    fn fit(&mut self, _: &Matrix<T>) -> Result<(), Error> {
-        // no op, because it has no parameter to fit
-        Ok(())
-    }
-
     fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
         let dists: Vec<T> = inputs.row_iter().map(|m| self.norm.norm(&*m)).collect();
         for (mut row, &d) in inputs.row_iter_mut().zip(dists.iter()) {
