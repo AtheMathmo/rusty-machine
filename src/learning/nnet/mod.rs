@@ -37,10 +37,10 @@
 //!
 //! The neural networks are specified via a criterion - similar to
 //! [Torch](https://github.com/torch/nn/blob/master/doc/criterion.md).
-//! The criterions combine an activation function and a cost function.
+//! The criterions specify a cost function and any regularization.
 //!
 //! You can define your own criterion by implementing the `Criterion`
-//! trait with a concrete `ActivationFunc` and `CostFunc`.
+//! trait with a concrete `CostFunc`.
 
 
 pub mod net_layer;
@@ -62,7 +62,7 @@ use self::net_layer::NetLayer;
 
 /// Neural Network Model
 ///
-/// The Neural Network struct specifies a Criterion and
+/// The Neural Network struct specifies a `Criterion` and
 /// a gradient descent algorithm.
 #[derive(Debug)]
 pub struct NeuralNet<T, A>
@@ -203,8 +203,6 @@ impl<T, A> NeuralNet<T, A>
     /// use rusty_machine::learning::nnet::net_layer::{NetLayer, Linear};
     /// use rusty_machine::learning::toolkit::activ_fn::Sigmoid;
     /// use rusty_machine::learning::optim::grad_desc::StochasticGD;
-    ///
-    /// use std::clone::Clone;
     ///
     /// // Create a new neural net 
     /// let mut net = NeuralNet::new(BCECriterion::default(), StochasticGD::default());
