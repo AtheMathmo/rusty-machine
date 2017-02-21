@@ -12,7 +12,9 @@
 //! use rusty_machine::data::transforms::shuffle::Shuffler;
 //!
 //! // Create an input matrix that we want to shuffle
-//! let mat = Matrix::new(3, 2, vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0]);
+//! let mat = Matrix::new(3, 2, vec![1.0, 2.0,
+//!                                  3.0, 4.0,
+//!                                  5.0, 6.0]);
 //!
 //! // Create a new shuffler
 //! let mut shuffler = Shuffler::default();
@@ -82,7 +84,6 @@ impl<R: Rng, T> Transformer<Matrix<T>> for Shuffler<R> {
             let j = self.rng.gen_range(0, n - i);
             inputs.swap_rows(i, i + j);
         }
-
         Ok(inputs)
     }
 }
