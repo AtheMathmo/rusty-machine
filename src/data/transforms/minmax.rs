@@ -125,7 +125,7 @@ impl<T: Float> TransformFitter<Matrix<T>, MinMaxScaler<T>> for MinMaxFitter<T> {
             .zip(scales.iter())
             .map(|(&(_, x), &s)| self.scaled_max - x * s)
             .collect::<Vec<_>>();
-        
+
         Ok(MinMaxScaler {
             scale_factors: Vector::new(scales),
             const_factors: Vector::new(consts)
