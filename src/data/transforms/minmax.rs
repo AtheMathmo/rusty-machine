@@ -79,7 +79,7 @@ impl<T: Float> MinMaxFitter<T> {
     }
 }
 
-impl<T: Float> TransformFitter<Matrix<T>, MinMaxScaler<T>> for MinMaxFitter<T> {
+impl<T: Float> TransformFitter<Matrix<T>, Matrix<T>, MinMaxScaler<T>> for MinMaxFitter<T> {
     fn fit(self, inputs: &Matrix<T>) -> LearningResult<MinMaxScaler<T>> {
         let features = inputs.cols();
 
@@ -149,7 +149,7 @@ pub struct MinMaxScaler<T: Float> {
 }
 
 
-impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
+impl<T: Float> Transformer<Matrix<T>, Matrix<T>> for MinMaxScaler<T> {
     fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
         if self.scale_factors.size() != inputs.cols() {
             Err(Error::new(ErrorKind::InvalidData,
@@ -169,7 +169,7 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
     }
 }
 
-impl<T: Float> Invertible<Matrix<T>> for MinMaxScaler<T> {
+impl<T: Float> Invertible<Matrix<T>, Matrix<T>> for MinMaxScaler<T> {
 
     fn inv_transform(&self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
         let features = self.scale_factors.size();

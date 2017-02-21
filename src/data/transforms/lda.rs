@@ -1,44 +1,53 @@
-//! Latent Diriclhet Allocation Module
+//! Latent Dirichlet Allocation Module
 //!
-//! Contains an implementation of Latent Diriclhet Allocation (LDA) using
+//! Contains an implementation of Latent Dirichlet Allocation (LDA) using
 //! [Gibbs Sampling](http://psiexp.ss.uci.edu/research/papers/sciencetopics.pdf)
 //!
-//! LDA is typically used for textual analysis.  It assumes that a topic can be modeled
+//! LDAFitter is typically used for textual analysis.  It assumes that a topic can be modeled
 //! as a distribution of words, and that a document can be modeled as a distribution of
 //! topics.  Thus, the output is these distributions on the input documents.
 //!
 //! Gibbs sampling is a Morkov Chain Monto Carlo algorithm that iteratively approximates
 //! the above distributions.
 //!
-//! This module doesn't use any training.  It uses unsupervised learning to estimate
-//! the categories for a collection of documents.
+//! This module is able to estimate a distribution of categories over documents in an
+//! unsupervised manner, and use that distrbution to estimate the categories over other
+//! models.
 //!
 //! # Examples
 //!
 //! ```
-//! use rusty_machine::linalg::{Matrix, BaseMatrix, Vector};
-//! use rusty_machine::learning::UnSupModel;
-//! use rusty_machine::learning::lda::LDA;
+//! #[allow(unused_variables)]
+//! use rusty_machine::linalg::Matrix;
+//! use rusty_machine::data::transforms::{LDA, Transformer, TransformFitter};
 //!
-//! // Create a basic input array
-//! let input = Matrix::ones(5, 4);
+//! // Create a basic input array with 4 documents and 3 words
+//! let input = Matrix::ones(4, 3);
 //!
 //! // Create a model that will find 5 topics, with parameters alpha=0.1, beta=0.1
-//! let lda = LDA::new(5, 0.1, 0.1);
+//! let lda = LDA::new(5, 0.1, 0.1, 10);
 //!
-//! // No need to train the model (doing so is a no-op)
-//! lda.predict(&(input, 10)).unwrap();
+//! // Fit the model to the input
+//! let mut result = lda.fit(&input).unwrap();
+//!
+//! // Find the estimated distrbution of words over categories
+//! let dist = result.word_distribution();
+//!
+//! // Use the model to estimate some topics for new documents
+//! let esimtated = result.transform(Matrix::ones(6, 3)).unwrap();
 //! ```
 
 
 use linalg::{Matrix, Vector, BaseMatrix};
-use learning::{LearningResult, UnSupModel};
+use super::{Transformer, TransformFitter};
 use rulinalg::matrix::BaseMatrixMut;
 use rand::{Rng, thread_rng};
+use learning::LearningResult;
 
 /// Latent Dirichlet Allocation
 #[derive(Debug)]
-pub struct LDA {
+pub struct LDAFitter {
+    iterations: usize,
     topic_count: usize,
     alpha: f64,
     beta: f64,
@@ -49,7 +58,7 @@ pub struct LDA {
 /// This object can then be used to get the distrbutions of
 /// topics over documents and words over topics
 #[derive(Debug)]
-pub struct LDAResult {
+pub struct LDAModel {
     document_topic_count: Matrix<f64>,
     topic_word_count: Matrix<f64>,
     // The two vectors are simply used to reduce the amount of calculation that must be
@@ -60,9 +69,11 @@ pub struct LDAResult {
     beta: f64,
 }
 
-impl Default for LDA {
-    fn default() -> LDA {
-        LDA {
+/// Creates a default for LDAFitter with alpha = beta = 0.1, topic_coutn = 10 and iterations = 30
+impl Default for LDAFitter {
+    fn default() -> LDAFitter {
+        LDAFitter {
+            iterations: 30,
             topic_count: 10,
             alpha: 0.1,
             beta: 0.1
@@ -70,26 +81,28 @@ impl Default for LDA {
     }
 }
 
-impl LDA {
+impl LDAFitter {
     /// Creates a new object for finding LDA.
-    /// alpha and beta are the symmetric priors for the algorithm.
+    /// `alpha` and `beta` are the symmetric priors for the algorithm.
+    /// `iterations` is the number of times the sampling algorithm will run.
     ///
     /// If you don't know what to use, try alpha = 50/topic_count and beta = 0.01
-    pub fn new(topic_count: usize, alpha: f64, beta: f64) -> LDA {
-        LDA {
+    pub fn new(topic_count: usize, alpha: f64, beta: f64, iterations: usize) -> LDAFitter {
+        LDAFitter {
             topic_count: topic_count,
             alpha: alpha,
-            beta: beta
+            beta: beta,
+            iterations: iterations
         }
     }
 }
 
-impl LDAResult {
-    fn new(input: &Matrix<usize>, topic_count: usize, alpha: f64, beta: f64) -> (LDAResult, Vec<Vec<usize> >) {
+impl LDAModel {
+    fn new(input: &Matrix<usize>, topic_count: usize, alpha: f64, beta: f64) -> (LDAModel, Vec<Vec<usize> >) {
         let document_count = input.rows();
         let vocab_count = input.cols();
         let mut topics = Vec::with_capacity(document_count);
-        let mut result = LDAResult {
+        let mut result = LDAModel {
             document_topic_count: Matrix::zeros(document_count, topic_count),
             topic_word_count: Matrix::zeros(topic_count, vocab_count),
             topic_total_by_document: Vector::zeros(document_count),
@@ -118,9 +131,9 @@ impl LDAResult {
     }
 
     /// Find the distribution of words over topics.  This gives a matrix where the rows are
-    /// topics and the columns are words.  Each entry (topic, word) gives the probability of
-    /// word given topic.
-    pub fn phi(&self) -> Matrix<f64> {
+    /// topics and the columns are words.  Each entry `topic, word)`` gives the probability of
+    /// `word` given `topic`.
+    pub fn word_distribution(&self) -> Matrix<f64> {
         let mut distribution = self.topic_word_count.clone() + self.beta;
         let row_sum = distribution.sum_rows();
         // XXX To my knowledge, there is not presently a way in rulinalg to divide a matrix
@@ -132,8 +145,8 @@ impl LDAResult {
     }
 }
 
-impl LDA {
-    fn conditional_distribution(&self, result: &LDAResult, document: usize, word: usize, vocab_count: f64, topic_count: f64) -> Vector<f64> {
+impl LDAFitter {
+    fn conditional_distribution(&self, result: &LDAModel, document: usize, word: usize, vocab_count: f64, topic_count: f64) -> Vector<f64> {
 
         // Convert the column of the word count by topic into a vector
         let word_topic_count:Vector<f64> = result.topic_word_count.col(word).into();
@@ -159,16 +172,15 @@ impl LDA {
     }
 }
 
-impl UnSupModel<(Matrix<usize>, usize), LDAResult> for LDA {
+impl TransformFitter<Matrix<usize>, Matrix<f64>, LDAModel> for LDAFitter {
     /// Predict categories from the input matrix.
-        fn predict(&self, inputs: &(Matrix<usize>, usize)) -> LearningResult<LDAResult> {
-            let ref matrix = inputs.0;
-            let (mut result, mut topics) = LDAResult::new(&matrix, self.topic_count, self.alpha, self.beta);
-            let vocab_count = matrix.cols() as f64;
+        fn fit(self, inputs: &Matrix<usize>) -> LearningResult<LDAModel> {
+            let (mut result, mut topics) = LDAModel::new(inputs, self.topic_count, self.alpha, self.beta);
+            let vocab_count = inputs.cols() as f64;
             let topic_count = self.topic_count as f64;
             let mut word_index:usize;
-            for _ in 0..inputs.1 {
-                for (document, row) in matrix.row_iter().enumerate() {
+            for _ in 0..self.iterations {
+                for (document, row) in inputs.row_iter().enumerate() {
                     word_index = 0;
                     let mut document_topics = unsafe{topics.get_unchecked_mut(document)};
                     for (word, word_count) in row.iter().enumerate() {
@@ -200,11 +212,23 @@ impl UnSupModel<(Matrix<usize>, usize), LDAResult> for LDA {
             }
             Ok(result)
         }
+}
 
-        /// Train the model using inputs  Does nothing on this model.
-        fn train(&mut self, _: &(Matrix<usize>, usize)) -> LearningResult<()> {
-            Ok(())
+impl Transformer<Matrix<usize>, Matrix<f64>> for LDAModel {
+    fn transform(&mut self, input: Matrix<usize>) -> LearningResult<Matrix<f64>> {
+        assert!(input.cols() == self.topic_word_count.rows(), "The input matrix must have the same size vocabulary as the fitting model");
+        let input = Matrix::from_fn(input.rows(), input.cols(), |col, row| {
+            input[[row, col]] as f64
+        });
+        let mut distribution = input * self.topic_word_count.transpose();
+
+        let row_sum = distribution.sum_rows();
+        for (mut row, sum) in distribution.row_iter_mut().zip(row_sum.iter()) {
+            *row /= sum;
         }
+
+        Ok(distribution)
+    }
 }
 
 /// This function models sampling from the categorical distribution.
@@ -227,11 +251,11 @@ fn choose_from(probability: Vector<f64>) -> usize {
 
 #[cfg(test)]
 mod test {
-    use super::{LDAResult, LDA};
+    use super::{LDAModel, LDAFitter};
     use linalg::{Matrix, Vector};
     #[test]
     fn test_conditional_distribution() {
-        let result = LDAResult {
+        let result = LDAModel {
             topic_word_count: Matrix::new(3, 4, vec![3.0, 3.0, 5.0, 0.0,
                                                      0.0, 1.0, 1.0, 0.0,
                                                      0.0, 0.0, 5.0, 2.0]),
@@ -242,8 +266,10 @@ mod test {
             alpha: 0.1,
             beta: 0.1,
         };
-        let lda = LDA::new(3, 0.1, 0.1);
+        let lda = LDAFitter::new(3, 0.1, 0.1, 1);
         let probability = lda.conditional_distribution(& result, 0, 2, 4.0, 3.0);
+
+        // Calculated by hand and verified using https://gist.github.com/mblondel/542786
         assert_eq!(probability,
             Vector::new(vec![0.13703500146066358, 0.2680243410921803, 0.5949406574471561]));
     }

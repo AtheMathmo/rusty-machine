@@ -1,8 +1,8 @@
 /// An example of how Latent Diriclhet Allocation (LDA) can be used.  This example begins by
-/// generating a distribution of words to categories.  This distribution is creatred so that
+/// generating a distribution of words to categories.  This distribution is created so that
 /// there are 10 topics.  Each of the 25 words are assigned to two topics with equal probability.
 /// (The distribution of words is printed to the screen as a chart.  Each entry in the chart
-///corresponds to a word in the vocabulary, arranged into a square for easy viewing).  Documents
+/// corresponds to a word in the vocabulary, arranged into a square for easy viewing).  Documents
 /// are then generated based on these distributions (each topic is assumed equally likely to be
 /// assigned to a document, but each document has only one topic).
 ///
@@ -14,8 +14,7 @@ extern crate rand;
 extern crate rulinalg;
 
 use rusty_machine::linalg::{Matrix, BaseMatrix, Vector};
-use rusty_machine::learning::UnSupModel;
-use rusty_machine::learning::lda::LDA;
+use rusty_machine::data::transforms::{TransformFitter, LDAFitter};
 
 use rand::{thread_rng, Rng};
 use rand::distributions::{gamma, IndependentSample};
@@ -164,7 +163,7 @@ fn print_topic_distribution(dist: &Matrix<f64>, topic_count: usize, width: usize
 pub fn main() {
     // Set initial constants
     // These can be changed as you wish
-    let topic_count = 28;
+    let topic_count = 10;
     let document_length = 100;
     let document_count = 500;
     let alpha = 0.1;
@@ -178,10 +177,10 @@ pub fn main() {
     print_topic_distribution(&word_distribution, topic_count, width);
     println!("Generating documents");
     let input = generate_documents(&word_distribution, topic_count, vocab_count, document_count, document_length, alpha);
-    let lda = LDA::new(topic_count, alpha, 0.1);
+    let lda = LDAFitter::new(topic_count, alpha, 0.1, 30);
     println!("Predicting word distrbution from generated documents");
-    let result =  lda.predict(&(input, 30)).unwrap();
-    let dist = result.phi();
+    let result =  lda.fit(&input).unwrap();
+    let dist = result.word_distribution();
     println!("Prediction completed.  Predicted word distribution:");
     println!("(Should be similar generated distribution above)", );
 

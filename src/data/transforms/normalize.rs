@@ -84,7 +84,7 @@ impl<T: Float, M> Normalizer<T, M>
     }
 }
 
-impl<T: Float, M> Transformer<Matrix<T>> for Normalizer<T, M>
+impl<T: Float, M> Transformer<Matrix<T>, Matrix<T>> for Normalizer<T, M>
     where for<'a> M: MatrixNorm<T, MatrixSlice<'a, T>>
 {
     fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
