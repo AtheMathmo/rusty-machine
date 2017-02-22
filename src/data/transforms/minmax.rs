@@ -10,14 +10,15 @@
 //! # Examples
 //!
 //! ```
-//! use rusty_machine::data::transforms::{Transformer, MinMaxScaler};
+//! use rusty_machine::data::transforms::{Transformer, TransformFitter, MinMaxFitter};
 //! use rusty_machine::linalg::Matrix;
+//!
+//! let inputs = Matrix::new(2, 2, vec![-1.0, 2.0, 1.5, 3.0]);
 //!
 //! // Constructs a new `MinMaxScaler` to map minimum to 0 and maximum
 //! // to 1.
-//! let mut transformer = MinMaxScaler::default();
+//! let mut transformer = MinMaxFitter::default().fit(&inputs).unwrap();
 //!
-//! let inputs = Matrix::new(2, 2, vec![-1.0, 2.0, 1.5, 3.0]);
 //!
 //! // Transform the inputs to get output data with required minimum
 //! // and maximum.
@@ -25,69 +26,68 @@
 //! ```
 
 use learning::error::{Error, ErrorKind};
-use linalg::{Matrix, BaseMatrix, BaseMatrixMut};
-use super::{Invertible, Transformer};
+use learning::LearningResult;
+use linalg::{Matrix, BaseMatrix, BaseMatrixMut, Vector};
+use super::{Invertible, Transformer, TransformFitter};
 
 use rulinalg::utils;
 
 use libnum::Float;
 
-/// The `MinMaxScaler`
-///
-/// The `MinMaxScaler` provides an implementation of `Transformer`
-/// which allows us to transform the input data to have a new minimum
-/// and maximum per column.
-///
-/// See the module description for more information.
+/// A builder used to construct a `MinMaxScaler`
 #[derive(Debug)]
-pub struct MinMaxScaler<T: Float> {
-    /// Values to scale each column by
-    scale_factors: Option<Vec<T>>,
-    /// Values to add to each column after scaling
-    const_factors: Option<Vec<T>>,
-    /// The min of the new data (default 0)
+pub struct MinMaxFitter<T: Float> {
     scaled_min: T,
-    /// The max of the new data (default 1)
-    scaled_max: T,
+    scaled_max: T
 }
 
-/// Create a default `MinMaxScaler` with minimum of `0` and
-/// maximum of `1`.
-impl<T: Float> Default for MinMaxScaler<T> {
-    fn default() -> MinMaxScaler<T> {
-        MinMaxScaler::new(T::zero(), T::one())
-    }
-}
-
-impl<T: Float> MinMaxScaler<T> {
-    /// Constructs a new MinMaxScaler with the specified scale.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use rusty_machine::data::transforms::{MinMaxScaler, Transformer};
-    ///
-    /// // Constructs a new `MinMaxScaler` which will give the data
-    /// // minimum `0` and maximum `2`.
-    /// let transformer = MinMaxScaler::new(0.0, 2.0);
-    /// ```
-    pub fn new(min: T, max: T) -> MinMaxScaler<T> {
-        MinMaxScaler {
-            scale_factors: None,
-            const_factors: None,
-            scaled_min: min,
-            scaled_max: max,
+impl<T: Float> Default for MinMaxFitter<T> {
+    fn default() -> Self {
+        MinMaxFitter {
+            scaled_min: T::zero(),
+            scaled_max: T::one()
         }
     }
 }
 
-impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
-    fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
+impl<T: Float> MinMaxFitter<T> {
+    /// Construct a new `MinMaxFitter` with
+    /// specified mean and standard deviation.
+    ///
+    /// Note that this function does not create a `Transformer`
+    /// only a builder which can be used to produce a fitted `Transformer`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::data::transforms::MinMaxFitter;
+    /// use rusty_machine::linalg::Matrix;
+    ///
+    /// let fitter = MinMaxFitter::new(0.0, 1.0);
+    ///
+    /// // We can call `fit` from the `transform::TransformFitter`
+    /// // trait to create a `MinMaxScaler` used to actually transform data.
+    /// use rusty_machine::data::transforms::TransformFitter;
+    /// let mat = Matrix::new(2,2,vec![1.0, 2.0, 3.0, 5.0]);
+    /// let transformer = fitter.fit(&mat);
+    /// ```
+    pub fn new(min: T, max: T) -> Self {
+        MinMaxFitter {
+            scaled_min: min,
+            scaled_max: max
+        }
+    }
+}
+
+impl<T: Float> TransformFitter<Matrix<T>, MinMaxScaler<T>> for MinMaxFitter<T> {
+    fn fit(self, inputs: &Matrix<T>) -> LearningResult<MinMaxScaler<T>> {
         let features = inputs.cols();
 
+        // TODO: can use min, max
+        // https://github.com/AtheMathmo/rulinalg/pull/115
         let mut input_min_max = vec![(T::max_value(), T::min_value()); features];
 
-        for row in inputs.iter_rows() {
+        for row in inputs.row_iter() {
             for (idx, (feature, min_max)) in row.into_iter().zip(input_min_max.iter_mut()).enumerate() {
                 if !feature.is_finite() {
                     return Err(Error::new(ErrorKind::InvalidData,
@@ -95,18 +95,14 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
                                                    processed",
                                                   idx)));
                 }
-
                 // Update min
                 if *feature < min_max.0 {
                     min_max.0 = *feature;
                 }
-
                 // Update max
                 if *feature > min_max.1 {
                     min_max.1 = *feature;
                 }
-
-                
             }
         }
 
@@ -129,51 +125,73 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
             .zip(scales.iter())
             .map(|(&(_, x), &s)| self.scaled_max - x * s)
             .collect::<Vec<_>>();
+        
+        Ok(MinMaxScaler {
+            scale_factors: Vector::new(scales),
+            const_factors: Vector::new(consts)
+        })
+    }
+}
 
-        for row in inputs.iter_rows_mut() {
-            utils::in_place_vec_bin_op(row, &scales, |x, &y| {
-                *x = *x * y;
-            });
+/// The `MinMaxScaler`
+///
+/// The `MinMaxScaler` provides an implementation of `Transformer`
+/// which allows us to transform the input data to have a new minimum
+/// and maximum per column.
+///
+/// See the module description for more information.
+#[derive(Debug)]
+pub struct MinMaxScaler<T: Float> {
+    /// Values to scale each column by
+    scale_factors: Vector<T>,
+    /// Values to add to each column after scaling
+    const_factors: Vector<T>,
+}
 
-            utils::in_place_vec_bin_op(row, &consts, |x, &y| {
-                *x = *x + y;
-            });
+
+impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
+    fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
+        if self.scale_factors.size() != inputs.cols() {
+            Err(Error::new(ErrorKind::InvalidData,
+                            "Input data has different number of columns than fitted data."))
+        } else {
+            for mut row in inputs.row_iter_mut() {
+                utils::in_place_vec_bin_op(row.raw_slice_mut(), self.scale_factors.data(), |x, &y| {
+                    *x = *x * y;
+                });
+
+                utils::in_place_vec_bin_op(row.raw_slice_mut(), self.const_factors.data(), |x, &y| {
+                    *x = *x + y;
+                });
+            }
+            Ok(inputs)
         }
-
-        self.scale_factors = Some(scales);
-        self.const_factors = Some(consts);
-
-        Ok(inputs)
     }
 }
 
 impl<T: Float> Invertible<Matrix<T>> for MinMaxScaler<T> {
+
     fn inv_transform(&self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
-        if let (&Some(ref scales), &Some(ref consts)) = (&self.scale_factors, &self.const_factors) {
-
-            let features = scales.len();
-            if inputs.cols() != features {
-                return Err(Error::new(ErrorKind::InvalidData,
-                                      "Inputs have different feature count than transformer."));
-            }
-
-            for row in inputs.iter_rows_mut() {
-                for i in 0..features {
-                    row[i] = (row[i] - consts[i]) / scales[i];
-                }
-            }
-
-            Ok(inputs)
-        } else {
-            Err(Error::new(ErrorKind::InvalidState, "Transformer has not been fitted."))
+        let features = self.scale_factors.size();
+        if inputs.cols() != features {
+            return Err(Error::new(ErrorKind::InvalidData,
+                                    "Input data has different number of columns than fitted data."));
         }
+
+        for mut row in inputs.row_iter_mut() {
+            for i in 0..features {
+                row[i] = (row[i] - self.const_factors[i]) / self.scale_factors[i];
+            }
+        }
+
+        Ok(inputs)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::super::{Transformer, Invertible};
+    use super::super::{Transformer, TransformFitter, Invertible};
     use linalg::Matrix;
     use std::f64;
 
@@ -181,9 +199,7 @@ mod tests {
     fn nan_data_test() {
         let inputs = Matrix::new(2, 2, vec![f64::NAN; 4]);
 
-        let mut scaler = MinMaxScaler::new(0.0, 1.0);
-        let res = scaler.transform(inputs);
-
+        let res = MinMaxFitter::new(0.0, 1.0).fit(&inputs);
         assert!(res.is_err());
     }
 
@@ -191,9 +207,7 @@ mod tests {
     fn infinity_data_test() {
         let inputs = Matrix::new(2, 2, vec![f64::INFINITY; 4]);
 
-        let mut scaler = MinMaxScaler::new(0.0, 1.0);
-        let res = scaler.transform(inputs);
-
+        let res = MinMaxFitter::new(0.0, 1.0).fit(&inputs);
         assert!(res.is_err());
     }
 
@@ -201,7 +215,7 @@ mod tests {
     fn basic_scale_test() {
         let inputs = Matrix::new(2, 2, vec![-1.0f32, 2.0, 0.0, 3.0]);
 
-        let mut scaler = MinMaxScaler::new(0.0, 1.0);
+        let mut scaler = MinMaxFitter::new(0.0, 1.0).fit(&inputs).unwrap();
         let transformed = scaler.transform(inputs).unwrap();
 
         assert!(transformed.data().iter().all(|&x| x >= 0.0));
@@ -218,7 +232,7 @@ mod tests {
     fn custom_scale_test() {
         let inputs = Matrix::new(2, 2, vec![-1.0f32, 2.0, 0.0, 3.0]);
 
-        let mut scaler = MinMaxScaler::new(1.0, 3.0);
+        let mut scaler = MinMaxFitter::new(1.0, 3.0).fit(&inputs).unwrap();
         let transformed = scaler.transform(inputs).unwrap();
 
         assert!(transformed.data().iter().all(|&x| x >= 1.0));
@@ -235,9 +249,7 @@ mod tests {
     fn constant_feature_test() {
         let inputs = Matrix::new(2, 2, vec![1.0, 2.0, 1.0, 3.0]);
 
-        let mut scaler = MinMaxScaler::new(0.0, 1.0);
-        let res = scaler.transform(inputs);
-
+        let res = MinMaxFitter::new(0.0, 1.0).fit(&inputs);
         assert!(res.is_err());
     }
 
@@ -245,7 +257,7 @@ mod tests {
     fn inv_transform_identity_test() {
         let inputs = Matrix::new(2, 2, vec![-1.0f32, 2.0, 0.0, 3.0]);
 
-        let mut scaler = MinMaxScaler::new(1.0, 3.0);
+        let mut scaler = MinMaxFitter::new(1.0, 3.0).fit(&inputs).unwrap();
         let transformed = scaler.transform(inputs.clone()).unwrap();
 
         let original = scaler.inv_transform(transformed).unwrap();

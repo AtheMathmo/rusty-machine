@@ -330,7 +330,7 @@ impl Initializer for KPlusPlus {
         let first_cen = rng.gen_range(0usize, inputs.rows());
 
         unsafe {
-            init_centroids.extend_from_slice(inputs.get_row_unchecked(first_cen));
+            init_centroids.extend_from_slice(inputs.row_unchecked(first_cen).raw_slice());
         }
 
         for i in 1..k {
@@ -350,7 +350,7 @@ impl Initializer for KPlusPlus {
                 }
 
                 let next_cen = sample_discretely(dist);
-                init_centroids.extend_from_slice(inputs.get_row_unchecked(next_cen));
+                init_centroids.extend_from_slice(inputs.row_unchecked(next_cen).raw_slice());
             }
         }
 

@@ -105,6 +105,7 @@
 #![deny(missing_docs)]
 #![warn(missing_debug_implementations)]
 
+#[macro_use]
 extern crate rulinalg;
 extern crate num as libnum;
 extern crate rand;
@@ -117,7 +118,7 @@ pub mod prelude;
 pub mod linalg {
     pub use rulinalg::matrix::{Axes, Matrix, MatrixSlice, MatrixSliceMut, BaseMatrix, BaseMatrixMut};
     pub use rulinalg::vector::Vector;
-    pub use rulinalg::Metric;
+    pub use rulinalg::norm;
 }
 
 /// Module for data handling
@@ -216,6 +217,11 @@ pub mod stats {
 
 /// Module for evaluating models.
 pub mod analysis {
+    pub mod confusion_matrix;
     pub mod cross_validation;
     pub mod score;
 }
+
+#[cfg(feature = "datasets")]
+/// Module for datasets.
+pub mod datasets;

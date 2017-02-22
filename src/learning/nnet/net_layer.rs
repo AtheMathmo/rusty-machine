@@ -40,8 +40,8 @@ pub trait NetLayer : Debug {
 ///
 /// Represents a fully connected layer with optional bias term
 ///
-/// The parameters are a matrix of weights of size I x O
-/// where O is the dimensionality of the output and I the dimensionality of the input
+/// The parameters are a matrix of weights of size I x N
+/// where N is the dimensionality of the output and I the dimensionality of the input
 #[derive(Debug, Clone, Copy)]
 pub struct Linear { 
     /// The number of dimensions of the input
@@ -72,6 +72,31 @@ impl Linear {
     }
 }
 
+fn remove_first_col(mat: Matrix<f64>) -> Matrix<f64>
+{
+    let rows = mat.rows();
+    let cols = mat.cols();
+    let mut data = mat.into_vec();
+
+    let len = data.len();
+    let mut del = 0;
+    {
+        let v = &mut *data;
+
+        for i in 0..len {
+            if i % cols == 0 {
+                del += 1;
+            } else if del > 0 {
+                v.swap(i - del, i);
+            }
+        }
+    }
+    if del > 0 {
+        data.truncate(len - del);
+    }
+    Matrix::new(rows, cols - 1, data)
+}
+
 impl NetLayer for Linear {
     /// Computes a matrix product
     ///
@@ -97,9 +122,7 @@ impl NetLayer for Linear {
         debug_assert_eq!(out_grad.cols(), params.cols());
         let gradient = out_grad * &params.transpose();
         if self.has_bias {
-            let rows = gradient.rows();
-            let cols = gradient.cols() - 1;
-            gradient.sub_slice([0, 1], rows, cols).into() 
+            remove_first_col(gradient)
         } else {
             gradient
         }

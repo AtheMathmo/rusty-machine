@@ -11,3 +11,5 @@ script:
   - cargo test --verbose
   - cargo build --features stats
   - cargo test --features stats
+  - cargo build --features datasets
+  - cargo test --features datasets

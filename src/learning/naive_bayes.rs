@@ -152,9 +152,9 @@ impl<T: Distribution> NaiveBayes<T> {
         self.class_counts = vec![0; class_count];
         let mut class_data = vec![Vec::new(); class_count];
 
-        for (idx, row) in targets.iter_rows().enumerate() {
+        for (idx, row) in targets.row_iter().enumerate() {
             // Find the class of this input
-            let class = try!(NaiveBayes::<T>::find_class(row));
+            let class = try!(NaiveBayes::<T>::find_class(row.raw_slice()));
 
             // Note the class of the input
             class_data[class].push(idx);
@@ -199,9 +199,9 @@ impl<T: Distribution> NaiveBayes<T> {
     fn get_classes(log_probs: Matrix<f64>) -> Vec<usize> {
         let mut data_classes = Vec::with_capacity(log_probs.rows());
 
-        data_classes.extend(log_probs.iter_rows().map(|row| {
+        data_classes.extend(log_probs.row_iter().map(|row| {
             // Argmax each class log-probability per input
-            let (class, _) = utils::argmax(row);
+            let (class, _) = utils::argmax(row.raw_slice());
             class
         }));
 
