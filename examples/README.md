@@ -9,6 +9,7 @@ This directory gathers fully-fledged programs, each using a piece of
 * [SVM](#svm)
 * [Neural Networks](#neural-networks)
 * [Naïve Bayes](#naïve-bayes)
+* [LDA](#lda)
 
 ## The Examples
 
@@ -164,4 +165,72 @@ Predicted: White; Actual: White; Accurate? true
 Predicted: White; Actual: White; Accurate? true
 Predicted: Red; Actual: Red; Accurate? true
 Accuracy: 822/1000 = 82.2%
+```
+
+### LDA
+
+#### Word distribution
+
+The [word distribution](lda_gen.rs) example starts by generating a distribution
+of words over topics, then generating documents based on a distribution of
+topics.  The example then tries to estimate the distribution of words based only
+on the generated documents.
+
+The generated distribution (G) of words are visualized as a grid, with each cell
+in the grid corresponding to the probability of a particular word being
+selected. Following this, documents (D) are generated based on a distribution
+over these topics.
+
+The distribution for each topic is shown, then Linear Dirichlet Allocation is
+used to try to estimate the distribution (E) of words to topic, based solely on
+generated documents (D).
+
+The resulting word distribution(E) is printed.  The order may not be the same,
+but for each estimated topic in (E), there should be a corresponding generated
+distribution in (G).
+
+Sample run:
+```
+$ cargo run --example lda_gen
+...
+Creating word distribution
+Distribution generated:
+Topic 1     Topic 2     Topic 3     Topic 4     Topic 5     
+-------     -------     -------     -------     -------     
+99999       .....       .....       .....       .....       
+.....       99999       .....       .....       .....       
+.....       .....       99999       .....       .....       
+.....       .....       .....       99999       .....       
+.....       .....       .....       .....       99999       
+
+
+Topic 6     Topic 7     Topic 8     Topic 9     Topic 10    
+-------     -------     -------     -------     -------     
+9....       .9...       ..9..       ...9.       ....9       
+9....       .9...       ..9..       ...9.       ....9       
+9....       .9...       ..9..       ...9.       ....9       
+9....       .9...       ..9..       ...9.       ....9       
+9....       .9...       ..9..       ...9.       ....9       
+
+
+Generating documents
+Predicting word distribution from generated documents
+Prediction completed.  Predicted word distribution:
+(Should be similar to generated distribution above)
+Topic 1     Topic 2     Topic 3     Topic 4     Topic 5     
+-------     -------     -------     -------     -------     
+..8..       .....       .....       ....8       8....       
+..8..       .....       .....       ....8       8....       
+..9..       98888       .....       ....9       8....       
+..8..       .....       .....       ....8       8....       
+..8..       .....       88988       ....8       9....       
+
+
+Topic 6     Topic 7     Topic 8     Topic 9     Topic 10    
+-------     -------     -------     -------     -------     
+...8.       .....       .8...       .....       89888       
+...8.       .....       .8...       88889       .....       
+...8.       .....       .9...       .....       .....       
+...8.       88889       .8...       .....       .....       
+...9.       .....       .8...       .....       .....       
 ```

@@ -21,6 +21,16 @@ use rand::distributions::{gamma, IndependentSample};
 
 use std::cmp::max;
 
+// These constants control the generation algorithm.  You can set them how you wish,
+// although very large values for TOPIC_COUNT size will cause problems.
+
+// TOPIC_COUNT should be even
+const TOPIC_COUNT:usize = 10;
+const DOCUMENT_LENGTH:usize = 100;
+const DOCUMENT_COUNT:usize = 500;
+const ALPHA:f64 = 0.1;
+const ITERATION_COUNT:usize = 300;
+
 /// Given `topic_count` topics, this function will create a distrbution of words for each
 /// topic.  For simplicity, this function assumes that the total number of words in the corpus
 /// will be `(topic_count / 2)^2`.
@@ -161,30 +171,23 @@ fn print_topic_distribution(dist: &Matrix<f64>, topic_count: usize, width: usize
 }
 
 pub fn main() {
-    // Set initial constants
-    // These can be changed as you wish
-    let topic_count = 10;
-    let document_length = 100;
-    let document_count = 500;
-    let alpha = 0.1;
-
-    // Don't change these though; they are calculated based on the above
-    let width = topic_count / 2;
+    let width = TOPIC_COUNT / 2;
     let vocab_count = width * width;
     println!("Creating word distribution");
-    let word_distribution = generate_word_distribution(topic_count);
+    let word_distribution = generate_word_distribution(TOPIC_COUNT);
     println!("Distrbution generated:");
-    print_topic_distribution(&word_distribution, topic_count, width);
+    print_topic_distribution(&word_distribution, TOPIC_COUNT, width);
     println!("Generating documents");
-    let input = generate_documents(&word_distribution, topic_count, vocab_count, document_count, document_length, alpha);
-    let lda = LDAFitter::new(topic_count, alpha, 0.1, 30);
+    let input = generate_documents(&word_distribution, TOPIC_COUNT, vocab_count, DOCUMENT_COUNT, DOCUMENT_LENGTH, ALPHA);
+    let lda = LDAFitter::new(TOPIC_COUNT, ALPHA, 0.1, ITERATION_COUNT);
     println!("Predicting word distrbution from generated documents");
     let result =  lda.fit(&input).unwrap();
     let dist = result.word_distribution();
-    println!("Prediction completed.  Predicted word distribution:");
-    println!("(Should be similar generated distribution above)", );
 
-    print_topic_distribution(&dist, topic_count, width);
+    println!("Prediction completed.  Predicted word distribution:");
+    println!("(Should be similar to generated distribution above)", );
+
+    print_topic_distribution(&dist, TOPIC_COUNT, width);
 
 
 }
