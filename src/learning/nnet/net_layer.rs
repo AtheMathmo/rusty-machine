@@ -87,7 +87,7 @@ fn remove_first_col(mat: Matrix<f64>) -> Matrix<f64>
             if i % cols == 0 {
                 del += 1;
             } else if del > 0 {
-                v.swap(i - del, i);
+                v[i - del] = v[i];
             }
         }
     }

@@ -398,30 +398,33 @@ impl<T: Criterion> BaseNeuralNet<T> {
             return Ok(inputs.clone());
         }
 
-        let mut ptr = self.weights.as_ptr();
         let mut outputs = unsafe {
             let shape = self.layers[0].param_shape();
-            let slice = MatrixSlice::from_raw_parts(ptr,
+            let slice = MatrixSlice::from_raw_parts(self.weights.as_ptr(),
                                                     shape.0,
                                                     shape.1,
                                                     shape.1);
-            ptr = ptr.offset(self.layers[0].num_params() as isize);
             try!(self.layers[0].forward(inputs, slice))
         };
+
+        let mut index = self.layers[0].num_params();
         for layer in self.layers.iter().skip(1) {
             let shape = layer.param_shape();
-            unsafe {
-                let slice = MatrixSlice::from_raw_parts(ptr,
-                                                        shape.0,
-                                                        shape.1,
-                                                        shape.1);
-                outputs = match layer.forward(&outputs, slice) {
-                    Ok(act) => act,
-                    Err(_) => {return Err(Error::new(ErrorKind::InvalidParameters,
-                        "The network's layers do not line up correctly."))}
-                };
-                ptr = ptr.offset(layer.num_params() as isize);
-            }
+
+            let slice = unsafe {
+                MatrixSlice::from_raw_parts(self.weights.as_ptr().offset(index as isize),
+                                            shape.0,
+                                            shape.1,
+                                            shape.1)
+            };
+            
+            outputs = match layer.forward(&outputs, slice) {
+                Ok(act) => act,
+                Err(_) => {return Err(Error::new(ErrorKind::InvalidParameters,
+                    "The network's layers do not line up correctly."))}
+            };
+
+            index += layer.num_params();
         }
         Ok(outputs)
     }
