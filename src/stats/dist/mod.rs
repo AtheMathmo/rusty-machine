@@ -1,8 +1,15 @@
 pub mod exponential;
 pub mod gaussian;
+pub mod binomial;
+pub mod multinomial;
+pub mod poisson;
+mod utils;
 
 pub use self::gaussian::Gaussian;
 pub use self::exponential::Exponential;
+pub use self::binomial::Binomial;
+pub use self::multinomial::Multinomial;
+pub use self::poisson::Poisson;
 
 /// Statistical constants
 ///
