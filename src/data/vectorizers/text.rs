@@ -77,7 +77,6 @@ impl<T: Float> Vectorizer<Vec<String>, Matrix<T>> for Frequency<T> {
 
 impl<T: Float> Frequency<T> {
     /// Constructs an empty `Frequency` vectorizer.
-    /// ```
     pub fn new() -> Self {
         Frequency {
             words: HashMap::new(),
