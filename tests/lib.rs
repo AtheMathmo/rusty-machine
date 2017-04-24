@@ -10,7 +10,13 @@ pub mod learning {
     mod gp;
 
     pub mod optim {
-    	mod grad_desc;
+        mod grad_desc;
+    }
+}
+
+pub mod data {
+    pub mod vectorizers {
+        mod text;
     }
 }
 
