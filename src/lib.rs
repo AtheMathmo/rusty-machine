@@ -124,6 +124,8 @@ pub mod linalg {
 /// Module for data handling
 pub mod data {
     pub mod transforms;
+    pub mod vectorizers;
+    pub mod tokenizers;
 }
 
 /// Module for machine learning.
