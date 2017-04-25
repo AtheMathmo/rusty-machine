@@ -13,7 +13,7 @@ use learning::LearningResult;
 /// A trait used to construct Vectorizers
 pub trait Vectorizer<U, V> {
     /// Fit the inputs to create the `Vectorizer`
-    fn fit(&mut self, inputs: U) -> LearningResult<V>;
+    fn fit(&mut self, inputs: &[U]) -> LearningResult<()>;
     /// Vectorize the inputs
-    fn vectorize(&mut self, inputs: &U) -> LearningResult<V>;
+    fn vectorize(&mut self, inputs: &[U]) -> LearningResult<V>;
 }
