@@ -1,10 +1,11 @@
 use rm::data::vectorizers::text::FreqVectorizer;
+use rm::data::tokenizers::{NaiveTokenizer};
 use rm::data::vectorizers::Vectorizer;
 use rm::prelude::Matrix;
 
 #[test]
 fn test_frequency_vectorizer() {
-    let mut freq_vectorizer = FreqVectorizer::<f32>::new();
+    let mut freq_vectorizer = FreqVectorizer::<f32, NaiveTokenizer>::new(NaiveTokenizer::new());
     let fit_inputs = vec!["This is fit"];
     freq_vectorizer.fit(&fit_inputs).unwrap();
 

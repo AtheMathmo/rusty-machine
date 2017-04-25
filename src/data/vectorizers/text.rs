@@ -12,11 +12,15 @@
 //! ```
 //! use rusty_machine::data::vectorizers::Vectorizer;
 //! use rusty_machine::data::vectorizers::text::FreqVectorizer;
+//! use rusty_machine::data::tokenizers::NaiveTokenizer;
 //!
 //! // Constructs an empty `FreqVectorizer` vectorizer
-//! let mut freq_vectorizer = FreqVectorizer::<f32>::new();
+//! let mut freq_vectorizer = FreqVectorizer::<f32, NaiveTokenizer>::new(NaiveTokenizer::new());
 //!
-//! let inputs = vec!["This is test".to_string()];
+//! let inputs = vec!["This is test"];
+//!
+//! // Fit the vectorizer
+//! freq_vectorizer.fit(&inputs).unwrap();
 //!
 //! // Transform the inputs
 //! let vectorized = freq_vectorizer.vectorize(&inputs).unwrap();
@@ -29,6 +33,7 @@ use std::marker::PhantomData;
 use linalg::Matrix;
 use learning::LearningResult;
 use super::Vectorizer;
+use super::super::tokenizers::Tokenizer;
 
 /// FreqVectorizer vectorizer for text
 ///
@@ -37,21 +42,20 @@ use super::Vectorizer;
 ///
 /// See the module description for more information.
 #[derive(Debug)]
-pub struct FreqVectorizer<T: Float> {
+pub struct FreqVectorizer<U: Float, T: Tokenizer> {
     words: HashMap<String, usize>,
-    float_type: PhantomData<T>
+    tokenizer: T,
+    float_type: PhantomData<U>,
 }
 
-impl<'a, T: Float> Vectorizer<&'a str, Matrix<T>> for FreqVectorizer<T> {
-    fn vectorize(&mut self, texts: &[&'a str]) -> LearningResult<Matrix<T>> {
+impl<'a, U: Float, T: Tokenizer> Vectorizer<&'a str, Matrix<U>> for FreqVectorizer<U, T> {
+    fn vectorize(&mut self, texts: &[&'a str]) -> LearningResult<Matrix<U>> {
         let mut result = Matrix::zeros(texts.len(), self.words.len());
         for (text, row) in texts.iter().zip((0..texts.len())) {
-            // this needs improvement we could offer more options
-            let tokens = text.split_whitespace();
+            let tokens = self.tokenizer.tokenize(text).unwrap();
             for token in tokens {
-                let token = token.to_lowercase();
                 if let Some(&col) = self.words.get(&token) {
-                    result[[row, col]] = result[[row, col]] + T::one();
+                    result[[row, col]] = result[[row, col]] + U::one();
                 }
             }
         }
@@ -61,10 +65,8 @@ impl<'a, T: Float> Vectorizer<&'a str, Matrix<T>> for FreqVectorizer<T> {
         self.words = HashMap::new();
         let mut index: usize = 0;
         for text in texts {
-            // this needs improvement we could offer more options
-            let tokens = text.split_whitespace();
+            let tokens = self.tokenizer.tokenize(text).unwrap();
             for token in tokens {
-                let token = token.to_lowercase();
                 if !self.words.contains_key(&token) {
                     self.words.insert(token, index);
                     index += 1;
@@ -75,12 +77,13 @@ impl<'a, T: Float> Vectorizer<&'a str, Matrix<T>> for FreqVectorizer<T> {
     }
 }
 
-impl<T: Float> FreqVectorizer<T> {
+impl<U: Float, T: Tokenizer> FreqVectorizer<U, T> {
     /// Constructs an empty `FreqVectorizer` vectorizer.
-    pub fn new() -> Self {
+    pub fn new(tokenizer: T) -> Self {
         FreqVectorizer {
             words: HashMap::new(),
-            float_type: PhantomData
+            tokenizer: tokenizer,
+            float_type: PhantomData,
         }
     }
 }
