@@ -71,3 +71,14 @@ fn test_regression_datasets_trees() {
                         53.899328875510534, 53.899328875510534, 68.51530482306926];
     assert_eq!(predicted, Vector::new(expected));
 }
+
+#[test]
+fn test_train_no_data() {
+    let inputs = Matrix::new(0, 1, vec![]);
+    let targets = Vector::new(vec![]);
+
+    let mut lin_mod = LinRegressor::default();
+    let res = lin_mod.train(&inputs, &targets);
+
+    assert!(res.is_err());
+}
