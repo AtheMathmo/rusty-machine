@@ -85,7 +85,7 @@
 //! // Train the model!
 //! gp.train(&inputs, &targets).unwrap();
 //!
-//! // Predict output from test datae]
+//! // Predict the output from test data.
 //! let outputs = gp.predict(&test_inputs).unwrap();
 //! ```
 //!
