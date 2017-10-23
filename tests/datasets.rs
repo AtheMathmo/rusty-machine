@@ -23,4 +23,13 @@ mod test {
 
         assert_eq!(dt.target().size(), 31);
     }
+
+    #[test]
+    fn test_cancer() {
+        let dt = datasets::cancer::load();
+        assert_eq!(dt.data().rows(), 569);
+        assert_eq!(dt.data().cols(), 30);
+
+        assert_eq!(dt.target().size(), 569);
+    }
 }

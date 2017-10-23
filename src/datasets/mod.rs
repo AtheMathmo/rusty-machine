@@ -4,6 +4,8 @@ use std::fmt::Debug;
 pub mod iris;
 /// Module for trees dataset.
 pub mod trees;
+/// Module for cancer dataset.
+pub mod cancer;
 
 /// Dataset container
 #[derive(Clone, Debug)]
