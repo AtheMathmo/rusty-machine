@@ -78,7 +78,7 @@ impl<T: Float> StandardizerFitter<T> {
     }
 }
 
-impl<T: Float + FromPrimitive> TransformFitter<Matrix<T>, Standardizer<T>> for StandardizerFitter<T> {
+impl<T: Float + FromPrimitive> TransformFitter<Matrix<T>, Matrix<T>, Standardizer<T>> for StandardizerFitter<T> {
     fn fit(self, inputs: &Matrix<T>) -> LearningResult<Standardizer<T>> {
         if inputs.rows() <= 1 {
             Err(Error::new(ErrorKind::InvalidData,
@@ -122,7 +122,7 @@ pub struct Standardizer<T: Float> {
     scaled_stdev: T,
 }
 
-impl<T: Float + FromPrimitive> Transformer<Matrix<T>> for Standardizer<T> {
+impl<T: Float + FromPrimitive> Transformer<Matrix<T>, Matrix<T>> for Standardizer<T> {
     fn transform(&mut self, mut inputs: Matrix<T>) -> LearningResult<Matrix<T>> {
         if self.means.size() != inputs.cols() {
             Err(Error::new(ErrorKind::InvalidData,
@@ -140,7 +140,7 @@ impl<T: Float + FromPrimitive> Transformer<Matrix<T>> for Standardizer<T> {
     }
 }
 
-impl<T: Float + FromPrimitive> Invertible<Matrix<T>> for Standardizer<T> {
+impl<T: Float + FromPrimitive> Invertible<Matrix<T>, Matrix<T>> for Standardizer<T> {
     fn inv_transform(&self, mut inputs: Matrix<T>) -> LearningResult<Matrix<T>> {
         let features = self.means.size();
         if inputs.cols() != features {

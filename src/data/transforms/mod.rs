@@ -25,6 +25,7 @@
 //! let transformed = scaler.transform(data).expect("Failed to transformer data");
 //! ```
 
+pub mod lda;
 pub mod minmax;
 pub mod normalize;
 pub mod standardize;
@@ -32,25 +33,26 @@ pub mod shuffle;
 
 use learning::LearningResult;
 
+pub use self::lda::LDAFitter;
 pub use self::minmax::MinMaxFitter;
 pub use self::normalize::Normalizer;
 pub use self::shuffle::Shuffler;
 pub use self::standardize::StandardizerFitter;
 
 /// A trait used to construct Transformers which must first be fitted
-pub trait TransformFitter<U, T: Transformer<U>> {
+pub trait TransformFitter<I, O, T: Transformer<I, O>> {
     /// Fit the inputs to create the `Transformer`
-    fn fit(self, inputs: &U) -> LearningResult<T>;
+    fn fit(self, inputs: &I) -> LearningResult<T>;
 }
 
 /// Trait for data transformers
-pub trait Transformer<T> {
+pub trait Transformer<I, O> {
     /// Transforms the inputs
-    fn transform(&mut self, inputs: T) -> LearningResult<T>;
+    fn transform(&mut self, inputs: I) -> LearningResult<O>;
 }
 
 /// Trait for invertible data transformers
-pub trait Invertible<T> : Transformer<T> {
+pub trait Invertible<I, O> : Transformer<I, O> {
     /// Maps the inputs using the inverse of the fitted transform.
-    fn inv_transform(&self, inputs: T) -> LearningResult<T>;
+    fn inv_transform(&self, inputs: O) -> LearningResult<I>;
 }

@@ -138,7 +138,7 @@ fn main() {
     for (dog, prediction) in test_dogs.iter().zip(predictions.row_iter()).take(unprinted_total) {
         evaluate_prediction(&mut hits, dog, prediction.raw_slice());
     }
-    
+
     if unprinted_total > 0 {
         println!("...");
     }

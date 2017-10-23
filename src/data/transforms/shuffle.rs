@@ -75,7 +75,7 @@ impl Default for Shuffler<ThreadRng> {
 /// its rows in place.
 ///
 /// Under the hood this uses a Fisher-Yates shuffle.
-impl<R: Rng, T> Transformer<Matrix<T>> for Shuffler<R> {
+impl<R: Rng, T> Transformer<Matrix<T>, Matrix<T>> for Shuffler<R> {
     fn transform(&mut self, mut inputs: Matrix<T>) -> LearningResult<Matrix<T>> {
         let n = inputs.rows();
 
