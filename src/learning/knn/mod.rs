@@ -33,11 +33,11 @@ use linalg::{Matrix, BaseMatrix, Vector};
 use learning::{LearningResult, SupModel};
 use learning::error::{Error, ErrorKind};
 
-mod binarytree;
-mod bruteforce;
+mod binary_tree;
+mod brute_force;
 
-pub use self::binarytree::{KDTree, BallTree};
-pub use self::bruteforce::BruteForce;
+pub use self::binary_tree::{KDTree, BallTree};
+pub use self::brute_force::BruteForce;
 
 /// k-Nearest Neighbor Classifier
 #[derive(Debug)]
