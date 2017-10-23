@@ -437,7 +437,7 @@ fn min(data: &Matrix<f64>) -> Vector<f64> {
     for i in 0..data.cols() {
         results.push(data[[0, i]]);
     }
-    for row in data.iter_rows() {
+    for row in data.row_iter() {
         for (r, v) in results.iter_mut().zip(row.iter()) {
             if *r > *v {
                 *r = *v;
@@ -455,7 +455,7 @@ fn max(data: &Matrix<f64>) -> Vector<f64> {
     for i in 0..data.cols() {
         results.push(data[[0, i]]);
     }
-    for row in data.iter_rows() {
+    for row in data.row_iter() {
         for (r, v) in results.iter_mut().zip(row.iter()) {
             if *r < *v {
                 *r = *v;

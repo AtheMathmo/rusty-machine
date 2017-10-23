@@ -59,8 +59,8 @@ impl KNearestSearch for BruteForce {
             let mut current_dist = query.dist();
 
             let mut i = k;
-            for row in data.iter_rows().skip(k) {
-                let d = dist(point, &row);
+            for row in data.row_iter().skip(k) {
+                let d = dist(point, &row.raw_slice());
                 if d < current_dist {
                     current_dist = query.add(i, d);
                 }
