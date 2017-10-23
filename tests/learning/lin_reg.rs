@@ -73,6 +73,7 @@ fn test_regression_datasets_trees() {
 }
 
 #[test]
+#[ignore = "FIXME #183 fails nondeterministically"]
 fn test_train_no_data() {
     let inputs = Matrix::new(0, 1, vec![]);
     let targets = Vector::new(vec![]);
