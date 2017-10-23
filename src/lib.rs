@@ -86,7 +86,7 @@
 //! // Train the model!
 //! gp.train(&inputs, &targets).unwrap();
 //!
-//! // Predict output from test datae]
+//! // Predict the output from test data.
 //! let outputs = gp.predict(&test_inputs).unwrap();
 //! ```
 //!
@@ -119,7 +119,7 @@ pub mod prelude;
 pub mod linalg {
     pub use rulinalg::matrix::{Axes, Matrix, MatrixSlice, MatrixSliceMut, BaseMatrix, BaseMatrixMut};
     pub use rulinalg::vector::Vector;
-    pub use rulinalg::Metric;
+    pub use rulinalg::norm;
 }
 
 /// Module for data handling

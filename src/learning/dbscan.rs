@@ -41,6 +41,7 @@ use learning::error::{Error, ErrorKind};
 
 use linalg::{Matrix, Vector, BaseMatrix};
 use rulinalg::utils;
+use rulinalg::matrix::Row;
 
 /// DBSCAN Model
 ///
@@ -80,7 +81,7 @@ impl UnSupModel<Matrix<f64>, Vector<Option<usize>>> for DBSCAN {
         self.init_params(inputs.rows());
         let mut cluster = 0;
 
-        for (idx, point) in inputs.iter_rows().enumerate() {
+        for (idx, point) in inputs.row_iter().enumerate() {
             let visited = self._visited[idx];
 
             if !visited {
@@ -108,12 +109,12 @@ impl UnSupModel<Matrix<f64>, Vector<Option<usize>>> for DBSCAN {
                                                                      &self.clusters) {
                 let mut classes = Vec::with_capacity(inputs.rows());
 
-                for input_point in inputs.iter_rows() {
+                for input_point in inputs.row_iter() {
                     let mut distances = Vec::with_capacity(cluster_data.rows());
 
-                    for cluster_point in cluster_data.iter_rows() {
+                    for cluster_point in cluster_data.row_iter() {
                         let point_distance =
-                            utils::vec_bin_op(input_point, cluster_point, |x, y| x - y);
+                            utils::vec_bin_op(input_point.raw_slice(), cluster_point.raw_slice(), |x, y| x - y);
                         distances.push(utils::dot(&point_distance, &point_distance).sqrt());
                     }
 
@@ -182,7 +183,7 @@ impl DBSCAN {
             let visited = self._visited[*data_point_idx];
             if !visited {
                 self._visited[*data_point_idx] = true;
-                let data_point_row = unsafe { inputs.get_row_unchecked(*data_point_idx) };
+                let data_point_row = unsafe { inputs.row_unchecked(*data_point_idx) };
                 let sub_neighbours = self.region_query(data_point_row, inputs);
 
                 if sub_neighbours.len() >= self.min_points {
@@ -193,13 +194,14 @@ impl DBSCAN {
     }
 
 
-    fn region_query(&self, point: &[f64], inputs: &Matrix<f64>) -> Vec<usize> {
-        debug_assert!(point.len() == inputs.cols(),
+    fn region_query(&self, point: Row<f64>, inputs: &Matrix<f64>) -> Vec<usize> {
+        debug_assert!(point.cols() == inputs.cols(),
                       "point must be of same dimension as inputs");
 
         let mut in_neighbourhood = Vec::new();
-        for (idx, data_point) in inputs.iter_rows().enumerate() {
-            let point_distance = utils::vec_bin_op(data_point, point, |x, y| x - y);
+        for (idx, data_point) in inputs.row_iter().enumerate() {
+            //TODO: Use `MatrixMetric` when rulinalg#154 is fixed.
+            let point_distance = utils::vec_bin_op(data_point.raw_slice(), point.raw_slice(), |x, y| x - y);
             let dist = utils::dot(&point_distance, &point_distance).sqrt();
 
             if dist < self.eps {
@@ -227,7 +229,7 @@ impl DBSCAN {
 #[cfg(test)]
 mod tests {
     use super::DBSCAN;
-    use linalg::Matrix;
+    use linalg::{Matrix, BaseMatrix};
 
     #[test]
     fn test_region_query() {
@@ -235,7 +237,9 @@ mod tests {
 
         let inputs = Matrix::new(3, 2, vec![1.0, 1.0, 1.1, 1.9, 3.0, 3.0]);
 
-        let neighbours = model.region_query(&[1.0, 1.0], &inputs);
+        let m = matrix![1.0, 1.0];
+        let row = m.row(0);
+        let neighbours = model.region_query(row, &inputs);
 
         assert!(neighbours.len() == 2);
     }
@@ -246,7 +250,9 @@ mod tests {
 
         let inputs = Matrix::new(3, 2, vec![1.0, 1.0, 1.1, 1.9, 1.1, 1.1]);
 
-        let neighbours = model.region_query(&[1.0, 1.0], &inputs);
+        let m = matrix![1.0, 1.0];
+        let row = m.row(0);
+        let neighbours = model.region_query(row, &inputs);
 
         assert!(neighbours.len() == 1);
     }

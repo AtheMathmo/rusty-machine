@@ -131,9 +131,9 @@ impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
             let dim2 = m2.rows();
 
             let mut ker_data = Vec::with_capacity(dim1 * dim2);
-            ker_data.extend(m1.iter_rows().flat_map(|row1| {
-                m2.iter_rows()
-                    .map(move |row2| self.ker.kernel(row1, row2))
+            ker_data.extend(m1.row_iter().flat_map(|row1| {
+                m2.row_iter()
+                    .map(move |row2| self.ker.kernel(row1.raw_slice(), row2.raw_slice()))
             }));
 
             Ok(Matrix::new(dim1, dim2, ker_data))
@@ -195,8 +195,8 @@ impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
 
             let test_mat = try!(self.ker_mat(inputs, t_data));
             let mut var_data = Vec::with_capacity(inputs.rows() * inputs.cols());
-            for row in test_mat.iter_rows() {
-                let test_point = Vector::new(row.to_vec());
+            for row in test_mat.row_iter() {
+                let test_point = Vector::new(row.raw_slice());
                 var_data.append(&mut t_mat.solve_l_triangular(test_point).unwrap().into_vec());
             }
 
