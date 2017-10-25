@@ -468,7 +468,7 @@ fn max(data: &Matrix<f64>) -> Vector<f64> {
 #[cfg(test)]
 mod tests {
 
-    use linalg::{Vector, Matrix};
+    use linalg::{Vector, Matrix, BaseMatrix};
     use super::super::KNearestSearch;
     use super::{KDTree, BallTree, min, max};
 
