@@ -340,7 +340,7 @@ impl Initializer for KPlusPlus {
                                                                  inputs.cols(),
                                                                  inputs.cols());
                 let (_, dist) =
-                    KMeansClassifier::<KPlusPlus>::find_closest_centroids(temp_centroids, &inputs);
+                    KMeansClassifier::<KPlusPlus>::find_closest_centroids(temp_centroids, inputs);
 
                 // A relatively cheap way to validate our input data
                 if !dist.data().iter().all(|x| x.is_finite()) {
@@ -349,7 +349,7 @@ impl Initializer for KPlusPlus {
                                            initialization."));
                 }
 
-                let next_cen = sample_discretely(dist);
+                let next_cen = sample_discretely(&dist);
                 init_centroids.extend_from_slice(inputs.row_unchecked(next_cen).raw_slice());
             }
         }
@@ -361,7 +361,7 @@ impl Initializer for KPlusPlus {
 /// Sample from an unnormalized distribution.
 ///
 /// The input to this function is assumed to have all positive entries.
-fn sample_discretely(unnorm_dist: Vector<f64>) -> usize {
+fn sample_discretely(unnorm_dist: &Vector<f64>) -> usize {
     assert!(unnorm_dist.size() > 0, "No entries in distribution vector.");
 
     let sum = unnorm_dist.sum();

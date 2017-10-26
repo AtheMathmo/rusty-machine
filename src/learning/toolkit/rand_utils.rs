@@ -25,7 +25,7 @@ pub fn reservoir_sample<T: Copy>(pool: &[T], reservoir_size: usize) -> Vec<T> {
     let mut ele_seen = reservoir_size;
     let mut rng = thread_rng();
 
-    while pool_mut.len() > 0 {
+    while !pool_mut.is_empty() {
         ele_seen += 1;
         let r = rng.gen_range(0, ele_seen);
 

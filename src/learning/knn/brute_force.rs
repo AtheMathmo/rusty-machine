@@ -51,7 +51,7 @@ impl KNearestSearch for BruteForce {
 
     /// Serch k-nearest items close to the point
     fn search(&self, point: &[f64], k: usize) -> Result<(Vec<usize>, Vec<f64>), Error> {
-        if let &Some(ref data) = &self.data {
+        if let Some(ref data) = self.data {
             let indices: Vec<usize> = (0..k).collect();
             let distances = get_distances(data, point, &indices);
 
@@ -60,7 +60,7 @@ impl KNearestSearch for BruteForce {
 
             let mut i = k;
             for row in data.row_iter().skip(k) {
-                let d = dist(point, &row.raw_slice());
+                let d = dist(point, row.raw_slice());
                 if d < current_dist {
                     current_dist = query.add(i, d);
                 }

@@ -163,20 +163,20 @@ impl BinarySplit for BallTreeBranch {
              left: Node<Self>, right: Node<Self>) -> Node<Self> {
 
         // calculate centroid (mean)
-        // ToDo: cleanup using .row()
+        // TODO: cleanup using .row()
         let mut center: Vec<f64> = vec![0.; data.cols()];
-        for &i in remains.iter() {
+        for &i in &remains {
             let row: Vec<f64> = data.select_rows(&[i]).into_vec();
             for (c, r) in center.iter_mut().zip(row.iter()) {
-                *c = *c + r;
+                *c += *r;
             }
         }
         let len = remains.len() as f64;
-        for c in center.iter_mut() {
-            *c = *c / len;
+        for c in &mut center {
+            *c /= len;
         }
         let mut radius = 0.;
-        for &i in remains.iter() {
+        for &i in &remains {
             let row: Vec<f64> = data.select_rows(&[i]).into_vec();
             let d = dist(&center, &row);
             if d > radius {
@@ -206,7 +206,7 @@ impl BinarySplit for BallTreeBranch {
     }
 
     fn dist(&self, point: &[f64]) -> f64 {
-        let d = dist(&self.center.data(), point);
+        let d = dist(self.center.data(), point);
         if d < self.radius {
             0.
         } else {
@@ -305,11 +305,11 @@ impl<B: BinarySplit> BinaryTree<B> {
             r_remains.shrink_to_fit();
             l_remains.shrink_to_fit();
 
-            if l_remains.len() == 0 {
+            if l_remains.is_empty() {
                 // all rows are in r_remains. re-split r_remains
                 remains = r_remains;
                 dmin[dim] = split;
-            } else if r_remains.len() == 0 {
+            } else if r_remains.is_empty() {
                 // all rows are in l_remains. re-split l_remains
                 remains = l_remains;
                 dmax[dim] = split;
@@ -358,13 +358,13 @@ impl<B: BinarySplit> BinaryTree<B> {
             loop {
                 // pop first element
                 let current: &Node<B> = queue.pop_front().unwrap();
-                match current {
-                    &Node::Leaf(ref l) => {
+                match *current {
+                    Node::Leaf(ref l) => {
                         let distances = get_distances(data, point, &l.children);
                         let kn = KNearest::new(k, l.children.clone(), distances);
                         return Ok((kn, queue));
                     },
-                    &Node::Branch(ref b) => {
+                    Node::Branch(ref b) => {
                         // the current branch must contains target point.
                         // store the child branch which contains target point to
                         // the front, put other side on the back.
@@ -396,13 +396,13 @@ impl<B: BinarySplit> KNearestSearch for BinaryTree<B> {
 
     /// Serch k-nearest items close to the point
     fn search(&self, point: &[f64], k: usize) -> Result<(Vec<usize>, Vec<f64>), Error> {
-        if let &Some(ref data) = &self.data {
+        if let Some(ref data) = self.data {
             let (mut query, mut queue) = try!(self.search_leaf(point, k));
-            while queue.len() > 0 {
+            while !queue.is_empty() {
                 let current = queue.pop_front().unwrap();
 
-                match current {
-                    &Node::Leaf(ref l) => {
+                match *current {
+                    Node::Leaf(ref l) => {
                         let distances = get_distances(data, point, &l.children);
                         let mut current_dist = query.dist();
 
@@ -412,8 +412,8 @@ impl<B: BinarySplit> KNearestSearch for BinaryTree<B> {
                             }
                         }
                     },
-                    &Node::Branch(ref b) => {
-                        let d = b.dist(&point);
+                    Node::Branch(ref b) => {
+                        let d = b.dist(point);
                         if d < query.dist() {
                             queue.push_back(b.left());
                             queue.push_back(b.right());

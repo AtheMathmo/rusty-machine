@@ -48,7 +48,7 @@ use rulinalg::utils;
 use std::f64::consts::PI;
 
 /// The Naive Bayes model.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct NaiveBayes<T: Distribution> {
     distr: Option<T>,
     cluster_count: Option<usize>,

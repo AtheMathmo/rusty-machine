@@ -78,7 +78,7 @@ pub fn confusion_matrix<T>(predictions: &[T],
 }
 
 fn ordered_distinct<T: Ord + Eq + Copy>(xs: &[T], ys: &[T]) -> Vec<T> {
-    let mut ds: Vec<T> = xs.iter().chain(ys).map(|x| *x).collect();
+    let mut ds: Vec<T> = xs.iter().chain(ys).cloned().collect();
     ds.sort();
     ds.dedup();
     ds

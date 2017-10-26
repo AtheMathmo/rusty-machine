@@ -107,14 +107,14 @@ impl<S: KNearestSearch> KNNClassifier<S> {
 impl<S: KNearestSearch> SupModel<Matrix<f64>, Vector<usize>> for KNNClassifier<S> {
 
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<usize>> {
-        match &self.target {
-            &Some(ref target) => {
+        match self.target {
+            Some(ref target) => {
 
                 let mut results: Vec<usize> = Vec::with_capacity(inputs.rows());
                 for row in inputs.row_iter() {
                     let (idx, _) = try!(self.searcher.search(row.raw_slice(), self.k));
                     let res = target.select(&idx);
-                    let (uniques, counts) = freq(&res.data());
+                    let (uniques, counts) = freq(res.data());
                     let (id, _) = counts.argmax();
                     results.push(uniques[id]);
                 }
@@ -150,7 +150,7 @@ struct KNearest {
 impl KNearest {
 
     fn new(k: usize, index: Vec<usize>, distances: Vec<f64>) -> Self {
-        debug_assert!(index.len() > 0, "index can't be empty");
+        debug_assert!(!index.is_empty(), "index can't be empty");
         debug_assert!(index.len() == distances.len(),
                       "index and distance must have the same length");
 
@@ -185,7 +185,7 @@ impl KNearest {
                     // append to the last
                     self.pairs.push((index, distance));
                 }
-                return self.pairs.get_unchecked(last_index).1;
+                self.pairs.get_unchecked(last_index).1
             } else {
                 // last element is already compared
                 if len >= self.k {
@@ -199,7 +199,7 @@ impl KNearest {
                     }
                 }
                 self.pairs.insert(0, (index, distance));
-                return self.pairs.get_unchecked(last_index).1;
+                self.pairs.get_unchecked(last_index).1
             }
         }
     }
@@ -223,7 +223,7 @@ impl KNearest {
     fn get_results(self) -> (Vec<usize>, Vec<f64>) {
         let mut indices: Vec<usize> = Vec::with_capacity(self.k);
         let mut distances: Vec<f64> = Vec::with_capacity(self.k);
-        for (i, d) in self.pairs.into_iter() {
+        for (i, d) in self.pairs {
             indices.push(i);
             distances.push(d);
         }
@@ -243,7 +243,7 @@ pub trait KNearestSearch: Default{
 }
 
 /// Count target label frequencies
-/// ToDo: Used in decisition tree, move impl to somewhere
+/// TODO: Used in decisition tree, move impl to somewhere
 fn freq(labels: &[usize]) -> (Vector<usize>, Vector<usize>) {
     let mut map: BTreeMap<usize, usize> = BTreeMap::new();
     for l in labels {
@@ -253,7 +253,7 @@ fn freq(labels: &[usize]) -> (Vector<usize>, Vector<usize>) {
 
     let mut uniques: Vec<usize> = Vec::with_capacity(map.len());
     let mut counts: Vec<usize> = Vec::with_capacity(map.len());
-    for (&k, &v) in map.iter() {
+    for (&k, &v) in &map {
         uniques.push(k);
         counts.push(v);
     }
@@ -262,7 +262,7 @@ fn freq(labels: &[usize]) -> (Vector<usize>, Vector<usize>) {
 
 /// Return distances between given point and data specified with row ids
 fn get_distances(data: &Matrix<f64>, point: &[f64], ids: &[usize]) -> Vec<f64> {
-    assert!(ids.len() > 0, "target ids is empty");
+    assert!(!ids.is_empty(), "target ids is empty");
 
     let mut distances: Vec<f64> = Vec::with_capacity(ids.len());
     for id in ids.iter() {

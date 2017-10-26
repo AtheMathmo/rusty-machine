@@ -166,7 +166,7 @@ impl GaussianMixtureModel {
         if mixture_weights.size() != k {
             Err(Error::new(ErrorKind::InvalidParameters, "Mixture weights must have length k."))
         } else if mixture_weights.data().iter().any(|&x| x < 0f64) {
-            Err(Error::new(ErrorKind::InvalidParameters, "Mixture weights must have only non-negative entries.")) 
+            Err(Error::new(ErrorKind::InvalidParameters, "Mixture weights must have only non-negative entries."))
         } else {
             let sum = mixture_weights.sum();
             let normalized_weights = mixture_weights / sum;
@@ -228,7 +228,7 @@ impl GaussianMixtureModel {
         match self.cov_option {
             CovOption::Diagonal => {
                 let variance = try!(inputs.variance(Axes::Row));
-                Ok(Matrix::from_diag(&variance.data()) * reg_value.sqrt())
+                Ok(Matrix::from_diag(variance.data()) * reg_value.sqrt())
             }
 
             CovOption::Full | CovOption::Regularized(_) => {
