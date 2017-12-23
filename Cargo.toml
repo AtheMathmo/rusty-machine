@@ -16,6 +16,6 @@ stats = []
 datasets = []
 
 [dependencies]
-num = { version = "0.1.36", default-features = false }
-rand = "0.3.15"
+num = { version = "0.1.41", default-features = false }
+rand = "0.4.1"
 rulinalg = "0.4.2"
