@@ -18,4 +18,4 @@ datasets = []
 [dependencies]
 num = { version = "0.1.41", default-features = false }
 rand = "0.4.1"
-rulinalg = "0.4.2"
+rulinalg = { git = "https://github.com/AtheMathmo/rulinalg", rev = "1ed8b937" }
