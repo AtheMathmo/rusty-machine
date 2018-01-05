@@ -131,6 +131,8 @@ impl StochasticGD {
     ///
     /// Requires the learning rate, momentum rate and iteration count
     /// to be specified.
+    /// 
+    /// With Nesterov momentum by default.
     ///
     /// # Examples
     ///
@@ -182,10 +184,13 @@ impl<M> OptimAlgorithm<M> for StochasticGD
                                                           &inputs.select_rows(&[*i]),
                                                           &targets.select_rows(&[*i]));
 
-                // Compute the difference in gradient using momentum
+                // Backup previous velocity
+                let prev_w = delta_w.clone();
+                // Compute the difference in gradient using Nesterov momentum
                 delta_w = Vector::new(vec_data) * self.mu + &delta_w * self.alpha;
                 // Update the parameters
-                optimizing_val = &optimizing_val - &delta_w * self.mu;
+                optimizing_val = &optimizing_val -
+                    (&prev_w * (-self.alpha) + &delta_w * (1. + self.alpha));
                 // Set the end cost (this is only used after the last iteration)
                 end_cost += cost;
             }
