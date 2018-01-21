@@ -58,7 +58,7 @@ fn convex_gd_training() {
 fn convex_stochastic_gd_training() {
     let x_sq = XSqModel { c: 20f64 };
 
-    let gd = StochasticGD::new(0.9f64, 0.1f64, 100);
+    let gd = StochasticGD::new(0.5f64, 1f64, 100);
     let test_data = vec![100f64];
     let params = gd.optimize(&x_sq,
                               &test_data[..],
