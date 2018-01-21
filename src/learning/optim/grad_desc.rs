@@ -209,11 +209,15 @@ impl<M> OptimAlgorithm<M> for StochasticGD
                     // Update the parameters
                     optimizing_val = &optimizing_val -
                         (&prev_w * (-self.alpha) + &delta_w * (1. + self.alpha));
-                    // Set the end cost (this is only used after the last iteration)
-                    end_cost += cost;
                 } else {
-
+                    // Compute the difference in gradient using momentum
+                    delta_w = Vector::new(vec_data) * self.mu + &delta_w * self.alpha;
+                    // Update the parameters
+                    optimizing_val = &optimizing_val - &delta_w * self.mu;
                 }
+
+                // Set the end cost (this is only used after the last iteration)
+                end_cost += cost;
             }
 
             end_cost /= inputs.rows() as f64;
