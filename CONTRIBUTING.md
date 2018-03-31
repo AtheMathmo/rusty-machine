@@ -45,7 +45,7 @@ suggestions on how to improve this process (an issue on the repository will be f
 We currently use a [fork](https://help.github.com/articles/fork-a-repo/) and
 [pull request](https://help.github.com/articles/using-pull-requests/) model to allow contributions to rusty-machine.
 
-Please take a look through the code and [API documentation](https://athemathmo.github.io/rusty-machine/rusty-machine/doc/rusty_machine/index.html)
+Please take a look through the code and [API documentation](https://AtheMathmo.github.io/rusty-machine/)
 to identify the areas you'd like to help out with. Take a look through the current issues and see if there's anything you'd like to tackle.
 Simple issues will (_should_) be tagged with the label `easy`.
 
