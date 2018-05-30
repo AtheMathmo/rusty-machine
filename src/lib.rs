@@ -104,6 +104,8 @@
 //! let _ = Matrix::new(2,2,vec![2.0;4]);
 //! ```
 
+#![feature(rust_2018_preview)]
+
 #![deny(missing_docs)]
 #![warn(missing_debug_implementations)]
 
