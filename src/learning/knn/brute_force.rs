@@ -1,6 +1,6 @@
 //! Bruteforce search implementations
-use linalg::{Matrix, BaseMatrix};
-use learning::error::Error;
+use crate::linalg::{Matrix, BaseMatrix};
+use crate::learning::error::Error;
 
 use super::{KNearest, KNearestSearch, get_distances, dist};
 

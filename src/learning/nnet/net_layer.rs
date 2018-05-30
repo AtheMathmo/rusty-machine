@@ -1,10 +1,10 @@
 //! Neural Network Layers
 
-use linalg::{Matrix, MatrixSlice, BaseMatrix};
+use crate::linalg::{Matrix, MatrixSlice, BaseMatrix};
 
-use learning::LearningResult;
-use learning::error::{Error, ErrorKind};
-use learning::toolkit::activ_fn::ActivationFunc;
+use crate::learning::LearningResult;
+use crate::learning::error::{Error, ErrorKind};
+use crate::learning::toolkit::activ_fn::ActivationFunc;
 
 use rand::thread_rng;
 use rand::distributions::Sample;

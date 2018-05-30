@@ -23,8 +23,8 @@
 //! println!("{}", shuffled_mat);
 //! ```
 
-use learning::LearningResult;
-use linalg::{Matrix, BaseMatrix, BaseMatrixMut};
+use crate::learning::LearningResult;
+use crate::linalg::{Matrix, BaseMatrix, BaseMatrixMut};
 use super::Transformer;
 
 use rand::{Rng, thread_rng, ThreadRng};

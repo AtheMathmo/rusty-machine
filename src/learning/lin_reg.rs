@@ -30,14 +30,14 @@
 //! assert!(output[0] > 17f64, "Our regressor isn't very good!");
 //! ```
 
-use linalg::{Matrix, BaseMatrix};
-use linalg::Vector;
-use learning::{LearningResult, SupModel};
-use learning::toolkit::cost_fn::CostFunc;
-use learning::toolkit::cost_fn::MeanSqError;
-use learning::optim::grad_desc::GradientDesc;
-use learning::optim::{OptimAlgorithm, Optimizable};
-use learning::error::Error;
+use crate::linalg::{Matrix, BaseMatrix};
+use crate::linalg::Vector;
+use crate::learning::{LearningResult, SupModel};
+use crate::learning::toolkit::cost_fn::CostFunc;
+use crate::learning::toolkit::cost_fn::MeanSqError;
+use crate::learning::optim::grad_desc::GradientDesc;
+use crate::learning::optim::{OptimAlgorithm, Optimizable};
+use crate::learning::error::Error;
 
 /// Linear Regression Model.
 ///

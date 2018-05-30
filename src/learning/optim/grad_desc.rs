@@ -8,12 +8,12 @@
 //! optimization algorithm but there is flexibility to introduce new
 //! algorithms and git them into the same scheme easily.
 
-use learning::optim::{Optimizable, OptimAlgorithm};
-use linalg::Vector;
-use linalg::{Matrix, BaseMatrix};
+use crate::learning::optim::{Optimizable, OptimAlgorithm};
+use crate::linalg::Vector;
+use crate::linalg::{Matrix, BaseMatrix};
 use rulinalg::utils;
 
-use learning::toolkit::rand_utils;
+use crate::learning::toolkit::rand_utils;
 
 const LEARNING_EPS: f64 = 1e-20;
 

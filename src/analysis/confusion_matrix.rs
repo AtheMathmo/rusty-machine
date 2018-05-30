@@ -2,7 +2,7 @@
 
 use std::hash::Hash;
 use std::collections::HashMap;
-use linalg::Matrix;
+use crate::linalg::Matrix;
 
 /// Returns a square matrix C where C_ij is the count of the samples which were
 /// predicted to lie in the class with jth label but actually lie in the class with

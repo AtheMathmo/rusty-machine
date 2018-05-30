@@ -26,13 +26,13 @@
 //! let transformed = transformer.transform(inputs).unwrap();
 //! ```
 
-use learning::error::{Error, ErrorKind};
-use linalg::{Matrix, MatrixSlice, BaseMatrix, BaseMatrixMut};
+use crate::learning::error::{Error, ErrorKind};
+use crate::linalg::{Matrix, MatrixSlice, BaseMatrix, BaseMatrixMut};
 use rulinalg::norm::{MatrixNorm, Euclidean};
 
 use super::Transformer;
 
-use libnum::Float;
+use crate::libnum::Float;
 
 use std::marker::PhantomData;
 

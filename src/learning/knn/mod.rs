@@ -29,9 +29,9 @@
 use std::f64;
 use std::collections::BTreeMap;
 
-use linalg::{Matrix, BaseMatrix, Vector};
-use learning::{LearningResult, SupModel};
-use learning::error::{Error, ErrorKind};
+use crate::linalg::{Matrix, BaseMatrix, Vector};
+use crate::learning::{LearningResult, SupModel};
+use crate::learning::error::{Error, ErrorKind};
 
 mod binary_tree;
 mod brute_force;

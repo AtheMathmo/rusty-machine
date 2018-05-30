@@ -24,11 +24,11 @@
 //! assert_eq!(output, Matrix::new(1, 2, vec![-0.6686215718235227, 0.042826190364433595]));
 //! ```
 
-use linalg::{Matrix, BaseMatrix, Axes};
-use linalg::Vector;
+use crate::linalg::{Matrix, BaseMatrix, Axes};
+use crate::linalg::Vector;
 
-use learning::{LearningResult, UnSupModel};
-use learning::error::{Error, ErrorKind};
+use crate::learning::{LearningResult, UnSupModel};
+use crate::learning::error::{Error, ErrorKind};
 
 /// Principal Component Analysis
 ///

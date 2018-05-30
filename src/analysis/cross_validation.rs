@@ -3,9 +3,9 @@
 use std::cmp;
 use std::iter::Chain;
 use std::slice::Iter;
-use linalg::{BaseMatrix, Matrix};
-use learning::{LearningResult, SupModel};
-use learning::toolkit::rand_utils::in_place_fisher_yates;
+use crate::linalg::{BaseMatrix, Matrix};
+use crate::learning::{LearningResult, SupModel};
+use crate::learning::toolkit::rand_utils::in_place_fisher_yates;
 
 /// Randomly splits the inputs into k 'folds'. For each fold a model
 /// is trained using all inputs except for that fold, and tested on the

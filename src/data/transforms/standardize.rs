@@ -24,14 +24,14 @@
 //! let transformed = transformer.transform(inputs).unwrap();
 //! ```
 
-use learning::LearningResult;
-use learning::error::{Error, ErrorKind};
-use linalg::{Matrix, Vector, Axes, BaseMatrix, BaseMatrixMut};
+use crate::learning::LearningResult;
+use crate::learning::error::{Error, ErrorKind};
+use crate::linalg::{Matrix, Vector, Axes, BaseMatrix, BaseMatrixMut};
 use super::{Invertible, Transformer, TransformFitter};
 
 use rulinalg::utils;
 
-use libnum::{Float, FromPrimitive};
+use crate::libnum::{Float, FromPrimitive};
 
 /// A builder used to construct a `Standardizer`
 #[derive(Debug)]

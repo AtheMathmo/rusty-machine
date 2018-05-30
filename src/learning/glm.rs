@@ -35,11 +35,11 @@
 //! assert!(output[0] > 0.5, "Our classifier isn't very good!");
 //! ```
 
-use linalg::Vector;
-use linalg::{Matrix, BaseMatrix};
+use crate::linalg::Vector;
+use crate::linalg::{Matrix, BaseMatrix};
 
-use learning::{LearningResult, SupModel};
-use learning::error::{Error, ErrorKind};
+use crate::learning::{LearningResult, SupModel};
+use crate::learning::error::{Error, ErrorKind};
 
 /// The Generalized Linear Model
 ///

@@ -36,10 +36,10 @@
 //! let clustering = model.clusters().unwrap();
 //! ```
 
-use learning::{LearningResult, UnSupModel};
-use learning::error::{Error, ErrorKind};
+use crate::learning::{LearningResult, UnSupModel};
+use crate::learning::error::{Error, ErrorKind};
 
-use linalg::{Matrix, Vector, BaseMatrix};
+use crate::linalg::{Matrix, Vector, BaseMatrix};
 use rulinalg::utils;
 use rulinalg::matrix::Row;
 

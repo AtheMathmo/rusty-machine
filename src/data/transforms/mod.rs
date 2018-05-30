@@ -30,7 +30,7 @@ pub mod normalize;
 pub mod standardize;
 pub mod shuffle;
 
-use learning::LearningResult;
+use crate::learning::LearningResult;
 
 pub use self::minmax::MinMaxFitter;
 pub use self::normalize::Normalizer;

@@ -40,9 +40,9 @@
 //! println!("Final outputs --\n{}", outputs);
 //! ```
 
-use linalg::{Matrix, Axes, BaseMatrix, BaseMatrixMut};
-use learning::{LearningResult, SupModel};
-use learning::error::{Error, ErrorKind};
+use crate::linalg::{Matrix, Axes, BaseMatrix, BaseMatrixMut};
+use crate::learning::{LearningResult, SupModel};
+use crate::learning::error::{Error, ErrorKind};
 use rulinalg::utils;
 
 use std::f64::consts::PI;

@@ -14,9 +14,9 @@
 //! let reg = Regularization::L1(0.5);
 //! ```
 
-use linalg::norm::{Euclidean, Lp, MatrixNorm};
-use linalg::{Matrix, MatrixSlice, BaseMatrix};
-use libnum::{FromPrimitive, Float};
+use crate::linalg::norm::{Euclidean, Lp, MatrixNorm};
+use crate::linalg::{Matrix, MatrixSlice, BaseMatrix};
+use crate::libnum::{FromPrimitive, Float};
 
 /// Model Regularization
 #[derive(Debug, Clone, Copy)]

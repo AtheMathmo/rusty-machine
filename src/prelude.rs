@@ -2,12 +2,12 @@
 //!
 //! This module alleviates some common imports used within rusty-machine.
 
-pub use linalg::{Matrix, MatrixSlice, MatrixSliceMut, BaseMatrix, BaseMatrixMut};
-pub use linalg::Vector;
-pub use linalg::Axes;
+pub use crate::linalg::{Matrix, MatrixSlice, MatrixSliceMut, BaseMatrix, BaseMatrixMut};
+pub use crate::linalg::Vector;
+pub use crate::linalg::Axes;
 
-pub use learning::SupModel;
-pub use learning::UnSupModel;
+pub use crate::learning::SupModel;
+pub use crate::learning::UnSupModel;
 
 #[cfg(test)]
 mod tests {

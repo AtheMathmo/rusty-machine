@@ -28,8 +28,8 @@
 //! - Conversion to Rust.
 //! - Length hard defaults to the max iterations.
 
-use learning::optim::{Optimizable, OptimAlgorithm};
-use linalg::Vector;
+use crate::learning::optim::{Optimizable, OptimAlgorithm};
+use crate::linalg::Vector;
 
 use std::cmp;
 use std::f64;

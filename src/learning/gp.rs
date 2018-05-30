@@ -26,11 +26,11 @@
 //! the predictive mean and covariance. However, this is likely to change in
 //! a future release.
 
-use learning::toolkit::kernel::{Kernel, SquaredExp};
-use linalg::{Matrix, BaseMatrix};
-use linalg::Vector;
-use learning::{LearningResult, SupModel};
-use learning::error::{Error, ErrorKind};
+use crate::learning::toolkit::kernel::{Kernel, SquaredExp};
+use crate::linalg::{Matrix, BaseMatrix};
+use crate::linalg::Vector;
+use crate::learning::{LearningResult, SupModel};
+use crate::learning::error::{Error, ErrorKind};
 
 
 /// Trait for GP mean functions.

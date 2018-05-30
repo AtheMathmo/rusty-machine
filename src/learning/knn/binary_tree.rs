@@ -2,8 +2,8 @@
 use std::borrow::Borrow;
 use std::collections::VecDeque;
 
-use linalg::{Matrix, BaseMatrix, Vector};
-use learning::error::Error;
+use crate::linalg::{Matrix, BaseMatrix, Vector};
+use crate::learning::error::Error;
 
 use super::{KNearest, KNearestSearch, get_distances, dist};
 

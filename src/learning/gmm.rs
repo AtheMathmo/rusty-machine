@@ -30,13 +30,13 @@
 //! // Probabilities that each point comes from each Gaussian.
 //! println!("{:?}", post_probs.data());
 //! ```
-use linalg::{Matrix, MatrixSlice, Vector, BaseMatrix, BaseMatrixMut, Axes};
+use crate::linalg::{Matrix, MatrixSlice, Vector, BaseMatrix, BaseMatrixMut, Axes};
 use rulinalg::utils;
 use rulinalg::matrix::decomposition::{PartialPivLu};
 
-use learning::{LearningResult, UnSupModel};
-use learning::toolkit::rand_utils;
-use learning::error::{Error, ErrorKind};
+use crate::learning::{LearningResult, UnSupModel};
+use crate::learning::toolkit::rand_utils;
+use crate::learning::error::{Error, ErrorKind};
 
 /// Covariance options for GMMs.
 ///

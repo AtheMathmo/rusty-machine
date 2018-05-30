@@ -25,14 +25,14 @@
 //! let transformed = transformer.transform(inputs).unwrap();
 //! ```
 
-use learning::error::{Error, ErrorKind};
-use learning::LearningResult;
-use linalg::{Matrix, BaseMatrix, BaseMatrixMut, Vector};
+use crate::learning::error::{Error, ErrorKind};
+use crate::learning::LearningResult;
+use crate::linalg::{Matrix, BaseMatrix, BaseMatrixMut, Vector};
 use super::{Invertible, Transformer, TransformFitter};
 
 use rulinalg::utils;
 
-use libnum::Float;
+use crate::libnum::Float;
 
 /// A builder used to construct a `MinMaxScaler`
 #[derive(Debug)]

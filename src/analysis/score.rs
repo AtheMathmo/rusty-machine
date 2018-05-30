@@ -2,10 +2,10 @@
 //! how close predictions and truth are. All functions in this
 //! module obey the convention that higher is better.
 
-use libnum::{Zero, One};
+use crate::libnum::{Zero, One};
 
-use linalg::{BaseMatrix, Matrix};
-use learning::toolkit::cost_fn::{CostFunc, MeanSqError};
+use crate::linalg::{BaseMatrix, Matrix};
+use crate::learning::toolkit::cost_fn::{CostFunc, MeanSqError};
 
 // ************************************
 // Classification Scores

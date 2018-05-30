@@ -42,12 +42,12 @@
 //!
 //! The [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) scheme.
 
-use linalg::{Matrix, MatrixSlice, Axes, Vector, BaseMatrix};
-use learning::{LearningResult, UnSupModel};
-use learning::error::{Error, ErrorKind};
+use crate::linalg::{Matrix, MatrixSlice, Axes, Vector, BaseMatrix};
+use crate::learning::{LearningResult, UnSupModel};
+use crate::learning::error::{Error, ErrorKind};
 
 use rand::{Rng, thread_rng};
-use libnum::abs;
+use crate::libnum::abs;
 
 use std::fmt::Debug;
 

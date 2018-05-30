@@ -4,8 +4,8 @@
 
 use std::ops::{Add, Mul};
 
-use linalg::Vector;
-use linalg::norm::{Euclidean, VectorNorm, VectorMetric};
+use crate::linalg::Vector;
+use crate::linalg::norm::{Euclidean, VectorNorm, VectorMetric};
 use rulinalg::utils;
 
 /// The Kernel trait

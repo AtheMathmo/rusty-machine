@@ -45,18 +45,18 @@
 
 pub mod net_layer;
 
-use linalg::{Matrix, MatrixSlice};
+use crate::linalg::{Matrix, MatrixSlice};
 use rulinalg::utils;
 
-use learning::{LearningResult, SupModel};
-use learning::error::{Error, ErrorKind};
-use learning::toolkit::activ_fn;
-use learning::toolkit::activ_fn::ActivationFunc;
-use learning::toolkit::cost_fn;
-use learning::toolkit::cost_fn::CostFunc;
-use learning::toolkit::regularization::Regularization;
-use learning::optim::{Optimizable, OptimAlgorithm};
-use learning::optim::grad_desc::StochasticGD;
+use crate::learning::{LearningResult, SupModel};
+use crate::learning::error::{Error, ErrorKind};
+use crate::learning::toolkit::activ_fn;
+use crate::learning::toolkit::activ_fn::ActivationFunc;
+use crate::learning::toolkit::cost_fn;
+use crate::learning::toolkit::cost_fn::CostFunc;
+use crate::learning::toolkit::regularization::Regularization;
+use crate::learning::optim::{Optimizable, OptimAlgorithm};
+use crate::learning::optim::grad_desc::StochasticGD;
 
 use self::net_layer::NetLayer;
 
