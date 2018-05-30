@@ -1,7 +1,10 @@
+cargo-features = ["edition"]
+       
 [package]
 name = "rusty-machine"
 version = "0.5.4"
 authors = ["AtheMathmo"]
+edition = "2018"
 
 description = "A machine learning library."
 repository = "https://github.com/AtheMathmo/rusty-machine"
