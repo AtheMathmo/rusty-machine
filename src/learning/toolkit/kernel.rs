@@ -4,8 +4,8 @@
 
 use std::ops::{Add, Mul};
 
+use linalg::norm::{Euclidean, VectorMetric, VectorNorm};
 use linalg::Vector;
-use linalg::norm::{Euclidean, VectorNorm, VectorMetric};
 use rulinalg::utils;
 
 /// The Kernel trait
@@ -42,8 +42,9 @@ pub trait Kernel {
 /// ```
 #[derive(Debug)]
 pub struct KernelSum<T, U>
-    where T: Kernel,
-          U: Kernel
+where
+    T: Kernel,
+    U: Kernel,
 {
     k1: T,
     k2: U,
@@ -51,8 +52,9 @@ pub struct KernelSum<T, U>
 
 /// Computes the sum of the two associated kernels.
 impl<T, U> Kernel for KernelSum<T, U>
-    where T: Kernel,
-          U: Kernel
+where
+    T: Kernel,
+    U: Kernel,
 {
     fn kernel(&self, x1: &[f64], x2: &[f64]) -> f64 {
         self.k1.kernel(x1, x2) + self.k2.kernel(x1, x2)
@@ -83,8 +85,9 @@ impl<T, U> Kernel for KernelSum<T, U>
 /// ```
 #[derive(Debug)]
 pub struct KernelProd<T, U>
-    where T: Kernel,
-          U: Kernel
+where
+    T: Kernel,
+    U: Kernel,
 {
     k1: T,
     k2: U,
@@ -92,8 +95,9 @@ pub struct KernelProd<T, U>
 
 /// Computes the product of the two associated kernels.
 impl<T, U> Kernel for KernelProd<T, U>
-    where T: Kernel,
-          U: Kernel
+where
+    T: Kernel,
+    U: Kernel,
 {
     fn kernel(&self, x1: &[f64], x2: &[f64]) -> f64 {
         self.k1.kernel(x1, x2) * self.k2.kernel(x1, x2)
@@ -259,10 +263,7 @@ impl SquaredExp {
     /// println!("{0}", ker.kernel(&[1.,2.,3.], &[3.,4.,5.]));
     /// ```
     pub fn new(ls: f64, ampl: f64) -> SquaredExp {
-        SquaredExp {
-            ls: ls,
-            ampl: ampl,
-        }
+        SquaredExp { ls: ls, ampl: ampl }
     }
 }
 
@@ -321,10 +322,7 @@ impl Exponential {
     /// println!("{0}", ker.kernel(&[1.,2.,3.], &[3.,4.,5.]));
     /// ```
     pub fn new(ls: f64, ampl: f64) -> Exponential {
-        Exponential {
-            ls: ls,
-            ampl: ampl,
-        }
+        Exponential { ls: ls, ampl: ampl }
     }
 }
 
@@ -381,10 +379,7 @@ impl HyperTan {
     /// println!("{0}", ker.kernel(&[1.,2.,3.], &[3.,4.,5.]));
     /// ```
     pub fn new(alpha: f64, c: f64) -> HyperTan {
-        HyperTan {
-            alpha: alpha,
-            c: c,
-        }
+        HyperTan { alpha: alpha, c: c }
     }
 }
 

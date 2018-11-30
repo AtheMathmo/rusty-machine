@@ -1,7 +1,7 @@
-use rm::learning::optim::Optimizable;
 use rm::learning::optim::fmincg::ConjugateGD;
-use rm::learning::optim::grad_desc::{GradientDesc, StochasticGD, AdaGrad, RMSProp};
+use rm::learning::optim::grad_desc::{AdaGrad, GradientDesc, RMSProp, StochasticGD};
 use rm::learning::optim::OptimAlgorithm;
+use rm::learning::optim::Optimizable;
 
 use rm::linalg::Matrix;
 
@@ -15,12 +15,13 @@ struct XSqModel {
 
 impl Optimizable for XSqModel {
     type Inputs = Matrix<f64>;
-	type Targets = Matrix<f64>;
+    type Targets = Matrix<f64>;
 
     fn compute_grad(&self, params: &[f64], _: &Matrix<f64>, _: &Matrix<f64>) -> (f64, Vec<f64>) {
-
-        ((params[0] - self.c) * (params[0] - self.c),
-         vec![2f64 * (params[0] - self.c)])
+        (
+            (params[0] - self.c) * (params[0] - self.c),
+            vec![2f64 * (params[0] - self.c)],
+        )
     }
 }
 
@@ -30,13 +31,18 @@ fn convex_fmincg_training() {
 
     let cgd = ConjugateGD::default();
     let test_data = vec![500f64];
-    let params = cgd.optimize(&x_sq,
-                              &test_data[..],
-                              &Matrix::zeros(1, 1),
-                              &Matrix::zeros(1, 1));
+    let params = cgd.optimize(
+        &x_sq,
+        &test_data[..],
+        &Matrix::zeros(1, 1),
+        &Matrix::zeros(1, 1),
+    );
 
     assert!(params[0] - 20f64 < 1e-10);
-    assert!(x_sq.compute_grad(&params, &Matrix::zeros(1, 1), &Matrix::zeros(1, 1)).0 < 1e-10);
+    assert!(
+        x_sq.compute_grad(&params, &Matrix::zeros(1, 1), &Matrix::zeros(1, 1))
+            .0 < 1e-10
+    );
 }
 
 #[test]
@@ -45,13 +51,18 @@ fn convex_gd_training() {
 
     let gd = GradientDesc::default();
     let test_data = vec![500f64];
-    let params = gd.optimize(&x_sq,
-                              &test_data[..],
-                              &Matrix::zeros(1, 1),
-                              &Matrix::zeros(1, 1));
+    let params = gd.optimize(
+        &x_sq,
+        &test_data[..],
+        &Matrix::zeros(1, 1),
+        &Matrix::zeros(1, 1),
+    );
 
     assert!(params[0] - 20f64 < 1e-10);
-    assert!(x_sq.compute_grad(&params, &Matrix::zeros(1, 1), &Matrix::zeros(1, 1)).0 < 1e-10);
+    assert!(
+        x_sq.compute_grad(&params, &Matrix::zeros(1, 1), &Matrix::zeros(1, 1))
+            .0 < 1e-10
+    );
 }
 
 #[test]
@@ -60,13 +71,18 @@ fn convex_stochastic_gd_training() {
 
     let gd = StochasticGD::new(0.9f64, 0.1f64, 100);
     let test_data = vec![100f64];
-    let params = gd.optimize(&x_sq,
-                              &test_data[..],
-                              &Matrix::zeros(100, 1),
-                              &Matrix::zeros(100, 1));
+    let params = gd.optimize(
+        &x_sq,
+        &test_data[..],
+        &Matrix::zeros(100, 1),
+        &Matrix::zeros(100, 1),
+    );
 
     assert!(params[0] - 20f64 < 1e-10);
-    assert!(x_sq.compute_grad(&params, &Matrix::zeros(1, 1), &Matrix::zeros(1, 1)).0 < 1e-10);
+    assert!(
+        x_sq.compute_grad(&params, &Matrix::zeros(1, 1), &Matrix::zeros(1, 1))
+            .0 < 1e-10
+    );
 }
 
 #[test]
@@ -75,26 +91,36 @@ fn convex_adagrad_training() {
 
     let gd = AdaGrad::new(5f64, 1f64, 100);
     let test_data = vec![100f64];
-    let params = gd.optimize(&x_sq,
-                              &test_data[..],
-                              &Matrix::zeros(100, 1),
-                              &Matrix::zeros(100, 1));
+    let params = gd.optimize(
+        &x_sq,
+        &test_data[..],
+        &Matrix::zeros(100, 1),
+        &Matrix::zeros(100, 1),
+    );
 
     assert!(params[0] - 20f64 < 1e-10);
-    assert!(x_sq.compute_grad(&params, &Matrix::zeros(1, 1), &Matrix::zeros(1, 1)).0 < 1e-10);
+    assert!(
+        x_sq.compute_grad(&params, &Matrix::zeros(1, 1), &Matrix::zeros(1, 1))
+            .0 < 1e-10
+    );
 }
 
 #[test]
 fn convex_rmsprop_training() {
-  let x_sq = XSqModel { c: 20f64 };
+    let x_sq = XSqModel { c: 20f64 };
 
-  let rms = RMSProp::new(0.05, 0.9, 1e-5, 50);
-  let test_data = vec![100f64];
-  let params = rms.optimize(&x_sq,
-                              &test_data[..],
-                              &Matrix::zeros(100, 1),
-                              &Matrix::zeros(100, 1));
+    let rms = RMSProp::new(0.05, 0.9, 1e-5, 50);
+    let test_data = vec![100f64];
+    let params = rms.optimize(
+        &x_sq,
+        &test_data[..],
+        &Matrix::zeros(100, 1),
+        &Matrix::zeros(100, 1),
+    );
 
-  assert!(params[0] - 20f64 < 1e-10);
-  assert!(x_sq.compute_grad(&params, &Matrix::zeros(1, 1), &Matrix::zeros(1, 1)).0 < 1e-10);
+    assert!(params[0] - 20f64 < 1e-10);
+    assert!(
+        x_sq.compute_grad(&params, &Matrix::zeros(1, 1), &Matrix::zeros(1, 1))
+            .0 < 1e-10
+    );
 }

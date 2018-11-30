@@ -42,21 +42,20 @@
 //! You can define your own criterion by implementing the `Criterion`
 //! trait with a concrete `CostFunc`.
 
-
 pub mod net_layer;
 
 use linalg::{Matrix, MatrixSlice};
 use rulinalg::utils;
 
-use learning::{LearningResult, SupModel};
 use learning::error::{Error, ErrorKind};
+use learning::optim::grad_desc::StochasticGD;
+use learning::optim::{OptimAlgorithm, Optimizable};
 use learning::toolkit::activ_fn;
 use learning::toolkit::activ_fn::ActivationFunc;
 use learning::toolkit::cost_fn;
 use learning::toolkit::cost_fn::CostFunc;
 use learning::toolkit::regularization::Regularization;
-use learning::optim::{Optimizable, OptimAlgorithm};
-use learning::optim::grad_desc::StochasticGD;
+use learning::{LearningResult, SupModel};
 
 use self::net_layer::NetLayer;
 
@@ -66,8 +65,9 @@ use self::net_layer::NetLayer;
 /// a gradient descent algorithm.
 #[derive(Debug)]
 pub struct NeuralNet<T, A>
-    where T: Criterion,
-          A: OptimAlgorithm<BaseNeuralNet<T>>
+where
+    T: Criterion,
+    A: OptimAlgorithm<BaseNeuralNet<T>>,
 {
     base: BaseNeuralNet<T>,
     alg: A,
@@ -77,8 +77,9 @@ pub struct NeuralNet<T, A>
 ///
 /// The model is trained using back propagation.
 impl<T, A> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<T, A>
-    where T: Criterion,
-          A: OptimAlgorithm<BaseNeuralNet<T>>
+where
+    T: Criterion,
+    A: OptimAlgorithm<BaseNeuralNet<T>>,
 {
     /// Predict neural network output using forward propagation.
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
@@ -87,7 +88,8 @@ impl<T, A> SupModel<Matrix<f64>, Matrix<f64>> for NeuralNet<T, A>
 
     /// Train the model using gradient optimization and back propagation.
     fn train(&mut self, inputs: &Matrix<f64>, targets: &Matrix<f64>) -> LearningResult<()> {
-        let optimal_w = self.alg.optimize(&self.base, &self.base.weights, inputs, targets);
+        let optimal_w = self.alg
+            .optimize(&self.base, &self.base.weights, inputs, targets);
         self.base.weights = optimal_w;
         Ok(())
     }
@@ -119,8 +121,9 @@ impl NeuralNet<BCECriterion, StochasticGD> {
 }
 
 impl<T, A> NeuralNet<T, A>
-    where T: Criterion,
-          A: OptimAlgorithm<BaseNeuralNet<T>>
+where
+    T: Criterion,
+    A: OptimAlgorithm<BaseNeuralNet<T>>,
 {
     /// Create a new neural network with no layers
     ///
@@ -160,8 +163,10 @@ impl<T, A> NeuralNet<T, A>
     /// let layers = &[3; 4];
     /// let mut net = NeuralNet::mlp(layers, BCECriterion::default(), StochasticGD::default(), Sigmoid);
     /// ```
-    pub fn mlp<U>(layer_sizes: &[usize], criterion: T, alg: A, activ_fn: U) -> NeuralNet<T, A> 
-        where U: ActivationFunc + 'static {
+    pub fn mlp<U>(layer_sizes: &[usize], criterion: T, alg: A, activ_fn: U) -> NeuralNet<T, A>
+    where
+        U: ActivationFunc + 'static,
+    {
         NeuralNet {
             base: BaseNeuralNet::mlp(layer_sizes, criterion, activ_fn),
             alg: alg,
@@ -179,7 +184,7 @@ impl<T, A> NeuralNet<T, A>
     /// use rusty_machine::learning::nnet::net_layer::Linear;
     /// use rusty_machine::learning::optim::grad_desc::StochasticGD;
     ///
-    /// // Create a new neural net 
+    /// // Create a new neural net
     /// let mut net = NeuralNet::new(BCECriterion::default(), StochasticGD::default());
     ///
     /// // Give net an input layer of size 3, hidden layer of size 4, and output layer of size 5
@@ -204,7 +209,7 @@ impl<T, A> NeuralNet<T, A>
     /// use rusty_machine::learning::toolkit::activ_fn::Sigmoid;
     /// use rusty_machine::learning::optim::grad_desc::StochasticGD;
     ///
-    /// // Create a new neural net 
+    /// // Create a new neural net
     /// let mut net = NeuralNet::new(BCECriterion::default(), StochasticGD::default());
     ///
     /// let linear_sig: Vec<Box<NetLayer>> = vec![Box::new(Linear::new(5, 5)), Box::new(Sigmoid)];
@@ -213,9 +218,11 @@ impl<T, A> NeuralNet<T, A>
     /// net.add_layers(linear_sig);
     /// ```
     pub fn add_layers<'a, U>(&'a mut self, layers: U) -> &'a mut NeuralNet<T, A>
-        where U: IntoIterator<Item = Box<NetLayer>> {
-            self.base.add_layers(layers);
-            self
+    where
+        U: IntoIterator<Item = Box<NetLayer>>,
+    {
+        self.base.add_layers(layers);
+        self
     }
 
     /// Gets matrix of weights between specified layer and forward layer.
@@ -251,15 +258,15 @@ pub struct BaseNeuralNet<T: Criterion> {
     criterion: T,
 }
 
-
 impl BaseNeuralNet<BCECriterion> {
     /// Creates a base neural network with the specified layer sizes.
     fn default<U>(layer_sizes: &[usize], activ_fn: U) -> BaseNeuralNet<BCECriterion>
-        where U: ActivationFunc + 'static {
+    where
+        U: ActivationFunc + 'static,
+    {
         BaseNeuralNet::mlp(layer_sizes, BCECriterion::default(), activ_fn)
     }
 }
-
 
 impl<T: Criterion> BaseNeuralNet<T> {
     /// Create a base neural network with no layers
@@ -267,17 +274,19 @@ impl<T: Criterion> BaseNeuralNet<T> {
         BaseNeuralNet {
             layers: Vec::new(),
             weights: Vec::new(),
-            criterion: criterion
+            criterion: criterion,
         }
-    } 
+    }
 
     /// Create a multilayer perceptron with the specified layer sizes.
-    fn mlp<U>(layer_sizes: &[usize], criterion: T, activ_fn: U) -> BaseNeuralNet<T> 
-        where U: ActivationFunc + 'static {
+    fn mlp<U>(layer_sizes: &[usize], criterion: T, activ_fn: U) -> BaseNeuralNet<T>
+    where
+        U: ActivationFunc + 'static,
+    {
         let mut mlp = BaseNeuralNet {
-            layers: Vec::with_capacity(2*(layer_sizes.len()-1)),
+            layers: Vec::with_capacity(2 * (layer_sizes.len() - 1)),
             weights: Vec::new(),
-            criterion: criterion
+            criterion: criterion,
         };
         for shape in layer_sizes.windows(2) {
             mlp.add(Box::new(net_layer::Linear::new(shape[0], shape[1])));
@@ -295,7 +304,8 @@ impl<T: Criterion> BaseNeuralNet<T> {
 
     /// Adds multiple layers to the end of the network
     fn add_layers<'a, U>(&'a mut self, layers: U) -> &'a mut BaseNeuralNet<T>
-        where U: IntoIterator<Item = Box<NetLayer>> 
+    where
+        U: IntoIterator<Item = Box<NetLayer>>,
     {
         for layer in layers {
             self.add(layer);
@@ -316,19 +326,22 @@ impl<T: Criterion> BaseNeuralNet<T> {
 
         let shape = self.layers[idx].param_shape();
         unsafe {
-            MatrixSlice::from_raw_parts(weights.as_ptr().offset(start as isize),
-                                        shape.0,
-                                        shape.1,
-                                        shape.1)
+            MatrixSlice::from_raw_parts(
+                weights.as_ptr().offset(start as isize),
+                shape.0,
+                shape.1,
+                shape.1,
+            )
         }
     }
 
     /// Compute the gradient using the back propagation algorithm.
-    fn compute_grad(&self,
-                    weights: &[f64],
-                    inputs: &Matrix<f64>,
-                    targets: &Matrix<f64>)
-                    -> (f64, Vec<f64>) {
+    fn compute_grad(
+        &self,
+        weights: &[f64],
+        inputs: &Matrix<f64>,
+        targets: &Matrix<f64>,
+    ) -> (f64, Vec<f64>) {
         let mut gradients = Vec::with_capacity(weights.len());
         unsafe {
             gradients.set_len(weights.len());
@@ -339,16 +352,18 @@ impl<T: Criterion> BaseNeuralNet<T> {
         let mut params = Vec::with_capacity(self.layers.len());
 
         // Forward propagation
-        
+
         let mut index = 0;
         for (i, layer) in self.layers.iter().enumerate() {
             let shape = layer.param_shape();
 
             let slice = unsafe {
-                MatrixSlice::from_raw_parts(weights.as_ptr().offset(index as isize),
-                                            shape.0,
-                                            shape.1,
-                                            shape.1)
+                MatrixSlice::from_raw_parts(
+                    weights.as_ptr().offset(index as isize),
+                    shape.0,
+                    shape.1,
+                    shape.1,
+                )
             };
 
             let output = if i == 0 {
@@ -364,29 +379,34 @@ impl<T: Criterion> BaseNeuralNet<T> {
         let output = activations.last().unwrap();
 
         // Backward propagation
-        
+
         // The gradient with respect to the current layer's output
         let mut out_grad = self.criterion.cost_grad(output, targets);
         // at this point index == weights.len()
         for (i, layer) in self.layers.iter().enumerate().rev() {
-            let activation = if i == 0 {inputs} else {&activations[i-1]};
+            let activation = if i == 0 { inputs } else { &activations[i - 1] };
             let result = &activations[i];
             index -= layer.num_params();
 
-            let grad_params = &mut gradients[index..index+layer.num_params()];
-            grad_params.copy_from_slice(layer.back_params(&out_grad, activation, result, params[i]).data());
-            
+            let grad_params = &mut gradients[index..index + layer.num_params()];
+            grad_params.copy_from_slice(
+                layer
+                    .back_params(&out_grad, activation, result, params[i])
+                    .data(),
+            );
+
             out_grad = layer.back_input(&out_grad, activation, result, params[i]);
         }
 
         let mut cost = self.criterion.cost(output, targets);
         if self.criterion.is_regularized() {
-            let all_params = unsafe {
-                MatrixSlice::from_raw_parts(weights.as_ptr(), weights.len(), 1, 1)
-            };
-            utils::in_place_vec_bin_op(&mut gradients,
-                                       self.criterion.reg_cost_grad(all_params).data(),
-                                       |x, &y| *x = *x + y);
+            let all_params =
+                unsafe { MatrixSlice::from_raw_parts(weights.as_ptr(), weights.len(), 1, 1) };
+            utils::in_place_vec_bin_op(
+                &mut gradients,
+                self.criterion.reg_cost_grad(all_params).data(),
+                |x, &y| *x = *x + y,
+            );
             cost += self.criterion.reg_cost(all_params);
         }
         (cost, gradients)
@@ -400,10 +420,8 @@ impl<T: Criterion> BaseNeuralNet<T> {
 
         let mut outputs = unsafe {
             let shape = self.layers[0].param_shape();
-            let slice = MatrixSlice::from_raw_parts(self.weights.as_ptr(),
-                                                    shape.0,
-                                                    shape.1,
-                                                    shape.1);
+            let slice =
+                MatrixSlice::from_raw_parts(self.weights.as_ptr(), shape.0, shape.1, shape.1);
             try!(self.layers[0].forward(inputs, slice))
         };
 
@@ -412,16 +430,22 @@ impl<T: Criterion> BaseNeuralNet<T> {
             let shape = layer.param_shape();
 
             let slice = unsafe {
-                MatrixSlice::from_raw_parts(self.weights.as_ptr().offset(index as isize),
-                                            shape.0,
-                                            shape.1,
-                                            shape.1)
+                MatrixSlice::from_raw_parts(
+                    self.weights.as_ptr().offset(index as isize),
+                    shape.0,
+                    shape.1,
+                    shape.1,
+                )
             };
-            
+
             outputs = match layer.forward(&outputs, slice) {
                 Ok(act) => act,
-                Err(_) => {return Err(Error::new(ErrorKind::InvalidParameters,
-                    "The network's layers do not line up correctly."))}
+                Err(_) => {
+                    return Err(Error::new(
+                        ErrorKind::InvalidParameters,
+                        "The network's layers do not line up correctly.",
+                    ))
+                }
             };
 
             index += layer.num_params();
@@ -437,11 +461,12 @@ impl<T: Criterion> Optimizable for BaseNeuralNet<T> {
     type Targets = Matrix<f64>;
 
     /// Compute the gradient of the neural network.
-    fn compute_grad(&self,
-                    params: &[f64],
-                    inputs: &Matrix<f64>,
-                    targets: &Matrix<f64>)
-                    -> (f64, Vec<f64>) {
+    fn compute_grad(
+        &self,
+        params: &[f64],
+        inputs: &Matrix<f64>,
+        targets: &Matrix<f64>,
+    ) -> (f64, Vec<f64>) {
         self.compute_grad(params, inputs, targets)
     }
 }
@@ -525,7 +550,9 @@ impl Criterion for BCECriterion {
 /// Creates an MSE Criterion without any regularization.
 impl Default for BCECriterion {
     fn default() -> Self {
-        BCECriterion { regularization: Regularization::None }
+        BCECriterion {
+            regularization: Regularization::None,
+        }
     }
 }
 
@@ -542,7 +569,9 @@ impl BCECriterion {
     /// let criterion = BCECriterion::new(Regularization::L2(0.3f64));
     /// ```
     pub fn new(regularization: Regularization<f64>) -> Self {
-        BCECriterion { regularization: regularization }
+        BCECriterion {
+            regularization: regularization,
+        }
     }
 }
 
@@ -566,7 +595,9 @@ impl Criterion for MSECriterion {
 /// Creates an MSE Criterion without any regularization.
 impl Default for MSECriterion {
     fn default() -> Self {
-        MSECriterion { regularization: Regularization::None }
+        MSECriterion {
+            regularization: Regularization::None,
+        }
     }
 }
 
@@ -583,6 +614,8 @@ impl MSECriterion {
     /// let criterion = MSECriterion::new(Regularization::L2(0.3f64));
     /// ```
     pub fn new(regularization: Regularization<f64>) -> Self {
-        MSECriterion { regularization: regularization }
+        MSECriterion {
+            regularization: regularization,
+        }
     }
 }

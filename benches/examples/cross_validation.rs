@@ -1,9 +1,9 @@
-use rusty_machine::linalg::{Matrix, BaseMatrix};
-use rusty_machine::learning::{LearningResult, SupModel};
-use rusty_machine::analysis::score::row_accuracy;
-use rusty_machine::analysis::cross_validation::k_fold_validate;
 use rand::{thread_rng, Rng};
-use test::{Bencher, black_box};
+use rusty_machine::analysis::cross_validation::k_fold_validate;
+use rusty_machine::analysis::score::row_accuracy;
+use rusty_machine::learning::{LearningResult, SupModel};
+use rusty_machine::linalg::{BaseMatrix, Matrix};
+use test::{black_box, Bencher};
 
 fn generate_data(rows: usize, cols: usize) -> Matrix<f64> {
     let mut rng = thread_rng();
@@ -22,14 +22,14 @@ fn generate_data(rows: usize, cols: usize) -> Matrix<f64> {
 /// matrices when trained. Its prediction for each row is the
 /// sum of the row's elements plus the precalculated training sum.
 struct DummyModel {
-    sum: f64
+    sum: f64,
 }
 
 impl SupModel<Matrix<f64>, Matrix<f64>> for DummyModel {
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
         let predictions: Vec<f64> = inputs
             .row_iter()
-            .map(|row| { self.sum + sum(row.iter()) })
+            .map(|row| self.sum + sum(row.iter()))
             .collect();
         Ok(Matrix::new(inputs.rows(), 1, predictions))
     }
@@ -40,12 +40,12 @@ impl SupModel<Matrix<f64>, Matrix<f64>> for DummyModel {
     }
 }
 
-fn sum<'a, I: Iterator<Item=&'a f64>>(x: I) -> f64 {
+fn sum<'a, I: Iterator<Item = &'a f64>>(x: I) -> f64 {
     x.fold(0f64, |acc, x| acc + x)
 }
 
 macro_rules! bench {
-    ($name:ident: $params:expr) => {
+    ($name:ident : $params:expr) => {
         #[bench]
         fn $name(b: &mut Bencher) {
             let (rows, cols, k) = $params;
@@ -54,12 +54,16 @@ macro_rules! bench {
 
             b.iter(|| {
                 let mut model = DummyModel { sum: 0f64 };
-                let _ = black_box(
-                    k_fold_validate(&mut model, &inputs, &targets, k, row_accuracy)
-                );
+                let _ = black_box(k_fold_validate(
+                    &mut model,
+                    &inputs,
+                    &targets,
+                    k,
+                    row_accuracy,
+                ));
             });
         }
-    }
+    };
 }
 
 bench!(bench_10_10_3: (10, 10, 3));

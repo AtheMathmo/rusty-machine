@@ -1,23 +1,21 @@
 use rusty_machine::learning::svm::SVM;
 // Necessary for the training trait.
-use rusty_machine::learning::SupModel;
 use rusty_machine::learning::toolkit::kernel::HyperTan;
+use rusty_machine::learning::SupModel;
 
 use rusty_machine::linalg::Matrix;
 use rusty_machine::linalg::Vector;
 
-use test::{Bencher, black_box};
+use test::{black_box, Bencher};
 
 fn generate_data() -> (Matrix<f64>, Vector<f64>) {
     // Training data
-    let inputs = Matrix::new(11, 1, vec![
-                             -0.1, -2., -9., -101., -666.7,
-                             0., 0.1, 1., 11., 99., 456.7
-                             ]);
-    let targets = Vector::new(vec![
-                              -1., -1., -1., -1., -1.,
-                              1., 1., 1., 1., 1., 1.
-                              ]);
+    let inputs = Matrix::new(
+        11,
+        1,
+        vec![-0.1, -2., -9., -101., -666.7, 0., 0.1, 1., 11., 99., 456.7],
+    );
+    let targets = Vector::new(vec![-1., -1., -1., -1., -1., 1., 1., 1., 1., 1., 1.]);
 
     (inputs, targets)
 }
@@ -43,7 +41,10 @@ fn svm_sign_learner_train(b: &mut Bencher) {
 fn svm_sign_learner_predict(b: &mut Bencher) {
     let (inputs, targets) = generate_data();
 
-    let test_data = (-1000..1000).filter(|&x| x % 100 == 0).map(|x| x as f64).collect::<Vec<_>>();
+    let test_data = (-1000..1000)
+        .filter(|&x| x % 100 == 0)
+        .map(|x| x as f64)
+        .collect::<Vec<_>>();
     let test_inputs = Matrix::new(test_data.len(), 1, test_data);
     let mut svm_mod = SVM::new(HyperTan::new(100., 0.), 0.3);
     let _ = svm_mod.train(&inputs, &targets);

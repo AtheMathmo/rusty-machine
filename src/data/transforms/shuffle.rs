@@ -23,11 +23,11 @@
 //! println!("{}", shuffled_mat);
 //! ```
 
-use learning::LearningResult;
-use linalg::{Matrix, BaseMatrix, BaseMatrixMut};
 use super::Transformer;
+use learning::LearningResult;
+use linalg::{BaseMatrix, BaseMatrixMut, Matrix};
 
-use rand::{Rng, thread_rng, ThreadRng};
+use rand::{thread_rng, Rng, ThreadRng};
 
 /// The `Shuffler`
 ///
@@ -90,11 +90,11 @@ impl<R: Rng, T> Transformer<Matrix<T>> for Shuffler<R> {
 
 #[cfg(test)]
 mod tests {
-    use linalg::Matrix;
     use super::super::Transformer;
     use super::Shuffler;
+    use linalg::Matrix;
 
-    use rand::{StdRng, SeedableRng};
+    use rand::{SeedableRng, StdRng};
 
     #[test]
     fn seeded_shuffle() {
@@ -104,8 +104,10 @@ mod tests {
         let mat = Matrix::new(4, 2, vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]);
         let shuffled = shuffler.transform(mat).unwrap();
 
-        assert_eq!(shuffled.into_vec(),
-                   vec![3.0, 4.0, 1.0, 2.0, 7.0, 8.0, 5.0, 6.0]);
+        assert_eq!(
+            shuffled.into_vec(),
+            vec![3.0, 4.0, 1.0, 2.0, 7.0, 8.0, 5.0, 6.0]
+        );
     }
 
     #[test]
@@ -115,7 +117,9 @@ mod tests {
         let mat = Matrix::new(1, 8, vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]);
         let shuffled = shuffler.transform(mat).unwrap();
 
-        assert_eq!(shuffled.into_vec(),
-                   vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]);
+        assert_eq!(
+            shuffled.into_vec(),
+            vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]
+        );
     }
 }

@@ -30,13 +30,14 @@ pub enum ErrorKind {
     /// The model has not been trained
     UntrainedModel,
     /// Linear algebra related error
-    LinearAlgebra
+    LinearAlgebra,
 }
 
 impl Error {
     /// Construct a new `Error` of a particular `ErrorKind`.
     pub fn new<E>(kind: ErrorKind, error: E) -> Error
-        where E: Into<Box<error::Error + Send + Sync>>
+    where
+        E: Into<Box<error::Error + Send + Sync>>,
     {
         Error {
             kind: kind,
@@ -59,7 +60,10 @@ impl Error {
 
 impl From<rulinalg::error::Error> for Error {
     fn from(e: rulinalg::error::Error) -> Error {
-        Error::new(ErrorKind::LinearAlgebra, <rulinalg::error::Error as error::Error>::description(&e))
+        Error::new(
+            ErrorKind::LinearAlgebra,
+            <rulinalg::error::Error as error::Error>::description(&e),
+        )
     }
 }
 

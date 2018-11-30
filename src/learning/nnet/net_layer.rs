@@ -1,27 +1,40 @@
 //! Neural Network Layers
 
-use linalg::{Matrix, MatrixSlice, BaseMatrix};
+use linalg::{BaseMatrix, Matrix, MatrixSlice};
 
-use learning::LearningResult;
 use learning::error::{Error, ErrorKind};
 use learning::toolkit::activ_fn::ActivationFunc;
+use learning::LearningResult;
 
-use rand::thread_rng;
-use rand::distributions::Sample;
 use rand::distributions::normal::Normal;
+use rand::distributions::Sample;
+use rand::thread_rng;
 
 use std::fmt::Debug;
 
 /// Trait for neural net layers
-pub trait NetLayer : Debug {
+pub trait NetLayer: Debug {
     /// The result of propogating data forward through this layer
-    fn forward(&self, input: &Matrix<f64>, params: MatrixSlice<f64>) -> LearningResult<Matrix<f64>>;
+    fn forward(&self, input: &Matrix<f64>, params: MatrixSlice<f64>)
+        -> LearningResult<Matrix<f64>>;
 
     /// The gradient of the output of this layer with respect to its input
-    fn back_input(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, output: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64>;
-    
+    fn back_input(
+        &self,
+        out_grad: &Matrix<f64>,
+        input: &Matrix<f64>,
+        output: &Matrix<f64>,
+        params: MatrixSlice<f64>,
+    ) -> Matrix<f64>;
+
     /// The gradient of the output of this layer with respect to its parameters
-    fn back_params(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, output: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64>;
+    fn back_params(
+        &self,
+        out_grad: &Matrix<f64>,
+        input: &Matrix<f64>,
+        output: &Matrix<f64>,
+        params: MatrixSlice<f64>,
+    ) -> Matrix<f64>;
 
     /// The default value of the parameters of this layer before training
     fn default_params(&self) -> Vec<f64>;
@@ -43,7 +56,7 @@ pub trait NetLayer : Debug {
 /// The parameters are a matrix of weights of size I x N
 /// where N is the dimensionality of the output and I the dimensionality of the input
 #[derive(Debug, Clone, Copy)]
-pub struct Linear { 
+pub struct Linear {
     /// The number of dimensions of the input
     input_size: usize,
     /// The number of dimensions of the output
@@ -56,24 +69,23 @@ impl Linear {
     /// Construct a new Linear layer
     pub fn new(input_size: usize, output_size: usize) -> Linear {
         Linear {
-            input_size: input_size + 1, 
+            input_size: input_size + 1,
             output_size: output_size,
-            has_bias: true
+            has_bias: true,
         }
     }
 
     /// Construct a Linear layer without a bias term
     pub fn without_bias(input_size: usize, output_size: usize) -> Linear {
         Linear {
-            input_size: input_size, 
+            input_size: input_size,
             output_size: output_size,
-            has_bias: false
+            has_bias: false,
         }
     }
 }
 
-fn remove_first_col(mat: Matrix<f64>) -> Matrix<f64>
-{
+fn remove_first_col(mat: Matrix<f64>) -> Matrix<f64> {
     let rows = mat.rows();
     let cols = mat.cols();
     let mut data = mat.into_vec();
@@ -102,23 +114,39 @@ impl NetLayer for Linear {
     ///
     /// input should have dimensions N x I
     /// where N is the number of samples and I is the dimensionality of the input
-    fn forward(&self, input: &Matrix<f64>, params: MatrixSlice<f64>) -> LearningResult<Matrix<f64>> {
+    fn forward(
+        &self,
+        input: &Matrix<f64>,
+        params: MatrixSlice<f64>,
+    ) -> LearningResult<Matrix<f64>> {
         if self.has_bias {
-            if input.cols()+1 != params.rows() {
-                Err(Error::new(ErrorKind::InvalidData, "The input had the wrong number of columns"))
+            if input.cols() + 1 != params.rows() {
+                Err(Error::new(
+                    ErrorKind::InvalidData,
+                    "The input had the wrong number of columns",
+                ))
             } else {
                 Ok(&Matrix::ones(input.rows(), 1).hcat(input) * &params)
             }
         } else {
             if input.cols() != params.rows() {
-                Err(Error::new(ErrorKind::InvalidData, "The input had the wrong number of columns"))
+                Err(Error::new(
+                    ErrorKind::InvalidData,
+                    "The input had the wrong number of columns",
+                ))
             } else {
                 Ok(input * &params)
             }
         }
     }
-    
-    fn back_input(&self, out_grad: &Matrix<f64>, _: &Matrix<f64>, _: &Matrix<f64>, params: MatrixSlice<f64>) -> Matrix<f64> {
+
+    fn back_input(
+        &self,
+        out_grad: &Matrix<f64>,
+        _: &Matrix<f64>,
+        _: &Matrix<f64>,
+        params: MatrixSlice<f64>,
+    ) -> Matrix<f64> {
         debug_assert_eq!(out_grad.cols(), params.cols());
         let gradient = out_grad * &params.transpose();
         if self.has_bias {
@@ -127,8 +155,14 @@ impl NetLayer for Linear {
             gradient
         }
     }
-    
-    fn back_params(&self, out_grad: &Matrix<f64>, input: &Matrix<f64>, _: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
+
+    fn back_params(
+        &self,
+        out_grad: &Matrix<f64>,
+        input: &Matrix<f64>,
+        _: &Matrix<f64>,
+        _: MatrixSlice<f64>,
+    ) -> Matrix<f64> {
         debug_assert_eq!(input.rows(), out_grad.rows());
         if self.has_bias {
             &Matrix::ones(input.rows(), 1).hcat(input).transpose() * out_grad
@@ -141,11 +175,15 @@ impl NetLayer for Linear {
     ///
     /// weights drawn from gaussian distribution with 0 mean and variance 2/(input_size+output_size)
     fn default_params(&self) -> Vec<f64> {
-        let mut distro = Normal::new(0.0, (2.0/(self.input_size+self.output_size) as f64).sqrt());
+        let mut distro = Normal::new(
+            0.0,
+            (2.0 / (self.input_size + self.output_size) as f64).sqrt(),
+        );
         let mut rng = thread_rng();
 
-        (0..self.input_size*self.output_size).map(|_| distro.sample(&mut rng))
-                                             .collect()
+        (0..self.input_size * self.output_size)
+            .map(|_| distro.sample(&mut rng))
+            .collect()
     }
 
     fn param_shape(&self) -> (usize, usize) {
@@ -156,22 +194,34 @@ impl NetLayer for Linear {
 impl<T: ActivationFunc> NetLayer for T {
     /// Applies the activation function to each element of the input
     fn forward(&self, input: &Matrix<f64>, _: MatrixSlice<f64>) -> LearningResult<Matrix<f64>> {
-        let mut output = Vec::with_capacity(input.rows()*input.cols());
+        let mut output = Vec::with_capacity(input.rows() * input.cols());
         for val in input.data() {
             output.push(T::func(*val));
         }
         Ok(Matrix::new(input.rows(), input.cols(), output))
     }
 
-    fn back_input(&self, out_grad: &Matrix<f64>, _: &Matrix<f64>, output: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
-        let mut in_grad = Vec::with_capacity(output.rows()*output.cols());
+    fn back_input(
+        &self,
+        out_grad: &Matrix<f64>,
+        _: &Matrix<f64>,
+        output: &Matrix<f64>,
+        _: MatrixSlice<f64>,
+    ) -> Matrix<f64> {
+        let mut in_grad = Vec::with_capacity(output.rows() * output.cols());
         for (y, g) in output.data().iter().zip(out_grad.data()) {
             in_grad.push(T::func_grad_from_output(*y) * g);
         }
         Matrix::new(output.rows(), output.cols(), in_grad)
     }
-    
-    fn back_params(&self, _: &Matrix<f64>, _: &Matrix<f64>, _: &Matrix<f64>, _: MatrixSlice<f64>) -> Matrix<f64> {
+
+    fn back_params(
+        &self,
+        _: &Matrix<f64>,
+        _: &Matrix<f64>,
+        _: &Matrix<f64>,
+        _: MatrixSlice<f64>,
+    ) -> Matrix<f64> {
         Matrix::new(0, 0, Vec::new())
     }
 

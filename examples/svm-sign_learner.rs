@@ -2,8 +2,8 @@ extern crate rusty_machine;
 
 use rusty_machine::learning::svm::SVM;
 // Necessary for the training trait.
-use rusty_machine::learning::SupModel;
 use rusty_machine::learning::toolkit::kernel::HyperTan;
+use rusty_machine::learning::SupModel;
 
 use rusty_machine::linalg::Matrix;
 use rusty_machine::linalg::Vector;
@@ -19,14 +19,12 @@ fn main() {
 
     println!("Training...");
     // Training data
-    let inputs = Matrix::new(11, 1, vec![
-                             -0.1, -2., -9., -101., -666.7,
-                             0., 0.1, 1., 11., 99., 456.7
-                             ]);
-    let targets = Vector::new(vec![
-                              -1., -1., -1., -1., -1.,
-                              1., 1., 1., 1., 1., 1.
-                              ]);
+    let inputs = Matrix::new(
+        11,
+        1,
+        vec![-0.1, -2., -9., -101., -666.7, 0., 0.1, 1., 11., 99., 456.7],
+    );
+    let targets = Vector::new(vec![-1., -1., -1., -1., -1., 1., 1., 1., 1., 1., 1.]);
 
     // Trainee
     let mut svm_mod = SVM::new(HyperTan::new(100., 0.), 0.3);

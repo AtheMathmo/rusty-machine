@@ -28,12 +28,11 @@
 //! - Conversion to Rust.
 //! - Length hard defaults to the max iterations.
 
-use learning::optim::{Optimizable, OptimAlgorithm};
+use learning::optim::{OptimAlgorithm, Optimizable};
 use linalg::Vector;
 
 use std::cmp;
 use std::f64;
-
 
 /// Conjugate Gradient Descent algorithm
 #[derive(Clone, Copy, Debug)]
@@ -81,12 +80,13 @@ impl Default for ConjugateGD {
 }
 
 impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
-    fn optimize(&self,
-                model: &M,
-                start: &[f64],
-                inputs: &M::Inputs,
-                targets: &M::Targets)
-                -> Vec<f64> {
+    fn optimize(
+        &self,
+        model: &M,
+        start: &[f64],
+        inputs: &M::Inputs,
+        targets: &M::Targets,
+    ) -> Vec<f64> {
         let mut i = 0usize;
         let mut ls_failed = false;
 
@@ -140,7 +140,6 @@ impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
                 let mut z2: f64;
 
                 while ((f2 > (f1 + z1 * self.rho * d1)) || (d2 > -self.sig * d1)) && (m > 0i32) {
-
                     limit = z1;
 
                     if f2 > f1 {
@@ -265,7 +264,6 @@ impl<M: Optimizable> OptimAlgorithm<M> for ConjugateGD {
                 z1 = 1f64 / (1f64 - d1);
                 ls_failed = true;
             }
-
         }
         x.into_vec()
     }

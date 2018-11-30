@@ -1,16 +1,16 @@
-extern crate rusty_machine;
 extern crate rand;
+extern crate rusty_machine;
 
 use rand::{random, Closed01};
 use std::vec::Vec;
 
-use rusty_machine::learning::nnet::{NeuralNet, BCECriterion};
-use rusty_machine::learning::toolkit::regularization::Regularization;
-use rusty_machine::learning::toolkit::activ_fn::Sigmoid;
+use rusty_machine::learning::nnet::{BCECriterion, NeuralNet};
 use rusty_machine::learning::optim::grad_desc::StochasticGD;
+use rusty_machine::learning::toolkit::activ_fn::Sigmoid;
+use rusty_machine::learning::toolkit::regularization::Regularization;
 
-use rusty_machine::linalg::Matrix;
 use rusty_machine::learning::SupModel;
+use rusty_machine::linalg::Matrix;
 
 // AND gate
 fn main() {
@@ -50,18 +50,8 @@ fn main() {
     // Our train function returns a Result<(), E>
     model.train(&inputs, &targets).unwrap();
 
-    let test_cases = vec![
-        0.0, 0.0,
-        0.0, 1.0,
-        1.0, 1.0,
-        1.0, 0.0,
-        ];
-    let expected = vec![
-        0.0,
-        0.0,
-        1.0,
-        0.0,
-        ];
+    let test_cases = vec![0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0];
+    let expected = vec![0.0, 0.0, 1.0, 0.0];
     let test_inputs = Matrix::new(test_cases.len() / 2, 2, test_cases);
     let res = model.predict(&test_inputs).unwrap();
 

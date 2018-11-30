@@ -1,8 +1,8 @@
 #![feature(test)]
 
+extern crate rand;
 extern crate rusty_machine;
 extern crate test;
-extern crate rand;
 
 mod examples {
     mod cross_validation;

@@ -34,21 +34,22 @@
 //! by using the `new` constructor instead. This allows us to provide
 //! a `GradientDesc` object with custom parameters.
 
-use linalg::{Matrix, BaseMatrix};
-use linalg::Vector;
-use learning::{LearningResult, SupModel};
-use learning::toolkit::activ_fn::{ActivationFunc, Sigmoid};
-use learning::toolkit::cost_fn::{CostFunc, CrossEntropyError};
+use learning::error::Error;
 use learning::optim::grad_desc::GradientDesc;
 use learning::optim::{OptimAlgorithm, Optimizable};
-use learning::error::Error;
+use learning::toolkit::activ_fn::{ActivationFunc, Sigmoid};
+use learning::toolkit::cost_fn::{CostFunc, CrossEntropyError};
+use learning::{LearningResult, SupModel};
+use linalg::Vector;
+use linalg::{BaseMatrix, Matrix};
 
 /// Logistic Regression Model.
 ///
 /// Contains option for optimized parameter.
 #[derive(Debug)]
 pub struct LogisticRegressor<A>
-    where A: OptimAlgorithm<BaseLogisticRegressor>
+where
+    A: OptimAlgorithm<BaseLogisticRegressor>,
 {
     base: BaseLogisticRegressor,
     alg: A,
@@ -93,7 +94,8 @@ impl<A: OptimAlgorithm<BaseLogisticRegressor>> LogisticRegressor<A> {
 }
 
 impl<A> SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor<A>
-    where A: OptimAlgorithm<BaseLogisticRegressor>
+where
+    A: OptimAlgorithm<BaseLogisticRegressor>,
 {
     /// Train the logistic regression model.
     ///
@@ -119,7 +121,8 @@ impl<A> SupModel<Matrix<f64>, Vector<f64>> for LogisticRegressor<A>
 
         let initial_params = vec![0.5; full_inputs.cols()];
 
-        let optimal_w = self.alg.optimize(&self.base, &initial_params[..], &full_inputs, targets);
+        let optimal_w = self.alg
+            .optimize(&self.base, &initial_params[..], &full_inputs, targets);
         self.base.set_parameters(Vector::new(optimal_w));
         Ok(())
     }
@@ -178,12 +181,12 @@ impl Optimizable for BaseLogisticRegressor {
     type Inputs = Matrix<f64>;
     type Targets = Vector<f64>;
 
-    fn compute_grad(&self,
-                    params: &[f64],
-                    inputs: &Matrix<f64>,
-                    targets: &Vector<f64>)
-                    -> (f64, Vec<f64>) {
-
+    fn compute_grad(
+        &self,
+        params: &[f64],
+        inputs: &Matrix<f64>,
+        targets: &Vector<f64>,
+    ) -> (f64, Vec<f64>) {
         let beta_vec = Vector::new(params.to_vec());
         let outputs = (inputs * beta_vec).apply(&Sigmoid::func);
 

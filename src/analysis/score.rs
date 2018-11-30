@@ -2,10 +2,10 @@
 //! how close predictions and truth are. All functions in this
 //! module obey the convention that higher is better.
 
-use libnum::{Zero, One};
+use libnum::{One, Zero};
 
-use linalg::{BaseMatrix, Matrix};
 use learning::toolkit::cost_fn::{CostFunc, MeanSqError};
+use linalg::{BaseMatrix, Matrix};
 
 // ************************************
 // Classification Scores
@@ -32,11 +32,15 @@ use learning::toolkit::cost_fn::{CostFunc, MeanSqError};
 ///
 /// - outputs and targets have different length
 pub fn accuracy<I1, I2, T>(outputs: I1, targets: I2) -> f64
-    where T: PartialEq,
-          I1: ExactSizeIterator + Iterator<Item=T>,
-          I2: ExactSizeIterator + Iterator<Item=T>
+where
+    T: PartialEq,
+    I1: ExactSizeIterator + Iterator<Item = T>,
+    I2: ExactSizeIterator + Iterator<Item = T>,
 {
-    assert!(outputs.len() == targets.len(), "outputs and targets must have the same length");
+    assert!(
+        outputs.len() == targets.len(),
+        "outputs and targets must have the same length"
+    );
     let len = outputs.len() as f64;
     let correct = outputs
         .zip(targets)
@@ -47,8 +51,10 @@ pub fn accuracy<I1, I2, T>(outputs: I1, targets: I2) -> f64
 
 /// Returns the fraction of outputs rows which match their target.
 pub fn row_accuracy(outputs: &Matrix<f64>, targets: &Matrix<f64>) -> f64 {
-    accuracy(outputs.row_iter().map(|r| r.raw_slice()),
-             targets.row_iter().map(|r| r.raw_slice()))
+    accuracy(
+        outputs.row_iter().map(|r| r.raw_slice()),
+        targets.row_iter().map(|r| r.raw_slice()),
+    )
 }
 
 /// Returns the precision score for 2 class classification.
@@ -76,10 +82,14 @@ pub fn row_accuracy(outputs: &Matrix<f64>, targets: &Matrix<f64>) -> f64 {
 /// - outputs and targets have different length
 /// - outputs or targets contains a value which is not 0 or 1
 pub fn precision<'a, I, T>(outputs: I, targets: I) -> f64
-    where I: ExactSizeIterator<Item=&'a T>,
-          T: 'a + PartialEq + Zero + One
+where
+    I: ExactSizeIterator<Item = &'a T>,
+    T: 'a + PartialEq + Zero + One,
 {
-    assert!(outputs.len() == targets.len(), "outputs and targets must have the same length");
+    assert!(
+        outputs.len() == targets.len(),
+        "outputs and targets must have the same length"
+    );
 
     let mut tpfp = 0.0f64;
     let mut tp = 0.0f64;
@@ -91,8 +101,7 @@ pub fn precision<'a, I, T>(outputs: I, targets: I) -> f64
                 tp += 1.0f64;
             }
         }
-        if ((*t != &T::zero()) & (*t != &T::one())) |
-           ((*o != &T::zero()) & (*o != &T::one())) {
+        if ((*t != &T::zero()) & (*t != &T::one())) | ((*o != &T::zero()) & (*o != &T::one())) {
             panic!("precision must be used for 2 class classification")
         }
     }
@@ -124,10 +133,14 @@ pub fn precision<'a, I, T>(outputs: I, targets: I) -> f64
 /// - outputs and targets have different length
 /// - outputs or targets contains a value which is not 0 or 1
 pub fn recall<'a, I, T>(outputs: I, targets: I) -> f64
-    where I: ExactSizeIterator<Item=&'a T>,
-          T: 'a + PartialEq + Zero + One
+where
+    I: ExactSizeIterator<Item = &'a T>,
+    T: 'a + PartialEq + Zero + One,
 {
-    assert!(outputs.len() == targets.len(), "outputs and targets must have the same length");
+    assert!(
+        outputs.len() == targets.len(),
+        "outputs and targets must have the same length"
+    );
 
     let mut tpfn = 0.0f64;
     let mut tp = 0.0f64;
@@ -139,8 +152,7 @@ pub fn recall<'a, I, T>(outputs: I, targets: I) -> f64
                 tp += 1.0f64;
             }
         }
-        if ((*t != &T::zero()) & (*t != &T::one())) |
-           ((*o != &T::zero()) & (*o != &T::one())) {
+        if ((*t != &T::zero()) & (*t != &T::one())) | ((*o != &T::zero()) & (*o != &T::one())) {
             panic!("recall must be used for 2 class classification")
         }
     }
@@ -172,10 +184,14 @@ pub fn recall<'a, I, T>(outputs: I, targets: I) -> f64
 /// - outputs and targets have different length
 /// - outputs or targets contains a value which is not 0 or 1
 pub fn f1<'a, I, T>(outputs: I, targets: I) -> f64
-    where I: ExactSizeIterator<Item=&'a T>,
-          T: 'a + PartialEq + Zero + One
+where
+    I: ExactSizeIterator<Item = &'a T>,
+    T: 'a + PartialEq + Zero + One,
 {
-    assert!(outputs.len() == targets.len(), "outputs and targets must have the same length");
+    assert!(
+        outputs.len() == targets.len(),
+        "outputs and targets must have the same length"
+    );
 
     let mut tpos = 0.0f64;
     let mut fpos = 0.0f64;
@@ -189,8 +205,7 @@ pub fn f1<'a, I, T>(outputs: I, targets: I) -> f64
         } else if *o == &T::one() {
             fneg += 1.0f64;
         }
-        if ((*t != &T::zero()) & (*t != &T::one())) |
-           ((*o != &T::zero()) & (*o != &T::one())) {
+        if ((*t != &T::zero()) & (*t != &T::one())) | ((*o != &T::zero()) & (*o != &T::one())) {
             panic!("f1-score must be used for 2 class classification")
         }
     }
@@ -205,22 +220,21 @@ pub fn f1<'a, I, T>(outputs: I, targets: I) -> f64
 /// Returns the additive inverse of the mean-squared-error of the
 /// outputs. So higher is better, and the returned value is always
 /// negative.
-pub fn neg_mean_squared_error(outputs: &Matrix<f64>, targets: &Matrix<f64>) -> f64
-{
+pub fn neg_mean_squared_error(outputs: &Matrix<f64>, targets: &Matrix<f64>) -> f64 {
     // MeanSqError divides the actual mean squared error by two.
     -2f64 * MeanSqError::cost(outputs, targets)
 }
 
 #[cfg(test)]
 mod tests {
+    use super::{accuracy, f1, neg_mean_squared_error, precision, recall};
     use linalg::Matrix;
-    use super::{accuracy, precision, recall, f1, neg_mean_squared_error};
 
     #[test]
     fn test_accuracy() {
         let outputs = [1, 2, 3, 4, 5, 6];
         let targets = [1, 2, 3, 3, 5, 1];
-        assert_eq!(accuracy(outputs.iter(), targets.iter()), 2f64/3f64);
+        assert_eq!(accuracy(outputs.iter(), targets.iter()), 2f64 / 3f64);
 
         let outputs = [1, 1, 1, 0, 0, 0];
         let targets = [1, 1, 1, 0, 0, 1];
@@ -316,7 +330,6 @@ mod tests {
         assert_eq!(f1(outputs.iter(), targets.iter()), 0.5);
     }
 
-
     #[test]
     #[should_panic]
     fn test_f1_outputs_not_2class() {
@@ -337,21 +350,13 @@ mod tests {
     fn test_neg_mean_squared_error_1d() {
         let outputs = Matrix::new(3, 1, vec![1f64, 2f64, 3f64]);
         let targets = Matrix::new(3, 1, vec![2f64, 4f64, 3f64]);
-        assert_eq!(neg_mean_squared_error(&outputs, &targets), -5f64/3f64);
+        assert_eq!(neg_mean_squared_error(&outputs, &targets), -5f64 / 3f64);
     }
 
     #[test]
     fn test_neg_mean_squared_error_2d() {
-        let outputs = Matrix::new(3, 2, vec![
-            1f64, 2f64,
-            3f64, 4f64,
-            5f64, 6f64
-            ]);
-        let targets = Matrix::new(3, 2, vec![
-            1.5f64, 2.5f64,
-            5f64,   6f64,
-            5.5f64, 6.5f64
-            ]);
+        let outputs = Matrix::new(3, 2, vec![1f64, 2f64, 3f64, 4f64, 5f64, 6f64]);
+        let targets = Matrix::new(3, 2, vec![1.5f64, 2.5f64, 5f64, 6f64, 5.5f64, 6.5f64]);
         assert_eq!(neg_mean_squared_error(&outputs, &targets), -3f64);
     }
 }

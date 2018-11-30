@@ -4,10 +4,10 @@
 //! found in the rand crate. This is provided through
 //! traits added within the containing stats module.
 
-use stats::dist::Distribution;
-use rand::Rng;
-use rand::distributions::{Sample, IndependentSample};
 use rand::distributions::exponential::Exp1;
+use rand::distributions::{IndependentSample, Sample};
+use rand::Rng;
+use stats::dist::Distribution;
 
 /// An Exponential random variable.
 #[derive(Debug, Clone, Copy)]
@@ -76,8 +76,10 @@ impl Distribution<f64> for Exponential {
     /// assert!((log_pdf - exp.lambda().ln() + exp.lambda() * 3f64).abs() < 1e-20);
     /// ```
     fn logpdf(&self, x: f64) -> f64 {
-        assert!(x >= 0.,
-                "Input to log pdf must be positive for exponential.");
+        assert!(
+            x >= 0.,
+            "Input to log pdf must be positive for exponential."
+        );
         self.lambda.ln() - (x * self.lambda)
     }
 

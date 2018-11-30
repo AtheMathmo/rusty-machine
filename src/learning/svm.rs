@@ -32,13 +32,12 @@
 //! assert!(output[0] == 1f64, "Our classifier isn't very good!");
 //! ```
 
-
-use linalg::{Matrix, BaseMatrix};
 use linalg::Vector;
+use linalg::{BaseMatrix, Matrix};
 
+use learning::error::{Error, ErrorKind};
 use learning::toolkit::kernel::{Kernel, SquaredExp};
 use learning::{LearningResult, SupModel};
-use learning::error::{Error, ErrorKind};
 
 use rand;
 use rand::Rng;
@@ -104,8 +103,10 @@ impl<K: Kernel> SVM<K> {
     /// Construct a kernel matrix
     fn ker_mat(&self, m1: &Matrix<f64>, m2: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
         if m1.cols() != m2.cols() {
-            Err(Error::new(ErrorKind::InvalidState,
-                           "Inputs to kernel matrices have different column counts."))
+            Err(Error::new(
+                ErrorKind::InvalidState,
+                "Inputs to kernel matrices have different column counts.",
+            ))
         } else {
             let dim1 = m1.rows();
             let dim2 = m2.rows();
@@ -129,7 +130,8 @@ impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
         let full_inputs = ones.hcat(inputs);
 
         if let (&Some(ref alpha), &Some(ref train_inputs), &Some(ref train_targets)) =
-               (&self.alpha, &self.train_inputs, &self.train_targets) {
+            (&self.alpha, &self.train_inputs, &self.train_targets)
+        {
             let ker_mat = try!(self.ker_mat(&full_inputs, train_inputs));
             let weight_vec = alpha.elemul(train_targets) / self.lambda;
 
@@ -154,9 +156,9 @@ impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
         for t in 0..self.optim_iters {
             let i = rng.gen_range(0, n);
             let row_i = full_inputs.select_rows(&[i]);
-            let sum = full_inputs.row_iter()
-                .fold(0f64, |sum, row| sum + self.ker.kernel(row_i.data(), row.raw_slice())) *
-                      targets[i] / (self.lambda * (t as f64));
+            let sum = full_inputs.row_iter().fold(0f64, |sum, row| {
+                sum + self.ker.kernel(row_i.data(), row.raw_slice())
+            }) * targets[i] / (self.lambda * (t as f64));
 
             if sum < 1f64 {
                 alpha[i] += 1f64;

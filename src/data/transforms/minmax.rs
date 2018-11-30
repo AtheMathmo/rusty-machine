@@ -25,10 +25,10 @@
 //! let transformed = transformer.transform(inputs).unwrap();
 //! ```
 
+use super::{Invertible, TransformFitter, Transformer};
 use learning::error::{Error, ErrorKind};
 use learning::LearningResult;
-use linalg::{Matrix, BaseMatrix, BaseMatrixMut, Vector};
-use super::{Invertible, Transformer, TransformFitter};
+use linalg::{BaseMatrix, BaseMatrixMut, Matrix, Vector};
 
 use rulinalg::utils;
 
@@ -38,14 +38,14 @@ use libnum::Float;
 #[derive(Debug)]
 pub struct MinMaxFitter<T: Float> {
     scaled_min: T,
-    scaled_max: T
+    scaled_max: T,
 }
 
 impl<T: Float> Default for MinMaxFitter<T> {
     fn default() -> Self {
         MinMaxFitter {
             scaled_min: T::zero(),
-            scaled_max: T::one()
+            scaled_max: T::one(),
         }
     }
 }
@@ -74,7 +74,7 @@ impl<T: Float> MinMaxFitter<T> {
     pub fn new(min: T, max: T) -> Self {
         MinMaxFitter {
             scaled_min: min,
-            scaled_max: max
+            scaled_max: max,
         }
     }
 }
@@ -88,12 +88,18 @@ impl<T: Float> TransformFitter<Matrix<T>, MinMaxScaler<T>> for MinMaxFitter<T> {
         let mut input_min_max = vec![(T::max_value(), T::min_value()); features];
 
         for row in inputs.row_iter() {
-            for (idx, (feature, min_max)) in row.into_iter().zip(input_min_max.iter_mut()).enumerate() {
+            for (idx, (feature, min_max)) in
+                row.into_iter().zip(input_min_max.iter_mut()).enumerate()
+            {
                 if !feature.is_finite() {
-                    return Err(Error::new(ErrorKind::InvalidData,
-                                          format!("Data point in column {} cannot be \
-                                                   processed",
-                                                  idx)));
+                    return Err(Error::new(
+                        ErrorKind::InvalidData,
+                        format!(
+                            "Data point in column {} cannot be \
+                             processed",
+                            idx
+                        ),
+                    ));
                 }
                 // Update min
                 if *feature < min_max.0 {
@@ -109,26 +115,32 @@ impl<T: Float> TransformFitter<Matrix<T>, MinMaxScaler<T>> for MinMaxFitter<T> {
         // We'll scale each feature by a * x + b.
         // Where scales holds `a` per column and consts
         // holds `b`.
-        let scales = try!(input_min_max.iter()
-            .map(|&(x, y)| {
-                let s = (self.scaled_max - self.scaled_min) / (y - x);
-                if s.is_finite() {
-                    Ok(s)
-                } else {
-                    Err(Error::new(ErrorKind::InvalidData,
-                                   "Constant feature columns not supported."))
-                }
-            })
-            .collect::<Result<Vec<_>, _>>());
+        let scales = try!(
+            input_min_max
+                .iter()
+                .map(|&(x, y)| {
+                    let s = (self.scaled_max - self.scaled_min) / (y - x);
+                    if s.is_finite() {
+                        Ok(s)
+                    } else {
+                        Err(Error::new(
+                            ErrorKind::InvalidData,
+                            "Constant feature columns not supported.",
+                        ))
+                    }
+                })
+                .collect::<Result<Vec<_>, _>>()
+        );
 
-        let consts = input_min_max.iter()
+        let consts = input_min_max
+            .iter()
             .zip(scales.iter())
             .map(|(&(_, x), &s)| self.scaled_max - x * s)
             .collect::<Vec<_>>();
-        
+
         Ok(MinMaxScaler {
             scale_factors: Vector::new(scales),
-            const_factors: Vector::new(consts)
+            const_factors: Vector::new(consts),
         })
     }
 }
@@ -148,21 +160,30 @@ pub struct MinMaxScaler<T: Float> {
     const_factors: Vector<T>,
 }
 
-
 impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
     fn transform(&mut self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
         if self.scale_factors.size() != inputs.cols() {
-            Err(Error::new(ErrorKind::InvalidData,
-                            "Input data has different number of columns than fitted data."))
+            Err(Error::new(
+                ErrorKind::InvalidData,
+                "Input data has different number of columns than fitted data.",
+            ))
         } else {
             for mut row in inputs.row_iter_mut() {
-                utils::in_place_vec_bin_op(row.raw_slice_mut(), self.scale_factors.data(), |x, &y| {
-                    *x = *x * y;
-                });
+                utils::in_place_vec_bin_op(
+                    row.raw_slice_mut(),
+                    self.scale_factors.data(),
+                    |x, &y| {
+                        *x = *x * y;
+                    },
+                );
 
-                utils::in_place_vec_bin_op(row.raw_slice_mut(), self.const_factors.data(), |x, &y| {
-                    *x = *x + y;
-                });
+                utils::in_place_vec_bin_op(
+                    row.raw_slice_mut(),
+                    self.const_factors.data(),
+                    |x, &y| {
+                        *x = *x + y;
+                    },
+                );
             }
             Ok(inputs)
         }
@@ -170,12 +191,13 @@ impl<T: Float> Transformer<Matrix<T>> for MinMaxScaler<T> {
 }
 
 impl<T: Float> Invertible<Matrix<T>> for MinMaxScaler<T> {
-
     fn inv_transform(&self, mut inputs: Matrix<T>) -> Result<Matrix<T>, Error> {
         let features = self.scale_factors.size();
         if inputs.cols() != features {
-            return Err(Error::new(ErrorKind::InvalidData,
-                                    "Input data has different number of columns than fitted data."));
+            return Err(Error::new(
+                ErrorKind::InvalidData,
+                "Input data has different number of columns than fitted data.",
+            ));
         }
 
         for mut row in inputs.row_iter_mut() {
@@ -190,8 +212,8 @@ impl<T: Float> Invertible<Matrix<T>> for MinMaxScaler<T> {
 
 #[cfg(test)]
 mod tests {
+    use super::super::{Invertible, TransformFitter, Transformer};
     use super::*;
-    use super::super::{Transformer, TransformFitter, Invertible};
     use linalg::Matrix;
     use std::f64;
 

@@ -3,7 +3,7 @@
 //! This module provides sampling and shuffling which are used
 //! within the learning modules.
 
-use rand::{Rng, thread_rng};
+use rand::{thread_rng, Rng};
 
 /// ```
 /// use rusty_machine::learning::toolkit::rand_utils;
@@ -14,8 +14,10 @@ use rand::{Rng, thread_rng};
 /// println!("{:?}", sample);
 /// ```
 pub fn reservoir_sample<T: Copy>(pool: &[T], reservoir_size: usize) -> Vec<T> {
-    assert!(pool.len() >= reservoir_size,
-            "Sample size is greater than total.");
+    assert!(
+        pool.len() >= reservoir_size,
+        "Sample size is greater than total."
+    );
 
     let mut pool_mut = &pool[..];
 
