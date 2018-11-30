@@ -24,10 +24,10 @@
 //! let transformed = transformer.transform(inputs).unwrap();
 //! ```
 
-use learning::LearningResult;
+use super::{Invertible, TransformFitter, Transformer};
 use learning::error::{Error, ErrorKind};
-use linalg::{Matrix, Vector, Axes, BaseMatrix, BaseMatrixMut};
-use super::{Invertible, Transformer, TransformFitter};
+use learning::LearningResult;
+use linalg::{Axes, BaseMatrix, BaseMatrixMut, Matrix, Vector};
 
 use rulinalg::utils;
 
@@ -37,14 +37,14 @@ use libnum::{Float, FromPrimitive};
 #[derive(Debug)]
 pub struct StandardizerFitter<T: Float> {
     scaled_mean: T,
-    scaled_stdev: T
+    scaled_stdev: T,
 }
 
 impl<T: Float> Default for StandardizerFitter<T> {
     fn default() -> Self {
         StandardizerFitter {
             scaled_mean: T::zero(),
-            scaled_stdev: T::one()
+            scaled_stdev: T::one(),
         }
     }
 }
@@ -73,31 +73,39 @@ impl<T: Float> StandardizerFitter<T> {
     pub fn new(mean: T, stdev: T) -> StandardizerFitter<T> {
         StandardizerFitter {
             scaled_mean: mean,
-            scaled_stdev: stdev
+            scaled_stdev: stdev,
         }
     }
 }
 
-impl<T: Float + FromPrimitive> TransformFitter<Matrix<T>, Standardizer<T>> for StandardizerFitter<T> {
+impl<T: Float + FromPrimitive> TransformFitter<Matrix<T>, Standardizer<T>>
+    for StandardizerFitter<T>
+{
     fn fit(self, inputs: &Matrix<T>) -> LearningResult<Standardizer<T>> {
         if inputs.rows() <= 1 {
-            Err(Error::new(ErrorKind::InvalidData,
-                           "Cannot standardize data with only one row."))
+            Err(Error::new(
+                ErrorKind::InvalidData,
+                "Cannot standardize data with only one row.",
+            ))
         } else {
             let mean = inputs.mean(Axes::Row);
-            let variance = try!(inputs.variance(Axes::Row).map_err(|_| {
-                Error::new(ErrorKind::InvalidData, "Cannot compute variance of data.")
-            }));
+            let variance = try!(inputs.variance(Axes::Row).map_err(|_| Error::new(
+                ErrorKind::InvalidData,
+                "Cannot compute variance of data."
+            )));
 
             if mean.data().iter().any(|x| !x.is_finite()) {
-                return Err(Error::new(ErrorKind::InvalidData, "Some data point is non-finite."));
+                return Err(Error::new(
+                    ErrorKind::InvalidData,
+                    "Some data point is non-finite.",
+                ));
             }
 
             Ok(Standardizer {
                 means: mean,
                 variances: variance,
                 scaled_mean: self.scaled_mean,
-                scaled_stdev: self.scaled_stdev
+                scaled_stdev: self.scaled_stdev,
             })
         }
     }
@@ -125,12 +133,16 @@ pub struct Standardizer<T: Float> {
 impl<T: Float + FromPrimitive> Transformer<Matrix<T>> for Standardizer<T> {
     fn transform(&mut self, mut inputs: Matrix<T>) -> LearningResult<Matrix<T>> {
         if self.means.size() != inputs.cols() {
-            Err(Error::new(ErrorKind::InvalidData,
-                            "Input data has different number of columns from fitted data."))
+            Err(Error::new(
+                ErrorKind::InvalidData,
+                "Input data has different number of columns from fitted data.",
+            ))
         } else {
             for mut row in inputs.row_iter_mut() {
                 // Subtract the mean
-                utils::in_place_vec_bin_op(row.raw_slice_mut(), self.means.data(), |x, &y| *x = *x - y);
+                utils::in_place_vec_bin_op(row.raw_slice_mut(), self.means.data(), |x, &y| {
+                    *x = *x - y
+                });
                 utils::in_place_vec_bin_op(row.raw_slice_mut(), self.variances.data(), |x, &y| {
                     *x = (*x * self.scaled_stdev / y.sqrt()) + self.scaled_mean
                 });
@@ -144,8 +156,10 @@ impl<T: Float + FromPrimitive> Invertible<Matrix<T>> for Standardizer<T> {
     fn inv_transform(&self, mut inputs: Matrix<T>) -> LearningResult<Matrix<T>> {
         let features = self.means.size();
         if inputs.cols() != features {
-            return Err(Error::new(ErrorKind::InvalidData,
-                                    "Inputs have different feature count than transformer."));
+            return Err(Error::new(
+                ErrorKind::InvalidData,
+                "Inputs have different feature count than transformer.",
+            ));
         }
 
         for mut row in inputs.row_iter_mut() {
@@ -163,8 +177,8 @@ impl<T: Float + FromPrimitive> Invertible<Matrix<T>> for Standardizer<T> {
 
 #[cfg(test)]
 mod tests {
+    use super::super::{Invertible, TransformFitter, Transformer};
     use super::*;
-    use super::super::{Transformer, TransformFitter, Invertible};
     use linalg::{Axes, Matrix};
 
     use std::f64;

@@ -1,8 +1,8 @@
 //! Bruteforce search implementations
-use linalg::{Matrix, BaseMatrix};
 use learning::error::Error;
+use linalg::{BaseMatrix, Matrix};
 
-use super::{KNearest, KNearestSearch, get_distances, dist};
+use super::{dist, get_distances, KNearest, KNearestSearch};
 
 /// Perform brute-force search
 #[derive(Debug)]
@@ -20,9 +20,7 @@ impl Default for BruteForce {
     /// let _ = BruteForce::default();
     /// ```
     fn default() -> Self {
-        BruteForce {
-            data: None
-        }
+        BruteForce { data: None }
     }
 }
 
@@ -43,7 +41,6 @@ impl BruteForce {
 
 /// Can search K-nearest items
 impl KNearestSearch for BruteForce {
-
     /// initialize BruteForce Searcher
     fn build(&mut self, data: Matrix<f64>) {
         self.data = Some(data);
@@ -76,17 +73,13 @@ impl KNearestSearch for BruteForce {
 #[cfg(test)]
 mod tests {
 
-    use linalg::Matrix;
     use super::super::KNearestSearch;
     use super::BruteForce;
+    use linalg::Matrix;
 
     #[test]
     fn test_bruteforce_search() {
-        let m = Matrix::new(5, 2, vec![1., 2.,
-                                       8., 0.,
-                                       6., 10.,
-                                       3., 6.,
-                                       0., 3.]);
+        let m = Matrix::new(5, 2, vec![1., 2., 8., 0., 6., 10., 3., 6., 0., 3.]);
         let mut b = BruteForce::new();
         b.build(m);
 
@@ -100,7 +93,10 @@ mod tests {
 
         let (ind, dist) = b.search(&vec![3., 4.9], 3).unwrap();
         assert_eq!(ind, vec![3, 0, 4]);
-        assert_eq!(dist, vec![1.0999999999999996, 3.5227829907617076, 3.551056180912941]);
+        assert_eq!(
+            dist,
+            vec![1.0999999999999996, 3.5227829907617076, 3.551056180912941]
+        );
     }
 
     #[test]

@@ -1,18 +1,18 @@
 #[macro_use]
 extern crate rulinalg;
-extern crate rusty_machine as rm;
 extern crate num as libnum;
+extern crate rusty_machine as rm;
 
 pub mod learning {
     mod dbscan;
-    mod lin_reg;
-    mod k_means;
     mod gp;
+    mod k_means;
     mod knn;
+    mod lin_reg;
     mod pca;
 
     pub mod optim {
-    	mod grad_desc;
+        mod grad_desc;
     }
 }
 

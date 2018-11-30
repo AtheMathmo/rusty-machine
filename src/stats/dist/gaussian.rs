@@ -4,11 +4,11 @@
 //! found in the rand crate. This is provided through
 //! traits added within the containing stats module.
 
-use stats::dist::Distribution;
-use rand::Rng;
-use rand::distributions::{Sample, IndependentSample};
-use rand::distributions::normal::StandardNormal;
 use super::consts as stat_consts;
+use rand::distributions::normal::StandardNormal;
+use rand::distributions::{IndependentSample, Sample};
+use rand::Rng;
+use stats::dist::Distribution;
 use std::f64::consts as float_consts;
 
 /// A Gaussian random variable.
@@ -86,8 +86,8 @@ impl Distribution<f64> for Gaussian {
     /// assert!((lpdf_zero - (1f64/consts::SQRT_2_PI).abs()) < 1e-20);
     /// ```
     fn pdf(&self, x: f64) -> f64 {
-        (-(x - self.mean) * (x - self.mean) / (2.0 * self.variance)).exp() /
-        (stat_consts::SQRT_2_PI * self._std_dev)
+        (-(x - self.mean) * (x - self.mean) / (2.0 * self.variance)).exp()
+            / (stat_consts::SQRT_2_PI * self._std_dev)
     }
 
     /// The log pdf of the normal distribution.
@@ -107,8 +107,9 @@ impl Distribution<f64> for Gaussian {
     /// assert!((lpdf_zero + 0.5*consts::LN_2_PI).abs() < 1e-20);
     /// ```
     fn logpdf(&self, x: f64) -> f64 {
-        -self._std_dev.ln() - (stat_consts::LN_2_PI / 2.0) -
-        ((x - self.mean) * (x - self.mean) / (2.0 * self.variance))
+        -self._std_dev.ln()
+            - (stat_consts::LN_2_PI / 2.0)
+            - ((x - self.mean) * (x - self.mean) / (2.0 * self.variance))
     }
 
     /// Rough estimate for the cdf of the gaussian distribution.
@@ -138,12 +139,11 @@ impl Distribution<f64> for Gaussian {
     /// assert!((0.5*(1f64 - 0.382924922548) - cdf).abs() < 0.004);
     /// ```
     fn cdf(&self, x: f64) -> f64 {
-        0.5 *
-        (1f64 +
-         (x - self.mean).signum() *
-         (1f64 -
-          (-float_consts::FRAC_2_PI * (x - self.mean) * (x - self.mean) / self.variance).exp())
-            .sqrt())
+        0.5 * (1f64 + (x - self.mean).signum()
+            * (1f64 - (-float_consts::FRAC_2_PI * (x - self.mean) * (x - self.mean)
+                / self.variance)
+                .exp())
+                .sqrt())
     }
 }
 

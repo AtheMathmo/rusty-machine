@@ -30,14 +30,14 @@
 //! assert!(output[0] > 17f64, "Our regressor isn't very good!");
 //! ```
 
-use linalg::{Matrix, BaseMatrix};
-use linalg::Vector;
-use learning::{LearningResult, SupModel};
-use learning::toolkit::cost_fn::CostFunc;
-use learning::toolkit::cost_fn::MeanSqError;
+use learning::error::Error;
 use learning::optim::grad_desc::GradientDesc;
 use learning::optim::{OptimAlgorithm, Optimizable};
-use learning::error::Error;
+use learning::toolkit::cost_fn::CostFunc;
+use learning::toolkit::cost_fn::MeanSqError;
+use learning::{LearningResult, SupModel};
+use linalg::Vector;
+use linalg::{BaseMatrix, Matrix};
 
 /// Linear Regression Model.
 ///
@@ -109,12 +109,12 @@ impl Optimizable for LinRegressor {
     type Inputs = Matrix<f64>;
     type Targets = Vector<f64>;
 
-    fn compute_grad(&self,
-                    params: &[f64],
-                    inputs: &Matrix<f64>,
-                    targets: &Vector<f64>)
-                    -> (f64, Vec<f64>) {
-
+    fn compute_grad(
+        &self,
+        params: &[f64],
+        inputs: &Matrix<f64>,
+        targets: &Vector<f64>,
+    ) -> (f64, Vec<f64>) {
         let beta_vec = Vector::new(params.to_vec());
         let outputs = inputs * beta_vec;
 

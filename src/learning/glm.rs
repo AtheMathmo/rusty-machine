@@ -36,10 +36,10 @@
 //! ```
 
 use linalg::Vector;
-use linalg::{Matrix, BaseMatrix};
+use linalg::{BaseMatrix, Matrix};
 
-use learning::{LearningResult, SupModel};
 use learning::error::{Error, ErrorKind};
+use learning::{LearningResult, SupModel};
 
 /// The Generalized Linear Model
 ///
@@ -94,8 +94,10 @@ impl<C: Criterion> SupModel<Matrix<f64>, Vector<f64>> for GenLinearModel<C> {
         let n = inputs.rows();
 
         if n != targets.size() {
-            return Err(Error::new(ErrorKind::InvalidData,
-                                  "Training data do not have the same dimensions"));
+            return Err(Error::new(
+                ErrorKind::InvalidData,
+                "Training data do not have the same dimensions",
+            ));
         }
 
         // Construct initial estimate for mu
@@ -119,8 +121,8 @@ impl<C: Criterion> SupModel<Matrix<f64>, Vector<f64>> for GenLinearModel<C> {
 
             let new_beta = (&x_t_w * &full_inputs)
                 .inverse()
-                .expect("Could not compute input data inverse.") *
-                           x_t_w * z;
+                .expect("Could not compute input data inverse.") * x_t_w
+                * z;
             let diff = (beta - &new_beta).apply(&|x| x.abs()).sum();
             beta = new_beta;
 
@@ -334,11 +336,7 @@ impl Criterion for Bernoulli {
         for m in mu {
             let var = self.model_variance(*m);
 
-            working_weights_vec.push(if var.abs() < 1e-5 {
-                1e-5
-            } else {
-                var
-            });
+            working_weights_vec.push(if var.abs() < 1e-5 { 1e-5 } else { var });
         }
 
         working_weights_vec
@@ -378,7 +376,6 @@ impl Criterion for Binomial {
         } else {
             var
         }
-
     }
 
     fn initialize_mu(&self, y: &[f64]) -> Vec<f64> {
@@ -403,11 +400,7 @@ impl Criterion for Binomial {
         for (idx, m) in mu.iter().enumerate() {
             let var = self.model_variance(*m) / self.weights[idx];
 
-            working_weights_vec.push(if var.abs() < 1e-5 {
-                1e-5
-            } else {
-                var
-            });
+            working_weights_vec.push(if var.abs() < 1e-5 { 1e-5 } else { var });
         }
 
         working_weights_vec
@@ -459,11 +452,7 @@ impl Criterion for Poisson {
         let mut mu_data = Vec::with_capacity(y.len());
 
         for y_val in y {
-            mu_data.push(if *y_val < 1e-10 {
-                1e-10
-            } else {
-                *y_val
-            });
+            mu_data.push(if *y_val < 1e-10 { 1e-10 } else { *y_val });
         }
 
         mu_data

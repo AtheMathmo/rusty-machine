@@ -1,8 +1,8 @@
 pub mod exponential;
 pub mod gaussian;
 
-pub use self::gaussian::Gaussian;
 pub use self::exponential::Exponential;
+pub use self::gaussian::Gaussian;
 
 /// Statistical constants
 ///

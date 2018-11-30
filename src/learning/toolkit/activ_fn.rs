@@ -109,14 +109,14 @@ impl ActivationFunc for Tanh {
 
     fn func_grad(x: f64) -> f64 {
         let y = x.tanh();
-        1.0 - y*y
+        1.0 - y * y
     }
 
     fn func_grad_from_output(y: f64) -> f64 {
-        1.0 - y*y
+        1.0 - y * y
     }
 
     fn func_inv(x: f64) -> f64 {
-        0.5*((1.0+x)/(1.0-x)).ln()
+        0.5 * ((1.0 + x) / (1.0 - x)).ln()
     }
 }

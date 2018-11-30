@@ -1,23 +1,20 @@
-extern crate rusty_machine;
 extern crate rand;
+extern crate rusty_machine;
 
-use rusty_machine::linalg::{Matrix, BaseMatrix};
 use rusty_machine::learning::k_means::KMeansClassifier;
 use rusty_machine::learning::UnSupModel;
+use rusty_machine::linalg::{BaseMatrix, Matrix};
 
-use rand::thread_rng;
-use rand::distributions::IndependentSample;
 use rand::distributions::normal::Normal;
+use rand::distributions::IndependentSample;
+use rand::thread_rng;
 
-fn generate_data(centroids: &Matrix<f64>,
-                 points_per_centroid: usize,
-                 noise: f64)
-                 -> Matrix<f64> {
+fn generate_data(centroids: &Matrix<f64>, points_per_centroid: usize, noise: f64) -> Matrix<f64> {
     assert!(centroids.cols() > 0, "Centroids cannot be empty.");
     assert!(centroids.rows() > 0, "Centroids cannot be empty.");
     assert!(noise >= 0f64, "Noise must be non-negative.");
-    let mut raw_cluster_data = Vec::with_capacity(centroids.rows() * points_per_centroid *
-                                                  centroids.cols());
+    let mut raw_cluster_data =
+        Vec::with_capacity(centroids.rows() * points_per_centroid * centroids.cols());
 
     let mut rng = thread_rng();
     let normal_rv = Normal::new(0f64, noise);
@@ -36,9 +33,11 @@ fn generate_data(centroids: &Matrix<f64>,
         }
     }
 
-    Matrix::new(centroids.rows() * points_per_centroid,
-                centroids.cols(),
-                raw_cluster_data)
+    Matrix::new(
+        centroids.rows() * points_per_centroid,
+        centroids.cols(),
+        raw_cluster_data,
+    )
 }
 
 fn main() {
@@ -46,8 +45,10 @@ fn main() {
 
     const SAMPLES_PER_CENTROID: usize = 2000;
 
-    println!("Generating {0} samples from each centroids:",
-             SAMPLES_PER_CENTROID);
+    println!(
+        "Generating {0} samples from each centroids:",
+        SAMPLES_PER_CENTROID
+    );
     // Choose two cluster centers, at (-0.5, -0.5) and (0, 0.5).
     let centroids = Matrix::new(2, 2, vec![-0.5, -0.5, 0.0, 0.5]);
     println!("{}", centroids);

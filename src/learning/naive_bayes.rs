@@ -40,9 +40,9 @@
 //! println!("Final outputs --\n{}", outputs);
 //! ```
 
-use linalg::{Matrix, Axes, BaseMatrix, BaseMatrixMut};
-use learning::{LearningResult, SupModel};
 use learning::error::{Error, ErrorKind};
+use learning::{LearningResult, SupModel};
+use linalg::{Axes, BaseMatrix, BaseMatrixMut, Matrix};
 use rulinalg::utils;
 
 use std::f64::consts::PI;
@@ -128,7 +128,10 @@ impl<T: Distribution> SupModel<Matrix<f64>, Matrix<f64>> for NaiveBayes<T> {
 
             Ok(Matrix::new(inputs.rows(), cluster_count, class_data))
         } else {
-            Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
+            Err(Error::new(
+                ErrorKind::UntrainedModel,
+                "The model has not been trained.",
+            ))
         }
     }
 }
@@ -136,7 +139,6 @@ impl<T: Distribution> SupModel<Matrix<f64>, Matrix<f64>> for NaiveBayes<T> {
 impl<T: Distribution> NaiveBayes<T> {
     /// Get the log-probabilities per class for each input.
     pub fn get_log_probs(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
-
         if let (&Some(ref distr), &Some(ref prior)) = (&self.distr, &self.class_prior) {
             // Get the joint log likelihood from the distribution
             distr.joint_log_lik(inputs, prior)
@@ -177,7 +179,11 @@ impl<T: Distribution> NaiveBayes<T> {
         let mut class_prior = Vec::with_capacity(class_count);
 
         // Compute the prior as the proportion in each class
-        class_prior.extend(self.class_counts.iter().map(|c| *c as f64 / total_data as f64));
+        class_prior.extend(
+            self.class_counts
+                .iter()
+                .map(|c| *c as f64 / total_data as f64),
+        );
 
         self.class_prior = Some(class_prior);
         self.cluster_count = Some(class_count);
@@ -192,8 +198,10 @@ impl<T: Distribution> NaiveBayes<T> {
             }
         }
 
-        Err(Error::new(ErrorKind::InvalidState,
-                       "No class found for entry in targets"))
+        Err(Error::new(
+            ErrorKind::InvalidState,
+            "No class found for entry in targets",
+        ))
     }
 
     fn get_classes(log_probs: Matrix<f64>) -> Vec<usize> {
@@ -220,10 +228,8 @@ pub trait Distribution {
     /// Compute the joint log likelihood of the data.
     ///
     /// Returns a matrix with rows containing the probability that the input lies in each class.
-    fn joint_log_lik(&self,
-                     data: &Matrix<f64>,
-                     class_prior: &[f64])
-                     -> LearningResult<Matrix<f64>>;
+    fn joint_log_lik(&self, data: &Matrix<f64>, class_prior: &[f64])
+        -> LearningResult<Matrix<f64>>;
 }
 
 /// The Gaussian Naive Bayes model distribution.
@@ -265,11 +271,10 @@ impl Distribution for Gaussian {
     fn update_params(&mut self, data: &Matrix<f64>, class: usize) -> LearningResult<()> {
         // Compute mean and sample variance
         let mean = data.mean(Axes::Row).into_vec();
-        let var = try!(data.variance(Axes::Row).map_err(|_| {
-                Error::new(ErrorKind::InvalidData,
-                           "Cannot compute variance for Gaussian distribution.")
-            }))
-            .into_vec();
+        let var = try!(data.variance(Axes::Row).map_err(|_| Error::new(
+            ErrorKind::InvalidData,
+            "Cannot compute variance for Gaussian distribution."
+        ))).into_vec();
 
         let features = data.cols();
 
@@ -281,16 +286,19 @@ impl Distribution for Gaussian {
         Ok(())
     }
 
-    fn joint_log_lik(&self,
-                     data: &Matrix<f64>,
-                     class_prior: &[f64])
-                     -> LearningResult<Matrix<f64>> {
+    fn joint_log_lik(
+        &self,
+        data: &Matrix<f64>,
+        class_prior: &[f64],
+    ) -> LearningResult<Matrix<f64>> {
         let class_count = class_prior.len();
         let mut log_lik = Vec::with_capacity(class_count);
 
         for (i, item) in class_prior.into_iter().enumerate() {
             let joint_i = item.ln();
-            let n_ij = -0.5 * (self.sigma.select_rows(&[i]) * 2.0 * PI).apply(&|x| x.ln()).sum();
+            let n_ij = -0.5 * (self.sigma.select_rows(&[i]) * 2.0 * PI)
+                .apply(&|x| x.ln())
+                .sum();
 
             // NOTE: Here we are copying the row data which is inefficient
             let r_ij = (data - self.theta.select_rows(&vec![i; data.rows()]))
@@ -350,13 +358,13 @@ impl Distribution for Bernoulli {
         }
 
         Ok(())
-
     }
 
-    fn joint_log_lik(&self,
-                     data: &Matrix<f64>,
-                     class_prior: &[f64])
-                     -> LearningResult<Matrix<f64>> {
+    fn joint_log_lik(
+        &self,
+        data: &Matrix<f64>,
+        class_prior: &[f64],
+    ) -> LearningResult<Matrix<f64>> {
         let class_count = class_prior.len();
 
         let neg_prob = self.log_probs.clone().apply(&|x| (1f64 - x.exp()).ln());
@@ -424,10 +432,11 @@ impl Distribution for Multinomial {
         Ok(())
     }
 
-    fn joint_log_lik(&self,
-                     data: &Matrix<f64>,
-                     class_prior: &[f64])
-                     -> LearningResult<Matrix<f64>> {
+    fn joint_log_lik(
+        &self,
+        data: &Matrix<f64>,
+        class_prior: &[f64],
+    ) -> LearningResult<Matrix<f64>> {
         let class_count = class_prior.len();
 
         let res = data * self.log_probs.transpose();
@@ -445,10 +454,10 @@ impl Distribution for Multinomial {
 
 #[cfg(test)]
 mod tests {
-    use super::NaiveBayes;
-    use super::Gaussian;
     use super::Bernoulli;
+    use super::Gaussian;
     use super::Multinomial;
+    use super::NaiveBayes;
 
     use learning::SupModel;
 
@@ -456,14 +465,20 @@ mod tests {
 
     #[test]
     fn test_gaussian() {
-        let inputs = Matrix::new(6,
-                                 2,
-                                 vec![1.0, 1.1, 1.1, 0.9, 2.2, 2.3, 2.5, 2.7, 5.2, 4.3, 6.2, 7.3]);
+        let inputs = Matrix::new(
+            6,
+            2,
+            vec![1.0, 1.1, 1.1, 0.9, 2.2, 2.3, 2.5, 2.7, 5.2, 4.3, 6.2, 7.3],
+        );
 
-        let targets = Matrix::new(6,
-                                  3,
-                                  vec![1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
-                                       0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]);
+        let targets = Matrix::new(
+            6,
+            3,
+            vec![
+                1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0,
+                0.0, 1.0,
+            ],
+        );
 
         let mut model = NaiveBayes::<Gaussian>::new();
         model.train(&inputs, &targets).unwrap();
@@ -474,9 +489,11 @@ mod tests {
 
     #[test]
     fn test_bernoulli() {
-        let inputs = Matrix::new(4,
-                                 3,
-                                 vec![1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0]);
+        let inputs = Matrix::new(
+            4,
+            3,
+            vec![1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0],
+        );
 
         let targets = Matrix::new(4, 2, vec![1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0]);
 
@@ -489,10 +506,13 @@ mod tests {
 
     #[test]
     fn test_multinomial() {
-        let inputs = Matrix::new(4,
-                                 3,
-                                 vec![1.0, 0.0, 5.0, 0.0, 0.0, 11.0, 13.0, 1.0, 0.0, 12.0, 3.0,
-                                      0.0]);
+        let inputs = Matrix::new(
+            4,
+            3,
+            vec![
+                1.0, 0.0, 5.0, 0.0, 0.0, 11.0, 13.0, 1.0, 0.0, 12.0, 3.0, 0.0,
+            ],
+        );
 
         let targets = Matrix::new(4, 2, vec![1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0]);
 

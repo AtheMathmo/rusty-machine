@@ -7,14 +7,20 @@ pub mod trees;
 
 /// Dataset container
 #[derive(Clone, Debug)]
-pub struct Dataset<D, T> where D: Clone + Debug, T: Clone + Debug {
-
+pub struct Dataset<D, T>
+where
+    D: Clone + Debug,
+    T: Clone + Debug,
+{
     data: D,
-    target: T
+    target: T,
 }
 
-impl<D, T> Dataset<D, T> where D: Clone + Debug, T: Clone + Debug {
-
+impl<D, T> Dataset<D, T>
+where
+    D: Clone + Debug,
+    T: Clone + Debug,
+{
     /// Returns explanatory variable (features)
     pub fn data(&self) -> &D {
         &self.data

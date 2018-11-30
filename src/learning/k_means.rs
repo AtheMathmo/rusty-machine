@@ -42,12 +42,12 @@
 //!
 //! The [k-means++](https://en.wikipedia.org/wiki/K-means%2B%2B) scheme.
 
-use linalg::{Matrix, MatrixSlice, Axes, Vector, BaseMatrix};
-use learning::{LearningResult, UnSupModel};
 use learning::error::{Error, ErrorKind};
+use learning::{LearningResult, UnSupModel};
+use linalg::{Axes, BaseMatrix, Matrix, MatrixSlice, Vector};
 
-use rand::{Rng, thread_rng};
 use libnum::abs;
+use rand::{thread_rng, Rng};
 
 use std::fmt::Debug;
 
@@ -185,26 +185,33 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
     /// Used internally within model.
     fn init_centroids(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
         if self.k > inputs.rows() {
-            Err(Error::new(ErrorKind::InvalidData,
-                           format!("Number of clusters ({0}) exceeds number of data points \
-                                    ({1}).",
-                                   self.k,
-                                   inputs.rows())))
+            Err(Error::new(
+                ErrorKind::InvalidData,
+                format!(
+                    "Number of clusters ({0}) exceeds number of data points \
+                     ({1}).",
+                    self.k,
+                    inputs.rows()
+                ),
+            ))
         } else {
             let centroids = try!(self.init_algorithm.init_centroids(self.k, inputs));
 
             if centroids.rows() != self.k {
-                Err(Error::new(ErrorKind::InvalidState,
-                                    "Initial centroids must have exactly k rows."))
+                Err(Error::new(
+                    ErrorKind::InvalidState,
+                    "Initial centroids must have exactly k rows.",
+                ))
             } else if centroids.cols() != inputs.cols() {
-                Err(Error::new(ErrorKind::InvalidState,
-                                    "Initial centroids must have the same column count as inputs."))
+                Err(Error::new(
+                    ErrorKind::InvalidState,
+                    "Initial centroids must have the same column count as inputs.",
+                ))
             } else {
                 self.centroids = Some(centroids);
                 Ok(())
             }
         }
-
     }
 
     /// Updated the centroids by computing means of assigned classes.
@@ -226,14 +233,20 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
         self.centroids = Some(Matrix::new(self.k, inputs.cols(), new_centroids));
     }
 
-    fn get_closest_centroids(&self,
-                             inputs: &Matrix<f64>)
-                             -> LearningResult<(Vector<usize>, Vector<f64>)> {
+    fn get_closest_centroids(
+        &self,
+        inputs: &Matrix<f64>,
+    ) -> LearningResult<(Vector<usize>, Vector<f64>)> {
         if let Some(ref c) = self.centroids {
-            Ok(KMeansClassifier::<InitAlg>::find_closest_centroids(c.as_slice(), inputs))
+            Ok(KMeansClassifier::<InitAlg>::find_closest_centroids(
+                c.as_slice(),
+                inputs,
+            ))
         } else {
-            Err(Error::new(ErrorKind::InvalidState,
-                           "Centroids not correctly initialized."))
+            Err(Error::new(
+                ErrorKind::InvalidState,
+                "Centroids not correctly initialized.",
+            ))
         }
     }
 
@@ -241,9 +254,10 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
     ///
     /// Used internally within model.
     /// Returns the index of the closest centroid and the distance to it.
-    fn find_closest_centroids(centroids: MatrixSlice<f64>,
-                              inputs: &Matrix<f64>)
-                              -> (Vector<usize>, Vector<f64>) {
+    fn find_closest_centroids(
+        centroids: MatrixSlice<f64>,
+        inputs: &Matrix<f64>,
+    ) -> (Vector<usize>, Vector<f64>) {
         let mut idx = Vec::with_capacity(inputs.rows());
         let mut distances = Vec::with_capacity(inputs.rows());
 
@@ -296,7 +310,6 @@ pub struct RandomPartition;
 
 impl Initializer for RandomPartition {
     fn init_centroids(&self, k: usize, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
-
         // Populate so we have something in each class.
         let mut random_assignments = (0..k).map(|i| vec![i]).collect::<Vec<Vec<usize>>>();
         let mut rng = thread_rng();
@@ -335,18 +348,22 @@ impl Initializer for KPlusPlus {
 
         for i in 1..k {
             unsafe {
-                let temp_centroids = MatrixSlice::from_raw_parts(init_centroids.as_ptr(),
-                                                                 i,
-                                                                 inputs.cols(),
-                                                                 inputs.cols());
+                let temp_centroids = MatrixSlice::from_raw_parts(
+                    init_centroids.as_ptr(),
+                    i,
+                    inputs.cols(),
+                    inputs.cols(),
+                );
                 let (_, dist) =
                     KMeansClassifier::<KPlusPlus>::find_closest_centroids(temp_centroids, inputs);
 
                 // A relatively cheap way to validate our input data
                 if !dist.data().iter().all(|x| x.is_finite()) {
-                    return Err(Error::new(ErrorKind::InvalidData,
-                                          "Input data led to invalid centroid distances during \
-                                           initialization."));
+                    return Err(Error::new(
+                        ErrorKind::InvalidData,
+                        "Input data led to invalid centroid distances during \
+                         initialization.",
+                    ));
                 }
 
                 let next_cen = sample_discretely(&dist);

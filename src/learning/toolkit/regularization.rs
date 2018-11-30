@@ -14,9 +14,9 @@
 //! let reg = Regularization::L1(0.5);
 //! ```
 
+use libnum::{Float, FromPrimitive};
 use linalg::norm::{Euclidean, Lp, MatrixNorm};
-use linalg::{Matrix, MatrixSlice, BaseMatrix};
-use libnum::{FromPrimitive, Float};
+use linalg::{BaseMatrix, Matrix, MatrixSlice};
 
 /// Model Regularization
 #[derive(Debug, Clone, Copy)]
@@ -76,7 +76,8 @@ impl<T: Float + FromPrimitive> Regularization<T> {
     }
 
     fn l2_reg_cost(mat: &MatrixSlice<T>, x: T) -> T {
-        Euclidean.norm(mat) * x / ((T::one() + T::one()) * FromPrimitive::from_usize(mat.rows()).unwrap())
+        Euclidean.norm(mat) * x
+            / ((T::one() + T::one()) * FromPrimitive::from_usize(mat.rows()).unwrap())
     }
 
     fn l2_reg_grad(mat: &MatrixSlice<T>, x: T) -> Matrix<T> {
@@ -87,8 +88,8 @@ impl<T: Float + FromPrimitive> Regularization<T> {
 #[cfg(test)]
 mod tests {
     use super::Regularization;
-    use linalg::{Matrix, BaseMatrix};
     use linalg::norm::{Euclidean, MatrixNorm};
+    use linalg::{BaseMatrix, Matrix};
 
     #[test]
     fn test_no_reg() {
@@ -156,15 +157,17 @@ mod tests {
 
         assert!(a - ((Euclidean.norm(&input_mat) / 24f64) + (42f64 / 12f64)) < 1e-18);
 
-        let l1_true_grad = Matrix::new(3, 4,
+        let l1_true_grad = Matrix::new(
+            3,
+            4,
             vec![-1., -1., -1., 1., 1., 1., 1., 1., 1., 1., 1., 1.]
-            .into_iter()
-            .map(|x| x / 12f64)
-            .collect::<Vec<_>>());
+                .into_iter()
+                .map(|x| x / 12f64)
+                .collect::<Vec<_>>(),
+        );
         let l2_true_grad = &input_mat / 12f64;
 
-        for eps in (b - l1_true_grad - l2_true_grad)
-            .into_vec() {
+        for eps in (b - l1_true_grad - l2_true_grad).into_vec() {
             // Slightly lower boundary than others - more numerical error as more ops.
             assert!(eps < 1e-12);
         }

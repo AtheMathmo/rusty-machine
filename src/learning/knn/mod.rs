@@ -26,17 +26,17 @@
 //! assert_eq!(res, Vector::new(vec![1, 0]));
 //! # }
 //! ```
-use std::f64;
 use std::collections::BTreeMap;
+use std::f64;
 
-use linalg::{Matrix, BaseMatrix, Vector};
-use learning::{LearningResult, SupModel};
 use learning::error::{Error, ErrorKind};
+use learning::{LearningResult, SupModel};
+use linalg::{BaseMatrix, Matrix, Vector};
 
 mod binary_tree;
 mod brute_force;
 
-pub use self::binary_tree::{KDTree, BallTree};
+pub use self::binary_tree::{BallTree, KDTree};
 pub use self::brute_force::BruteForce;
 
 /// k-Nearest Neighbor Classifier
@@ -61,7 +61,7 @@ impl Default for KNNClassifier<KDTree> {
         KNNClassifier {
             k: 5,
             searcher: KDTree::default(),
-            target: None
+            target: None,
         }
     }
 }
@@ -80,7 +80,7 @@ impl KNNClassifier<KDTree> {
         KNNClassifier {
             k: k,
             searcher: KDTree::default(),
-            target: None
+            target: None,
         }
     }
 }
@@ -99,17 +99,15 @@ impl<S: KNearestSearch> KNNClassifier<S> {
         KNNClassifier {
             k: k,
             searcher: searcher,
-            target: None
+            target: None,
         }
     }
 }
 
 impl<S: KNearestSearch> SupModel<Matrix<f64>, Vector<usize>> for KNNClassifier<S> {
-
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<usize>> {
         match self.target {
             Some(ref target) => {
-
                 let mut results: Vec<usize> = Vec::with_capacity(inputs.rows());
                 for row in inputs.row_iter() {
                     let (idx, _) = try!(self.searcher.search(row.raw_slice(), self.k));
@@ -119,19 +117,23 @@ impl<S: KNearestSearch> SupModel<Matrix<f64>, Vector<usize>> for KNNClassifier<S
                     results.push(uniques[id]);
                 }
                 Ok(Vector::new(results))
-            },
-            _ => Err(Error::new_untrained())
+            }
+            _ => Err(Error::new_untrained()),
         }
     }
 
     fn train(&mut self, inputs: &Matrix<f64>, targets: &Vector<usize>) -> LearningResult<()> {
         if inputs.rows() != targets.size() {
-            return Err(Error::new(ErrorKind::InvalidData,
-                                  "inputs and targets must be the same length"));
+            return Err(Error::new(
+                ErrorKind::InvalidData,
+                "inputs and targets must be the same length",
+            ));
         }
         if inputs.rows() < self.k {
-            return Err(Error::new(ErrorKind::InvalidData,
-                                  "inputs number of rows must be equal or learger than k"));
+            return Err(Error::new(
+                ErrorKind::InvalidData,
+                "inputs number of rows must be equal or learger than k",
+            ));
         }
         self.searcher.build(inputs.clone());
         self.target = Some(targets.clone());
@@ -148,23 +150,19 @@ struct KNearest {
 }
 
 impl KNearest {
-
     fn new(k: usize, index: Vec<usize>, distances: Vec<f64>) -> Self {
         debug_assert!(!index.is_empty(), "index can't be empty");
-        debug_assert!(index.len() == distances.len(),
-                      "index and distance must have the same length");
+        debug_assert!(
+            index.len() == distances.len(),
+            "index and distance must have the same length"
+        );
 
-        let mut pairs: Vec<(usize, f64)> = index.into_iter()
-                                                .zip(distances.into_iter())
-                                                .collect();
+        let mut pairs: Vec<(usize, f64)> = index.into_iter().zip(distances.into_iter()).collect();
         // sort by distance, take k elements
         pairs.sort_by(|x, y| x.1.partial_cmp(&y.1).unwrap());
         pairs.truncate(k);
 
-        KNearest {
-            k: k,
-            pairs: pairs
-        }
+        KNearest { k: k, pairs: pairs }
     }
 
     /// Add new index and distances to the container, keeping first k elements which
@@ -173,11 +171,7 @@ impl KNearest {
         // self.pairs can't be empty
         let len = self.pairs.len();
         // index of the last element after the query
-        let last_index: usize = if len < self.k {
-            len
-        } else {
-            len - 1
-        };
+        let last_index: usize = if len < self.k { len } else { len - 1 };
 
         unsafe {
             if self.pairs.get_unchecked(len - 1).1 < distance {
@@ -232,8 +226,7 @@ impl KNearest {
 }
 
 /// Search K-nearest items
-pub trait KNearestSearch: Default{
-
+pub trait KNearestSearch: Default {
     /// build data structure for search optimization
     fn build(&mut self, data: Matrix<f64>);
 
@@ -278,17 +271,17 @@ fn get_distances(data: &Matrix<f64>, point: &[f64], ids: &[usize]) -> Vec<f64> {
 fn dist(v1: &[f64], v2: &[f64]) -> f64 {
     // ToDo: use metrics
     let d: f64 = v1.iter()
-                   .zip(v2.iter())
-                   .map(|(&x, &y)| (x - y) * (x - y))
-                   .fold(0., |s, v| s + v);
+        .zip(v2.iter())
+        .map(|(&x, &y)| (x - y) * (x - y))
+        .fold(0., |s, v| s + v);
     d.sqrt()
 }
 
 #[cfg(test)]
 mod tests {
 
-    use std::f64;
     use super::KNearest;
+    use std::f64;
 
     #[test]
     fn test_knearest() {

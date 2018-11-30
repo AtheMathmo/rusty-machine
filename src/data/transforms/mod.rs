@@ -27,8 +27,8 @@
 
 pub mod minmax;
 pub mod normalize;
-pub mod standardize;
 pub mod shuffle;
+pub mod standardize;
 
 use learning::LearningResult;
 
@@ -50,7 +50,7 @@ pub trait Transformer<T> {
 }
 
 /// Trait for invertible data transformers
-pub trait Invertible<T> : Transformer<T> {
+pub trait Invertible<T>: Transformer<T> {
     /// Maps the inputs using the inverse of the fitted transform.
     fn inv_transform(&self, inputs: T) -> LearningResult<T>;
 }
