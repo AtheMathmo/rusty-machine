@@ -55,6 +55,11 @@ impl Default for LinRegressor {
 }
 
 impl LinRegressor {
+    /// Create a new linear regression model from parameters
+    pub fn new(parameters: Option<Vector<f64>>) -> LinRegressor {
+        LinRegressor { parameters }
+    }
+
     /// Get the parameters from the model.
     ///
     /// Returns an option that is None if the model has not been trained.
