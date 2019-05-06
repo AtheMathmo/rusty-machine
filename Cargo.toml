@@ -14,8 +14,9 @@ license = "MIT"
 [features]
 stats = []
 datasets = []
+wasm-bindgen = ["rand/wasm-bindgen"]
 
 [dependencies]
 num = { version = "0.1.41", default-features = false }
-rand = { version = "0.6", features = ["wasm-bindgen"] }
+rand = "0.6"
 rulinalg = { git = "https://github.com/AtheMathmo/rulinalg", rev = "1ed8b937" }
