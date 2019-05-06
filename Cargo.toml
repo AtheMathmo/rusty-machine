@@ -17,5 +17,5 @@ datasets = []
 
 [dependencies]
 num = { version = "0.1.41", default-features = false }
-rand = "0.4.1"
+rand = { version = "0.6", features = ["wasm-bindgen"] }
 rulinalg = { git = "https://github.com/AtheMathmo/rulinalg", rev = "1ed8b937" }
