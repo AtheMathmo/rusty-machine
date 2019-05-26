@@ -36,12 +36,12 @@
 //! let clustering = model.clusters().unwrap();
 //! ```
 
-use learning::{LearningResult, UnSupModel};
 use learning::error::{Error, ErrorKind};
+use learning::{LearningResult, UnSupModel};
 
-use linalg::{Matrix, Vector, BaseMatrix};
-use rulinalg::utils;
+use linalg::{BaseMatrix, Matrix, Vector};
 use rulinalg::matrix::Row;
+use rulinalg::utils;
 
 /// DBSCAN Model
 ///
@@ -80,6 +80,8 @@ impl UnSupModel<Matrix<f64>, Vector<Option<usize>>> for DBSCAN {
     fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
         self.init_params(inputs.rows());
         let mut cluster = 0;
+        let mut neighbours = Vec::with_capacity(inputs.rows());
+        let mut sub_neighbours = Vec::with_capacity(inputs.rows());
 
         for (idx, point) in inputs.row_iter().enumerate() {
             let visited = self._visited[idx];
@@ -87,10 +89,11 @@ impl UnSupModel<Matrix<f64>, Vector<Option<usize>>> for DBSCAN {
             if !visited {
                 self._visited[idx] = true;
 
-                let neighbours = self.region_query(point, inputs);
+                neighbours.clear();
+                self.region_query(point, inputs, &mut neighbours);
 
                 if neighbours.len() >= self.min_points {
-                    self.expand_cluster(inputs, idx, neighbours, cluster);
+                    self.expand_cluster(inputs, idx, &mut neighbours, &mut sub_neighbours, cluster);
                     cluster += 1;
                 }
             }
@@ -105,16 +108,14 @@ impl UnSupModel<Matrix<f64>, Vector<Option<usize>>> for DBSCAN {
 
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Vector<Option<usize>>> {
         if self.predictive {
-            if let (&Some(ref cluster_data), &Some(ref clusters)) = (&self._cluster_data,
-                                                                     &self.clusters) {
+            if let (&Some(ref cluster_data), &Some(ref clusters)) = (&self._cluster_data, &self.clusters) {
                 let mut classes = Vec::with_capacity(inputs.rows());
 
                 for input_point in inputs.row_iter() {
                     let mut distances = Vec::with_capacity(cluster_data.rows());
 
                     for cluster_point in cluster_data.row_iter() {
-                        let point_distance =
-                            utils::vec_bin_op(input_point.raw_slice(), cluster_point.raw_slice(), |x, y| x - y);
+                        let point_distance = utils::vec_bin_op(input_point.raw_slice(), cluster_point.raw_slice(), |x, y| x - y);
                         distances.push(utils::dot(&point_distance, &point_distance).sqrt());
                     }
 
@@ -131,8 +132,7 @@ impl UnSupModel<Matrix<f64>, Vector<Option<usize>>> for DBSCAN {
                 Err(Error::new_untrained())
             }
         } else {
-            Err(Error::new(ErrorKind::InvalidState,
-                           "Model must be set to predictive. Use `self.set_predictive(true)`."))
+            Err(Error::new(ErrorKind::InvalidState, "Model must be set to predictive. Use `self.set_predictive(true)`."))
         }
     }
 }
@@ -167,49 +167,43 @@ impl DBSCAN {
         self.clusters.as_ref()
     }
 
-    fn expand_cluster(&mut self,
-                      inputs: &Matrix<f64>,
-                      point_idx: usize,
-                      neighbour_pts: Vec<usize>,
-                      cluster: usize) {
-        debug_assert!(point_idx < inputs.rows(),
-                      "Point index too large for inputs");
-        debug_assert!(neighbour_pts.iter().all(|x| *x < inputs.rows()),
-                      "Neighbour indices too large for inputs");
-
+    fn expand_cluster(&mut self, inputs: &Matrix<f64>, mut point_idx: usize, neighbours: &mut Vec<usize>, sub_neighbours: &mut Vec<usize>, cluster: usize) {
+        debug_assert!(point_idx < inputs.rows(), "Point index too large for inputs");
         self.clusters.as_mut().map(|x| x.mut_data()[point_idx] = Some(cluster));
 
-        for data_point_idx in &neighbour_pts {
-            let visited = self._visited[*data_point_idx];
+        while let Some(data_point_idx) = neighbours.pop() {
+            debug_assert!(data_point_idx < inputs.rows(), "Data point index too large for inputs");
+            debug_assert!(neighbours.iter().all(|x| *x < inputs.rows()), "Neighbour indices too large for inputs");
+
+            self.clusters.as_mut().map(|x| x.mut_data()[point_idx] = Some(cluster));
+            let visited = self._visited[data_point_idx];
             if !visited {
-                self._visited[*data_point_idx] = true;
-                let data_point_row = unsafe { inputs.row_unchecked(*data_point_idx) };
-                let sub_neighbours = self.region_query(data_point_row, inputs);
+                self._visited[data_point_idx] = true;
+                let data_point_row = unsafe { inputs.row_unchecked(data_point_idx) };
+
+                sub_neighbours.clear();
+                self.region_query(data_point_row, inputs, sub_neighbours);
 
                 if sub_neighbours.len() >= self.min_points {
-                    self.expand_cluster(inputs, *data_point_idx, sub_neighbours, cluster);
+                    point_idx = data_point_idx;
+                    neighbours.extend_from_slice(&sub_neighbours);
                 }
             }
         }
     }
 
+    fn region_query(&self, point: Row<f64>, inputs: &Matrix<f64>, neighbours: &mut Vec<usize>) {
+        debug_assert!(point.cols() == inputs.cols(), "point must be of same dimension as inputs");
 
-    fn region_query(&self, point: Row<f64>, inputs: &Matrix<f64>) -> Vec<usize> {
-        debug_assert!(point.cols() == inputs.cols(),
-                      "point must be of same dimension as inputs");
-
-        let mut in_neighbourhood = Vec::new();
         for (idx, data_point) in inputs.row_iter().enumerate() {
             //TODO: Use `MatrixMetric` when rulinalg#154 is fixed.
             let point_distance = utils::vec_bin_op(data_point.raw_slice(), point.raw_slice(), |x, y| x - y);
             let dist = utils::dot(&point_distance, &point_distance).sqrt();
 
             if dist < self.eps {
-                in_neighbourhood.push(idx);
+                neighbours.push(idx);
             }
         }
-
-        in_neighbourhood
     }
 
     fn init_params(&mut self, total_points: usize) {
@@ -229,7 +223,7 @@ impl DBSCAN {
 #[cfg(test)]
 mod tests {
     use super::DBSCAN;
-    use linalg::{Matrix, BaseMatrix};
+    use linalg::{BaseMatrix, Matrix};
 
     #[test]
     fn test_region_query() {
@@ -239,7 +233,8 @@ mod tests {
 
         let m = matrix![1.0, 1.0];
         let row = m.row(0);
-        let neighbours = model.region_query(row, &inputs);
+        let mut neighbours = vec![];
+        model.region_query(row, &inputs, &mut neighbours);
 
         assert!(neighbours.len() == 2);
     }
@@ -252,7 +247,8 @@ mod tests {
 
         let m = matrix![1.0, 1.0];
         let row = m.row(0);
-        let neighbours = model.region_query(row, &inputs);
+        let mut neighbours = vec![];
+        model.region_query(row, &inputs, &mut neighbours);
 
         assert!(neighbours.len() == 1);
     }
