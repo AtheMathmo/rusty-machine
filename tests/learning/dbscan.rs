@@ -27,11 +27,25 @@ fn test_basic_clusters() {
     let mut model = DBSCAN::new(0.5, 2);
     model.train(&inputs).unwrap();
 
-    let clustering = model.clusters().unwrap();
+    let clustering = dbg!(model.clusters().unwrap());
 
     assert!(clustering.data().iter().take(4).all(|x| *x == Some(0)));
     assert!(clustering.data().iter().skip(4).take(2).all(|x| *x == Some(1)));
     assert!(clustering.data().iter().skip(6).all(|x| *x == None));
+}
+
+#[test]
+fn test_border_points() {
+    let inputs = Matrix::new(5, 1, vec![1.55, 2.0, 2.1, 2.2, 2.65]);
+
+    let mut model = DBSCAN::new(0.5, 3);
+    model.train(&inputs).unwrap();
+
+    let clustering = dbg!(model.clusters().unwrap());
+
+    assert!(clustering.data().iter().take(1).all(|x| *x == None));
+    assert!(clustering.data().iter().skip(1).take(3).all(|x| *x == Some(0)));
+    assert!(clustering.data().iter().skip(4).all(|x| *x == None));
 }
 
 #[test]

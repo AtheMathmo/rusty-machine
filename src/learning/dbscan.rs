@@ -39,6 +39,8 @@
 use learning::error::{Error, ErrorKind};
 use learning::{LearningResult, UnSupModel};
 
+use kdtree::distance::squared_euclidean;
+use kdtree::KdTree;
 use linalg::{BaseMatrix, Matrix, Vector};
 use rulinalg::matrix::Row;
 use rulinalg::utils;
@@ -83,17 +85,24 @@ impl UnSupModel<Matrix<f64>, Vector<Option<usize>>> for DBSCAN {
         let mut neighbours = Vec::with_capacity(inputs.rows());
         let mut sub_neighbours = Vec::with_capacity(inputs.rows());
 
+        let kdt = Self::kdtree(inputs);
+
         for (idx, point) in inputs.row_iter().enumerate() {
             let visited = self._visited[idx];
 
+            idx;
+            point;
+            visited;
             if !visited {
                 self._visited[idx] = true;
 
                 neighbours.clear();
-                self.region_query(point, inputs, &mut neighbours);
+                self.region_query(point, inputs, &mut neighbours, &kdt);
+                neighbours.sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
+                neighbours.dedup();
 
                 if neighbours.len() >= self.min_points {
-                    self.expand_cluster(inputs, idx, &mut neighbours, &mut sub_neighbours, cluster);
+                    self.expand_cluster(inputs, idx, &mut neighbours, &mut sub_neighbours, cluster, &kdt);
                     cluster += 1;
                 }
             }
@@ -167,7 +176,7 @@ impl DBSCAN {
         self.clusters.as_ref()
     }
 
-    fn expand_cluster(&mut self, inputs: &Matrix<f64>, mut point_idx: usize, neighbours: &mut Vec<usize>, sub_neighbours: &mut Vec<usize>, cluster: usize) {
+    fn expand_cluster<'a>(&mut self, inputs: &Matrix<f64>, mut point_idx: usize, neighbours: &mut Vec<usize>, sub_neighbours: &mut Vec<usize>, cluster: usize, kdt: &KdTree<f64, usize, &'a [f64]>) {
         debug_assert!(point_idx < inputs.rows(), "Point index too large for inputs");
         self.clusters.as_mut().map(|x| x.mut_data()[point_idx] = Some(cluster));
 
@@ -182,28 +191,31 @@ impl DBSCAN {
                 let data_point_row = unsafe { inputs.row_unchecked(data_point_idx) };
 
                 sub_neighbours.clear();
-                self.region_query(data_point_row, inputs, sub_neighbours);
+                self.region_query(data_point_row, inputs, sub_neighbours, kdt);
 
                 if sub_neighbours.len() >= self.min_points {
                     point_idx = data_point_idx;
                     neighbours.extend_from_slice(&sub_neighbours);
+                    neighbours.sort_unstable_by(|a, b| a.partial_cmp(b).unwrap());
+                    neighbours.dedup();
                 }
             }
         }
     }
 
-    fn region_query(&self, point: Row<f64>, inputs: &Matrix<f64>, neighbours: &mut Vec<usize>) {
+    fn region_query<'a>(&self, point: Row<f64>, inputs: &Matrix<f64>, neighbours: &mut Vec<usize>, kdt: &KdTree<f64, usize, &'a [f64]>) {
         debug_assert!(point.cols() == inputs.cols(), "point must be of same dimension as inputs");
-
-        for (idx, data_point) in inputs.row_iter().enumerate() {
-            //TODO: Use `MatrixMetric` when rulinalg#154 is fixed.
-            let point_distance = utils::vec_bin_op(data_point.raw_slice(), point.raw_slice(), |x, y| x - y);
-            let dist = utils::dot(&point_distance, &point_distance).sqrt();
-
-            if dist < self.eps {
-                neighbours.push(idx);
-            }
+        for (pnt, idx) in kdt.within(point.raw_slice(), self.eps.powi(2), &squared_euclidean).expect("KdTree error checking point") {
+            neighbours.push(*idx);
         }
+    }
+
+    fn kdtree<'a>(inputs: &'a Matrix<f64>) -> KdTree<f64, usize, &'a [f64]> {
+        let mut kdt = KdTree::new(inputs.cols());
+        for (idx, row) in inputs.row_iter().enumerate() {
+            kdt.add(row.raw_slice(), idx);
+        }
+        kdt
     }
 
     fn init_params(&mut self, total_points: usize) {
@@ -230,11 +242,12 @@ mod tests {
         let model = DBSCAN::new(1.0, 3);
 
         let inputs = Matrix::new(3, 2, vec![1.0, 1.0, 1.1, 1.9, 3.0, 3.0]);
+        let kdt = DBSCAN::kdtree(&inputs);
 
         let m = matrix![1.0, 1.0];
         let row = m.row(0);
         let mut neighbours = vec![];
-        model.region_query(row, &inputs, &mut neighbours);
+        model.region_query(row, &inputs, &mut neighbours, &kdt);
 
         assert!(neighbours.len() == 2);
     }
@@ -244,11 +257,12 @@ mod tests {
         let model = DBSCAN::new(0.01, 3);
 
         let inputs = Matrix::new(3, 2, vec![1.0, 1.0, 1.1, 1.9, 1.1, 1.1]);
+        let kdt = DBSCAN::kdtree(&inputs);
 
         let m = matrix![1.0, 1.0];
         let row = m.row(0);
         let mut neighbours = vec![];
-        model.region_query(row, &inputs, &mut neighbours);
+        model.region_query(row, &inputs, &mut neighbours, &kdt);
 
         assert!(neighbours.len() == 1);
     }
