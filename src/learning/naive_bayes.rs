@@ -186,7 +186,7 @@ impl<T: Distribution> NaiveBayes<T> {
 
     fn find_class(row: &[f64]) -> LearningResult<usize> {
         // Find the `1` entry in the row
-        for (idx, r) in row.into_iter().enumerate() {
+        for (idx, r) in row.iter().enumerate() {
             if *r == 1f64 {
                 return Ok(idx);
             }
@@ -288,7 +288,7 @@ impl Distribution for Gaussian {
         let class_count = class_prior.len();
         let mut log_lik = Vec::with_capacity(class_count);
 
-        for (i, item) in class_prior.into_iter().enumerate() {
+        for (i, item) in class_prior.iter().enumerate() {
             let joint_i = item.ln();
             let n_ij = -0.5 * (self.sigma.select_rows(&[i]) * 2.0 * PI).apply(&|x| x.ln()).sum();
 
@@ -371,7 +371,7 @@ impl Distribution for Bernoulli {
         let mut per_class_row = Vec::with_capacity(class_count);
         let neg_prob_sum = neg_prob.sum_cols();
 
-        for (idx, p) in class_prior.into_iter().enumerate() {
+        for (idx, p) in class_prior.iter().enumerate() {
             per_class_row.push(p.ln() + neg_prob_sum[idx]);
         }
 
