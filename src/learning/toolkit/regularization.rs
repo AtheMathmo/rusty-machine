@@ -117,7 +117,7 @@ mod tests {
         assert!((a - (42f64 / 12f64)) < 1e-18);
 
         let true_grad = vec![-1., -1., -1., 1., 1., 1., 1., 1., 1., 1., 1., 1.]
-            .iter()
+            .into_iter()
             .map(|x| x / 12f64)
             .collect::<Vec<_>>();
 
@@ -158,7 +158,7 @@ mod tests {
 
         let l1_true_grad = Matrix::new(3, 4,
             vec![-1., -1., -1., 1., 1., 1., 1., 1., 1., 1., 1., 1.]
-            .iter()
+            .into_iter()
             .map(|x| x / 12f64)
             .collect::<Vec<_>>());
         let l2_true_grad = &input_mat / 12f64;
