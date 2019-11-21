@@ -18,5 +18,6 @@ wasm-bindgen = ["rand/wasm-bindgen"]
 
 [dependencies]
 num = { version = "0.1.41", default-features = false }
-rand = "0.6"
+rand = "0.7"
+rand_distr = "0.2"
 rulinalg = { git = "https://github.com/AtheMathmo/rulinalg", rev = "1ed8b937" }

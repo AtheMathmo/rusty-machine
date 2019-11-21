@@ -50,11 +50,12 @@ impl<R: Rng> Shuffler<R> {
     ///
     /// use rusty_machine::data::transforms::Transformer;
     /// use rusty_machine::data::transforms::shuffle::Shuffler;
-    /// use rand::{StdRng, SeedableRng};
+    /// use rand::SeedableRng;
+    /// use rand::rngs::StdRng;
     ///
     /// # fn main() {
     /// // We can create a seeded rng
-    /// let rng = StdRng::from_seed(&[1, 2, 3]);
+    /// let rng = StdRng::seed_from_u64(123);
     ///
     /// let shuffler = Shuffler::new(rng);
     /// # }
@@ -95,11 +96,12 @@ mod tests {
     use super::super::Transformer;
     use super::Shuffler;
 
-    use rand::{StdRng, SeedableRng};
+    use rand::SeedableRng;
+    use rand::rngs::StdRng;
 
     #[test]
     fn seeded_shuffle() {
-        let rng = StdRng::from_seed(&[1, 2, 3]);
+        let rng = StdRng::seed_from_u64(123);
         let mut shuffler = Shuffler::new(rng);
 
         let mat = Matrix::new(4, 2, vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]);

@@ -1,13 +1,13 @@
 extern crate rusty_machine;
 extern crate rand;
+extern crate rand_distr;
 
 use rusty_machine::linalg::{Matrix, BaseMatrix};
 use rusty_machine::learning::k_means::KMeansClassifier;
 use rusty_machine::learning::UnSupModel;
 
 use rand::thread_rng;
-use rand::distributions::IndependentSample;
-use rand::distributions::normal::Normal;
+use rand_distr::{Distribution, Normal};
 
 fn generate_data(centroids: &Matrix<f64>,
                  points_per_centroid: usize,
@@ -20,7 +20,7 @@ fn generate_data(centroids: &Matrix<f64>,
                                                   centroids.cols());
 
     let mut rng = thread_rng();
-    let normal_rv = Normal::new(0f64, noise);
+    let normal_rv = Normal::new(0f64, noise).unwrap();
 
     for _ in 0..points_per_centroid {
         // Generate points from each centroid
@@ -28,7 +28,7 @@ fn generate_data(centroids: &Matrix<f64>,
             // Generate a point randomly around the centroid
             let mut point = Vec::with_capacity(centroids.cols());
             for feature in centroid.iter() {
-                point.push(feature + normal_rv.ind_sample(&mut rng));
+                point.push(feature + normal_rv.sample(&mut rng));
             }
 
             // Push point to raw_cluster_data

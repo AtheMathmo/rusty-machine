@@ -1,7 +1,9 @@
 extern crate rusty_machine;
 extern crate rand;
+extern crate rand_distr;
 
-use rand::{random, Closed01};
+use rand::{Rng, thread_rng};
+use rand_distr::OpenClosed01;
 use std::vec::Vec;
 
 use rusty_machine::learning::nnet::{NeuralNet, BCECriterion};
@@ -26,8 +28,8 @@ fn main() {
 
     for _ in 0..SAMPLES {
         // The two inputs are "signals" between 0 and 1
-        let Closed01(left) = random::<Closed01<f64>>();
-        let Closed01(right) = random::<Closed01<f64>>();
+        let left: f64 = thread_rng().sample(OpenClosed01);
+        let right: f64 = thread_rng().sample(OpenClosed01);
         input_data.push(left);
         input_data.push(right);
         if left > THRESHOLD && right > THRESHOLD {

@@ -4,10 +4,9 @@
 //! found in the rand crate. This is provided through
 //! traits added within the containing stats module.
 
-use stats::dist::Distribution;
+use stats::dist::Distribution as StatDistribution;
 use rand::Rng;
-use rand::distributions::{Sample, IndependentSample};
-use rand::distributions::normal::StandardNormal;
+use rand_distr::{Distribution, StandardNormal};
 use super::consts as stat_consts;
 use std::f64::consts as float_consts;
 
@@ -68,7 +67,7 @@ impl Gaussian {
 ///
 /// Accurately computes the PDF and log PDF.
 /// Estimates the CDF accurate only to 0.003.
-impl Distribution<f64> for Gaussian {
+impl StatDistribution<f64> for Gaussian {
     /// The pdf of the normal distribution
     ///
     /// # Examples
@@ -147,15 +146,9 @@ impl Distribution<f64> for Gaussian {
     }
 }
 
-impl Sample<f64> for Gaussian {
-    fn sample<R: Rng>(&mut self, rng: &mut R) -> f64 {
-        self.ind_sample(rng)
-    }
-}
-
-impl IndependentSample<f64> for Gaussian {
-    fn ind_sample<R: Rng>(&self, rng: &mut R) -> f64 {
-        let StandardNormal(n) = rng.gen::<StandardNormal>();
+impl Distribution<f64> for Gaussian {
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> f64 {
+        let n: f64 = rng.sample(StandardNormal);
         self.mean + self._std_dev * n
     }
 }
