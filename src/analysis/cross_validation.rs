@@ -67,8 +67,8 @@ pub fn k_fold_validate<M, S>(model: &mut M,
         let test_inputs = inputs.select_rows(p.test_indices_iter.clone());
         let test_targets = targets.select_rows(p.test_indices_iter.clone());
 
-        try!(model.train(&train_inputs, &train_targets));
-        let outputs = try!(model.predict(&test_inputs));
+        model.train(&train_inputs, &train_targets)?;
+        let outputs = model.predict(&test_inputs)?;
         costs.push(score(&outputs, &test_targets));
     }
 

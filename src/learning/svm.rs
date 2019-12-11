@@ -130,7 +130,7 @@ impl<K: Kernel> SupModel<Matrix<f64>, Vector<f64>> for SVM<K> {
 
         if let (&Some(ref alpha), &Some(ref train_inputs), &Some(ref train_targets)) =
                (&self.alpha, &self.train_inputs, &self.train_targets) {
-            let ker_mat = try!(self.ker_mat(&full_inputs, train_inputs));
+            let ker_mat = self.ker_mat(&full_inputs, train_inputs)?;
             let weight_vec = alpha.elemul(train_targets) / self.lambda;
 
             let plane_dist = ker_mat * weight_vec;

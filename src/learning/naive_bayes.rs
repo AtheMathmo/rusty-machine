@@ -113,7 +113,7 @@ impl<T: Distribution> SupModel<Matrix<f64>, Matrix<f64>> for NaiveBayes<T> {
 
     /// Predict output from inputs.
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
-        let log_probs = try!(self.get_log_probs(inputs));
+        let log_probs = self.get_log_probs(inputs)?;
         let input_classes = NaiveBayes::<T>::get_classes(log_probs);
 
         if let Some(cluster_count) = self.cluster_count {
@@ -154,7 +154,7 @@ impl<T: Distribution> NaiveBayes<T> {
 
         for (idx, row) in targets.row_iter().enumerate() {
             // Find the class of this input
-            let class = try!(NaiveBayes::<T>::find_class(row.raw_slice()));
+            let class = NaiveBayes::<T>::find_class(row.raw_slice())?;
 
             // Note the class of the input
             class_data[class].push(idx);
@@ -170,7 +170,7 @@ impl<T: Distribution> NaiveBayes<T> {
                     continue;
                 }
                 // Update the parameters within this class
-                try!(distr.update_params(&inputs.select_rows(&c), idx));
+                distr.update_params(&inputs.select_rows(&c), idx)?;
             }
         }
 
@@ -265,10 +265,10 @@ impl Distribution for Gaussian {
     fn update_params(&mut self, data: &Matrix<f64>, class: usize) -> LearningResult<()> {
         // Compute mean and sample variance
         let mean = data.mean(Axes::Row).into_vec();
-        let var = try!(data.variance(Axes::Row).map_err(|_| {
+        let var = data.variance(Axes::Row).map_err(|_| {
                 Error::new(ErrorKind::InvalidData,
                            "Cannot compute variance for Gaussian distribution.")
-            }))
+            })?
             .into_vec();
 
         let features = data.cols();

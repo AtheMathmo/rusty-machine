@@ -397,7 +397,7 @@ impl<B: BinarySplit> KNearestSearch for BinaryTree<B> {
     /// Serch k-nearest items close to the point
     fn search(&self, point: &[f64], k: usize) -> Result<(Vec<usize>, Vec<f64>), Error> {
         if let Some(ref data) = self.data {
-            let (mut query, mut queue) = try!(self.search_leaf(point, k));
+            let (mut query, mut queue) = self.search_leaf(point, k)?;
             while !queue.is_empty() {
                 let current = queue.pop_front().unwrap();
 

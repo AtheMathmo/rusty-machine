@@ -80,7 +80,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
         let k = self.comp_count;
 
         self.model_covars = {
-            let cov_mat = try!(self.initialize_covariances(inputs, reg_value));
+            let cov_mat = self.initialize_covariances(inputs, reg_value)?;
             Some(vec![cov_mat; k])
         };
 
@@ -91,7 +91,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
         for _ in 0..self.max_iters {
             let log_lik_0 = self.log_lik;
 
-            let (weights, log_lik_1) = try!(self.membership_weights(inputs));
+            let (weights, log_lik_1) = self.membership_weights(inputs)?;
 
             if (log_lik_1 - log_lik_0).abs() < 1e-15 {
                 break;
@@ -108,7 +108,7 @@ impl UnSupModel<Matrix<f64>, Matrix<f64>> for GaussianMixtureModel {
     /// Predict output from inputs.
     fn predict(&self, inputs: &Matrix<f64>) -> LearningResult<Matrix<f64>> {
         if let (&Some(_), &Some(_)) = (&self.model_means, &self.model_covars) {
-            Ok(try!(self.membership_weights(inputs)).0)
+            Ok(self.membership_weights(inputs)?.0)
         } else {
             Err(Error::new_untrained())
         }
@@ -227,7 +227,7 @@ impl GaussianMixtureModel {
     fn initialize_covariances(&self, inputs: &Matrix<f64>, reg_value: f64) -> LearningResult<Matrix<f64>> {
         match self.cov_option {
             CovOption::Diagonal => {
-                let variance = try!(inputs.variance(Axes::Row));
+                let variance = inputs.variance(Axes::Row)?;
                 Ok(Matrix::from_diag(variance.data()) * reg_value.sqrt())
             }
 
@@ -264,7 +264,7 @@ impl GaussianMixtureModel {
                 let lup = PartialPivLu::decompose(cov.clone()).expect("Covariance could not be lup decomposed");
                 let covar_det = lup.det();
                 // TODO: We can probably remove this inverse for a more stable solve elsewhere.
-                let covar_inv = try!(lup.inverse().map_err(Error::from));
+                let covar_inv = lup.inverse().map_err(Error::from)?;
 
                 cov_sqrt_dets.push(covar_det.sqrt());
                 cov_invs.push(covar_inv);

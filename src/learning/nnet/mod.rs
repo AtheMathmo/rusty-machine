@@ -404,7 +404,7 @@ impl<T: Criterion> BaseNeuralNet<T> {
                                                     shape.0,
                                                     shape.1,
                                                     shape.1);
-            try!(self.layers[0].forward(inputs, slice))
+            self.layers[0].forward(inputs, slice)?
         };
 
         let mut index = self.layers[0].num_params();

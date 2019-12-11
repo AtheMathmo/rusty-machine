@@ -148,7 +148,7 @@ impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Vector<f64>> for GaussianProc
         // Messy referencing for succint syntax
         if let (&Some(ref alpha), &Some(ref t_data)) = (&self.alpha, &self.train_data) {
             let mean = self.mean.func(inputs.clone());
-            let post_mean = try!(self.ker_mat(inputs, t_data)) * alpha;
+            let post_mean = self.ker_mat(inputs, t_data)? * alpha;
             Ok(mean + post_mean)
         } else {
             Err(Error::new(ErrorKind::UntrainedModel, "The model has not been trained."))
@@ -161,10 +161,10 @@ impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Vector<f64>> for GaussianProc
 
         let ker_mat = self.ker_mat(inputs, inputs).unwrap();
 
-        let train_mat = try!((ker_mat + noise_mat).cholesky().map_err(|_| {
+        let train_mat = (ker_mat + noise_mat).cholesky().map_err(|_| {
             Error::new(ErrorKind::InvalidState,
                        "Could not compute Cholesky decomposition.")
-        }));
+        })?;
 
         let x = train_mat.solve_l_triangular(targets - self.mean.func(inputs.clone())).unwrap();
         let alpha = train_mat.transpose().solve_u_triangular(x).unwrap();
@@ -191,9 +191,9 @@ impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
                                                                           &self.train_data) {
             let mean = self.mean.func(inputs.clone());
 
-            let post_mean = mean + try!(self.ker_mat(inputs, t_data)) * alpha;
+            let post_mean = mean + self.ker_mat(inputs, t_data)? * alpha;
 
-            let test_mat = try!(self.ker_mat(inputs, t_data));
+            let test_mat = self.ker_mat(inputs, t_data)?;
             let mut var_data = Vec::with_capacity(inputs.rows() * inputs.cols());
             for row in test_mat.row_iter() {
                 let test_point = Vector::new(row.raw_slice());
@@ -202,7 +202,7 @@ impl<T: Kernel, U: MeanFunc> GaussianProcess<T, U> {
 
             let v_mat = Matrix::new(test_mat.rows(), test_mat.cols(), var_data);
 
-            let post_var = try!(self.ker_mat(inputs, inputs)) - &v_mat * v_mat.transpose();
+            let post_var = self.ker_mat(inputs, inputs)? - &v_mat * v_mat.transpose();
 
             Ok((post_mean, post_var))
         } else {
