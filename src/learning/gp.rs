@@ -27,11 +27,10 @@
 //! a future release.
 
 use learning::toolkit::kernel::{Kernel, SquaredExp};
-use linalg::{Matrix, BaseMatrix};
+use linalg::{Matrix, BaseMatrix, Decomposition, Cholesky};
 use linalg::Vector;
 use learning::{LearningResult, SupModel};
 use learning::error::{Error, ErrorKind};
-
 
 /// Trait for GP mean functions.
 pub trait MeanFunc {
@@ -161,10 +160,10 @@ impl<T: Kernel, U: MeanFunc> SupModel<Matrix<f64>, Vector<f64>> for GaussianProc
 
         let ker_mat = self.ker_mat(inputs, inputs).unwrap();
 
-        let train_mat = (ker_mat + noise_mat).cholesky().map_err(|_| {
+        let train_mat = Cholesky::decompose(ker_mat + noise_mat).map_err(|_| {
             Error::new(ErrorKind::InvalidState,
                        "Could not compute Cholesky decomposition.")
-        })?;
+        })?.unpack();
 
         let x = train_mat.solve_l_triangular(targets - self.mean.func(inputs.clone())).unwrap();
         let alpha = train_mat.transpose().solve_u_triangular(x).unwrap();
