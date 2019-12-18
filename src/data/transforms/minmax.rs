@@ -109,7 +109,7 @@ impl<T: Float> TransformFitter<Matrix<T>, MinMaxScaler<T>> for MinMaxFitter<T> {
         // We'll scale each feature by a * x + b.
         // Where scales holds `a` per column and consts
         // holds `b`.
-        let scales = try!(input_min_max.iter()
+        let scales = input_min_max.iter()
             .map(|&(x, y)| {
                 let s = (self.scaled_max - self.scaled_min) / (y - x);
                 if s.is_finite() {
@@ -119,7 +119,7 @@ impl<T: Float> TransformFitter<Matrix<T>, MinMaxScaler<T>> for MinMaxFitter<T> {
                                    "Constant feature columns not supported."))
                 }
             })
-            .collect::<Result<Vec<_>, _>>());
+            .collect::<Result<Vec<_>, _>>()?;
 
         let consts = input_min_max.iter()
             .zip(scales.iter())

@@ -112,7 +112,7 @@ impl<S: KNearestSearch> SupModel<Matrix<f64>, Vector<usize>> for KNNClassifier<S
 
                 let mut results: Vec<usize> = Vec::with_capacity(inputs.rows());
                 for row in inputs.row_iter() {
-                    let (idx, _) = try!(self.searcher.search(row.raw_slice(), self.k));
+                    let (idx, _) = self.searcher.search(row.raw_slice(), self.k)?;
                     let res = target.select(&idx);
                     let (uniques, counts) = freq(res.data());
                     let (id, _) = counts.argmax();
