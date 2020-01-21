@@ -122,6 +122,7 @@ pub mod linalg {
     pub use rulinalg::matrix::{Axes, Matrix, MatrixSlice, MatrixSliceMut, BaseMatrix, BaseMatrixMut};
     pub use rulinalg::vector::Vector;
     pub use rulinalg::norm;
+    pub use rulinalg::matrix::decomposition::*;
 }
 
 /// Module for data handling

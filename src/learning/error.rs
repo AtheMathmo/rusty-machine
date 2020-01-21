@@ -12,7 +12,7 @@ use rulinalg;
 #[derive(Debug)]
 pub struct Error {
     kind: ErrorKind,
-    error: Box<error::Error + Send + Sync>,
+    error: Box<dyn error::Error + Send + Sync>,
 }
 
 /// Types of errors produced in the learning module.
@@ -36,7 +36,7 @@ pub enum ErrorKind {
 impl Error {
     /// Construct a new `Error` of a particular `ErrorKind`.
     pub fn new<E>(kind: ErrorKind, error: E) -> Error
-        where E: Into<Box<error::Error + Send + Sync>>
+        where E: Into<Box<dyn error::Error + Send + Sync>>
     {
         Error {
             kind: kind,

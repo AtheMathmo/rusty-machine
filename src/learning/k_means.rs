@@ -90,12 +90,12 @@ impl<InitAlg: Initializer> UnSupModel<Matrix<f64>, Vector<usize>> for KMeansClas
 
     /// Train the classifier using input data.
     fn train(&mut self, inputs: &Matrix<f64>) -> LearningResult<()> {
-        try!(self.init_centroids(inputs));
+        self.init_centroids(inputs)?;
         let mut cost = 0.0;
         let eps = 1e-14;
 
         for _i in 0..self.iters {
-            let (idx, distances) = try!(self.get_closest_centroids(inputs));
+            let (idx, distances) = self.get_closest_centroids(inputs)?;
             self.update_centroids(inputs, idx);
 
             let cost_i = distances.sum();
@@ -191,7 +191,7 @@ impl<InitAlg: Initializer> KMeansClassifier<InitAlg> {
                                    self.k,
                                    inputs.rows())))
         } else {
-            let centroids = try!(self.init_algorithm.init_centroids(self.k, inputs));
+            let centroids = self.init_algorithm.init_centroids(self.k, inputs)?;
 
             if centroids.rows() != self.k {
                 Err(Error::new(ErrorKind::InvalidState,
