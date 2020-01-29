@@ -200,6 +200,7 @@ pub mod learning {
 
         pub mod grad_desc;
         pub mod fmincg;
+        pub mod adam;
     }
 
     /// Module for learning tools.
