@@ -59,7 +59,7 @@ impl Default for Adam {
             beta1: 0.09,
             beta2: 0.999,
             epsilon: 1e-8,
-            iters: 100
+            iters: 50
         }
     }
 }
@@ -108,20 +108,21 @@ impl<M> OptimAlgorithm<M> for Adam
                 let grad_squared = grad.clone().apply(&|x| x * x);
 
                 //Moving averages of the gradients
-                m = &m * self.beta1 + grad * (1.0 - self.beta1);
+                m = m * self.beta1 + grad * (1.0 - self.beta1);
 
                 // Moving averages of the squared gradients
-                v = &v * self.beta1 + grad_squared * (1.0 - self.beta1);
+                v = v * self.beta2 + grad_squared * (1.0 - self.beta2);
 
                 // Bias-corrected estimates
-                // In the paper these are &m_hat and v_hat
-                m = &m / (1.0 - (self.beta1.powf(t)));
-                v = &v / (1.0 - (self.beta2.powf(t)));
+                let mut m_hat = &m / (1.0 - (self.beta1.powf(t)));
+                let mut v_hat = &v / (1.0 - (self.beta2.powf(t)));
 
-                let v_hat_sqrt = v.clone().apply(&|x| x.sqrt());
+                utils::in_place_vec_bin_op(m_hat.mut_data(), v_hat.data(), |x, &y| {
+                    *x = (*x / &y.sqrt() - self.epsilon) * self.alpha;
+                });
 
                 // update params
-                params = &params - ((&m * self.alpha).elediv(&(v_hat_sqrt + self.epsilon)));
+                params = &params - &m_hat;
 
                 loss_vector.push(cost);
             }
