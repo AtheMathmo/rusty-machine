@@ -1,7 +1,6 @@
 //! Adam Optimizer
 //! 
 //! Implementation of the ADAM optimization algorithm.
-//! 
 use learning::optim::{Optimizable, OptimAlgorithm};
 use linalg::Vector;
 use linalg::{Matrix, BaseMatrix};
@@ -51,7 +50,7 @@ impl Adam {
 /// - beta2 = 0.999 (dw^2)
 /// - epsilon = 1e-8
 /// - iters = 50
-/// source: https://arxiv.org/pdf/1412.6980.pdf
+/// Source: https://arxiv.org/pdf/1412.6980.pdf
 impl Default for Adam {
     fn default() -> Adam {
         Adam {
@@ -78,17 +77,16 @@ impl<M> OptimAlgorithm<M> for Adam
         // Set up the indices for permutation
         let mut permutation = (0..inputs.rows()).collect::<Vec<_>>();
 
-        // moment vectors & timestep
+        // Moment vectors & timestep
         let mut t: f64 = 0.0;
         let mut m = Vector::zeros(start.len());
         let mut v = Vector::zeros(start.len());
 
-
+        // Vector for tracking loss
         let mut loss_vector: Vec<f64> = vec![];
 
         for l in 0..self.iters {
-            // The cost at the end of each pass
-
+            // Printing running average loss
             if l % EVAL_STEP == 0 && l > 0 {
                 let average_loss: f64 = loss_vector.iter().sum::<f64>() / loss_vector.len() as f64;
                 println!("Running average loss iter {:#?}: {:#?}", l, average_loss);
@@ -115,15 +113,17 @@ impl<M> OptimAlgorithm<M> for Adam
 
                 // Bias-corrected estimates
                 let mut m_hat = &m / (1.0 - (self.beta1.powf(t)));
-                let mut v_hat = &v / (1.0 - (self.beta2.powf(t)));
+                let v_hat = &v / (1.0 - (self.beta2.powf(t)));
 
+                // Final math step and applying the learning rate
                 utils::in_place_vec_bin_op(m_hat.mut_data(), v_hat.data(), |x, &y| {
                     *x = (*x / &y.sqrt() - self.epsilon) * self.alpha;
                 });
 
-                // update params
+                // Update params
                 params = &params - &m_hat;
 
+                // Update loss vector
                 loss_vector.push(cost);
             }
         }
