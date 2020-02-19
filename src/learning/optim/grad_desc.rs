@@ -107,6 +107,8 @@ pub struct StochasticGD {
     mu: f64,
     /// The number of passes through the data.
     iters: usize,
+    /// Use Nesterove momentum or not
+    nesterove_momentum: bool,
 }
 
 /// The default Stochastic GD algorithm.
@@ -116,12 +118,14 @@ pub struct StochasticGD {
 /// - alpha = 0.1
 /// - mu = 0.1
 /// - iters = 20
+/// - nestorove = false
 impl Default for StochasticGD {
     fn default() -> StochasticGD {
         StochasticGD {
             alpha: 0.1,
             mu: 0.1,
             iters: 20,
+            nesterove_momentum: false,
         }
     }
 }
@@ -131,8 +135,6 @@ impl StochasticGD {
     ///
     /// Requires the learning rate, momentum rate and iteration count
     /// to be specified.
-    /// 
-    /// With Nesterov momentum by default.
     ///
     /// # Examples
     ///
@@ -149,7 +151,22 @@ impl StochasticGD {
             alpha: alpha,
             mu: mu,
             iters: iters,
+            nesterove_momentum: false,
         }
+    }
+
+    /// Enable Nesterove momentum for stochastic gradient descent algorithm.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rusty_machine::learning::optim::grad_desc::StochasticGD;
+    ///
+    /// let sgd = StochasticGD::new(0.1, 0.3, 5).with_nesterove_momentum();
+    /// ```
+    pub fn with_nesterove_momentum(mut self) -> StochasticGD {
+        self.nesterove_momentum = true;
+        self
     }
 }
 
@@ -184,13 +201,21 @@ impl<M> OptimAlgorithm<M> for StochasticGD
                                                           &inputs.select_rows(&[*i]),
                                                           &targets.select_rows(&[*i]));
 
-                // Backup previous velocity
-                let prev_w = delta_w.clone();
-                // Compute the difference in gradient using Nesterov momentum
-                delta_w = Vector::new(vec_data) * self.mu + &delta_w * self.alpha;
-                // Update the parameters
-                optimizing_val = &optimizing_val -
-                    (&prev_w * (-self.alpha) + &delta_w * (1. + self.alpha));
+                if self.nesterove_momentum {
+                    // Backup previous velocity
+                    let prev_w = delta_w.clone();
+                    // Compute the difference in gradient using Nesterov momentum
+                    delta_w = Vector::new(vec_data) * self.mu + &delta_w * self.alpha;
+                    // Update the parameters
+                    optimizing_val = &optimizing_val -
+                        (&prev_w * (-self.alpha) + &delta_w * (1. + self.alpha));
+                } else {
+                    // Compute the difference in gradient using momentum
+                    delta_w = Vector::new(vec_data) * self.mu + &delta_w * self.alpha;
+                    // Update the parameters
+                    optimizing_val = &optimizing_val - &delta_w * self.mu;
+                }
+
                 // Set the end cost (this is only used after the last iteration)
                 end_cost += cost;
             }

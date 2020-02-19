@@ -58,7 +58,22 @@ fn convex_gd_training() {
 fn convex_stochastic_gd_training() {
     let x_sq = XSqModel { c: 20f64 };
 
-    let gd = StochasticGD::new(0.9f64, 0.1f64, 100);
+    let gd = StochasticGD::new(0.5f64, 1f64, 100);
+    let test_data = vec![100f64];
+    let params = gd.optimize(&x_sq,
+                              &test_data[..],
+                              &Matrix::zeros(100, 1),
+                              &Matrix::zeros(100, 1));
+
+    assert!(params[0] - 20f64 < 1e-10);
+    assert!(x_sq.compute_grad(&params, &Matrix::zeros(1, 1), &Matrix::zeros(1, 1)).0 < 1e-10);
+}
+
+#[test]
+fn convex_stochastic_gd_nesterove_momentum_training() {
+    let x_sq = XSqModel { c: 20f64 };
+
+    let gd = StochasticGD::new(0.9f64, 0.1f64, 100).with_nesterove_momentum();
     let test_data = vec![100f64];
     let params = gd.optimize(&x_sq,
                               &test_data[..],
