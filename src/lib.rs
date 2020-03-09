@@ -111,6 +111,7 @@
 extern crate rulinalg;
 extern crate num as libnum;
 extern crate rand;
+extern crate rand_distr;
 
 pub mod prelude;
 

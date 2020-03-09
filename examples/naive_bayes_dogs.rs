@@ -1,9 +1,9 @@
 extern crate rusty_machine;
 extern crate rand;
+extern crate rand_distr;
 
-use rand::Rand;
-use rand::distributions::Sample;
-use rand::distributions::normal::Normal;
+use rand::SeedableRng;
+use rand_distr::{Distribution, Normal};
 use rusty_machine::learning::naive_bayes::{self, NaiveBayes};
 use rusty_machine::linalg::{Matrix, BaseMatrix};
 use rusty_machine::learning::SupModel;
@@ -23,18 +23,18 @@ struct Dog {
     speed: f64,
 }
 
-impl Rand for Dog {
+impl Dog {
     /// Generate a random dog.
-    fn rand<R: rand::Rng>(rng: &mut R) -> Self {
+    fn gen_rand<R: rand::Rng>(rng: &mut R) -> Self {
         // Friendliness, furriness, and speed are normally distributed and
         // (given color:) independent.
-        let mut red_dog_friendliness = Normal::new(0., 1.);
-        let mut red_dog_furriness = Normal::new(0., 1.);
-        let mut red_dog_speed = Normal::new(0., 1.);
+        let mut red_dog_friendliness = Normal::new(0., 1.).unwrap();
+        let mut red_dog_furriness = Normal::new(0., 1.).unwrap();
+        let mut red_dog_speed = Normal::new(0., 1.).unwrap();
 
-        let mut white_dog_friendliness = Normal::new(1., 1.);
-        let mut white_dog_furriness = Normal::new(1., 1.);
-        let mut white_dog_speed = Normal::new(-1., 1.);
+        let mut white_dog_friendliness = Normal::new(1., 1.).unwrap();
+        let mut white_dog_furriness = Normal::new(1., 1.).unwrap();
+        let mut white_dog_speed = Normal::new(-1., 1.).unwrap();
 
         // Flip a coin to decide whether to generate a red or white dog.
         let coin: f64 = rng.gen();
@@ -64,19 +64,18 @@ impl Rand for Dog {
 
 fn generate_dog_data(training_set_size: u32, test_set_size: u32)
     -> (Matrix<f64>, Matrix<f64>, Matrix<f64>, Vec<Dog>) {
-    let mut randomness = rand::StdRng::new()
-        .expect("we should be able to get an RNG");
+    let mut randomness = rand::rngs::StdRng::seed_from_u64(0);
     let rng = &mut randomness;
 
     // We'll train the model on these dogs
     let training_dogs = (0..training_set_size)
-        .map(|_| { Dog::rand(rng) })
+        .map(|_| { Dog::gen_rand(rng) })
         .collect::<Vec<_>>();
 
     // ... and then use the model to make predictions about these dogs' color
     // given only their trait measurements.
     let test_dogs = (0..test_set_size)
-        .map(|_| { Dog::rand(rng) })
+        .map(|_| { Dog::gen_rand(rng) })
         .collect::<Vec<_>>();
 
     // The model's `.train` method will take two matrices, each with a row for
@@ -138,11 +137,11 @@ fn main() {
     for (dog, prediction) in test_dogs.iter().zip(predictions.row_iter()).take(unprinted_total) {
         evaluate_prediction(&mut hits, dog, prediction.raw_slice());
     }
-    
+
     if unprinted_total > 0 {
         println!("...");
     }
-    
+
     for (dog, prediction) in test_dogs.iter().zip(predictions.row_iter()).skip(unprinted_total) {
         let (actual_color, accurate) = evaluate_prediction(&mut hits, dog, prediction.raw_slice());
         println!("Predicted: {:?}; Actual: {:?}; Accurate? {:?}",

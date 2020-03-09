@@ -4,10 +4,9 @@
 //! found in the rand crate. This is provided through
 //! traits added within the containing stats module.
 
-use stats::dist::Distribution;
+use stats::dist::Distribution as StatDistribution;
 use rand::Rng;
-use rand::distributions::{Sample, IndependentSample};
-use rand::distributions::exponential::Exp1;
+use rand_distr::{Distribution, Exp1};
 
 /// An Exponential random variable.
 #[derive(Debug, Clone, Copy)]
@@ -39,7 +38,7 @@ impl Exponential {
     }
 }
 
-impl Distribution<f64> for Exponential {
+impl StatDistribution<f64> for Exponential {
     /// The pdf of the exponential distribution.
     ///
     /// # Examples
@@ -102,15 +101,9 @@ impl Distribution<f64> for Exponential {
     }
 }
 
-impl Sample<f64> for Exponential {
-    fn sample<R: Rng>(&mut self, rng: &mut R) -> f64 {
-        self.ind_sample(rng)
-    }
-}
-
-impl IndependentSample<f64> for Exponential {
-    fn ind_sample<R: Rng>(&self, rng: &mut R) -> f64 {
-        let Exp1(n) = rng.gen::<Exp1>();
+impl Distribution<f64> for Exponential {
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> f64 {
+        let n: f64 = rng.sample(Exp1);
         n / self.lambda
     }
 }
