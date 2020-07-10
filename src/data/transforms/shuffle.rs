@@ -27,7 +27,8 @@ use learning::LearningResult;
 use linalg::{Matrix, BaseMatrix, BaseMatrixMut};
 use super::Transformer;
 
-use rand::{Rng, thread_rng, ThreadRng};
+// use rand::{Rng, thread_rng, ThreadRng};
+use rand::prelude::*;
 
 /// The `Shuffler`
 ///
