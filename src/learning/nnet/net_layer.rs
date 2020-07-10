@@ -7,8 +7,7 @@ use learning::error::{Error, ErrorKind};
 use learning::toolkit::activ_fn::ActivationFunc;
 
 use rand::thread_rng;
-use rand::distributions::Sample;
-use rand::distributions::normal::Normal;
+use rand::distributions::{Normal, Distribution};
 
 use std::fmt::Debug;
 
